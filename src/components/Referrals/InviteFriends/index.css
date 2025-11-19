@@ -1,0 +1,63 @@
+#invite-friends {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+
+    p {
+        padding: 10px;
+        font-size: 13px;
+        font-weight: 500;
+        color: rgb(228 197 153);
+        text-align: center;
+        width: 300px;
+    }
+
+    input {
+        width: 240px;
+        border-radius: 4px;
+        padding: 4px;
+        font-size: 12px;
+        margin: 4px 0;
+    }
+
+    .actions {
+        display: flex;
+        margin: 6px 0;
+
+        .button {
+            color: var(--color-primary);
+            font-size: 12px;
+            font-weight: 500;
+            padding: 4px 4px;
+            cursor: pointer;
+            flex: auto;
+            height: 100%;
+            align-items: center;
+            display: flex;
+            justify-content: center;
+           /* background: linear-gradient(180deg, rgba(34, 49, 58, 1), rgba(16, 14, 21, 1));*/
+            border-radius: 8px;
+            margin: 4px;
+            border: 2px solid var(--color-primary);
+            flex-direction: row;
+
+            > * {
+                margin: 0 2px;
+            }
+
+            > .icon {
+                height: 14px;
+                width: 14px;
+            }
+
+        }
+        .share {
+            fill: #c3c3c3;
+        }
+        .copy {
+            fill: #4782b2;
+        }
+    }
+}

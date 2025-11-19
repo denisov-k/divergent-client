@@ -1,0 +1,10 @@
+.notification {
+    position: absolute;
+    top: 16px;
+    padding: 6px;
+    background-color: #535353;
+    border-radius: 6px;
+    border: 1px var(--color-primary) solid;
+    color: #e1e1e1;
+    font-size: 13px;
+}

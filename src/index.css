@@ -1,0 +1,101 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --color-danger: rgb(255, 58, 80);
+  --color-purple: rgb(154, 62, 224);
+  --color-text: rgb(209, 209, 212);
+  --color-disabled: rgb(110, 111, 115);
+  --color-border: rgba(209, 209, 212, 0.15);
+  --color-background: rgb(24, 26, 30);
+  --color-overlay: rgba(59, 146, 187, 0.5);
+  --color-overlay-strong: rgba(59, 146, 187, 0.75);
+  --color-primary: rgb(59, 146, 187);
+
+  height: 100%;
+  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+
+  color: var(--color-text);
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+a {
+  font-weight: 500;
+  color: var(--color-overlay-strong);
+  text-decoration: inherit;
+}
+a:hover {
+  color: var(--color-primary);
+}
+
+* {
+  touch-action: pan-y pan-x;
+}
+
+body {
+  margin: 0;
+  display: flex;
+  justify-content: center;
+  min-width: 320px;
+  height: 100%;
+  background: #1d1d1d;
+}
+
+input {
+  color: black;
+  font-weight: 500;
+}
+
+h1 {
+  font-size: 3.2em;
+  line-height: 1.1;
+}
+
+button:focus,
+button:focus-visible {
+  outline: 4px auto -webkit-focus-ring-color;
+}
+
+@font-face {
+  font-family: 'Montserrat';
+  src: url('@/assets/fonts/Montserrat-VariableFont_wght.ttf');
+}
+
+#root {
+  max-width: 450px;
+  width: 100vw;
+  height: 100%;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  justify-content: space-between;
+  font-size: 14px;
+  font-family: Montserrat, serif;
+  background: var(--color-background);
+}
+
+.text-gradient-dark {
+  background: linear-gradient(180deg, #22313A, #100E15);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.button-golden {
+  @apply bg-golden-gradient rounded-[6px] text-sm font-medium flex-1 px-4 py-2;
+}
+
+@layer base {
+  input[type="number"]::-webkit-inner-spin-button,
+  input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+}

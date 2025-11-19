@@ -1,0 +1,7 @@
+#promo-view {
+    padding: 0 4px;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    margin: 0 4px;
+}

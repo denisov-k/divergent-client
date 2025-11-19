@@ -1,0 +1,8 @@
+.radio-button {
+    position: relative;
+    margin: 0 20px;
+    width: 40px;
+    background: #707070;
+    border-radius: 10px;
+    cursor: pointer;
+}

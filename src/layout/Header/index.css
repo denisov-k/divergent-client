@@ -1,0 +1,49 @@
+#header {
+    display: flex;
+	position: relative;
+    flex-direction: column;
+    width: 100%;
+    justify-content: space-around;
+    padding: 5px;
+	min-height: 20px;
+    /*margin: 5px 0;*/
+	
+	&.collapsed .header-inner {
+		display: none;
+	}
+	
+	.header-inner {
+		display: flex;
+		flex-direction: column;
+	}
+	
+	.toggle {
+		display: flex;
+		width: 30px;
+		height: 14px;
+		margin: auto;
+		cursor: pointer;
+		position: absolute;
+		left: 50%;
+		right: 50%;
+		top: 3px;
+		transform: translate(-50%, 0);
+
+		display: none;
+		
+		div {
+			width: 100%;
+			height: 100%;
+		}
+		
+		svg {
+			width: 100%;
+			height: 100%;
+			fill: #564e44;
+			transform: rotate(180deg);
+		}
+	}
+	&.collapsed svg {
+		transform: rotate(0deg);
+	}
+}

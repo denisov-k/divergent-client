@@ -1,0 +1,32 @@
+.items {
+    display: flex;
+    width: 100%;
+    flex-direction: column;
+
+    .grid {
+        display: flex;
+        width: 100%;
+        flex-flow: wrap;
+        margin: 2px 0;
+
+        .cell {
+            flex: 1 1 25%;
+            aspect-ratio: 1;
+            padding: 0 4px;
+            background: #00000061;
+            border-radius: 8px;
+            margin: 2px;
+        }
+    }
+
+    .navigator {
+        display: flex;
+        justify-content: center;
+        padding: 10px;
+
+        .button {
+            width: 26px;
+            fill: #16141a;
+        }
+    }
+}

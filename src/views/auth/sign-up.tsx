@@ -1,0 +1,159 @@
+import { useState } from 'react'
+import { useNavigate, useSearchParams } from 'react-router-dom'
+
+import { useAuth } from '@/hooks/use-auth'
+
+import { z, ZodError } from 'zod'
+import './index.css';
+import {ReactSVG} from "react-svg";
+
+import LogoIcon from '@/assets/images/logo-icon.svg';
+import Logo from '@/assets/images/logo.svg';
+
+const signUpSchema = z.object({
+  email: z.string().email('Invalid email address'),
+  password: z
+    .string()
+    .min(8, 'Password must be at least 8 characters')
+    .regex(/[A-Z]/, 'Password must contain at least one uppercase letter')
+    .regex(/[a-z]/, 'Password must contain at least one lowercase letter')
+    .regex(/[0-9]/, 'Password must contain at least one number'),
+  name: z.string().optional()
+})
+
+
+export default function SignUp() {
+  const [formData, setFormData] = useState({
+    email: '',
+    password: '',
+    name: ''
+  })
+  const [errors, setErrors] = useState<{
+    email?: string;
+    password?: string;
+    name?: string;
+    submit?: string;
+  }>({})
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [searchParams] = useSearchParams();
+  const navigate = useNavigate()
+  const { signUp } = useAuth()
+
+  const handleSubmit = async (data: typeof formData) => {
+    try {
+      setIsSubmitting(true)
+      setErrors({})
+      
+      // Validate the form data
+      const validatedData = signUpSchema.parse(data);
+
+      const referrerId = searchParams.get('referrerId') as string;
+      const referrerLinkId = searchParams.get('referrerLinkId') as string;
+
+      console.log(referrerLinkId);
+
+      // Attempt sign up
+      await signUp(validatedData.email, validatedData.password, validatedData.name, referrerId, referrerLinkId)
+      navigate('/')
+    } catch (error) {
+      if (error instanceof ZodError) {
+        const formattedErrors: Record<string, string> = {}
+        error.errors.forEach((err) => {
+          if (err.path) {
+            formattedErrors[err.path[0]] = err.message
+          }
+        })
+        setErrors(formattedErrors)
+      } else {
+        setErrors({ submit: 'Failed to create account. Please try again.' })
+      }
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target
+    setFormData(prev => ({ ...prev, [name]: value }))
+    // Clear error when user starts typing
+    if (errors[name as keyof typeof errors]) {
+      setErrors(prev => ({ ...prev, [name]: undefined }))
+    }
+  }
+
+  return (
+    <div id="sign-in">
+      <div className="logo">
+        <ReactSVG src={Logo} className="title"></ReactSVG>
+        <ReactSVG src={LogoIcon}></ReactSVG>
+      </div>
+      <form onSubmit={(e) => {
+        e.preventDefault()
+        handleSubmit(formData)
+      }}>
+        <span>Registration</span>
+        <div>
+          <input
+            id="email"
+            name="email"
+            type="email"
+            value={formData.email}
+            onChange={handleChange}
+            required
+            placeholder="Enter your email"
+            className={errors.email ? 'border-red-500' : ''}
+          />
+          {errors.email && (
+            <p className="text-sm text-red-500">{errors.email}</p>
+          )}
+        </div>
+        <div>
+          <input
+            id="password"
+            name="password"
+            type="password"
+            value={formData.password}
+            onChange={handleChange}
+            required
+            placeholder="Create a password"
+            className={errors.password ? 'border-red-500' : ''}
+          />
+          {errors.password && (
+            <p className="text-sm text-red-500">{errors.password}</p>
+          )}
+        </div>
+        <div>
+          <input
+            id="name"
+            name="name"
+            type="text"
+            value={formData.name}
+            onChange={handleChange}
+            placeholder="Enter your name"
+            className={errors.name ? 'border-red-500' : ''}
+          />
+          {errors.name && (
+            <p className="text-sm text-red-500">{errors.name}</p>
+          )}
+        </div>
+        {errors.submit && (
+          <p className="text-sm text-red-500 text-center">{errors.submit}</p>
+        )}
+        <button
+          type="submit"
+          disabled={isSubmitting}
+        >
+          {isSubmitting ? 'Creating...' : 'Create'}
+        </button>
+        <div className="form-footer">
+          <a
+            href="/signin"
+            className="link"
+          >
+            Login
+          </a>
+        </div>
+      </form>
+    </div>
+  )
+}

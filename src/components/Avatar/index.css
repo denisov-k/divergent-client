@@ -1,0 +1,28 @@
+#avatar {
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    margin: 8px 4px;
+    font-weight: 500;
+
+    > div {
+        display: flex;
+        align-items: center;
+
+        .avatar {
+            width: 40px;
+            height: 40px;
+            border: 2px solid var(--color-primary);
+            border-radius: 20px;
+            overflow: hidden;
+        }
+        .name {
+            font-size: 13px;
+            padding: 0 10px;
+            font-weight: 500;
+        }
+        .balance {
+            font-size: 13px;
+        }
+    }
+}

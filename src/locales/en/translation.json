@@ -1,0 +1,92 @@
+{
+  "navigation": {
+    "goals": "Goals",
+    "frens": "Frens",
+    "rewards": "Rewards",
+    "progress": "Progress"
+  },
+  "profile": {
+    "id": "ID:",
+    "language": "Language:",
+    "role": "Role:",
+    "sign_out": "Sign out"
+  },
+  "tasks": {
+    "complete": "Complete",
+    "start": "Start"
+  },
+  "wallet": {
+    "deposit": {
+      "deposit": "Deposit",
+      "connect_wallet": "Connect wallet"
+    },
+    "withdraw": {
+      "withdraw": "Withdraw"
+    },
+    "transfer": {
+      "transfer": "Transfer"
+    },
+    "history": {
+      "date": "Date",
+      "amount": "Amount",
+      "reason": "Reason",
+      "status": "Status"
+    },
+    "navigation": {
+      "deposit": "Deposit",
+      "withdraw": "Withdraw",
+      "transfer": "Transfer",
+      "history": "History",
+      "items": "Items"
+    }
+  },
+  "frens": {
+    "navigation": {
+      "invite_friends": "Invite friends",
+      "progress": "Progress"
+    },
+    "invite_friends": {
+      "share": "Share",
+      "copy": "Copy",
+      "copied": "Copied",
+      "description": "Invite friends and earn 10% of their wins. Simply send the invitation link to someone who hasn't played in our room yet"
+    },
+    "invite_players": {
+      "description": "Invite players and earn percentage of their wins. Simply send the invitation link to someone who hasn't played in our room yet"
+    },
+    "invite_agents": {
+      "description": "Invite agents and earn part of their commission"
+    },
+    "create_link": {
+      "create": "Create link",
+      "onetime": "Onetime",
+      "reusable": "Reusable",
+      "rakeback": "Percentage of winnings",
+      "rakeback_limit": "Max. percentage of winnings",
+      "commission": "Percentage of commission",
+      "commission_limit": "Max. percentage of commission"
+    },
+    "rewards": {
+      "collect": "Collect",
+      "date": "Updated:",
+      "last_collect": "Last collection:",
+      "total": "Total reward:",
+      "id": "ID",
+      "name": "Name",
+      "earnings": "Earnings",
+      "empty": "No referrals"
+    },
+    "links": {
+      "empty": "No links",
+      "id": "ID",
+      "rakeback": "Rakeback",
+      "commission": "Commission",
+      "actions": "Actions",
+      "created_at": "Created at",
+      "reusable": "Reusable"
+    }
+  },
+  "items": {
+    "your_collection": "Your collection"
+  }
+}

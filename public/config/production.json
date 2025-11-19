@@ -1,0 +1,13 @@
+{
+    "api": {
+        "http": {
+            "baseURL": "https://server.divergent.testtty.ru/"
+        },
+        "ton": {
+            "manifestURL": "https://divergent.testtty.ru/tonconnect-manifest.json"
+        },
+        "telegram": {
+            "twaURL": "https://t.me/divergent_app_bot/start"
+        }
+    }
+}

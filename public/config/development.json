@@ -1,0 +1,13 @@
+{
+    "api": {
+        "http": {
+            "baseURL": "http://localhost:3000/"
+        },
+        "ton": {
+            "manifestURL": "https://localhost:8081/tonconnect-manifest.json"
+        },
+        "telegram": {
+            "twaURL": "https://t.me/divergent_app_bot/app"
+        }
+    }
+}

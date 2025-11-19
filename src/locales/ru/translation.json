@@ -1,0 +1,92 @@
+{
+  "navigation": {
+    "goals": "Цели",
+    "frens": "Друзья",
+    "rewards": "Награды",
+    "progress": "Прогресс"
+  },
+  "profile": {
+    "id": "ID:",
+    "language": "Язык:",
+    "role": "Роль:",
+    "sign_out": "Выйти"
+  },
+  "tasks": {
+    "complete": "Награда",
+    "start": "Начать"
+  },
+  "wallet": {
+    "deposit": {
+      "deposit": "Депозит",
+      "connect_wallet": "Подключить кошелёк"
+    },
+    "withdraw": {
+      "withdraw": "Вывести"
+    },
+    "transfer": {
+      "transfer": "Перевести"
+    },
+    "history": {
+      "date": "Дата",
+      "amount": "Кол-во",
+      "reason": "Тип",
+      "status": "Статус"
+    },
+    "navigation": {
+      "deposit": "Депозит",
+      "withdraw": "Вывод",
+      "transfer": "Перевод",
+      "history": "История",
+      "items": "Предметы"
+    }
+  },
+  "frens": {
+    "navigation": {
+      "invite_friends": "Пригласить друзей",
+      "progress": "Прогресс"
+    },
+    "invite_friends": {
+      "share": "Отправить",
+      "copy": "Скопировать",
+      "copied": "Скопировано",
+      "description": "Пригласите друзей и получайте 10% от их выигрышей. Просто отправьте ссылку тем, кто ещё не играл в наших комнатах"
+    },
+    "invite_players": {
+      "description": "Пригласите игроков и получайте проценты от их выигрышей. Просто отправьте ссылку тем, кто ещё не играл в наших комнатах"
+    },
+    "invite_agents": {
+      "description": "Пригласите агентов и получайте часть их комиссии от игроков"
+    },
+    "create_link": {
+      "create": "Создать ссылку",
+      "onetime": "Одноразовая",
+      "reusable": "Многоразовая",
+      "rakeback": "Процент от выигрыша",
+      "rakeback_limit": "Макс. процент от выигрыша",
+      "commission": "Процент комиссии",
+      "commission_limit": "Макс. процент комиссии"
+    },
+    "rewards": {
+      "collect": "Собрать",
+      "date": "Обновлено:",
+      "last_collect": "Последний сбор:",
+      "total": "Общая награда:",
+      "id": "ID",
+      "name": "Имя",
+      "earnings": "Заработано",
+      "empty": "Нет приглашённых"
+    },
+    "links": {
+      "empty": "Нет ссылок",
+      "id": "ID",
+      "rakeback": "Рейкбек",
+      "commission": "Комиссия",
+      "actions": "Действия",
+      "created_at": "Дата создания",
+      "reusable": "Многоразовая"
+    }
+  },
+  "items": {
+    "your_collection": "Ваша коллекция"
+  }
+}
