@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect } from 'react'
-import {User, UserRole} from '@/types'
+import {User} from '@/types'
 import ServiceTransport from '@/services/Transport'
 
 interface AuthContextType {
