@@ -5,13 +5,13 @@
 :root {
   --color-danger: rgb(255, 58, 80);
   --color-purple: rgb(154, 62, 224);
-  --color-text: rgb(209, 209, 212);
+  --color-text: rgb(61 61 61);
   --color-disabled: rgb(110, 111, 115);
   --color-border: rgba(209, 209, 212, 0.15);
-  --color-background: rgb(24, 26, 30);
-  --color-overlay: rgba(59, 146, 187, 0.5);
-  --color-overlay-strong: rgba(59, 146, 187, 0.75);
-  --color-primary: rgb(59, 146, 187);
+  --color-background: rgb(209, 209, 212);
+  --color-overlay: rgba(72, 72, 72, 0.5);
+  --color-overlay-strong: rgba(72, 72, 72, 0.75);
+  --color-primary: rgb(72, 72, 72);
 
   height: 100%;
   font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;

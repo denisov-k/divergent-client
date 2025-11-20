@@ -22,7 +22,7 @@ export default function () {
       </div>
       <div>
         <div className="balance">
-          {user?.balance?.toFixed(2)} <span>$</span>
+          {user?.level} <span>lvl</span>
         </div>
       </div>
     </div>

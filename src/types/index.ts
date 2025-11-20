@@ -7,14 +7,10 @@ export enum UserRole {
 
 export interface User {
   id: number;
+  level: number;
   name: string | null;
   email: string;
   photo_url: string;
   token: string;
-  rakeback: number;
-  agency: number;
-  balance: number;
-  unclaimed_balance: number;
   role: UserRole;
-  wallet: object;
 }
