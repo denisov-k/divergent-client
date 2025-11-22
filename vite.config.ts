@@ -1,7 +1,7 @@
 import path from "path"
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
-import mkcert from '@vitejs/plugin-basic-ssl'
+import basicSsl from '@vitejs/plugin-basic-ssl';
 
 // https://vite.dev/config/
 export default defineConfig({
@@ -9,13 +9,13 @@ export default defineConfig({
     host: true,
     port: 8081,
     strictPort: true,
-    cors: true
+    cors: true,
   },
   preview: {
     port: 8080,
     strictPort: true,
   },
-  plugins: [react(), mkcert()],
+  plugins: [react(), basicSsl()],
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
