@@ -9,11 +9,14 @@ import Footer from '@/layout/Footer';
 import SignInView from '@/views/auth/sign-in'
 import SignUpView from '@/views/auth/sign-up'
 import ResetPasswordView from '@/views/auth/reset'
-import HomeView from '@/views/home/'
+
 import FrensView from '@/views/frens'
-import PromoView from '@/views/promo'
-import ProfileView from '@/views/profile/'
-import RewardsView from '@/views/rewards/'
+import GoalsView from '@/views/goals'
+import SettingsView from '@/views/settings/'
+import RewardsView from '@/views/rewards'
+import RemindersView from '@/views/reminders'
+import ProgressView from '@/views/progress'
+
 import {useEffect} from "react";
 
 function AppRoot() {
@@ -21,7 +24,7 @@ function AppRoot() {
 
   useEffect(() => {
     setInterval(checkAuth, 5000);
-  }, [])
+  }, []);
 
   return (
     <Router>
@@ -30,11 +33,11 @@ function AppRoot() {
         <Route path="/signup" element={<SignUpView />} />
         <Route path="/reset" element={<ResetPasswordView />} />
         <Route
-          path="/"
+          path="/progress"
           element={
             <ProtectedRoute>
               <Layout header={<Header></Header>} footer={<Footer></Footer>}>
-                <HomeView />
+                <ProgressView />
               </Layout>
             </ProtectedRoute>
           }
@@ -50,21 +53,21 @@ function AppRoot() {
           }
         />
         <Route
-          path="/goals"
+          path="/"
           element={
             <ProtectedRoute>
               <Layout header={<Header></Header>} footer={<Footer></Footer>}>
-                <PromoView />
+                <GoalsView />
               </Layout>
             </ProtectedRoute>
           }
         />
         <Route
-          path="/profile"
+          path="/settings"
           element={
             <ProtectedRoute>
               <Layout header={<Header></Header>} footer={<Footer></Footer>}>
-                <ProfileView />
+                <SettingsView />
               </Layout>
             </ProtectedRoute>
           }
@@ -75,6 +78,16 @@ function AppRoot() {
             <ProtectedRoute>
               <Layout header={<Header></Header>} footer={<Footer></Footer>}>
                 <RewardsView />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/reminders"
+          element={
+            <ProtectedRoute>
+              <Layout header={<Header></Header>} footer={<Footer></Footer>}>
+                <RemindersView />
               </Layout>
             </ProtectedRoute>
           }
