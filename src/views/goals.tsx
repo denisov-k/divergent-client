@@ -81,7 +81,7 @@ export default function Goals() {
   };
 
   return (
-    <div className="flex flex-col px-2">
+    <div className="flex flex-col px-2 flex-1">
       <div className="flex items-center justify-between py-2">
         <h2>Мои цели</h2>
 
@@ -110,7 +110,7 @@ export default function Goals() {
           </CardContent>
         </Card>
       ) : (
-        <div className="grid gap-4 md:grid-cols-2 overflow-auto">
+        <div className="grid gap-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 overflow-auto">
           {goals.map((goal) => (
             <GoalCard
               key={goal.id}

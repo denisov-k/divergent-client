@@ -17,7 +17,7 @@ export default function Friends() {
         </Button>
       </div>
 
-      <div className="space-y-3 overflow-auto">
+      <div className="grid gap-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 overflow-auto">
         {friends.map((friend) => (
           <FriendCard key={friend.id} {...friend} />
         ))}

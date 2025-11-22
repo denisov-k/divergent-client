@@ -29,7 +29,7 @@ const Navigation = () => {
 
   return (
     <div className="
-      flex w-full justify-around
+      flex w-full
       h-[45px] text-[8px] font-extrabold uppercase
       text-primary my-2
     ">
@@ -42,13 +42,13 @@ const Navigation = () => {
             onClick={() => onClick(route.path)}
             className={`
               cursor-pointer flex flex-col items-center justify-center 
-              flex-1 mx-1 rounded-lg border-2 
+              flex-1 min-w-0 mx-1 rounded-lg border-2 px-2
               transition
               ${isActive
               ? "bg-primary text-background border-primary"
               : "border-primary text-primary"
             }
-            `}
+          `}
           >
             {route.icon && (
               <ReactSVG
@@ -61,7 +61,7 @@ const Navigation = () => {
               />
             )}
 
-            <span className='text-center'>{route.title}</span>
+            <span className="text-center whitespace-normal break-all">{route.title}</span>
           </div>
         );
       })}

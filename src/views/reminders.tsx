@@ -85,7 +85,7 @@ export default function Reminders() {
           </CardContent>
         </Card>
       ) : (
-        <div className="grid gap-4 md:grid-cols-2 overflow-auto">
+        <div className="grid gap-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4  overflow-auto">
           {reminders.map((reminder) => {
             const { goalTitle, taskTitle } = getReminderDetails(reminder);
             return (

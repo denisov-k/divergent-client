@@ -1,7 +1,7 @@
 {
   "name": "divergent-client",
   "private": true,
-  "version": "0.1.1",
+  "version": "0.1.2",
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
@@ -64,7 +64,6 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.15.0",
-    "@tailwindcss/postcss": "^4.1.17",
     "@types/node": "^22.13.1",
     "@types/react": "^18.3.12",
     "@types/react-dom": "^18.3.1",
