@@ -226,6 +226,7 @@ export function GoalDialog({ open, onOpenChange, onSave, goal, categories, onAdd
             <Input
               id="xpReward"
               type="number"
+              min={0}
               placeholder="1000"
               value={xpReward}
               onChange={(e) => setXpReward(e.target.value)}
@@ -251,6 +252,7 @@ export function GoalDialog({ open, onOpenChange, onSave, goal, categories, onAdd
               />
               <Input
                 type="number"
+                min={0}
                 placeholder="XP"
                 className="w-24"
                 value={newTaskXp}

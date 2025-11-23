@@ -1,25 +1,25 @@
-import {useNavigate, useLocation, To} from "react-router-dom";
-import { ReactSVG } from "react-svg";
+import { useNavigate, useLocation, To } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
-import goalIcon from "@/assets/images/navigation/goal.svg";
-import frensIcon from "@/assets/images/navigation/frens.svg";
-import rewardIcon from "@/assets/images/navigation/reward.svg";
-import progressIcon from "@/assets/images/navigation/progress.svg";
-import reminderIcon from "@/assets/images/navigation/reminder.svg";
+import {
+  Target,
+  Gift,
+  BarChart2,
+  Bell,
+  Users
+} from "lucide-react";
 
 const Navigation = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const location = useLocation();
-  const { pathname } = location;
+  const { pathname } = useLocation();
 
   const routes = [
-    { path: "/", title: t("navigation.goals"), icon: goalIcon, iconClass: "stroke" },
-    { path: "/rewards", title: t("navigation.rewards"), icon: rewardIcon },
-    { path: "/progress", title: t("navigation.progress"), icon: progressIcon },
-    { path: "/reminders", title: t("navigation.reminders"), icon: reminderIcon },
-    { path: "/frens", title: t("navigation.frens"), icon: frensIcon },
+    { path: "/", title: t("navigation.goals"), icon: Target },
+    { path: "/rewards", title: t("navigation.rewards"), icon: Gift },
+    { path: "/progress", title: t("navigation.progress"), icon: BarChart2 },
+    { path: "/reminders", title: t("navigation.reminders"), icon: Bell },
+    { path: "/frens", title: t("navigation.frens"), icon: Users },
   ];
 
   const onClick = (path: To) => {
@@ -28,13 +28,16 @@ const Navigation = () => {
   };
 
   return (
-    <div className="
+    <div
+      className="
       flex w-full
       h-[45px] text-[8px] font-extrabold uppercase
       text-primary my-2
-    ">
-      {routes.map(route => {
+    "
+    >
+      {routes.map((route) => {
         const isActive = pathname === route.path;
+        const Icon = route.icon;
 
         return (
           <div
@@ -44,24 +47,24 @@ const Navigation = () => {
               cursor-pointer flex flex-col items-center justify-center 
               flex-1 min-w-0 mx-1 rounded-lg border-2 px-2
               transition
-              ${isActive
-              ? "bg-primary text-background border-primary"
-              : "border-primary text-primary"
+              ${
+              isActive
+                ? "bg-primary text-background border-primary"
+                : "border-primary text-primary"
             }
-          `}
+            `}
           >
-            {route.icon && (
-              <ReactSVG
-                src={route.icon}
-                className={`
-                  h-[17px] aspect-square flex items-center
-                  ${route.iconClass === "stroke" ? "stroke-current" : "fill-current"}
-                  ${isActive ? "text-background" : "text-primary"}
-                `}
-              />
-            )}
+            <Icon
+              className={`
+                h-[17px] aspect-square
+                ${isActive ? "text-background" : "text-primary"}
+              `}
+              strokeWidth={2.5}
+            />
 
-            <span className="text-center whitespace-normal break-all">{route.title}</span>
+            <span className="text-center whitespace-normal break-all">
+              {route.title}
+            </span>
           </div>
         );
       })}

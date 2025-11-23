@@ -8,6 +8,7 @@ import { toast } from "sonner";
 
 import { useAppStore } from "@/stores/useAppStore";
 import {useState} from "react";
+import {Reminder, ReminderDialog} from "@/components/ReminderDialog.tsx";
 
 export default function Goals() {
   const {
@@ -16,6 +17,8 @@ export default function Goals() {
     updateGoal,
     toggleTask,
     addXp,
+    addReminder,
+    updateReminder
   } = useAppStore();
 
   const [categories, setCategories] = useState<CategoryOption[]>([
@@ -29,6 +32,10 @@ export default function Goals() {
 
   const [goalDialogOpen, setGoalDialogOpen] = useState(false);
   const [editingGoal, setEditingGoal] = useState<Goal | undefined>();
+
+  const [reminderDialogOpen, setReminderDialogOpen] = useState(false);
+  const [editingReminder, setEditingReminder] = useState<Reminder | undefined>(undefined);
+  const [selectedGoalIdForReminder, setSelectedGoalIdForReminder] = useState<string | undefined>(undefined);
 
   // ------------------------------
   // Сохранение цели
@@ -58,6 +65,23 @@ export default function Goals() {
   const handleAddCategory = (category: CategoryOption) => {
     setCategories([...categories, category]);
     toast.success(`Категория "${category.label}" создана`);
+  };
+
+  const handleAddReminderFromGoal = (goalId: string) => {
+    setSelectedGoalIdForReminder(goalId);
+    setEditingReminder(undefined);
+    setReminderDialogOpen(true);
+  };
+
+  const handleSaveReminder = (reminder: Reminder) => {
+    if (editingReminder) {
+      updateReminder(reminder);
+      toast.success("Напоминание обновлено");
+    } else {
+      addReminder(reminder);
+      toast.success("Напоминание создано");
+    }
+    setEditingReminder(undefined);
   };
 
   // ------------------------------
@@ -140,6 +164,7 @@ export default function Goals() {
                 variant="detailed"
                 onEdit={handleEditGoal}
                 onTaskToggle={handleTaskToggle}
+                onAddReminder={handleAddReminderFromGoal}
               />
             </div>
           ))}
@@ -157,6 +182,20 @@ export default function Goals() {
         goal={editingGoal}
         categories={categories}
         onAddCategory={handleAddCategory}
+      />
+      <ReminderDialog
+        open={reminderDialogOpen}
+        onOpenChange={(open) => {
+          setReminderDialogOpen(open);
+          if (!open) {
+            setEditingReminder(undefined);
+            setSelectedGoalIdForReminder(undefined);
+          }
+        }}
+        onSave={handleSaveReminder}
+        reminder={editingReminder}
+        goals={goals}
+        initialGoalId={selectedGoalIdForReminder}
       />
     </div>
   );

@@ -4,7 +4,7 @@ import { CategoryBadge } from "./CategoryBadge";
 import { ProgressRing } from "./ProgressRing";
 import { Badge } from "./ui/badge";
 import { Button } from "./ui/button";
-import { Calendar, Target, Edit, ChevronDown, ChevronUp } from "lucide-react";
+import {Calendar, Target, Edit, ChevronDown, ChevronUp, AlarmClock} from "lucide-react";
 import { TaskItem } from "./TaskItem";
 import { useState } from "react";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "./ui/collapsible";
@@ -31,6 +31,7 @@ interface GoalCardProps {
   variant?: "compact" | "detailed";
   onEdit?: (id: string) => void;
   onTaskToggle?: (goalId: string, taskId: string) => void;
+  onAddReminder?: (id: string) => void;
 }
 
 export function GoalCard({
@@ -45,10 +46,14 @@ export function GoalCard({
   variant = "detailed",
   onEdit,
   onTaskToggle,
+  onAddReminder,
 }: GoalCardProps) {
   const [isOpen, setIsOpen] = useState(false);
-  
+  const [completedOpen, setCompletedOpen] = useState(false);
+
   const completedTasks = tasks.filter(t => t.completed).length;
+  const activeTasks = tasks.filter(t => !t.completed);
+  const completedTasksList = tasks.filter(t => t.completed);
   const totalTasks = tasks.length;
   const progress = totalTasks > 0 ? (completedTasks / totalTasks) * 100 : 0;
 
@@ -114,15 +119,28 @@ export function GoalCard({
           </div>
           <div className="flex items-center gap-2">
             <ProgressRing progress={progress} size={70} strokeWidth={6} />
-            {onEdit && (
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => onEdit(id)}
-              >
-                <Edit className="size-4" />
-              </Button>
-            )}
+            <div className="flex flex-col">
+              {onEdit && (
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => onEdit(id)}
+                >
+                  <Edit className="size-4" />
+                </Button>
+              )}
+              {onAddReminder && (
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => onAddReminder(id)}
+                  className="shrink-0"
+                  title="Создать напоминание"
+                >
+                  <AlarmClock className="size-4" />
+                </Button>
+              )}
+            </div>
           </div>
         </div>
       </CardHeader>
@@ -141,24 +159,53 @@ export function GoalCard({
           <CollapsibleTrigger asChild>
             <Button variant="outline" className="w-full justify-between">
               <span>Задачи цели</span>
-              {isOpen ? (
-                <ChevronUp className="size-4" />
-              ) : (
-                <ChevronDown className="size-4" />
-              )}
+              {isOpen ? <ChevronUp className="size-4" /> : <ChevronDown className="size-4" />}
             </Button>
           </CollapsibleTrigger>
+
           <CollapsibleContent className="space-y-2 mt-3">
-            {tasks.map((task) => (
+
+            {/* ВЛОЖЕННЫЙ COLLAPSIBLE ДЛЯ ВЫПОЛНЕННЫХ ЗАДАЧ */}
+            {completedTasksList.length > 0 && (
+              <Collapsible
+                open={completedOpen}
+                onOpenChange={setCompletedOpen}
+              >
+                <CollapsibleTrigger asChild>
+                  <Button variant="ghost" className="w-full justify-between text-muted-foreground">
+                    <span>Выполненные задачи</span>
+                    {completedOpen ? (
+                      <ChevronUp className="size-4" />
+                    ) : (
+                      <ChevronDown className="size-4" />
+                    )}
+                  </Button>
+                </CollapsibleTrigger>
+
+                <CollapsibleContent className="space-y-2 mt-2">
+                  {completedTasksList.map(task => (
+                    <TaskItem
+                      key={task.id}
+                      {...task}
+                      onToggle={() => onTaskToggle?.(id, task.id)}
+                    />
+                  ))}
+                </CollapsibleContent>
+              </Collapsible>
+            )}
+
+            {/* НЕВЫПОЛНЕННЫЕ ЗАДАЧИ */}
+            {activeTasks.map(task => (
               <TaskItem
                 key={task.id}
                 {...task}
                 onToggle={() => onTaskToggle?.(id, task.id)}
               />
             ))}
+
           </CollapsibleContent>
         </Collapsible>
-        
+
         <div className="flex items-center justify-between pt-2 border-t">
           {dueDate && (
             <div className="flex items-center gap-2 text-muted-foreground">

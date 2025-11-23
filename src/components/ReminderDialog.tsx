@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "./ui/dialog";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
@@ -23,16 +23,35 @@ interface ReminderDialogProps {
   onSave: (reminder: Reminder) => void;
   reminder?: Reminder;
   goals: Goal[];
+  initialGoalId?: string;
 }
 
 const daysOfWeek = ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"];
 
-export function ReminderDialog({ open, onOpenChange, onSave, reminder, goals }: ReminderDialogProps) {
+export function ReminderDialog({ open, onOpenChange, onSave, reminder, goals, initialGoalId }: ReminderDialogProps) {
   const [title, setTitle] = useState(reminder?.title || "");
   const [time, setTime] = useState(reminder?.time || "09:00");
   const [selectedDays, setSelectedDays] = useState<string[]>(reminder?.days || []);
-  const [goalId, setGoalId] = useState(reminder?.goalId || "");
+  const [goalId, setGoalId] = useState(reminder?.goalId || initialGoalId || "");
   const [taskId, setTaskId] = useState(reminder?.taskId || "");
+
+  useEffect(() => {
+    if (open) {
+      if (reminder) {
+        setTitle(reminder.title);
+        setTime(reminder.time);
+        setSelectedDays(reminder.days);
+        setGoalId(reminder.goalId || "");
+        setTaskId(reminder.taskId || "");
+      } else {
+        setTitle("");
+        setTime("09:00");
+        setSelectedDays([]);
+        setGoalId(initialGoalId || "");
+        setTaskId("");
+      }
+    }
+  }, [open, reminder, initialGoalId]);
 
   const selectedGoal = goals.find(g => g.id === goalId);
   const availableTasks = selectedGoal?.tasks || [];
@@ -185,8 +204,8 @@ export function ReminderDialog({ open, onOpenChange, onSave, reminder, goals }: 
           <Button variant="outline" onClick={handleClose}>
             Отмена
           </Button>
-          <Button 
-            onClick={handleSave} 
+          <Button
+            onClick={handleSave}
             disabled={!title || !time || selectedDays.length === 0}
           >
             {reminder ? "Сохранить" : "Создать напоминание"}

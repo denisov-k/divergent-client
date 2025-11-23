@@ -172,3 +172,10 @@
   background-color: var(--background);
   touch-action: none;
 }
+input[type="date"] {
+  position: relative;
+  &::-webkit-calendar-picker-indicator {
+    position: absolute;
+    right: 0.75rem;
+  }
+}
