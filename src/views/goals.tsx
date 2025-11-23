@@ -1,6 +1,6 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { GoalDialog, type Goal } from "@/components/GoalDialog";
+import { GoalDialog, type Goal, type CategoryOption } from "@/components/GoalDialog";
 import { GoalCard } from "@/components/GoalCard";
 
 import { Plus } from "lucide-react";
@@ -17,6 +17,15 @@ export default function Goals() {
     toggleTask,
     addXp,
   } = useAppStore();
+
+  const [categories, setCategories] = useState<CategoryOption[]>([
+    { value: "work", label: "Работа" },
+    { value: "health", label: "Здоровье" },
+    { value: "learning", label: "Обучение" },
+    { value: "fitness", label: "Фитнес" },
+    { value: "creative", label: "Творчество" },
+    { value: "personal", label: "Личное" },
+  ]);
 
   const [goalDialogOpen, setGoalDialogOpen] = useState(false);
   const [editingGoal, setEditingGoal] = useState<Goal | undefined>();
@@ -44,6 +53,11 @@ export default function Goals() {
       setEditingGoal(goal);
       setGoalDialogOpen(true);
     }
+  };
+
+  const handleAddCategory = (category: CategoryOption) => {
+    setCategories([...categories, category]);
+    toast.success(`Категория "${category.label}" создана`);
   };
 
   // ------------------------------
@@ -110,17 +124,27 @@ export default function Goals() {
           </CardContent>
         </Card>
       ) : (
-        <div className="grid gap-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 overflow-auto">
+        <div className="flex flex-wrap gap-2 overflow-auto flex-1">
           {goals.map((goal) => (
-            <GoalCard
+            <div
               key={goal.id}
-              {...goal}
-              variant="detailed"
-              onEdit={handleEditGoal}
-              onTaskToggle={handleTaskToggle}
-            />
+              className="
+                w-full
+                sm:w-[calc(50%-0.25rem)]
+                lg:w-[calc(33.333%-0.4rem)]
+                xl:w-[calc(25%-0.4rem)]
+              "
+            >
+              <GoalCard
+                {...goal}
+                variant="detailed"
+                onEdit={handleEditGoal}
+                onTaskToggle={handleTaskToggle}
+              />
+            </div>
           ))}
         </div>
+
       )}
 
       <GoalDialog
@@ -131,6 +155,8 @@ export default function Goals() {
         }}
         onSave={handleSaveGoal}
         goal={editingGoal}
+        categories={categories}
+        onAddCategory={handleAddCategory}
       />
     </div>
   );

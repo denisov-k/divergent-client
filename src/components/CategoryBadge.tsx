@@ -6,10 +6,11 @@ import {
   Dumbbell, 
   Palette,
   Home,
-  type LucideIcon 
+  Rocket,
+  type LucideIcon
 } from "lucide-react";
 
-type CategoryType = "work" | "health" | "learning" | "fitness" | "creative" | "personal";
+import { type CategoryType } from "@/components/GoalCard.tsx";
 
 interface CategoryBadgeProps {
   category: CategoryType;
@@ -23,10 +24,11 @@ const categoryConfig: Record<CategoryType, { icon: LucideIcon; color: string }> 
   fitness: { icon: Dumbbell, color: "bg-green-500/10 text-green-700 border-green-200" },
   creative: { icon: Palette, color: "bg-pink-500/10 text-pink-700 border-pink-200" },
   personal: { icon: Home, color: "bg-orange-500/10 text-orange-700 border-orange-200" },
+  custom: { icon: Rocket, color: "bg-yellow-500/10 text-yellow-700 border-yellow-200" },
 };
 
 export function CategoryBadge({ category, label }: CategoryBadgeProps) {
-  const config = categoryConfig[category];
+  const config = categoryConfig[category] || categoryConfig['custom'];
   const Icon = config.icon;
 
   return (

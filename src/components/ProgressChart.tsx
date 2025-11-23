@@ -32,25 +32,25 @@ export function ProgressChart({
               <XAxis 
                 dataKey={xAxisKey} 
                 className="text-xs"
-                tick={{ fill: 'hsl(var(--muted-foreground))' }}
+                tick={{ fill: 'var(--muted-foreground)' }}
               />
               <YAxis 
                 className="text-xs"
-                tick={{ fill: 'hsl(var(--muted-foreground))' }}
+                tick={{ fill: 'var(--muted-foreground)' }}
               />
               <Tooltip 
                 contentStyle={{ 
-                  backgroundColor: 'hsl(var(--card))',
-                  border: '1px solid hsl(var(--border))',
+                  backgroundColor: 'var(--card)',
+                  border: '1px solid var(--border)',
                   borderRadius: '6px'
                 }}
               />
               <Line 
                 type="monotone" 
                 dataKey={dataKey} 
-                stroke="hsl(var(--primary))" 
+                stroke="rgb(var(--primary))"
                 strokeWidth={2}
-                dot={{ fill: 'hsl(var(--primary))' }}
+                dot={{ fill: 'rgb(var(--primary))' }}
               />
             </LineChart>
           ) : (
@@ -59,22 +59,22 @@ export function ProgressChart({
               <XAxis 
                 dataKey={xAxisKey} 
                 className="text-xs"
-                tick={{ fill: 'hsl(var(--muted-foreground))' }}
+                tick={{ fill: 'var(--muted-foreground)' }}
               />
               <YAxis 
                 className="text-xs"
-                tick={{ fill: 'hsl(var(--muted-foreground))' }}
+                tick={{ fill: 'var(--muted-foreground)' }}
               />
               <Tooltip 
                 contentStyle={{ 
-                  backgroundColor: 'hsl(var(--card))',
-                  border: '1px solid hsl(var(--border))',
+                  backgroundColor: 'var(--card)',
+                  border: '1px solid var(--border)',
                   borderRadius: '6px'
                 }}
               />
               <Bar 
                 dataKey={dataKey} 
-                fill="hsl(var(--primary))" 
+                fill="rgb(var(--primary))"
                 radius={[4, 4, 0, 0]}
               />
             </BarChart>

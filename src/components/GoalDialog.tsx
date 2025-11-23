@@ -9,7 +9,7 @@ import { TaskItem } from "./TaskItem";
 import { Plus, X } from "lucide-react";
 import { Separator } from "./ui/separator";
 
-type CategoryType = "work" | "health" | "learning" | "fitness" | "creative" | "personal";
+import { type CategoryType } from "@/components/GoalCard.tsx";
 
 export interface Task {
   id: string;
@@ -30,23 +30,21 @@ export interface Goal {
   xpReward?: number;
 }
 
+export interface CategoryOption {
+  value: string;
+  label: string;
+}
+
 interface GoalDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSave: (goal: Goal) => void;
   goal?: Goal;
+  categories: CategoryOption[];
+  onAddCategory: (category: CategoryOption) => void;
 }
 
-const categoryOptions = [
-  { value: "work", label: "Работа" },
-  { value: "health", label: "Здоровье" },
-  { value: "learning", label: "Обучение" },
-  { value: "fitness", label: "Фитнес" },
-  { value: "creative", label: "Творчество" },
-  { value: "personal", label: "Личное" },
-];
-
-export function GoalDialog({ open, onOpenChange, onSave, goal }: GoalDialogProps) {
+export function GoalDialog({ open, onOpenChange, onSave, goal, categories, onAddCategory }: GoalDialogProps) {
   const [title, setTitle] = useState(goal?.title || "");
   const [description, setDescription] = useState(goal?.description || "");
   const [category, setCategory] = useState<CategoryType>(goal?.category || "personal");
@@ -55,6 +53,21 @@ export function GoalDialog({ open, onOpenChange, onSave, goal }: GoalDialogProps
   const [tasks, setTasks] = useState<Task[]>(goal?.tasks || []);
   const [newTaskTitle, setNewTaskTitle] = useState("");
   const [newTaskXp, setNewTaskXp] = useState("");
+
+  const [isCreatingCategory, setIsCreatingCategory] = useState(false);
+  const [newCategoryName, setNewCategoryName] = useState("");
+
+  const handleAddCategory = () => {
+    if (!newCategoryName.trim()) return;
+
+    const value = newCategoryName.toLowerCase().replace(/\s+/g, "-");
+    const newCategory = { value, label: newCategoryName };
+
+    onAddCategory(newCategory);
+    setCategory(value);
+    setNewCategoryName("");
+    setIsCreatingCategory(false);
+  };
 
   const handleAddTask = () => {
     if (!newTaskTitle.trim()) return;
@@ -82,8 +95,8 @@ export function GoalDialog({ open, onOpenChange, onSave, goal }: GoalDialogProps
   };
 
   const handleSave = () => {
-    const categoryLabel = categoryOptions.find(opt => opt.value === category)?.label || "";
-    
+    const categoryLabel = categories.find(opt => opt.value === category)?.label || category;
+
     const goalData: Goal = {
       id: goal?.id || Date.now().toString(),
       title,
@@ -109,6 +122,8 @@ export function GoalDialog({ open, onOpenChange, onSave, goal }: GoalDialogProps
       setTasks([]);
       setNewTaskTitle("");
       setNewTaskXp("");
+      setIsCreatingCategory(false);
+      setNewCategoryName("");
     }
     onOpenChange(false);
   };
@@ -147,19 +162,52 @@ export function GoalDialog({ open, onOpenChange, onSave, goal }: GoalDialogProps
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="category">Категория *</Label>
-              <Select value={category} onValueChange={(value) => setCategory(value as CategoryType)}>
-                <SelectTrigger id="category">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {categoryOptions.map((option) => (
-                    <SelectItem key={option.value} value={option.value}>
-                      {option.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <div className="flex items-center justify-between">
+                <Label htmlFor="category">Категория *</Label>
+                {!isCreatingCategory ? (
+                  <Button
+                    variant="link"
+                    className="h-auto p-0 text-xs"
+                    onClick={() => setIsCreatingCategory(true)}
+                  >
+                    + Создать
+                  </Button>
+                ) : (
+                  <Button
+                    variant="link"
+                    className="h-auto p-0 text-xs"
+                    onClick={() => setIsCreatingCategory(false)}
+                  >
+                    Отмена
+                  </Button>
+                )}
+              </div>
+
+              {isCreatingCategory ? (
+                <div className="flex gap-2">
+                  <Input
+                    placeholder="Название категории"
+                    value={newCategoryName}
+                    onChange={(e) => setNewCategoryName(e.target.value)}
+                  />
+                  <Button type="button" onClick={handleAddCategory} disabled={!newCategoryName.trim()}>
+                    OK
+                  </Button>
+                </div>
+              ) : (
+                <Select value={category} onValueChange={(value) => setCategory(value)}>
+                  <SelectTrigger id="category">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {categories.map((option) => (
+                      <SelectItem key={option.value} value={option.value}>
+                        {option.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              )}
             </div>
 
             <div className="space-y-2">
@@ -188,7 +236,7 @@ export function GoalDialog({ open, onOpenChange, onSave, goal }: GoalDialogProps
 
           <div className="space-y-3">
             <Label>Задачи для достижения цели</Label>
-            
+
             <div className="flex gap-2">
               <Input
                 placeholder="Название задачи"

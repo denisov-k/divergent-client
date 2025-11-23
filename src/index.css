@@ -96,12 +96,14 @@
     font-size: var(--font-size);
     height: 100%;
     display: flex;
+    touch-action: none;
   }
 
   body {
     background-color: var(--background);
     color: var(--foreground);
     font-family: 'Montserrat', sans-serif;
+    touch-action: none;
   }
 
   /* Typography */
@@ -168,4 +170,5 @@
   font-size: var(--text-base);
   font-family: 'Montserrat', sans-serif;
   background-color: var(--background);
+  touch-action: none;
 }

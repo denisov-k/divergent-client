@@ -9,7 +9,7 @@ import { TaskItem } from "./TaskItem";
 import { useState } from "react";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "./ui/collapsible";
 
-type CategoryType = "work" | "health" | "learning" | "fitness" | "creative" | "personal";
+export type CategoryType = string;
 
 interface Task {
   id: string;
