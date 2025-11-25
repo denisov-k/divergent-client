@@ -211,16 +211,18 @@ export function GoalCard({
 
         <div className="flex items-center justify-between pt-2 border-t">
           {dueDate && (
-            <div className="flex items-center gap-2 text-muted-foreground">
+            <div className="flex items-center gap-2 text-muted-foreground mr-4">
               <Calendar className="size-4" />
-              <span>{dueDate}</span>
+              <span className="whitespace-nowrap">{dueDate}</span>
             </div>
           )}
           {(xpReward || reward) && (
-            <div>
-              <span>Награда: </span>
-              {reward && <Badge className="mx-1 bg-purple-500">{reward?.title}</Badge>}
-              {xpReward && <Badge>+{xpReward} XP</Badge>}
+            <div className="flex item-center flex-wrap justify-center items-center">
+              <span className="mr-1">Награда: </span>
+              <div className="flex flex-wrap justify-center">
+                {reward && <Badge className="mr-1 my-0.5 bg-purple-500">{reward?.title}</Badge>}
+                {xpReward && <Badge className="my-0.5">+{xpReward} XP</Badge>}
+              </div>
             </div>
           )}
         </div>

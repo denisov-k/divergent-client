@@ -322,9 +322,9 @@ export function GoalDialog({ open, onOpenChange, onSave, goal, categories, rewar
             </div>
 
             {tasks.length > 0 && (
-              <div className="space-y-2 border rounded-lg p-3">
+              <div className="">
                 {tasks.map((task) => (
-                  <div key={task.id} className="flex items-center gap-2">
+                  <div key={task.id} className="flex items-center gap-2 my-2">
                     <div className="flex-1">
                       <TaskItem
                         {...task}
