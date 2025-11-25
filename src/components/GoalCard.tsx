@@ -8,6 +8,7 @@ import {Calendar, Target, Edit, ChevronDown, ChevronUp, AlarmClock} from "lucide
 import { TaskItem } from "./TaskItem";
 import { useState } from "react";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "./ui/collapsible";
+import {Reward} from "@/components/RewardDialog.tsx";
 
 export type CategoryType = string;
 
@@ -28,6 +29,7 @@ interface GoalCardProps {
   tasks: Task[];
   dueDate?: string;
   xpReward?: number;
+  reward?: Reward | null;
   variant?: "compact" | "detailed";
   onEdit?: (id: string) => void;
   onTaskToggle?: (goalId: string, taskId: string) => void;
@@ -43,6 +45,7 @@ export function GoalCard({
   tasks,
   dueDate,
   xpReward,
+  reward,
   variant = "detailed",
   onEdit,
   onTaskToggle,
@@ -213,8 +216,12 @@ export function GoalCard({
               <span>{dueDate}</span>
             </div>
           )}
-          {xpReward && (
-            <Badge>При выполнении: +{xpReward} XP</Badge>
+          {(xpReward || reward) && (
+            <div>
+              <span>Награда: </span>
+              {reward && <Badge className="mx-1 bg-purple-500">{reward?.title}</Badge>}
+              {xpReward && <Badge>+{xpReward} XP</Badge>}
+            </div>
           )}
         </div>
       </CardContent>

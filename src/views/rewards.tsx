@@ -10,8 +10,7 @@ import { useState } from "react";
 import { useAppStore } from "@/stores/useAppStore";
 
 export default function Rewards() {
-  const { rewards, user, addReward, updateReward, claimReward } = useAppStore();
-  const currentXp = user.xp;
+  const { rewards, addReward, updateReward, goals } = useAppStore();
 
   const [rewardDialogOpen, setRewardDialogOpen] = useState(false);
   const [editingReward, setEditingReward] = useState<Reward | undefined>(undefined);
@@ -39,14 +38,6 @@ export default function Rewards() {
       setEditingReward(reward);
       setRewardDialogOpen(true);
     }
-  };
-
-  // ------------------------------
-  // Получение награды
-  // ------------------------------
-  const handleClaimReward = (id: string) => {
-    claimReward(id);
-    toast.success("🎉 Награда получена!");
   };
 
   return (
@@ -80,9 +71,8 @@ export default function Rewards() {
             <RewardCard
               key={reward.id}
               {...reward}
-              currentXp={currentXp}
-              onClaim={() => handleClaimReward(reward.id)}
               onEdit={handleEditReward}
+              goalTitle={goals.find(g => g.id === reward.goalId)?.title}
             />
           ))}
         </div>
@@ -96,6 +86,7 @@ export default function Rewards() {
         }}
         onSave={handleSaveReward}
         reward={editingReward}
+        goals={goals}
       />
     </div>
   );

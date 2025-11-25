@@ -1,4 +1,4 @@
-import { useState } from "react";
+import {useEffect, useState} from "react";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "./ui/dialog";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
@@ -10,6 +10,7 @@ import { Plus, X } from "lucide-react";
 import { Separator } from "./ui/separator";
 
 import { type CategoryType } from "@/components/GoalCard.tsx";
+import { Reward } from "@/components/RewardDialog.tsx";
 
 export interface Task {
   id: string;
@@ -28,6 +29,7 @@ export interface Goal {
   tasks: Task[];
   dueDate?: string;
   xpReward?: number;
+  rewardId?: string;
 }
 
 export interface CategoryOption {
@@ -41,10 +43,11 @@ interface GoalDialogProps {
   onSave: (goal: Goal) => void;
   goal?: Goal;
   categories: CategoryOption[];
+  rewards: Reward[];
   onAddCategory: (category: CategoryOption) => void;
 }
 
-export function GoalDialog({ open, onOpenChange, onSave, goal, categories, onAddCategory }: GoalDialogProps) {
+export function GoalDialog({ open, onOpenChange, onSave, goal, categories, rewards, onAddCategory }: GoalDialogProps) {
   const [title, setTitle] = useState(goal?.title || "");
   const [description, setDescription] = useState(goal?.description || "");
   const [category, setCategory] = useState<CategoryType>(goal?.category || "personal");
@@ -53,9 +56,31 @@ export function GoalDialog({ open, onOpenChange, onSave, goal, categories, onAdd
   const [tasks, setTasks] = useState<Task[]>(goal?.tasks || []);
   const [newTaskTitle, setNewTaskTitle] = useState("");
   const [newTaskXp, setNewTaskXp] = useState("");
+  const [rewardId, setRewardId] = useState(goal?.rewardId || "");
 
   const [isCreatingCategory, setIsCreatingCategory] = useState(false);
   const [newCategoryName, setNewCategoryName] = useState("");
+
+  useEffect(() => {
+    if (goal) {
+      setTitle(goal.title || "");
+      setDescription(goal.description || "");
+      setCategory(goal.category || "personal");
+      setDueDate(goal.dueDate || "");
+      setXpReward(goal.xpReward?.toString() || "");
+      setTasks(goal.tasks || []);
+      setRewardId(goal.rewardId || "");
+    } else {
+      // режим создания — очищаем форму
+      setTitle("");
+      setDescription("");
+      setCategory("personal");
+      setDueDate("");
+      setXpReward("");
+      setTasks([]);
+      setRewardId("");
+    }
+  }, [goal, open]);
 
   const handleAddCategory = () => {
     if (!newCategoryName.trim()) return;
@@ -105,6 +130,7 @@ export function GoalDialog({ open, onOpenChange, onSave, goal, categories, onAdd
       categoryLabel,
       tasks,
       dueDate: dueDate || undefined,
+      rewardId: rewardId || undefined,
       xpReward: xpReward ? parseInt(xpReward) : undefined,
     };
 
@@ -129,7 +155,13 @@ export function GoalDialog({ open, onOpenChange, onSave, goal, categories, onAdd
   };
 
   return (
-    <Dialog open={open} onOpenChange={handleClose}>
+    <Dialog
+      open={open}
+      onOpenChange={(value) => {
+        if (!value) handleClose(); // закрытие
+        else onOpenChange(true);   // открытие
+      }}
+    >
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>{goal ? "Редактировать цель" : "Создать новую цель"}</DialogTitle>
@@ -158,6 +190,13 @@ export function GoalDialog({ open, onOpenChange, onSave, goal, categories, onAdd
               onChange={(e) => setDescription(e.target.value)}
               rows={3}
             />
+            <Button
+              variant="link"
+              className="h-auto p-0 text-xs flex mr-0 ml-auto"
+              onClick={() => {}}
+            >
+              Узнать у ИИ, как достичь цели
+            </Button>
           </div>
 
           <div className="grid grid-cols-2 gap-4">
@@ -197,7 +236,7 @@ export function GoalDialog({ open, onOpenChange, onSave, goal, categories, onAdd
               ) : (
                 <Select value={category} onValueChange={(value) => setCategory(value)}>
                   <SelectTrigger id="category">
-                    <SelectValue />
+                    <SelectValue/>
                   </SelectTrigger>
                   <SelectContent>
                     {categories.map((option) => (
@@ -222,6 +261,25 @@ export function GoalDialog({ open, onOpenChange, onSave, goal, categories, onAdd
           </div>
 
           <div className="space-y-2">
+            <Label htmlFor="reward">Награда за цель</Label>
+
+            <Select value={rewardId} onValueChange={(value) => setRewardId(value)}>
+              <SelectTrigger id="reward">
+                <SelectValue placeholder="Выберите награду"/>
+              </SelectTrigger>
+
+              <SelectContent>
+                <SelectItem value="none">Без награды</SelectItem>
+                {rewards.map((reward) => (
+                  <SelectItem key={reward.id} value={reward.id}>
+                    {reward.title}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="space-y-2">
             <Label htmlFor="xpReward">Награда за цель (XP)</Label>
             <Input
               id="xpReward"
@@ -233,7 +291,7 @@ export function GoalDialog({ open, onOpenChange, onSave, goal, categories, onAdd
             />
           </div>
 
-          <Separator />
+          <Separator/>
 
           <div className="space-y-3">
             <Label>Задачи для достижения цели</Label>
@@ -259,7 +317,7 @@ export function GoalDialog({ open, onOpenChange, onSave, goal, categories, onAdd
                 onChange={(e) => setNewTaskXp(e.target.value)}
               />
               <Button type="button" onClick={handleAddTask} size="icon">
-                <Plus className="size-4" />
+                <Plus className="size-4"/>
               </Button>
             </div>
 
@@ -279,7 +337,7 @@ export function GoalDialog({ open, onOpenChange, onSave, goal, categories, onAdd
                       size="icon"
                       onClick={() => handleRemoveTask(task.id)}
                     >
-                      <X className="size-4" />
+                      <X className="size-4"/>
                     </Button>
                   </div>
                 ))}

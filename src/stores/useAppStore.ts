@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { Goal } from "@/components/GoalDialog";
+import {type CategoryOption, Goal} from "@/components/GoalDialog";
 import { Reward } from "@/components/RewardDialog";
 import { Reminder } from "@/components/ReminderDialog";
 
@@ -38,6 +38,7 @@ interface AppStore {
   goals: Goal[];
   rewards: Reward[];
   reminders: Reminder[];
+  categories: CategoryOption[];
   friends: any[];
 
   // XP
@@ -46,6 +47,7 @@ interface AppStore {
 
   // GOALS
   addGoal: (goal: Goal) => void;
+  addCategory: (category: CategoryOption) => void;
   updateGoal: (goal: Goal) => void;
   toggleTask: (goalId: string, taskId: string) => void;
 
@@ -81,6 +83,7 @@ const initialGoals: Goal[] = [
     category: "learning",
     categoryLabel: "Обучение",
     dueDate: "2025-12-31",
+    rewardId: "1",
     xpReward: 1200,
     tasks: [
       { id: "1-1", title: "Прочитать 'Война и мир'", completed: true, xpReward: 100 },
@@ -104,7 +107,7 @@ const initialGoals: Goal[] = [
     category: "fitness",
     categoryLabel: "Фитнес",
     dueDate: "2025-06-30",
-    xpReward: 2000,
+    xpReward: 1500,
     tasks: [
       { id: "2-1", title: "Пробежать 10 км", completed: true, xpReward: 40 },
       { id: "2-2", title: "Пробежать 20 км", completed: true, xpReward: 40 },
@@ -119,6 +122,7 @@ const initialGoals: Goal[] = [
     category: "learning",
     categoryLabel: "Обучение",
     dueDate: "2025-03-01",
+    rewardId: "3",
     xpReward: 1500,
     tasks: [
       { id: "3-1", title: "Основы синтаксиса", completed: true, xpReward: 75 },
@@ -130,41 +134,57 @@ const initialGoals: Goal[] = [
       { id: "3-7", title: "Тестирование кода", completed: false, xpReward: 75 },
       { id: "3-8", title: "Деплой проекта", completed: false, xpReward: 75 }
     ]
+  },
+  {
+    id: "4",
+    title: "Выйти на доход 1 миллион в месяц",
+    category: "work",
+    categoryLabel: "Работа",
+    dueDate: "2025-03-01",
+    rewardId: "2",
+    xpReward: 1500,
+    tasks: [
+      { id: "3-1", title: "300 тыс. в месяц", completed: true, xpReward: 75 },
+      { id: "3-2", title: "500 тыс. в месяц", completed: false, xpReward: 75 },
+      { id: "3-3", title: "700 тыс. в месяц", completed: false, xpReward: 75 },
+      { id: "3-4", title: "1 миллион в месяц", completed: false, xpReward: 75 }
+    ]
   }
+];
+
+const initialCategories: CategoryOption[] = [
+  { value: "work", label: "Работа" },
+  { value: "health", label: "Здоровье" },
+  { value: "learning", label: "Обучение" },
+  { value: "fitness", label: "Фитнес" },
+  { value: "creative", label: "Творчество" },
+  { value: "personal", label: "Личное" },
 ];
 
 const initialRewards: Reward[] = [
   {
     id: "1",
-    title: "Первые шаги",
-    description: "Выполните первую задачу",
-    requiredXp: 100,
+    title: "iPhone",
+    description: "Куплю себе новый смартфон",
     icon: "star",
-    isUnlocked: true
+    isUnlocked: true,
+    goalId: "1"
   },
   {
     id: "2",
-    title: "Бегун-марафонец",
-    description: "Пробежите 100 км",
-    requiredXp: 2500,
+    title: "Поездка в Испанию",
+    description: "Отпуск на 7 дней",
     icon: "trophy",
-    isUnlocked: false
+    isUnlocked: false,
+    goalId: "4"
   },
   {
     id: "3",
-    title: "Мастер привычек",
-    description: "Выполните привычку 30 дней подряд",
-    requiredXp: 3000,
+    title: "MacBook",
+    description: "Куплю себе новый ноутбук",
     icon: "crown",
-    isUnlocked: false
-  },
-  {
-    id: "4",
-    title: "Книжный червь",
-    description: "Прочитайте 5 книг",
-    requiredXp: 1500,
-    icon: "gift",
-    isUnlocked: true
+    isUnlocked: false,
+    goalId: "3"
   }
 ];
 
@@ -206,6 +226,7 @@ export const useAppStore = create<AppStore>((set, get) => ({
   rewards: initialRewards,
   reminders: initialReminders,
   friends: initialFriends,
+  categories: initialCategories,
 
   // ==========================
   // XP SYSTEM
@@ -248,6 +269,12 @@ export const useAppStore = create<AppStore>((set, get) => ({
   addGoal(goal) {
     set({
       goals: [...get().goals, goal],
+    });
+  },
+
+  addCategory(category) {
+    set({
+      categories: [...get().categories, category],
     });
   },
 

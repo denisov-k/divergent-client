@@ -1,4 +1,4 @@
-import { useState } from "react";
+import {useEffect, useState} from "react";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "./ui/dialog";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
@@ -6,6 +6,7 @@ import { Label } from "./ui/label";
 import { Textarea } from "./ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
 import { Trophy, Star, Gift, Crown, Award, Zap } from "lucide-react";
+import {Goal} from "@/components/GoalDialog.tsx";
 
 type RewardIcon = "trophy" | "star" | "gift" | "crown" | "award" | "zap";
 
@@ -13,9 +14,9 @@ export interface Reward {
   id: string;
   title: string;
   description: string;
-  requiredXp: number;
   icon: RewardIcon;
   isUnlocked: boolean;
+  goalId: string;
 }
 
 interface RewardDialogProps {
@@ -23,6 +24,7 @@ interface RewardDialogProps {
   onOpenChange: (open: boolean) => void;
   onSave: (reward: Reward) => void;
   reward?: Reward;
+  goals: Goal[];
 }
 
 const iconOptions = [
@@ -34,19 +36,36 @@ const iconOptions = [
   { value: "zap", label: "Молния", Icon: Zap },
 ];
 
-export function RewardDialog({ open, onOpenChange, onSave, reward }: RewardDialogProps) {
+export function RewardDialog({ open, onOpenChange, onSave, reward, goals }: RewardDialogProps) {
   const [title, setTitle] = useState(reward?.title || "");
   const [description, setDescription] = useState(reward?.description || "");
-  const [requiredXp, setRequiredXp] = useState(reward?.requiredXp?.toString() || "");
   const [icon, setIcon] = useState<RewardIcon>(reward?.icon || "trophy");
+  const [goalId, setGoalId] = useState(reward?.goalId || "");
+
+  useEffect(() => {
+    if (open && reward) {
+      setTitle(reward.title || "");
+      setDescription(reward.description || "");
+      setIcon(reward.icon || "trophy");
+      setGoalId(reward.goalId || "");
+    }
+
+    if (open && !reward) {
+      setTitle("");
+      setDescription("");
+      setIcon("trophy");
+      setGoalId("");
+    }
+  }, [reward, open]);
+
 
   const handleSave = () => {
     const rewardData: Reward = {
       id: reward?.id || Date.now().toString(),
       title,
       description,
-      requiredXp: parseInt(requiredXp),
       icon,
+      goalId,
       isUnlocked: reward?.isUnlocked || false,
     };
 
@@ -58,14 +77,19 @@ export function RewardDialog({ open, onOpenChange, onSave, reward }: RewardDialo
     if (!reward) {
       setTitle("");
       setDescription("");
-      setRequiredXp("");
       setIcon("trophy");
     }
     onOpenChange(false);
   };
 
   return (
-    <Dialog open={open} onOpenChange={handleClose}>
+    <Dialog
+      open={open}
+      onOpenChange={(value) => {
+        if (!value) handleClose();  // закрывается → сброс
+        else onOpenChange(true);    // открывается → просто открыть
+      }}
+    >
       <DialogContent className="max-w-md">
         <DialogHeader>
           <DialogTitle>{reward ? "Редактировать награду" : "Создать новую награду"}</DialogTitle>
@@ -100,7 +124,7 @@ export function RewardDialog({ open, onOpenChange, onSave, reward }: RewardDialo
             <Label htmlFor="reward-icon">Иконка</Label>
             <Select value={icon} onValueChange={(value) => setIcon(value as RewardIcon)}>
               <SelectTrigger id="reward-icon">
-                <SelectValue />
+                <SelectValue/>
               </SelectTrigger>
               <SelectContent>
                 {iconOptions.map((option) => {
@@ -108,7 +132,7 @@ export function RewardDialog({ open, onOpenChange, onSave, reward }: RewardDialo
                   return (
                     <SelectItem key={option.value} value={option.value}>
                       <div className="flex items-center gap-2">
-                        <IconComponent className="size-4" />
+                        <IconComponent className="size-4"/>
                         {option.label}
                       </div>
                     </SelectItem>
@@ -119,17 +143,23 @@ export function RewardDialog({ open, onOpenChange, onSave, reward }: RewardDialo
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="reward-xp">Требуемый опыт (XP) *</Label>
-            <Input
-              id="reward-xp"
-              type="number"
-              placeholder="1000"
-              value={requiredXp}
-              onChange={(e) => setRequiredXp(e.target.value)}
-            />
-            <p className="text-muted-foreground">
-              Награда будет доступна, когда пользователь наберёт этот опыт
-            </p>
+            <Label htmlFor="reward">Цель</Label>
+
+            <Select value={goalId} onValueChange={(value) => setGoalId(value)}>
+              <SelectTrigger id="reward">
+                <SelectValue placeholder="Выберите цель"/>
+              </SelectTrigger>
+
+              <SelectContent>
+                <SelectItem value="none">Без цели</SelectItem>
+                {goals.map((goal) => (
+                  <SelectItem key={goal.id} value={goal.id}>
+                    {goal.title}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+
           </div>
         </div>
 
@@ -137,9 +167,9 @@ export function RewardDialog({ open, onOpenChange, onSave, reward }: RewardDialo
           <Button variant="outline" onClick={handleClose}>
             Отмена
           </Button>
-          <Button 
-            onClick={handleSave} 
-            disabled={!title || !description || !requiredXp || parseInt(requiredXp) <= 0}
+          <Button
+            onClick={handleSave}
+            disabled={!title || !description}
           >
             {reward ? "Сохранить" : "Создать награду"}
           </Button>

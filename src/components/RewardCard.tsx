@@ -1,7 +1,7 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/card";
+import { Card, CardContent, CardDescription, CardTitle } from "./ui/card";
 import { Badge } from "./ui/badge";
 import { Button } from "./ui/button";
-import { Trophy, Star, Gift, Crown, Award, Zap, Edit } from "lucide-react";
+import {Trophy, Star, Gift, Crown, Award, Zap, Edit, Target} from "lucide-react";
 
 type RewardIcon = "trophy" | "star" | "gift" | "crown" | "award" | "zap";
 
@@ -9,11 +9,9 @@ interface RewardCardProps {
   id: string;
   title: string;
   description: string;
-  requiredXp: number;
-  currentXp: number;
   icon?: RewardIcon;
   isUnlocked?: boolean;
-  onClaim?: () => void;
+  goalTitle?: string;          // <-- Новое
   onEdit?: (id: string) => void;
 }
 
@@ -27,45 +25,38 @@ const iconMap = {
 };
 
 export function RewardCard({
-  id,
-  title,
-  description,
-  requiredXp,
-  currentXp,
-  icon = "trophy",
-  isUnlocked = false,
-  onClaim,
-  onEdit,
-}: RewardCardProps) {
+                             id,
+                             title,
+                             description,
+                             icon = "trophy",
+                             isUnlocked = false,
+                             goalTitle,
+                             onEdit,
+                           }: RewardCardProps) {
   const Icon = iconMap[icon];
-  const canClaim = currentXp >= requiredXp;
-  const progress = Math.min((currentXp / requiredXp) * 100, 100);
 
   return (
-    <Card className={`transition-all ${
-      isUnlocked 
-        ? "border-green-500 bg-green-500/5" 
-        : canClaim 
-        ? "border-primary shadow-md" 
-        : ""
-    }`}>
-      <CardHeader>
+    <Card
+      className={`transition-all ${
+        isUnlocked
+          ? "border-green-500 bg-green-500/5"
+          : ""
+      }`}
+    >
+      <CardContent className="px-6 [&:last-child]:pb-6 pt-6">
         <div className="flex items-start gap-4">
-          <div className={`p-3 rounded-lg ${
-            isUnlocked 
-              ? "bg-green-500/10" 
-              : canClaim 
-              ? "bg-primary/10" 
-              : "bg-muted"
-          }`}>
-            <Icon className={`size-6 ${
-              isUnlocked 
-                ? "text-green-600" 
-                : canClaim 
-                ? "text-primary" 
-                : "text-muted-foreground"
-            }`} />
+          <div
+            className={`p-3 rounded-lg ${
+              isUnlocked ? "bg-green-500/10" : "bg-muted"
+            }`}
+          >
+            <Icon
+              className={`size-6 ${
+                isUnlocked ? "text-green-600" : "text-muted-foreground"
+              }`}
+            />
           </div>
+
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2">
               <CardTitle>{title}</CardTitle>
@@ -75,51 +66,25 @@ export function RewardCard({
                 </Badge>
               )}
             </div>
-            <CardDescription className="mt-1">{description}</CardDescription>
+
+            <CardDescription className="mt-1">
+              {description}
+            </CardDescription>
+
+            {goalTitle && (
+              <div className="mt-2 flex items-center">
+                <Target className="size-3 text-primary mr-1" />
+                <span className="">{goalTitle}</span>
+              </div>
+            )}
           </div>
+
           {onEdit && (
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => onEdit(id)}
-            >
+            <Button variant="ghost" size="icon" onClick={() => onEdit(id)}>
               <Edit className="size-4" />
             </Button>
           )}
         </div>
-      </CardHeader>
-      <CardContent className="space-y-3">
-        {!isUnlocked && (
-          <>
-            <div className="flex items-center justify-between">
-              <span className="text-muted-foreground">Требуется:</span>
-              <Badge variant="outline">
-                {currentXp} / {requiredXp} XP
-              </Badge>
-            </div>
-            <div className="w-full bg-muted rounded-full h-2">
-              <div
-                className="bg-primary h-2 rounded-full transition-all"
-                style={{ width: `${progress}%` }}
-              />
-            </div>
-            {canClaim && (
-              <Button 
-                onClick={onClaim} 
-                className="w-full"
-              >
-                <Gift className="size-4 mr-2" />
-                Получить награду
-              </Button>
-            )}
-          </>
-        )}
-        {isUnlocked && (
-          <div className="flex items-center justify-center py-2 text-green-600">
-            <Trophy className="size-4 mr-2" />
-            <span>Награда получена!</span>
-          </div>
-        )}
       </CardContent>
     </Card>
   );

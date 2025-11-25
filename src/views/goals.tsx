@@ -18,17 +18,12 @@ export default function Goals() {
     toggleTask,
     addXp,
     addReminder,
-    updateReminder
+    addCategory,
+    updateReminder,
+    rewards,
+    categories
   } = useAppStore();
 
-  const [categories, setCategories] = useState<CategoryOption[]>([
-    { value: "work", label: "Работа" },
-    { value: "health", label: "Здоровье" },
-    { value: "learning", label: "Обучение" },
-    { value: "fitness", label: "Фитнес" },
-    { value: "creative", label: "Творчество" },
-    { value: "personal", label: "Личное" },
-  ]);
 
   const [goalDialogOpen, setGoalDialogOpen] = useState(false);
   const [editingGoal, setEditingGoal] = useState<Goal | undefined>();
@@ -63,7 +58,7 @@ export default function Goals() {
   };
 
   const handleAddCategory = (category: CategoryOption) => {
-    setCategories([...categories, category]);
+    addCategory(category);
     toast.success(`Категория "${category.label}" создана`);
   };
 
@@ -149,25 +144,30 @@ export default function Goals() {
         </Card>
       ) : (
         <div className="flex flex-wrap gap-2 overflow-auto flex-1">
-          {goals.map((goal) => (
-            <div
-              key={goal.id}
-              className="
-                w-full
-                sm:w-[calc(50%-0.25rem)]
-                lg:w-[calc(33.333%-0.4rem)]
-                xl:w-[calc(25%-0.4rem)]
-              "
-            >
-              <GoalCard
-                {...goal}
-                variant="detailed"
-                onEdit={handleEditGoal}
-                onTaskToggle={handleTaskToggle}
-                onAddReminder={handleAddReminderFromGoal}
-              />
-            </div>
-          ))}
+          {goals.map((goal) => {
+            const reward = rewards.find((r) => r.id === goal.rewardId) || null;
+
+            return (
+              <div
+                key={goal.id}
+                className="
+                  w-full
+                  sm:w-[calc(50%-0.25rem)]
+                  lg:w-[calc(33.333%-0.4rem)]
+                  xl:w-[calc(25%-0.4rem)]
+                "
+              >
+                <GoalCard
+                  {...goal}
+                  reward={reward}        // ← вот это
+                  variant="detailed"
+                  onEdit={handleEditGoal}
+                  onTaskToggle={handleTaskToggle}
+                  onAddReminder={handleAddReminderFromGoal}
+                />
+              </div>
+            );
+          })}
         </div>
 
       )}
@@ -181,6 +181,7 @@ export default function Goals() {
         onSave={handleSaveGoal}
         goal={editingGoal}
         categories={categories}
+        rewards={rewards}
         onAddCategory={handleAddCategory}
       />
       <ReminderDialog
