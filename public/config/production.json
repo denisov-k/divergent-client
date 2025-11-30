@@ -1,7 +1,7 @@
 {
     "api": {
         "http": {
-            "baseURL": "https://server.divergent.testtty.ru/"
+            "baseURL": "https://server.divergent.testtty.ru"
         },
         "ton": {
             "manifestURL": "https://divergent.testtty.ru/tonconnect-manifest.json"
