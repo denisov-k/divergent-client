@@ -5,7 +5,8 @@ import { Badge } from "./ui/badge";
 
 import { Trophy, Target, Flame } from "lucide-react";
 
-interface FriendCardProps {
+export interface FriendCardProps {
+  id: string;
   name: string;
   level: number;
   avatarUrl?: string;

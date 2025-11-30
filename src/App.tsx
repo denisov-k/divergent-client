@@ -1,5 +1,4 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
-import { useAuth } from '@/hooks/use-auth'
 import { ProtectedRoute } from '@/components/protected-route'
 
 import Layout from '@/layout/'
@@ -17,13 +16,16 @@ import RewardsView from '@/views/rewards'
 import RemindersView from '@/views/reminders'
 import ProgressView from '@/views/progress'
 
+import {useAppStore} from "@/stores/useAppStore.ts";
 import {useEffect} from "react";
 
 function AppRoot() {
-  const { checkAuth } = useAuth();
+
+  const {initialize} = useAppStore();
+
 
   useEffect(() => {
-    setInterval(checkAuth, 5000);
+    initialize();
   }, []);
 
   return (

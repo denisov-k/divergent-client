@@ -1,7 +1,7 @@
 {
     "api": {
         "http": {
-            "baseURL": "http://localhost:3000/"
+            "baseURL": "http://localhost:4000"
         },
         "ton": {
             "manifestURL": "https://localhost:8081/tonconnect-manifest.json"

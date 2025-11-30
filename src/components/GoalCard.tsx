@@ -213,7 +213,7 @@ export function GoalCard({
           {dueDate && (
             <div className="flex items-center gap-2 text-muted-foreground mr-4">
               <Calendar className="size-4" />
-              <span className="whitespace-nowrap">{dueDate}</span>
+              <span className="whitespace-nowrap">{new Date(dueDate).toISOString().split('T')[0]}</span>
             </div>
           )}
           {(xpReward || reward) && (

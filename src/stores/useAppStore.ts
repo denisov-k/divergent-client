@@ -1,367 +1,276 @@
 import { create } from "zustand";
-import {type CategoryOption, Goal} from "@/components/GoalDialog";
+import * as api from "@/utils/api";
+import { type CategoryOption, Goal } from "@/components/GoalDialog";
 import { Reward } from "@/components/RewardDialog";
 import { Reminder } from "@/components/ReminderDialog";
+import { FriendCardProps } from "@/components/FriendCard.tsx";
 
-// ==========================
-// XP SYSTEM CONSTANTS
-// ==========================
-const XP_PER_LEVEL = 250;
-
-function calculateLevel(xp: number) {
-  return Math.floor(xp / XP_PER_LEVEL) + 1;
-}
-
-function calculateXpInCurrentLevel(xp: number) {
-  return xp % XP_PER_LEVEL;
-}
-
-function calculateRequiredXp(level: number) {
-  return level * XP_PER_LEVEL;
-}
-
-// ==========================
-// STORE INTERFACE
-// ==========================
 interface AppStore {
   loading: boolean;
-
-  user: {
-    id: string;
-    name: string;
-    xp: number;
-    level: number;
-    xpInCurrentLevel: number;
-    requiredXp: number;
-  };
-
+  user: { id: string; name: string; xp: number; level: number; xpInCurrentLevel: number; requiredXp: number } | null;
+  token: string | null,
   goals: Goal[];
   rewards: Reward[];
   reminders: Reminder[];
+  friends: FriendCardProps[];
   categories: CategoryOption[];
-  friends: any[];
 
-  // XP
-  addXp: (amount: number) => void;
-  removeXp: (amount: number) => void;
+  initialize: () => Promise<void>;
 
-  // GOALS
-  addGoal: (goal: Goal) => void;
+  login: (tgData: string) => Promise<void>;
+  logout: () => void;
+  refreshUser: () => Promise<void>;
+
+  addXp: (amount: number) => Promise<void>;
+  removeXp: (amount: number) => Promise<void>;
+
+  addGoal: (goal: Goal) => Promise<void>;
   addCategory: (category: CategoryOption) => void;
-  updateGoal: (goal: Goal) => void;
-  toggleTask: (goalId: string, taskId: string) => void;
+  updateGoal: (goal: Goal) => Promise<void>;
+  toggleTask: (goalId: string, taskId: string) => Promise<void>;
 
-  // REWARDS
-  addReward: (reward: Reward) => void;
-  updateReward: (reward: Reward) => void;
-  claimReward: (id: string) => void;
+  addReward: (reward: Reward) => Promise<void>;
+  updateReward: (reward: Reward) => Promise<void>;
+  claimReward: (id: string) => Promise<void>;
 
-  // REMINDERS
-  addReminder: (reminder: Reminder) => void;
-  updateReminder: (reminder: Reminder) => void;
-  toggleReminder: (id: string) => void;
+  addReminder: (reminder: Reminder) => Promise<void>;
+  updateReminder: (reminder: Reminder) => Promise<void>;
+  toggleReminder: (id: string) => Promise<void>;
 }
 
-// ==========================
-// INITIAL MOCK DATA
-// ==========================
 
-const initialUser = {
-  id: "u1",
-  name: "Иван Петров",
-  xp: 2450,
-  level: calculateLevel(2450),
-  xpInCurrentLevel: calculateXpInCurrentLevel(2450),
-  requiredXp: calculateRequiredXp(calculateLevel(2450)),
-};
-
-const initialGoals: Goal[] = [
-  {
-    id: "1",
-    title: "Прочитать 12 книг за год",
-    description: "Развивать привычку ежедневного чтения",
-    category: "learning",
-    categoryLabel: "Обучение",
-    dueDate: "2025-12-31",
-    rewardId: "1",
-    xpReward: 1200,
-    tasks: [
-      { id: "1-1", title: "Прочитать 'Война и мир'", completed: true, xpReward: 100 },
-      { id: "1-2", title: "Прочитать 'Преступление и наказание'", completed: true, xpReward: 100 },
-      { id: "1-3", title: "Прочитать 'Мастер и Маргарита'", completed: true, xpReward: 100 },
-      { id: "1-4", title: "Прочитать 'Анна Каренина'", completed: true, xpReward: 100 },
-      { id: "1-5", title: "Прочитать 'Идиот'", completed: true, xpReward: 100 },
-      { id: "1-6", title: "Прочитать 'Братья Карамазовы'", completed: false, xpReward: 100 },
-      { id: "1-7", title: "Прочитать 'Евгений Онегин'", completed: false, xpReward: 100 },
-      { id: "1-8", title: "Прочитать 'Отцы и дети'", completed: false, xpReward: 100 },
-      { id: "1-9", title: "Прочитать 'Тихий Дон'", completed: false, xpReward: 100 },
-      { id: "1-10", title: "Прочитать 'Обломов'", completed: false, xpReward: 100 },
-      { id: "1-11", title: "Прочитать 'Доктор Живаго'", completed: false, xpReward: 100 },
-      { id: "1-12", title: "Прочитать 'Двенадцать стульев'", completed: false, xpReward: 100 }
-    ]
-  },
-  {
-    id: "2",
-    title: "Пробежать 500 км",
-    description: "Улучшить физическую форму и выносливость",
-    category: "fitness",
-    categoryLabel: "Фитнес",
-    dueDate: "2025-06-30",
-    xpReward: 1500,
-    tasks: [
-      { id: "2-1", title: "Пробежать 10 км", completed: true, xpReward: 40 },
-      { id: "2-2", title: "Пробежать 20 км", completed: true, xpReward: 40 },
-      { id: "2-3", title: "Пробежать 30 км", completed: true, xpReward: 40 },
-      { id: "2-4", title: "Пробежать 40 км", completed: true, xpReward: 40 },
-      { id: "2-5", title: "Пробежать 50 км", completed: false, xpReward: 40 }
-    ]
-  },
-  {
-    id: "3",
-    title: "Выучить Python",
-    category: "learning",
-    categoryLabel: "Обучение",
-    dueDate: "2025-03-01",
-    rewardId: "3",
-    xpReward: 1500,
-    tasks: [
-      { id: "3-1", title: "Основы синтаксиса", completed: true, xpReward: 75 },
-      { id: "3-2", title: "Работа с функциями", completed: true, xpReward: 75 },
-      { id: "3-3", title: "ООП в Python", completed: true, xpReward: 75 },
-      { id: "3-4", title: "Работа с файлами", completed: true, xpReward: 75 },
-      { id: "3-5", title: "Работа с базами данных", completed: true, xpReward: 75 },
-      { id: "3-6", title: "Веб-разработка на Django", completed: false, xpReward: 75 },
-      { id: "3-7", title: "Тестирование кода", completed: false, xpReward: 75 },
-      { id: "3-8", title: "Деплой проекта", completed: false, xpReward: 75 }
-    ]
-  },
-  {
-    id: "4",
-    title: "Выйти на доход 1 миллион в месяц",
-    category: "work",
-    categoryLabel: "Работа",
-    dueDate: "2025-03-01",
-    rewardId: "2",
-    xpReward: 1500,
-    tasks: [
-      { id: "3-1", title: "300 тыс. в месяц", completed: true, xpReward: 75 },
-      { id: "3-2", title: "500 тыс. в месяц", completed: false, xpReward: 75 },
-      { id: "3-3", title: "700 тыс. в месяц", completed: false, xpReward: 75 },
-      { id: "3-4", title: "1 миллион в месяц", completed: false, xpReward: 75 }
-    ]
-  }
-];
-
-const initialCategories: CategoryOption[] = [
-  { value: "work", label: "Работа" },
-  { value: "health", label: "Здоровье" },
-  { value: "learning", label: "Обучение" },
-  { value: "fitness", label: "Фитнес" },
-  { value: "creative", label: "Творчество" },
-  { value: "personal", label: "Личное" },
-];
-
-const initialRewards: Reward[] = [
-  {
-    id: "1",
-    title: "iPhone",
-    description: "Куплю себе новый смартфон",
-    icon: "star",
-    isUnlocked: true,
-    goalId: "1"
-  },
-  {
-    id: "2",
-    title: "Поездка в Испанию",
-    description: "Отпуск на 7 дней",
-    icon: "trophy",
-    isUnlocked: false,
-    goalId: "4"
-  },
-  {
-    id: "3",
-    title: "MacBook",
-    description: "Куплю себе новый ноутбук",
-    icon: "crown",
-    isUnlocked: false,
-    goalId: "3"
-  }
-];
-
-const initialReminders: Reminder[] = [
-  {
-    id: "1",
-    title: "Утренняя зарядка",
-    time: "07:00",
-    days: ["Пн", "Ср", "Пт"],
-    isActive: true,
-    goalId: "2"
-  },
-  {
-    id: "2",
-    title: "Вечернее чтение",
-    time: "21:00",
-    days: ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"],
-    isActive: false,
-    goalId: "1",
-    taskId: "1-6"
-  }
-];
-
-const initialFriends = [
-  { id: "1", name: "Анна Смирнова", level: 15, currentXp: 3200, totalGoals: 12, completedGoals: 9, streak: 21, rank: 1 },
-  { id: "2", name: "Дмитрий Козлов", level: 13, currentXp: 2800, totalGoals: 10, completedGoals: 7, streak: 14, rank: 2 },
-  { id: "3", name: "Мария Попова", level: 12, currentXp: 2450, totalGoals: 8, completedGoals: 5, streak: 12, rank: 3 },
-  { id: "4", name: "Алексей Волков", level: 11, currentXp: 2100, totalGoals: 9, completedGoals: 4, streak: 8 }
-];
-
-// ==========================
-// ZUSTAND STORE
-// ==========================
 export const useAppStore = create<AppStore>((set, get) => ({
   loading: false,
+  user: null,
+  token: null,
+  goals: [] as Goal[],
+  rewards: [] as Reward[],
+  reminders: [] as Reminder[],
+  friends: [] as FriendCardProps[],
+  categories: [] as CategoryOption[],
 
-  user: initialUser,
-  goals: initialGoals,
-  rewards: initialRewards,
-  reminders: initialReminders,
-  friends: initialFriends,
-  categories: initialCategories,
+  // ==========================
+  // AUTH
+  // ==========================
+  login: async (tgData: string) => {
+    set({ loading: true });
+    try {
+      const { user, token } = await api.login(tgData);
+      set({ user, token });
+      localStorage.setItem("token", token); // сохраняем для перезагрузки
+    } catch (err) {
+      console.error(err);
+      throw err;
+    } finally {
+      set({ loading: false });
+    }
+  },
+
+  logout: () => {
+    set({ user: null, token: null, goals: [], rewards: [], reminders: [] });
+    localStorage.removeItem("token");
+  },
+
+  refreshUser: async () => {
+    const token = get().token || localStorage.getItem("token");
+    if (!token) return;
+
+    set({ loading: true });
+    try {
+      const user = await api.fetchUser();
+      set({ user });
+    } catch (err) {
+      console.error(err);
+      get().logout();
+    } finally {
+      set({ loading: false });
+    }
+  },
+
+  initialize: async () => {
+    set({ loading: true });
+    try {
+      // 1. Получаем пользователя
+      const user = await api.fetchUser(); // с credentials: 'include'
+      set({ user });
+
+      // 2. Если есть пользователь, подтягиваем данные
+      if (user) {
+        const [goals, rewards, reminders, friends, categories] = await Promise.all([
+          api.fetchGoals(),
+          api.fetchRewards(),
+          api.fetchReminders(),
+          api.fetchFriends(),
+          api.fetchCategories()
+        ]);
+        set({ goals, rewards, reminders, friends, categories });
+      }
+    } catch (err) {
+      console.error(err);
+      set({ user: null });
+    } finally {
+      set({ loading: false });
+    }
+  },
 
   // ==========================
   // XP SYSTEM
   // ==========================
-  addXp(amount) {
-    const user = get().user;
-    const newXp = user.xp + amount;
-    const level = calculateLevel(newXp);
-
-    set({
-      user: {
-        ...user,
-        xp: newXp,
-        level,
-        xpInCurrentLevel: calculateXpInCurrentLevel(newXp),
-        requiredXp: calculateRequiredXp(level),
-      },
-    });
+  addXp: async (amount: number) => {
+    set({ loading: true });
+    try {
+      const updatedUser = await api.addXp(amount);
+      set({ user: updatedUser });
+    } catch (err) {
+      console.error(err);
+    } finally {
+      set({ loading: false });
+    }
   },
 
-  removeXp(amount) {
-    const user = get().user;
-    const newXp = Math.max(0, user.xp - amount);
-    const level = calculateLevel(newXp);
-
-    set({
-      user: {
-        ...user,
-        xp: newXp,
-        level,
-        xpInCurrentLevel: calculateXpInCurrentLevel(newXp),
-        requiredXp: calculateRequiredXp(level),
-      },
-    });
+  removeXp: async (amount: number) => {
+    set({ loading: true });
+    try {
+      const updatedUser = await api.removeXp(amount);
+      set({ user: updatedUser });
+    } catch (err) {
+      console.error(err);
+    } finally {
+      set({ loading: false });
+    }
   },
 
   // ==========================
-  // GOALS / TASKS
+  // GOALS
   // ==========================
-  addGoal(goal) {
-    set({
-      goals: [...get().goals, goal],
-    });
+  addGoal: async (goal: Goal) => {
+    set({ loading: true });
+    try {
+      const newGoal = await api.createGoal(goal);
+      set({ goals: [...get().goals, newGoal] });
+    } catch (err) {
+      console.error(err);
+    } finally {
+      set({ loading: false });
+    }
   },
 
-  addCategory(category) {
-    set({
-      categories: [...get().categories, category],
-    });
+  addCategory: (category: CategoryOption) => {
+    set({ categories: [...get().categories, category] });
   },
 
-  updateGoal(goal) {
-    set({
-      goals: get().goals.map((g) => (g.id === goal.id ? goal : g)),
-    });
+  updateGoal: async (goal: Goal) => {
+    set({ loading: true });
+    try {
+      const updatedGoal = await api.updateGoal(goal);
+      set({
+        goals: get().goals.map((g) => (g.id === updatedGoal.id ? updatedGoal : g)),
+      });
+    } catch (err) {
+      console.error(err);
+    } finally {
+      set({ loading: false });
+    }
   },
 
-  toggleTask(goalId, taskId) {
-    const { goals, addXp, removeXp } = get();
-
-    set({
-      goals: goals.map((goal) => {
-        if (goal.id !== goalId) return goal;
-
-        const updatedTasks = goal.tasks.map((task) => {
-          if (task.id !== taskId) return task;
-
-          const completed = !task.completed;
-
-          if (completed) addXp(task.xpReward || 0);
-          else removeXp(task.xpReward || 0);
-
-          return { ...task, completed };
-        });
-
-        // проверяем завершение цели
-        const wasCompleted = goal.tasks.every((t) => t.completed);
-        const nowCompleted = updatedTasks.every((t) => t.completed);
-
-        if (!wasCompleted && nowCompleted) {
-          addXp(goal.xpReward || 0);
-        }
-
-        return { ...goal, tasks: updatedTasks };
-      }),
-    });
+  toggleTask: async (goalId: string, taskId: string) => {
+    set({ loading: true });
+    try {
+      const { user, goal } = await api.toggleTask(goalId, taskId);
+      set({
+        user,
+        goals: get().goals.map((g) => (g.id === goal.id ? goal : g)),
+      });
+    } catch (err) {
+      console.error(err);
+    } finally {
+      set({ loading: false });
+    }
   },
 
   // ==========================
   // REWARDS
   // ==========================
-  addReward(reward) {
-    set({
-      rewards: [...get().rewards, reward],
-    });
+  addReward: async (reward: Reward) => {
+    set({ loading: true });
+    try {
+      const newReward = await api.createReward(reward);
+      set({ rewards: [...get().rewards, newReward] });
+    } catch (err) {
+      console.error(err);
+    } finally {
+      set({ loading: false });
+    }
   },
 
-  updateReward(reward) {
-    set({
-      rewards: get().rewards.map((r) =>
-        r.id === reward.id ? reward : r
-      ),
-    });
+  updateReward: async (reward: Reward) => {
+    set({ loading: true });
+    try {
+      const updatedReward = await api.updateReward(reward);
+      set({
+        rewards: get().rewards.map((r) => (r.id === updatedReward.id ? updatedReward : r)),
+      });
+    } catch (err) {
+      console.error(err);
+    } finally {
+      set({ loading: false });
+    }
   },
 
-  claimReward(id) {
-    set({
-      rewards: get().rewards.map((r) =>
-        r.id === id ? { ...r, isUnlocked: true } : r
-      ),
-    });
+  claimReward: async (id: string) => {
+    set({ loading: true });
+    try {
+      const updatedReward = await api.claimReward(id);
+      set({
+        rewards: get().rewards.map((r) => (r.id === updatedReward.id ? updatedReward : r)),
+      });
+    } catch (err) {
+      console.error(err);
+    } finally {
+      set({ loading: false });
+    }
   },
 
   // ==========================
   // REMINDERS
   // ==========================
-  addReminder(reminder) {
-    set({
-      reminders: [...get().reminders, reminder],
-    });
+  addReminder: async (reminder: Reminder) => {
+    set({ loading: true });
+    try {
+      const newReminder = await api.createReminder(reminder);
+      set({ reminders: [...get().reminders, newReminder] });
+    } catch (err) {
+      console.error(err);
+    } finally {
+      set({ loading: false });
+    }
   },
 
-  updateReminder(reminder) {
-    set({
-      reminders: get().reminders.map((r) =>
-        r.id === reminder.id ? reminder : r
-      ),
-    });
+  updateReminder: async (reminder: Reminder) => {
+    set({ loading: true });
+    try {
+      const updatedReminder = await api.updateReminder(reminder);
+      set({
+        reminders: get().reminders.map((r) => (r.id === updatedReminder.id ? updatedReminder : r)),
+      });
+    } catch (err) {
+      console.error(err);
+    } finally {
+      set({ loading: false });
+    }
   },
 
-  toggleReminder(id) {
-    set({
-      reminders: get().reminders.map((r) =>
-        r.id === id ? { ...r, isActive: !r.isActive } : r
-      ),
-    });
+  toggleReminder: async (id: string) => {
+    set({ loading: true });
+    try {
+      const updatedReminder = await api.toggleReminder(id);
+      set({
+        reminders: get().reminders.map((r) => (r.id === updatedReminder.id ? updatedReminder : r)),
+      });
+    } catch (err) {
+      console.error(err);
+    } finally {
+      set({ loading: false });
+    }
   },
 }));

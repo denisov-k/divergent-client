@@ -5,7 +5,7 @@ import './index.css';
 import Config from './services/Config';
 import './i18n';
 
-import { AuthProvider } from '@/hooks/use-auth';
+//import { AuthProvider } from '@/hooks/use-auth';
 
 WebApp.ready();
 
@@ -18,8 +18,6 @@ if (WebApp.version !== '6.0') {
 
 Config.init().then(() => {
   ReactDOM.createRoot(document.getElementById('root')!).render(
-    <AuthProvider>
-      <AppRoot />
-    </AuthProvider>
+    <AppRoot />
   );
 });
