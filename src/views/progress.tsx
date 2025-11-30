@@ -12,7 +12,7 @@ export default function Progress() {
   // ==========================
   // Вычисляем статистику
   // ==========================
-  const currentXp = user.xp;
+  const currentXp = user?.xp;
   const completedTasks = goals.reduce(
     (acc, goal) => acc + goal.tasks.filter((t) => t.completed).length,
     0
@@ -52,7 +52,7 @@ export default function Progress() {
         <div className="grid gap-2 md:grid-cols-4">
           <StatCard
             title="Всего XP"
-            value={currentXp}
+            value={currentXp || ""}
             icon={Zap}
             description="Накоплено опыта"
             trend={{ value: 12, isPositive: true }}
