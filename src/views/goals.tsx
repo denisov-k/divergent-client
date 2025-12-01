@@ -1,6 +1,6 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { GoalDialog, type Goal, type CategoryOption } from "@/components/GoalDialog";
+import { GoalDialog, type Goal, type GoalFormData, type CategoryOption } from "@/components/GoalDialog";
 import { GoalCard } from "@/components/GoalCard";
 
 import { Plus } from "lucide-react";
@@ -9,6 +9,7 @@ import { toast } from "sonner";
 import { useAppStore } from "@/stores/useAppStore";
 import {useState} from "react";
 import {Reminder, ReminderDialog} from "@/components/ReminderDialog.tsx";
+import {useNavigate} from "react-router-dom";
 
 export default function Goals() {
   const {
@@ -24,6 +25,7 @@ export default function Goals() {
     categories
   } = useAppStore();
 
+  const navigate = useNavigate();
 
   const [goalDialogOpen, setGoalDialogOpen] = useState(false);
   const [editingGoal, setEditingGoal] = useState<Goal | undefined>();
@@ -35,14 +37,26 @@ export default function Goals() {
   // ------------------------------
   // Сохранение цели
   // ------------------------------
-  const handleSaveGoal = (goal: Goal) => {
+  const handleSaveGoal = (goal: GoalFormData) => {
     if (editingGoal) {
-      updateGoal(goal);
-      toast.success("Цель обновлена");
+      updateGoal(goal).then(() => {
+        toast.success("Цель обновлена");
+
+        // --- Обновляем goalId у награды, если она есть ---
+        if (goal.rewardId) {
+          useAppStore.getState().updateRewardGoal(goal.rewardId, goal.id);
+        }
+      });
     } else {
-      addGoal(goal);
-      toast.success("Цель создана");
+      addGoal(goal).then(() => {
+        toast.success("Цель создана");
+
+        if (goal.rewardId) {
+          useAppStore.getState().updateRewardGoal(goal.rewardId, goal.id);
+        }
+      });
     }
+
     setEditingGoal(undefined);
   };
 
@@ -70,11 +84,14 @@ export default function Goals() {
 
   const handleSaveReminder = (reminder: Reminder) => {
     if (editingReminder) {
-      updateReminder(reminder);
-      toast.success("Напоминание обновлено");
+      updateReminder(reminder).then(() => {
+        toast.success("Напоминание обновлено");
+      });
     } else {
-      addReminder(reminder);
-      toast.success("Напоминание создано");
+      addReminder(reminder).then(() => {
+        toast.success("Напоминание создано");
+        navigate("/reminders");
+      });
     }
     setEditingReminder(undefined);
   };
@@ -145,7 +162,7 @@ export default function Goals() {
       ) : (
         <div className="flex flex-wrap gap-2 overflow-auto flex-1">
           {goals.map((goal) => {
-            const reward = rewards.find((r) => r.id === goal.rewardId) || null;
+            const reward = rewards.find((r) => r.goalId === goal.id) || null;
 
             return (
               <div
@@ -159,7 +176,7 @@ export default function Goals() {
               >
                 <GoalCard
                   {...goal}
-                  reward={reward}        // ← вот это
+                  reward={reward}
                   variant="detailed"
                   onEdit={handleEditGoal}
                   onTaskToggle={handleTaskToggle}

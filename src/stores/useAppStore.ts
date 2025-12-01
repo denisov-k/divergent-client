@@ -8,7 +8,15 @@ import { FriendCardProps } from "@/components/FriendCard.tsx";
 interface AppStore {
   initialized: boolean;
   loading: boolean;
-  user: { id: string; name: string; xp: number; level: number; xpInCurrentLevel: number; requiredXp: number } | null;
+  user: {
+    id: string;
+    name: string;
+    xp: number;
+    level: number;
+    xpInCurrentLevel: number;
+    requiredXp: number;
+    photoUrl: string
+  } | null;
   token: string | null,
   goals: Goal[];
   rewards: Reward[];
@@ -32,6 +40,7 @@ interface AppStore {
 
   addReward: (reward: Reward) => Promise<void>;
   updateReward: (reward: Reward) => Promise<void>;
+  updateRewardGoal: (rewardId: string, goalId: string) => Promise<void>;
   claimReward: (id: string) => Promise<void>;
 
   addReminder: (reminder: Reminder) => Promise<void>;
@@ -93,11 +102,9 @@ export const useAppStore = create<AppStore>((set, get) => ({
   initialize: async () => {
     set({ loading: true });
     try {
-      // 1. Получаем пользователя
-      const user = await api.fetchUser(); // с credentials: 'include'
+      const user = await api.fetchUser();
       set({ user });
 
-      // 2. Если есть пользователь, подтягиваем данные
       if (user) {
         const [goals, rewards, reminders, friends, categories] = await Promise.all([
           api.fetchGoals(),
@@ -106,13 +113,14 @@ export const useAppStore = create<AppStore>((set, get) => ({
           api.fetchFriends(),
           api.fetchCategories()
         ]);
-        set({ goals, rewards, reminders, friends, categories, initialized: true });
+
+        set({ goals, rewards, reminders, friends, categories });
       }
     } catch (err) {
       console.error(err);
       set({ user: null });
     } finally {
-      set({ loading: false });
+      set({ initialized: true, loading: false });
     }
   },
 
@@ -121,9 +129,9 @@ export const useAppStore = create<AppStore>((set, get) => ({
   // ==========================
   addXp: async (amount: number) => {
     set({ loading: true });
+    const user = get().user;
     try {
-      const updatedUser = await api.addXp(amount);
-      set({ user: updatedUser });
+      set({ user: { ...user!, xp: amount } });
     } catch (err) {
       console.error(err);
     } finally {
@@ -133,9 +141,9 @@ export const useAppStore = create<AppStore>((set, get) => ({
 
   removeXp: async (amount: number) => {
     set({ loading: true });
+    const user = get().user;
     try {
-      const updatedUser = await api.removeXp(amount);
-      set({ user: updatedUser });
+      set({ user: { ...user!, xp: amount } });
     } catch (err) {
       console.error(err);
     } finally {
@@ -178,12 +186,31 @@ export const useAppStore = create<AppStore>((set, get) => ({
 
   toggleTask: async (goalId: string, taskId: string) => {
     set({ loading: true });
+
     try {
-      const { user, goal } = await api.toggleTask(goalId, taskId);
+      const { task, user } = await api.toggleTask(goalId, taskId);
+
+      // обновляем задачу внутри goals
       set({
-        user,
-        goals: get().goals.map((g) => (g.id === goal.id ? goal : g)),
+        goals: get().goals.map((g) =>
+          g.id !== goalId
+            ? g
+            : {
+              ...g,
+              tasks: g.tasks.map((t) =>
+                t.id === task.id ? task : t
+              )
+            }
+        ),
+        user: {
+          ...get().user,
+          xp: user.xp,
+          level: user.level,
+          xpInCurrentLevel: user.xpInCurrentLevel,
+          requiredXp: user.requiredXp
+        }
       });
+
     } catch (err) {
       console.error(err);
     } finally {
@@ -218,6 +245,14 @@ export const useAppStore = create<AppStore>((set, get) => ({
     } finally {
       set({ loading: false });
     }
+  },
+
+  updateRewardGoal: async (rewardId: string, goalId: string) => {
+    set((state) => ({
+      rewards: state.rewards.map((r) =>
+        r.id === rewardId ? { ...r, goalId } : r
+      ),
+    }));
   },
 
   claimReward: async (id: string) => {

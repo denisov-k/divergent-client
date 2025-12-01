@@ -35,22 +35,6 @@ export async function fetchUser() {
   return fetchJSON("/api/user");
 }
 
-export async function addXp(amount: number) {
-  return fetchJSON("/api/user/xp", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ amount }),
-  });
-}
-
-export async function removeXp(amount: number) {
-  return fetchJSON("/api/user/xp", {
-    method: "DELETE",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ amount }),
-  });
-}
-
 // ==========================
 // GOALS
 // ==========================
@@ -64,14 +48,21 @@ export async function createGoal(goal: Goal) {
 
 export async function updateGoal(goal: Goal) {
   return fetchJSON(`/api/goals/${goal.id}`, {
-    method: "PATCH",
+    method: "PUT",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(goal),
   });
 }
 
+export async function deleteGoal(id: string) {
+  return fetchJSON(`/api/goals/${id}`, { method: 'DELETE' });
+}
+
 export async function toggleTask(goalId: string, taskId: string) {
-  return fetchJSON(`/api/goals/${goalId}/tasks/${taskId}/toggle`, { method: "POST" });
+  return fetchJSON(`/api/goals/${goalId}/toggle-task`, {
+    method: "PATCH",
+    body: JSON.stringify({ taskId }),
+  });
 }
 
 // ==========================
@@ -117,7 +108,7 @@ export async function updateReminder(reminder: Reminder) {
 }
 
 export async function toggleReminder(id: string) {
-  return fetchJSON(`/api/reminders/${id}/toggle`, { method: "POST" });
+  return fetchJSON(`/api/reminders/${id}/toggle`, { method: "PATCH" });
 }
 
 // ==========================

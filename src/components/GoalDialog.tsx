@@ -29,7 +29,10 @@ export interface Goal {
   tasks: Task[];
   dueDate?: string;
   xpReward?: number;
-  rewardId?: string;
+}
+
+export interface GoalFormData extends Goal {
+  rewardId?: string | null;
 }
 
 export interface CategoryOption {
@@ -40,7 +43,7 @@ export interface CategoryOption {
 interface GoalDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onSave: (goal: Goal) => void;
+  onSave: (data: GoalFormData) => void;
   goal?: Goal;
   categories: CategoryOption[];
   rewards: Reward[];
@@ -56,7 +59,9 @@ export function GoalDialog({ open, onOpenChange, onSave, goal, categories, rewar
   const [tasks, setTasks] = useState<Task[]>(goal?.tasks || []);
   const [newTaskTitle, setNewTaskTitle] = useState("");
   const [newTaskXp, setNewTaskXp] = useState("");
-  const [rewardId, setRewardId] = useState(goal?.rewardId || "");
+  const [rewardId, setRewardId] = useState(
+    rewards.find(r => r.goalId === goal?.id)?.id || "none"
+  );
 
   const [isCreatingCategory, setIsCreatingCategory] = useState(false);
   const [newCategoryName, setNewCategoryName] = useState("");
@@ -69,7 +74,7 @@ export function GoalDialog({ open, onOpenChange, onSave, goal, categories, rewar
       setDueDate(goal.dueDate || "");
       setXpReward(goal.xpReward?.toString() || "");
       setTasks(goal.tasks || []);
-      setRewardId(goal.rewardId || "");
+      setRewardId(rewards.find(r => r.goalId === goal?.id)?.id || "none");
     } else {
       // режим создания — очищаем форму
       setTitle("");
@@ -122,7 +127,7 @@ export function GoalDialog({ open, onOpenChange, onSave, goal, categories, rewar
   const handleSave = () => {
     const categoryLabel = categories.find(opt => opt.value === category)?.label || category;
 
-    const goalData: Goal = {
+    const goalData: GoalFormData = {
       id: goal?.id || Date.now().toString(),
       title,
       description,
@@ -130,8 +135,8 @@ export function GoalDialog({ open, onOpenChange, onSave, goal, categories, rewar
       categoryLabel,
       tasks,
       dueDate: dueDate || undefined,
-      rewardId: rewardId || undefined,
       xpReward: xpReward ? parseInt(xpReward) : undefined,
+      rewardId: rewardId === "none" ? null : rewardId, // <-- ВАЖНО
     };
 
     onSave(goalData);
@@ -265,7 +270,7 @@ export function GoalDialog({ open, onOpenChange, onSave, goal, categories, rewar
 
             <Select value={rewardId} onValueChange={(value) => setRewardId(value)}>
               <SelectTrigger id="reward">
-                <SelectValue placeholder="Выберите награду"/>
+                <SelectValue placeholder="Выберите награду" />
               </SelectTrigger>
 
               <SelectContent>

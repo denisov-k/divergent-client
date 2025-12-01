@@ -17,13 +17,15 @@ const Header = () => {
 	const { user } = useAppStore();
 	if (!user) return null;
 
-	const { name, level, xpInCurrentLevel, requiredXp } = user;
+	const { name, level, xpInCurrentLevel, requiredXp, photoUrl } = user;
+
+	console.log(user)
 
 	return (
 		<div id="header" className={isCollapsed ? "collapsed" : ""}>
 			<div className="header-inner">
 				<div className="flex items-start gap-6">
-					<UserAvatar name={name} level={level} size="lg" />
+					<UserAvatar name={name} level={level} avatarUrl={photoUrl} size="lg" />
 					<div className="flex-1 space-y-4">
 						<div>
 							<h1>{name}</h1>
