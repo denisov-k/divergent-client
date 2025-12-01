@@ -1,29 +1,20 @@
-// components/protected-route.tsx
-import { Navigate } from "react-router-dom";
-import { useAppStore } from "@/stores/useAppStore";
-import {useEffect} from "react";
+import { Navigate } from 'react-router-dom'
+import {useAppStore} from "@/stores/useAppStore.ts";
 
-interface ProtectedRouteProps {
-  children: JSX.Element;
-}
-
-export const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
-  const { user, loading, refreshUser } = useAppStore();
-
-  // При монтировании проверяем пользователя (кука может быть)
-  useEffect(() => {
-    if (!user) {
-      refreshUser().catch(() => {}); // попытаемся подгрузить
-    }
-  }, [user]);
+export function ProtectedRoute({ children }: { children: React.ReactNode }) {
+  const { user, loading } = useAppStore();
 
   if (loading) {
-    return <div>Загрузка...</div>; // можно поставить спиннер
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div style={{ color: 'var(--color-primary)' }}>Loading...</div>
+      </div>
+    )
   }
 
   if (!user) {
-    return <Navigate to="/signin" replace />;
+    return <Navigate to="/signin" replace />
   }
 
-  return children;
-};
+  return <>{children}</>
+}

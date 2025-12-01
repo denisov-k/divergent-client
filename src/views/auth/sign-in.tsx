@@ -20,18 +20,10 @@ export default function SignIn() {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [searchParams] = useSearchParams()
   const navigate = useNavigate()
-  const { user, loading, login, refreshUser } = useAppStore()
+  const { user, loading, login } = useAppStore()
   // @ts-ignore
   const isTelegramClient = !!window.Telegram?.WebApp?.initData
   const redirect = searchParams.get('redirect')
-
-  // Авто-проверка пользователя при монтировании
-  useEffect(() => {
-    console.log(user)
-    if (!user) {
-      refreshUser().catch(() => {})
-    }
-  }, [user])
 
   // Редирект если уже есть пользователь
   useEffect(() => {

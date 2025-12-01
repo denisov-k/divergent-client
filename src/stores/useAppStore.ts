@@ -6,6 +6,7 @@ import { Reminder } from "@/components/ReminderDialog";
 import { FriendCardProps } from "@/components/FriendCard.tsx";
 
 interface AppStore {
+  initialized: boolean;
   loading: boolean;
   user: { id: string; name: string; xp: number; level: number; xpInCurrentLevel: number; requiredXp: number } | null;
   token: string | null,
@@ -40,6 +41,7 @@ interface AppStore {
 
 
 export const useAppStore = create<AppStore>((set, get) => ({
+  initialized: false,
   loading: false,
   user: null,
   token: null,
@@ -55,7 +57,8 @@ export const useAppStore = create<AppStore>((set, get) => ({
   login: async (tgData: string) => {
     set({ loading: true });
     try {
-      const { user, token } = await api.login(tgData);
+      const token = '';
+      const user = await api.login(tgData);
       set({ user, token });
       localStorage.setItem("token", token); // сохраняем для перезагрузки
     } catch (err) {
@@ -103,7 +106,7 @@ export const useAppStore = create<AppStore>((set, get) => ({
           api.fetchFriends(),
           api.fetchCategories()
         ]);
-        set({ goals, rewards, reminders, friends, categories });
+        set({ goals, rewards, reminders, friends, categories, initialized: true });
       }
     } catch (err) {
       console.error(err);

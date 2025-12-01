@@ -21,12 +21,13 @@ import {useEffect} from "react";
 
 function AppRoot() {
 
-  const {initialize} = useAppStore();
+  const {initialize, user, initialized} = useAppStore();
 
 
   useEffect(() => {
-    initialize();
-  }, []);
+    if (user && !initialized)
+      initialize();
+  }, [user, initialized]);
 
   return (
     <Router>
