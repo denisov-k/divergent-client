@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 
-import { useAuth } from '@/hooks/use-auth'
+import { useAppStore } from '@/stores/useAppStore';
 
 import { z, ZodError } from 'zod'
 import './index.css';
@@ -37,7 +37,7 @@ export default function SignUp() {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [searchParams] = useSearchParams();
   const navigate = useNavigate()
-  const { signUp } = useAuth()
+  const { signup } = useAppStore();
 
   const handleSubmit = async (data: typeof formData) => {
     try {
@@ -53,7 +53,7 @@ export default function SignUp() {
       console.log(referrerLinkId);
 
       // Attempt sign up
-      await signUp(validatedData.email, validatedData.password, validatedData.name, referrerId, referrerLinkId)
+      await signup(validatedData.email, validatedData.password, validatedData.name, referrerId, referrerLinkId)
       navigate('/')
     } catch (error) {
       if (error instanceof ZodError) {

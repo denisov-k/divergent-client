@@ -16,7 +16,7 @@ export interface Reward {
   description: string;
   icon: RewardIcon;
   isUnlocked: boolean;
-  goalId: string;
+  goalId?: string;
 }
 
 interface RewardDialogProps {

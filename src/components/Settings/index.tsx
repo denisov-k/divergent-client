@@ -1,4 +1,4 @@
-import { useAuth } from '@/hooks/use-auth';
+import { useAppStore } from '@/stores/useAppStore';
 
 import './index.css';
 import LanguageSwitcher from "./LanguageSwitcher";
@@ -7,7 +7,7 @@ import {useTranslation} from "react-i18next";
 export default function Profile() {
   const { t } = useTranslation();
 
-  const { signOut, user } = useAuth();
+  const { signOut, user } = useAppStore();
 
   return (
     <div id='profile'>

@@ -5,7 +5,7 @@ import {ReactSVG} from "react-svg";
 import LogoIcon from '@/assets/images/logo-icon.svg';
 import Logo from '@/assets/images/logo.svg';
 
-import { useAuth } from '@/hooks/use-auth'
+import { useAppStore } from '@/stores/useAppStore';
 import { z, ZodError } from 'zod'
 import './index.css';
 
@@ -21,9 +21,9 @@ export default function Reset() {
     email?: string;
     submit?: string;
   }>({})
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const navigate = useNavigate()
-  const { user, passwordReset } = useAuth()
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const navigate = useNavigate();
+  const { user, passwordReset } = useAppStore();
 
 
   useEffect(() => {

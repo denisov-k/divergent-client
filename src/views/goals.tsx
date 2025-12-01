@@ -21,6 +21,7 @@ export default function Goals() {
     addReminder,
     addCategory,
     updateReminder,
+    updateRewardGoal,
     rewards,
     categories
   } = useAppStore();
@@ -43,17 +44,13 @@ export default function Goals() {
         toast.success("Цель обновлена");
 
         // --- Обновляем goalId у награды, если она есть ---
-        if (goal.rewardId) {
-          useAppStore.getState().updateRewardGoal(goal.rewardId, goal.id);
-        }
+        updateRewardGoal(goal.id, goal.rewardId ?? undefined);
       });
     } else {
       addGoal(goal).then(() => {
         toast.success("Цель создана");
 
-        if (goal.rewardId) {
-          useAppStore.getState().updateRewardGoal(goal.rewardId, goal.id);
-        }
+        updateRewardGoal(goal.id, goal.rewardId ?? undefined);
       });
     }
 

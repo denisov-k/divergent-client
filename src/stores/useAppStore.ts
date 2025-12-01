@@ -11,6 +11,7 @@ interface AppStore {
   user: {
     id: string;
     name: string;
+    role: string;
     xp: number;
     level: number;
     xpInCurrentLevel: number;
@@ -26,6 +27,9 @@ interface AppStore {
 
   initialize: () => Promise<void>;
 
+  signup: (email: string, password: string, name?: string, referrerId?: string, referrerLinkId?: string) => Promise<void>;
+  signOut: () => Promise<void>;
+  passwordReset: (email: string) => Promise<void>;
   login: (tgData: string) => Promise<void>;
   logout: () => void;
   refreshUser: () => Promise<void>;
@@ -40,7 +44,7 @@ interface AppStore {
 
   addReward: (reward: Reward) => Promise<void>;
   updateReward: (reward: Reward) => Promise<void>;
-  updateRewardGoal: (rewardId: string, goalId: string) => Promise<void>;
+  updateRewardGoal: (goalId: string, rewardId?: string) => Promise<void>;
   claimReward: (id: string) => Promise<void>;
 
   addReminder: (reminder: Reminder) => Promise<void>;
@@ -76,6 +80,18 @@ export const useAppStore = create<AppStore>((set, get) => ({
     } finally {
       set({ loading: false });
     }
+  },
+
+  signup: async (email, password, name, referrerId, referrerLinkId) => {
+    console.log(email, password, name, referrerId, referrerLinkId);
+  },
+
+  signOut: async () => {
+
+  },
+
+  passwordReset: async (email) => {
+    console.log(email);
   },
 
   logout: () => {
@@ -189,26 +205,25 @@ export const useAppStore = create<AppStore>((set, get) => ({
 
     try {
       const { task, user } = await api.toggleTask(goalId, taskId);
+      const storedUser = get().user;
+
+      console.log(task, user)
 
       // обновляем задачу внутри goals
       set({
-        goals: get().goals.map((g) =>
-          g.id !== goalId
-            ? g
-            : {
-              ...g,
-              tasks: g.tasks.map((t) =>
-                t.id === task.id ? task : t
-              )
-            }
+        goals: get().goals.map(g =>
+          g.id !== goalId ? g : { ...g, tasks: g.tasks.map(t => t.id === task.id ? task : t) }
         ),
         user: {
-          ...get().user,
+          id: storedUser!.id,
+          name: storedUser!.name,
+          photoUrl: storedUser!.photoUrl,
+          role: storedUser!.role,
           xp: user.xp,
           level: user.level,
           xpInCurrentLevel: user.xpInCurrentLevel,
-          requiredXp: user.requiredXp
-        }
+          requiredXp: user.requiredXp,
+        },
       });
 
     } catch (err) {
@@ -247,13 +262,21 @@ export const useAppStore = create<AppStore>((set, get) => ({
     }
   },
 
-  updateRewardGoal: async (rewardId: string, goalId: string) => {
+  updateRewardGoal: async (goalId: string, rewardId?: string) =>
     set((state) => ({
-      rewards: state.rewards.map((r) =>
-        r.id === rewardId ? { ...r, goalId } : r
-      ),
-    }));
-  },
+      rewards: state.rewards.map((r) => {
+        console.log(rewardId, goalId)
+
+        if (r.id === rewardId) {
+          // новая/редактируемая награда
+          return { ...r, goalId: goalId === "none" ? undefined : goalId };
+        } else if (r.goalId === goalId) {
+          // старая награда, которая была привязана к этой цели — отвязываем
+          return { ...r, goalId: undefined };
+        }
+        return r;
+      }),
+    })),
 
   claimReward: async (id: string) => {
     set({ loading: true });
