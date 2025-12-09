@@ -44,7 +44,7 @@ export function RewardCard({
       }`}
     >
       <CardContent className="px-6 [&:last-child]:pb-6 pt-6">
-        <div className="flex items-start gap-4">
+        <div className="flex gap-4 items-center">
           <div
             className={`p-3 rounded-lg ${
               isUnlocked ? "bg-green-500/10" : "bg-muted"

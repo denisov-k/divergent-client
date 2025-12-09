@@ -12,14 +12,24 @@ export default function Friends() {
       <div className="flex items-center justify-between py-2">
         <h2>Друзья и лидеры</h2>
         <Button disabled>
-          <Plus className="size-4 mr-2" />
+          <Plus className="size-4 mr-2"/>
           Добавить друга
         </Button>
       </div>
 
-      <div className="grid gap-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 overflow-auto">
+      <div className="flex flex-wrap gap-2 overflow-auto">
         {friends.map((friend) => (
-          <FriendCard key={friend.id} {...friend} />
+          <div
+            key={friend.id}
+            className="
+              w-full
+              md:basis-[calc(50%-0.5rem)]
+              lg:basis-[calc(33.333%-0.5rem)]
+              xl:basis-[calc(25%-0.5rem)]
+            "
+          >
+            <FriendCard {...friend} />
+          </div>
         ))}
       </div>
     </div>

@@ -4,11 +4,18 @@ import { Button } from "./ui/button";
 import { Bell, Clock, Repeat, Edit, Target } from "lucide-react";
 import { Switch } from "./ui/switch";
 
+import { DAYS_OF_WEEK } from "@/components/ReminderDialog.tsx";
+
+const DAY_LABEL_MAP = Object.fromEntries(
+  DAYS_OF_WEEK.map(d => [d.key, d.label])
+) as Record<string, string>;
+
 interface ReminderCardProps {
   id: string;
   title: string;
   time: string;
-  days?: string[];
+  daysOfWeek?: string[];
+  daysOfMonth?: number[];
   isActive: boolean;
   goalTitle?: string;
   taskTitle?: string;
@@ -16,17 +23,21 @@ interface ReminderCardProps {
   onEdit?: (id: string) => void;
 }
 
-export function ReminderCard({ 
-  id,
-  title, 
-  time, 
-  days, 
-  isActive,
-  goalTitle,
-  taskTitle,
-  onToggle,
-  onEdit,
-}: ReminderCardProps) {
+export function ReminderCard({
+     id,
+     title,
+     time,
+     daysOfWeek = [],
+     daysOfMonth = [],
+     isActive,
+     goalTitle,
+     taskTitle,
+     onToggle,
+     onEdit,
+   }: ReminderCardProps) {
+  const hasDays = daysOfWeek.length > 0;
+  const hasDates = daysOfMonth.length > 0;
+
   return (
     <Card className={`transition-all ${isActive ? "border-primary" : "opacity-60"}`}>
       <CardHeader className="pb-3">
@@ -38,28 +49,40 @@ export function ReminderCard({
           <div className="flex items-center gap-2">
             <Switch checked={isActive} onCheckedChange={onToggle} />
             {onEdit && (
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => onEdit(id)}
-              >
+              <Button variant="ghost" size="icon" onClick={() => onEdit(id)}>
                 <Edit className="size-4" />
               </Button>
             )}
           </div>
         </div>
       </CardHeader>
+
       <CardContent className="space-y-3">
         <div className="flex items-center gap-2">
           <Clock className="size-4 text-muted-foreground" />
           <span>{time}</span>
         </div>
-        
-        {days && days.length > 0 && (
+
+        {/* Дни недели */}
+        {hasDays && (
           <div className="flex items-center gap-2">
             <Repeat className="size-4 text-muted-foreground" />
             <div className="flex flex-wrap gap-1">
-              {days.map((day) => (
+              {daysOfWeek.map(day => (
+                <Badge key={day} variant="outline" className="text-xs">
+                  {DAY_LABEL_MAP[day] ?? day}
+                </Badge>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Числа месяца */}
+        {hasDates && (
+          <div className="flex items-center gap-2">
+            <Repeat className="size-4 text-muted-foreground" />
+            <div className="flex flex-wrap gap-1">
+              {daysOfMonth?.sort((dayX, dayY) => dayX - dayY).map(day => (
                 <Badge key={day} variant="outline" className="text-xs">
                   {day}
                 </Badge>
@@ -68,6 +91,7 @@ export function ReminderCard({
           </div>
         )}
 
+        {/* Цель и задача */}
         {(goalTitle || taskTitle) && (
           <div className="pt-2 border-t">
             <div className="flex items-start gap-2">
