@@ -4,20 +4,21 @@ import { CategoryBadge } from "./CategoryBadge";
 import { ProgressRing } from "./ProgressRing";
 import { Badge } from "./ui/badge";
 import { Button } from "./ui/button";
-import {Calendar, Target, Edit, ChevronDown, ChevronUp, AlarmClock} from "lucide-react";
+import { Calendar, Target, Edit, ChevronDown, ChevronUp, AlarmClock } from "lucide-react";
 import { TaskItem } from "./TaskItem";
 import { useState } from "react";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "./ui/collapsible";
-import {Reward} from "@/components/RewardDialog.tsx";
+import { Reward } from "@/components/RewardDialog.tsx";
 
 export type CategoryType = string;
 
-interface Task {
+export interface Task {
   id: string;
   title: string;
   completed: boolean;
   xpReward?: number;
   dueDate?: string;
+  subtasks?: Task[];
 }
 
 interface GoalCardProps {
@@ -31,34 +32,80 @@ interface GoalCardProps {
   xpReward?: number;
   reward?: Reward | null;
   variant?: "compact" | "detailed";
+  editMode?: boolean;
   onEdit?: (id: string) => void;
-  onTaskToggle?: (goalId: string, taskId: string) => void;
+  onTaskToggle?: (goalId: string, taskId: string, parentId?: string) => void;
   onAddReminder?: (id: string) => void;
 }
 
 export function GoalCard({
-  id,
-  title,
-  description,
-  category,
-  categoryLabel,
-  tasks,
-  dueDate,
-  xpReward,
-  reward,
-  variant = "detailed",
-  onEdit,
-  onTaskToggle,
-  onAddReminder,
-}: GoalCardProps) {
+                           id,
+                           title,
+                           description,
+                           category,
+                           categoryLabel,
+                           tasks,
+                           dueDate,
+                           xpReward,
+                           reward,
+                           variant = "detailed",
+                           editMode = false,
+                           onEdit,
+                           onTaskToggle,
+                           onAddReminder,
+                         }: GoalCardProps) {
   const [isOpen, setIsOpen] = useState(false);
-  const [completedOpen, setCompletedOpen] = useState(false);
+  const [expandedTasks, setExpandedTasks] = useState<Record<string, boolean>>({});
+  const [newSubTaskTitles, setNewSubTaskTitles] = useState<Record<string, string>>({});
+  const [newSubTaskXps, setNewSubTaskXps] = useState<Record<string, string>>({});
 
-  const completedTasks = tasks.filter(t => t.completed).length;
-  const activeTasks = tasks.filter(t => !t.completed);
-  const completedTasksList = tasks.filter(t => t.completed);
+  function countTasks(tasks?: Task[]): number {
+    if (!tasks || tasks.length === 0) return 0;
+    return tasks.reduce((sum, t) => sum + 1 + countTasks(t.subtasks), 0);
+  }
+
+  function countCompleted(tasks?: Task[]): number {
+    if (!tasks || tasks.length === 0) return 0;
+    return tasks.reduce((sum, t) => sum + (t.completed ? 1 : 0) + countCompleted(t.subtasks), 0);
+  }
+
   const totalTasks = tasks.length;
-  const progress = totalTasks > 0 ? (completedTasks / totalTasks) * 100 : 0;
+  const completedTasks = tasks.reduce((sum, t) => sum + (t.completed ? 1 : 0) + countCompleted(t.subtasks), 0);
+  const progress = totalTasks > 0 ? (completedTasks / countTasks(tasks)) * 100 : 0;
+
+  const handleToggleExpand = (taskId: string) => {
+    setExpandedTasks({ ...expandedTasks, [taskId]: !expandedTasks[taskId] });
+  };
+
+  const handleAddSubTask = (parentId: string) => {
+    console.log("Add subtask to", parentId, newSubTaskTitles[parentId], newSubTaskXps[parentId]);
+    setNewSubTaskTitles({ ...newSubTaskTitles, [parentId]: "" });
+    setNewSubTaskXps({ ...newSubTaskXps, [parentId]: "" });
+  };
+
+  const handleRemoveTask = (taskId: string, parentId?: string) => {
+    console.log("Remove task", taskId, "parent:", parentId);
+  };
+
+  const renderTasks = (tasks: Task[], parentId?: string) => {
+    return tasks.map((task) => (
+      <TaskItem
+        key={task.id}
+        {...task}
+        parentId={parentId}
+        onToggle={(taskId, pId) => onTaskToggle?.(id, taskId, pId)}
+        onRemove={handleRemoveTask}
+        onToggleExpand={handleToggleExpand}
+        newSubTaskTitles={newSubTaskTitles}
+        newSubTaskXps={newSubTaskXps}
+        setNewSubTaskTitles={setNewSubTaskTitles}
+        setNewSubTaskXps={setNewSubTaskXps}
+        handleAddSubTask={handleAddSubTask}
+        expanded={expandedTasks[task.id]}
+        editMode={editMode}
+      />
+    ));
+  };
 
   if (variant === "compact") {
     return (
@@ -74,12 +121,7 @@ export function GoalCard({
             <div className="flex items-center gap-2">
               <ProgressRing progress={progress} size={50} strokeWidth={4} />
               {onEdit && (
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => onEdit(id)}
-                  className="shrink-0"
-                >
+                <Button variant="ghost" size="icon" onClick={() => onEdit(id)} className="shrink-0">
                   <Edit className="size-4" />
                 </Button>
               )}
@@ -88,12 +130,8 @@ export function GoalCard({
         </CardHeader>
         <CardContent className="space-y-2">
           <div className="flex items-center justify-between">
-            <span className="text-muted-foreground">
-              {completedTasks} / {totalTasks} задач
-            </span>
-            {xpReward && (
-              <Badge variant="secondary">+{xpReward} XP</Badge>
-            )}
+            <span className="text-muted-foreground">{completedTasks} / {countTasks(tasks)} задач</span>
+            {xpReward && <Badge variant="secondary">+{xpReward} XP</Badge>}
           </div>
           {dueDate && (
             <div className="flex items-center gap-2 text-muted-foreground">
@@ -116,33 +154,13 @@ export function GoalCard({
               <CategoryBadge category={category} label={categoryLabel} />
             </div>
             <CardTitle>{title}</CardTitle>
-            {description && (
-              <CardDescription>{description}</CardDescription>
-            )}
+            {description && <CardDescription>{description}</CardDescription>}
           </div>
           <div className="flex items-center gap-2">
             <ProgressRing progress={progress} size={70} strokeWidth={6} />
             <div className="flex flex-col">
-              {onEdit && (
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => onEdit(id)}
-                >
-                  <Edit className="size-4" />
-                </Button>
-              )}
-              {onAddReminder && (
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => onAddReminder(id)}
-                  className="shrink-0"
-                  title="Создать напоминание"
-                >
-                  <AlarmClock className="size-4" />
-                </Button>
-              )}
+              {onEdit && <Button variant="ghost" size="icon" onClick={() => onEdit(id)}><Edit className="size-4" /></Button>}
+              {onAddReminder && <Button variant="ghost" size="icon" onClick={() => onAddReminder(id)} className="shrink-0" title="Создать напоминание"><AlarmClock className="size-4" /></Button>}
             </div>
           </div>
         </div>
@@ -151,9 +169,7 @@ export function GoalCard({
         <div>
           <div className="flex items-center justify-between mb-2">
             <span className="text-muted-foreground">Прогресс выполнения</span>
-            <span className="text-muted-foreground">
-              {completedTasks} / {totalTasks} задач
-            </span>
+            <span className="text-muted-foreground">{completedTasks} / {countTasks(tasks)} задач</span>
           </div>
           <Progress value={progress} className="h-2" />
         </div>
@@ -165,47 +181,8 @@ export function GoalCard({
               {isOpen ? <ChevronUp className="size-4" /> : <ChevronDown className="size-4" />}
             </Button>
           </CollapsibleTrigger>
-
           <CollapsibleContent className="space-y-2 mt-3">
-
-            {/* ВЛОЖЕННЫЙ COLLAPSIBLE ДЛЯ ВЫПОЛНЕННЫХ ЗАДАЧ */}
-            {completedTasksList.length > 0 && (
-              <Collapsible
-                open={completedOpen}
-                onOpenChange={setCompletedOpen}
-              >
-                <CollapsibleTrigger asChild>
-                  <Button variant="ghost" className="w-full justify-between text-muted-foreground">
-                    <span>Выполненные задачи</span>
-                    {completedOpen ? (
-                      <ChevronUp className="size-4" />
-                    ) : (
-                      <ChevronDown className="size-4" />
-                    )}
-                  </Button>
-                </CollapsibleTrigger>
-
-                <CollapsibleContent className="space-y-2 mt-2">
-                  {completedTasksList.map(task => (
-                    <TaskItem
-                      key={task.id}
-                      {...task}
-                      onToggle={() => onTaskToggle?.(id, task.id)}
-                    />
-                  ))}
-                </CollapsibleContent>
-              </Collapsible>
-            )}
-
-            {/* НЕВЫПОЛНЕННЫЕ ЗАДАЧИ */}
-            {activeTasks.map(task => (
-              <TaskItem
-                key={task.id}
-                {...task}
-                onToggle={() => onTaskToggle?.(id, task.id)}
-              />
-            ))}
-
+            {renderTasks(tasks)}
           </CollapsibleContent>
         </Collapsible>
 
@@ -217,7 +194,7 @@ export function GoalCard({
             </div>
           )}
           {(xpReward || reward) && (
-            <div className="flex item-center flex-wrap justify-center items-center">
+            <div className="flex items-center flex-wrap justify-center">
               <span className="mr-1">Награда: </span>
               <div className="flex flex-wrap justify-center">
                 {reward && <Badge className="mr-1 my-0.5 bg-purple-500">{reward?.title}</Badge>}

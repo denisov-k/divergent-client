@@ -187,18 +187,17 @@ export function GoalDialog({
     setNewSubTaskXps(prev => ({ ...prev, [parentId]: "" }));
   };
 
-  const handleRemoveTask = (id: string, parentId?: string) => {
-    if (parentId) {
-      setTasks(
-        tasks.map((t) =>
-          t.id === parentId
-            ? { ...t, subtasks: t.subtasks?.filter((st) => st.id !== id) }
-            : t
-        )
-      );
-    } else {
-      setTasks(tasks.filter((task) => task.id !== id));
-    }
+  function removeTaskRecursive(tasks: Task[], idToRemove: string): Task[] {
+    return tasks
+      .filter((task) => task.id !== idToRemove)
+      .map((task) => ({
+        ...task,
+        subtasks: task.subtasks ? removeTaskRecursive(task.subtasks, idToRemove) : [],
+      }));
+  }
+
+  const handleRemoveTask = (id: string) => {
+    setTasks((prev) => removeTaskRecursive(prev, id));
   };
 
   const handleToggleTask = (id: string, parentId?: string) => {
@@ -410,6 +409,7 @@ export function GoalDialog({
                 id={task.id}
                 title={task.title}
                 completed={task.completed}
+                editMode={true}
                 xpReward={task.xpReward}
                 dueDate={task.dueDate}
                 subtasks={task.subtasks} // Task[], а не TaskItemProps[]

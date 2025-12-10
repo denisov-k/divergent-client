@@ -3,8 +3,8 @@ import { Badge } from "./ui/badge";
 import { Calendar, ChevronDown, ChevronRight, Plus, X } from "lucide-react";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
-import React, {useState} from "react";
-import {Task} from "@/components/GoalDialog.tsx";
+import React, { useState } from "react";
+import { Task } from "@/components/GoalDialog.tsx";
 
 export interface TaskItemProps {
   id: string;
@@ -14,13 +14,12 @@ export interface TaskItemProps {
   dueDate?: string;
   subtasks?: Task[];
   expanded?: boolean;
+  editMode?: boolean;
 
-  // функции для управления задачами
   onToggle: (id: string, parentId?: string) => void;
   onRemove: (id: string, parentId?: string) => void;
   onToggleExpand: (id: string) => void;
 
-  // для добавления подзадач
   newSubTaskTitles: Record<string, string>;
   newSubTaskXps: Record<string, string>;
   setNewSubTaskTitles: React.Dispatch<React.SetStateAction<Record<string, string>>>;
@@ -38,6 +37,7 @@ export function TaskItem({
                            dueDate,
                            subtasks = [],
                            expanded = false,
+                           editMode = false,
                            onToggle,
                            onRemove,
                            onToggleExpand,
@@ -58,9 +58,11 @@ export function TaskItem({
   return (
     <div className="flex flex-col p-3 rounded-lg border bg-card hover:bg-accent/50 transition-colors">
       <div className="flex items-center gap-3">
-        <Button variant="ghost" size="icon" onClick={() => onToggleExpand(id)}>
-          {expanded ? <ChevronDown /> : <ChevronRight />}
-        </Button>
+        {(hasSubtasks || editMode) && (
+          <Button variant="ghost" size="icon" onClick={() => onToggleExpand(id)}>
+            {expanded ? <ChevronDown /> : <ChevronRight />}
+          </Button>
+        )}
 
         <Checkbox
           id={id}
@@ -90,14 +92,16 @@ export function TaskItem({
           </Badge>
         )}
 
-        <Button variant="ghost" size="icon" onClick={() => onRemove(id, parentId)}>
-          <X className="size-4" />
-        </Button>
+        {editMode && (
+          <Button variant="ghost" size="icon" onClick={() => onRemove(id, parentId)}>
+            <X className="size-4" />
+          </Button>
+        )}
       </div>
 
       {/* Подзадачи */}
       {expanded && hasSubtasks && (
-        <div className="ml-2 mt-2 space-y-1">
+        <div className="ml-2 mt-4 space-y-1">
           {subtasks.map((subtask) => (
             <TaskItem
               key={subtask.id}
@@ -112,13 +116,14 @@ export function TaskItem({
               handleAddSubTask={handleAddSubTask}
               parentId={id}
               expanded={expandedTasks[subtask.id]}
+              editMode={editMode}
             />
           ))}
         </div>
       )}
 
       {/* Добавление новой подзадачи */}
-      {expanded && (
+      {expanded && editMode && (
         <div className="flex gap-2 mt-1 ml-2">
           <Input
             placeholder="Подзадача"
