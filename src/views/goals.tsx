@@ -1,6 +1,6 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { GoalDialog, type Goal, type GoalFormData, type CategoryOption } from "@/components/GoalDialog";
+import { GoalDialog, type Goal, type GoalFormData, type CategoryOption, type Task } from "@/components/GoalDialog";
 import { GoalCard } from "@/components/GoalCard";
 
 import { Plus } from "lucide-react";
@@ -93,6 +93,25 @@ export default function Goals() {
     setEditingReminder(undefined);
   };
 
+  function allTasksCompleted(tasks: Task[]): boolean {
+    return tasks.every(
+      t => t.completed && (!t.subtasks || allTasksCompleted(t.subtasks))
+    );
+  }
+
+  function findTaskRecursive(tasks: Task[], taskId: string): Task | null {
+    for (const task of tasks) {
+      if (task.id === taskId) return task;
+
+      if (task.subtasks?.length) {
+        const found = findTaskRecursive(task.subtasks, taskId);
+        if (found) return found;
+      }
+    }
+    return null;
+  }
+
+
   // ------------------------------
   // Переключить задачу
   // ------------------------------
@@ -100,7 +119,8 @@ export default function Goals() {
     const goal = goals.find((g) => g.id === goalId);
     if (!goal) return;
 
-    const task = goal.tasks.find((t) => t.id === taskId);
+    // --- Рекурсивно ищем задачу ---
+    const task = findTaskRecursive(goal.tasks, taskId);
     if (!task) return;
 
     const newCompleted = !task.completed;
@@ -113,15 +133,11 @@ export default function Goals() {
       addXp(-(task.xpReward || 0));
     }
 
+    // toggle в сторе
     toggleTask(goalId, taskId);
 
-    // Проверяем — цель выполнена?
-    const updatedTasks = goal.tasks.map((t) =>
-      t.id === taskId ? { ...t, completed: newCompleted } : t
-    );
-
-    const allCompleted = updatedTasks.every((t) => t.completed);
-    if (allCompleted && !goal.tasks.every((t) => t.completed)) {
+    // Проверяем выполнена ли вся цель
+    if (allTasksCompleted(goal.tasks)) {
       addXp(goal.xpReward ?? 0);
       toast.success(`🎉 Цель выполнена! +${goal.xpReward} XP`);
     }

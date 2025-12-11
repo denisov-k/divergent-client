@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import * as api from "@/utils/api";
-import { type CategoryOption, Goal } from "@/components/GoalDialog";
+import {type CategoryOption, Goal, Task} from "@/components/GoalDialog";
 import { Reward } from "@/components/RewardDialog";
 import { Reminder } from "@/components/ReminderDialog";
 import { FriendCardProps } from "@/components/FriendCard.tsx";
@@ -52,6 +52,34 @@ interface AppStore {
   toggleReminder: (id: string) => Promise<void>;
 }
 
+function setChildrenCompletion(task: Task, completed: boolean): Task {
+  return {
+    ...task,
+    completed,
+    subtasks: task.subtasks?.map(st => setChildrenCompletion(st, completed)) ?? []
+  };
+}
+
+function allTasksCompleted(tasks: Task[]): boolean {
+  return tasks.every(t => t.completed);
+}
+
+function toggleTaskDeep(tasks: Task[], taskId: string): Task[] {
+  return tasks.map(task => {
+    if (task.id === taskId) {
+      const newCompleted = !task.completed;
+      return setChildrenCompletion(task, newCompleted);
+    }
+
+    if (task.subtasks?.length) {
+      const updatedSubtasks = toggleTaskDeep(task.subtasks, taskId);
+      const parentCompleted = allTasksCompleted(updatedSubtasks);
+      return { ...task, completed: parentCompleted, subtasks: updatedSubtasks };
+    }
+
+    return task;
+  });
+}
 
 export const useAppStore = create<AppStore>((set, get) => ({
   initialized: false,
@@ -204,16 +232,19 @@ export const useAppStore = create<AppStore>((set, get) => ({
     set({ loading: true });
 
     try {
-      const { task, user } = await api.toggleTask(goalId, taskId);
+      const { user } = await api.toggleTask(goalId, taskId);
       const storedUser = get().user;
 
-      console.log(task, user)
-
-      // обновляем задачу внутри goals
       set({
         goals: get().goals.map(g =>
-          g.id !== goalId ? g : { ...g, tasks: g.tasks.map(t => t.id === task.id ? task : t) }
+          g.id !== goalId
+            ? g
+            : {
+              ...g,
+              tasks: toggleTaskDeep(g.tasks, taskId), // ← вот оно
+            }
         ),
+
         user: {
           id: storedUser!.id,
           name: storedUser!.name,

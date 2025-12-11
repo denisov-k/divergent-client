@@ -101,7 +101,7 @@ export function TaskItem({
 
       {/* Подзадачи */}
       {expanded && hasSubtasks && (
-        <div className="ml-2 mt-4 space-y-1">
+        <div className="mt-4 space-y-1">
           {subtasks.map((subtask) => (
             <TaskItem
               key={subtask.id}
@@ -124,7 +124,7 @@ export function TaskItem({
 
       {/* Добавление новой подзадачи */}
       {expanded && editMode && (
-        <div className="flex gap-2 mt-1 ml-2">
+        <div className="flex gap-2 mt-2">
           <Input
             placeholder="Подзадача"
             value={newSubTaskTitles[id] || ""}

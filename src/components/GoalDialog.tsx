@@ -200,23 +200,27 @@ export function GoalDialog({
     setTasks((prev) => removeTaskRecursive(prev, id));
   };
 
-  const handleToggleTask = (id: string, parentId?: string) => {
-    if (parentId) {
-      setTasks(
-        tasks.map((t) =>
-          t.id === parentId
-            ? {
-              ...t,
-              subtasks: t.subtasks?.map((st) =>
-                st.id === id ? { ...st, completed: !st.completed } : st
-              ),
-            }
-            : t
-        )
-      );
-    } else {
-      setTasks(tasks.map((task) => (task.id === id ? { ...task, completed: !task.completed } : task)));
-    }
+  function toggleTaskRecursive(tasks: Task[], taskId: string): Task[] {
+    return tasks.map((task) => {
+      if (task.id === taskId) {
+        // нашли нужную задачу
+        return { ...task, completed: !task.completed };
+      }
+
+      if (task.subtasks?.length) {
+        // продолжаем рекурсию
+        return {
+          ...task,
+          subtasks: toggleTaskRecursive(task.subtasks, taskId),
+        };
+      }
+
+      return task;
+    });
+  }
+
+  const handleToggleTask = (id: string) => {
+    setTasks(prev => toggleTaskRecursive(prev, id));
   };
 
   const toggleExpand = (id: string) => {
