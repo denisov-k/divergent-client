@@ -1,6 +1,8 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { GoalDialog, type Goal, type GoalFormData, type CategoryOption, type Task } from "@/components/GoalDialog";
+import { GoalDialog } from "@/components/GoalDialog";
+import {GoalFormData, Goal, CategoryOption, Task} from "@/types";
+
 import { GoalCard } from "@/components/GoalCard";
 
 import { Plus } from "lucide-react";
@@ -8,8 +10,11 @@ import { toast } from "sonner";
 
 import { useAppStore } from "@/stores/useAppStore";
 import {useState} from "react";
-import {Reminder, ReminderDialog} from "@/components/ReminderDialog.tsx";
+import {ReminderDialog} from "@/components/ReminderDialog.tsx";
 import {useNavigate} from "react-router-dom";
+import {useTranslation} from "react-i18next";
+
+import {Reminder} from "@/types";
 
 export default function Goals() {
   const {
@@ -25,6 +30,8 @@ export default function Goals() {
     rewards,
     categories
   } = useAppStore();
+
+  const { t } = useTranslation();
 
   const navigate = useNavigate();
 
@@ -146,7 +153,7 @@ export default function Goals() {
   return (
     <div className="flex flex-col px-2 flex-1">
       <div className="flex items-center justify-between py-2">
-        <h2>Мои цели</h2>
+        <h2>{t('goals.title')}</h2>
 
         <Button
           onClick={() => {
@@ -155,7 +162,7 @@ export default function Goals() {
           }}
         >
           <Plus className="size-4 mr-2" />
-          Создать цель
+          {t('goals.create')}
         </Button>
       </div>
 

@@ -3,17 +3,19 @@ import { Button } from "@/components/ui/button";
 import { FriendCard } from "@/components/FriendCard";
 
 import { useAppStore } from "@/stores/useAppStore";
+import {useTranslation} from "react-i18next";
 
 export default function Friends() {
+  const { t } = useTranslation();
   const { friends } = useAppStore();
 
   return (
     <div className="flex flex-col px-2 flex-1">
       <div className="flex items-center justify-between py-2">
-        <h2>Друзья и лидеры</h2>
+        <h2>{t('frens.title')}</h2>
         <Button disabled>
           <Plus className="size-4 mr-2"/>
-          Добавить друга
+          {t('frens.add')}
         </Button>
       </div>
 

@@ -17,38 +17,9 @@ import { Plus } from "lucide-react";
 import { Separator } from "./ui/separator";
 
 import { type CategoryType } from "@/components/GoalCard";
-import { Reward } from "@/components/RewardDialog";
+import {useTranslation} from "react-i18next";
+import {GoalFormData, Goal, CategoryOption, Task, Reward} from "@/types";
 
-export interface Task {
-  id: string;
-  title: string;
-  completed: boolean;
-  xpReward?: number;
-  dueDate?: string;
-  subtasks?: Task[];
-  expanded?: boolean;
-  parentId?: string | null;
-}
-
-export interface Goal {
-  id: string;
-  title: string;
-  description?: string;
-  category: CategoryType;
-  categoryLabel: string;
-  tasks: Task[];
-  dueDate?: string;
-  xpReward?: number;
-}
-
-export interface GoalFormData extends Goal {
-  rewardId?: string | null;
-}
-
-export interface CategoryOption {
-  value: string;
-  label: string;
-}
 
 interface GoalDialogProps {
   open: boolean;
@@ -80,6 +51,8 @@ export function GoalDialog({
   const [rewardId, setRewardId] = useState(
     rewards.find((r) => r.goalId === goal?.id)?.id || "none"
   );
+
+  const { t } = useTranslation();
 
   const [isCreatingCategory, setIsCreatingCategory] = useState(false);
   const [newCategoryName, setNewCategoryName] = useState("");
@@ -467,7 +440,7 @@ export function GoalDialog({
             Отмена
           </Button>
           <Button onClick={handleSave} disabled={!title || tasks.length === 0}>
-            {goal ? "Сохранить" : "Создать цель"}
+            {goal ? t('goals.save') : t('goals.create')}
           </Button>
         </DialogFooter>
       </DialogContent>

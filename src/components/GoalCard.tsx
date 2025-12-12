@@ -8,7 +8,9 @@ import { Calendar, Target, Edit, ChevronDown, ChevronUp, AlarmClock } from "luci
 import { TaskItem } from "./TaskItem";
 import { useState } from "react";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "./ui/collapsible";
-import { Reward } from "@/components/RewardDialog.tsx";
+import {useTranslation} from "react-i18next";
+
+import {Reward} from "@/types";
 
 export type CategoryType = string;
 
@@ -58,6 +60,8 @@ export function GoalCard({
   const [expandedTasks, setExpandedTasks] = useState<Record<string, boolean>>({});
   const [newSubTaskTitles, setNewSubTaskTitles] = useState<Record<string, string>>({});
   const [newSubTaskXps, setNewSubTaskXps] = useState<Record<string, string>>({});
+
+  const { t } = useTranslation();
 
   function countTasks(tasks?: Task[]): number {
     if (!tasks || tasks.length === 0) return 0;
@@ -168,8 +172,8 @@ export function GoalCard({
       <CardContent className="space-y-4">
         <div>
           <div className="flex items-center justify-between mb-2">
-            <span className="text-muted-foreground">Прогресс выполнения</span>
-            <span className="text-muted-foreground">{completedTasks} / {countTasks(tasks)} задач</span>
+            <span className="text-muted-foreground">{t('goals.progress')}</span>
+            <span className="text-muted-foreground">{completedTasks} / {countTasks(tasks)} {t('goals.tasks_count')}</span>
           </div>
           <Progress value={progress} className="h-2" />
         </div>
@@ -177,7 +181,7 @@ export function GoalCard({
         <Collapsible open={isOpen} onOpenChange={setIsOpen}>
           <CollapsibleTrigger asChild>
             <Button variant="outline" className="w-full justify-between">
-              <span>Задачи цели</span>
+              <span>{t('goals.tasks')}</span>
               {isOpen ? <ChevronUp className="size-4" /> : <ChevronDown className="size-4" />}
             </Button>
           </CollapsibleTrigger>

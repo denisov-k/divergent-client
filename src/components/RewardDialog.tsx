@@ -6,18 +6,9 @@ import { Label } from "./ui/label";
 import { Textarea } from "./ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
 import { Trophy, Star, Gift, Crown, Award, Zap } from "lucide-react";
-import {Goal} from "@/components/GoalDialog.tsx";
 
-type RewardIcon = "trophy" | "star" | "gift" | "crown" | "award" | "zap";
+import {Goal, Reward, RewardIcon} from "@/types";
 
-export interface Reward {
-  id: string;
-  title: string;
-  description: string;
-  icon: RewardIcon;
-  isUnlocked: boolean;
-  goalId?: string;
-}
 
 interface RewardDialogProps {
   open: boolean;

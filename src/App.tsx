@@ -11,7 +11,7 @@ import ResetPasswordView from '@/views/auth/reset'
 
 import FrensView from '@/views/frens'
 import GoalsView from '@/views/goals'
-import SettingsView from '@/views/settings/'
+import SettingsView from '@/views/settings'
 import RewardsView from '@/views/rewards'
 import RemindersView from '@/views/reminders'
 import ProgressView from '@/views/progress'
@@ -19,10 +19,17 @@ import ProgressView from '@/views/progress'
 import {useAppStore} from "@/stores/useAppStore.ts";
 import {useEffect} from "react";
 
+import i18n from './i18n';
+
 function AppRoot() {
 
-  const {initialize, initialized, loading} = useAppStore();
+  const {initialize, initialized, loading, user} = useAppStore();
 
+  useEffect(() => {
+    if (user?.language) {
+      i18n.changeLanguage(user.language);
+    }
+  }, [user?.language]);
 
   useEffect(() => {
     if (!initialized && !loading) {

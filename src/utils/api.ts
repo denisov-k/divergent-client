@@ -1,7 +1,4 @@
-// Обёртка для fetch с JSON и проверкой ошибок
-import {Goal} from "@/components/GoalDialog.tsx";
-import {Reward} from "@/components/RewardDialog.tsx";
-import {Reminder} from "@/components/ReminderDialog.tsx";
+import type { User, Goal, Reward, Reminder } from "@/types/";
 
 import Config from '@/services/Config';
 
@@ -33,6 +30,14 @@ export async function login(tgData: string) {
 // ==========================
 export async function fetchUser() {
   return fetchJSON("/api/user");
+}
+
+export async function updateUser(patch: Partial<User>) {
+  return fetchJSON('/api/user', {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(patch),
+  })
 }
 
 // ==========================

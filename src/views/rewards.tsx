@@ -1,15 +1,19 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { RewardCard } from "@/components/RewardCard";
-import { RewardDialog, type Reward } from "@/components/RewardDialog";
+import { RewardDialog } from "@/components/RewardDialog";
 
 import { Plus } from "lucide-react";
 import { toast } from "sonner";
 import { useState } from "react";
 
+import {Reward} from "@/types"
+
 import { useAppStore } from "@/stores/useAppStore";
+import {useTranslation} from "react-i18next";
 
 export default function Rewards() {
+  const { t } = useTranslation();
   const { rewards, addReward, updateReward, goals } = useAppStore();
 
   const [rewardDialogOpen, setRewardDialogOpen] = useState(false);
@@ -43,7 +47,7 @@ export default function Rewards() {
   return (
     <div className="flex flex-col px-2 flex-1">
       <div className="flex items-center justify-between py-2">
-        <h2>Награды и достижения</h2>
+        <h2>{t('rewards.title')}</h2>
         <Button
           onClick={() => {
             setEditingReward(undefined);
@@ -51,7 +55,7 @@ export default function Rewards() {
           }}
         >
           <Plus className="size-4 mr-2" />
-          Создать награду
+          {t('rewards.add')}
         </Button>
       </div>
 

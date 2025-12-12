@@ -1,11 +1,13 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { ReminderCard } from "@/components/ReminderCard";
-import { ReminderDialog, type Reminder } from "@/components/ReminderDialog";
+import { ReminderDialog } from "@/components/ReminderDialog";
 
 import { useState } from "react";
 import { Plus } from "lucide-react";
 import { toast } from "sonner";
+
+import {Reminder} from "@/types";
 
 import { useAppStore } from "@/stores/useAppStore";
 

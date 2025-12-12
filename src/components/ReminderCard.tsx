@@ -4,7 +4,7 @@ import { Button } from "./ui/button";
 import { Bell, Clock, Repeat, Edit, Target } from "lucide-react";
 import { Switch } from "./ui/switch";
 
-import { DAYS_OF_WEEK } from "@/components/ReminderDialog.tsx";
+import { DAYS_OF_WEEK } from "@/types";
 
 const DAY_LABEL_MAP = Object.fromEntries(
   DAYS_OF_WEEK.map(d => [d.key, d.label])

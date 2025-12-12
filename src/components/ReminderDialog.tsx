@@ -4,18 +4,10 @@ import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
-import type { Goal } from "./GoalDialog";
 
-export interface Reminder {
-  id: string;
-  title: string;
-  time: string;
-  daysOfWeek: string[];
-  daysOfMonth: number[];
-  isActive: boolean;
-  goalId?: string;
-  taskId?: string;
-}
+import type { Goal, Reminder } from "@/types";
+import {DAYS_OF_MONTH, DAYS_OF_WEEK} from "@/types";
+
 
 interface ReminderDialogProps {
   open: boolean;
@@ -26,17 +18,6 @@ interface ReminderDialogProps {
   initialGoalId?: string;
 }
 
-export const DAYS_OF_WEEK = [
-  { key: 'mon', label: 'Пн' },
-  { key: 'tue', label: 'Вт' },
-  { key: 'wed', label: 'Ср' },
-  { key: 'thu', label: 'Чт' },
-  { key: 'fri', label: 'Пт' },
-  { key: 'sat', label: 'Сб' },
-  { key: 'sun', label: 'Вс' },
-] as const;
-
-export const DAYS_OF_MONTH = Array.from({ length: 31 }, (_, i) => i + 1);
 
 export function ReminderDialog({ open, onOpenChange, onSave, reminder, goals, initialGoalId }: ReminderDialogProps) {
   const [title, setTitle] = useState(reminder?.title || "");

@@ -4,7 +4,7 @@ import { Calendar, ChevronDown, ChevronRight, Plus, X } from "lucide-react";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import React, { useState } from "react";
-import { Task } from "@/components/GoalDialog.tsx";
+import { Task } from "@/types";
 
 export interface TaskItemProps {
   id: string;

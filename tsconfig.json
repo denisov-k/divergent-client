@@ -5,6 +5,10 @@
     { "path": "./tsconfig.node.json" }
   ],
   "compilerOptions": {
+    "lib": [
+      "ESNext",
+      "DOM"
+    ],
     "baseUrl": ".",
     "types": ["node", "./node_modules/telegram-webapps"],
     "paths": {

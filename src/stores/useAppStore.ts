@@ -1,23 +1,13 @@
 import { create } from "zustand";
 import * as api from "@/utils/api";
-import {type CategoryOption, Goal, Task} from "@/components/GoalDialog";
-import { Reward } from "@/components/RewardDialog";
-import { Reminder } from "@/components/ReminderDialog";
 import { FriendCardProps } from "@/components/FriendCard.tsx";
+
+import type { User, CategoryOption, Goal, Task, Reminder, Reward } from "@/types/";
 
 interface AppStore {
   initialized: boolean;
   loading: boolean;
-  user: {
-    id: string;
-    name: string;
-    role: string;
-    xp: number;
-    level: number;
-    xpInCurrentLevel: number;
-    requiredXp: number;
-    photoUrl: string
-  } | null;
+  user: User | null;
   token: string | null,
   goals: Goal[];
   rewards: Reward[];
@@ -29,6 +19,7 @@ interface AppStore {
 
   signup: (email: string, password: string, name?: string, referrerId?: string, referrerLinkId?: string) => Promise<void>;
   signOut: () => Promise<void>;
+  updateUser: (patch: Partial<User>) => Promise<void>;
   passwordReset: (email: string) => Promise<void>;
   login: (tgData: string) => Promise<void>;
   logout: () => void;
@@ -116,6 +107,12 @@ export const useAppStore = create<AppStore>((set, get) => ({
 
   signOut: async () => {
 
+  },
+
+  updateUser: async (patch: Partial<User>) => {
+    const updated = await api.updateUser(patch);
+
+    set({ user: updated });
   },
 
   passwordReset: async (email) => {
@@ -250,6 +247,8 @@ export const useAppStore = create<AppStore>((set, get) => ({
           name: storedUser!.name,
           photoUrl: storedUser!.photoUrl,
           role: storedUser!.role,
+          language: storedUser!.language,
+          timeZone: storedUser!.timeZone,
           xp: user.xp,
           level: user.level,
           xpInCurrentLevel: user.xpInCurrentLevel,
