@@ -2,7 +2,7 @@ import { create } from "zustand";
 import * as api from "@/utils/api";
 import { FriendCardProps } from "@/components/FriendCard.tsx";
 
-import type { User, CategoryOption, Goal, Task, Reminder, Reward } from "@/types/";
+import type { User, CategoryOption, Goal, Reminder, Reward } from "@/types/";
 
 interface AppStore {
   initialized: boolean;
@@ -32,6 +32,7 @@ interface AppStore {
   addCategory: (category: CategoryOption) => void;
   updateGoal: (goal: Goal) => Promise<void>;
   toggleTask: (goalId: string, taskId: string) => Promise<void>;
+  updateGoalProgress: (goalId: string, delta: number) => Promise<void>;
 
   addReward: (reward: Reward) => Promise<void>;
   updateReward: (reward: Reward) => Promise<void>;
@@ -41,35 +42,6 @@ interface AppStore {
   addReminder: (reminder: Reminder) => Promise<void>;
   updateReminder: (reminder: Reminder) => Promise<void>;
   toggleReminder: (id: string) => Promise<void>;
-}
-
-function setChildrenCompletion(task: Task, completed: boolean): Task {
-  return {
-    ...task,
-    completed,
-    subtasks: task.subtasks?.map(st => setChildrenCompletion(st, completed)) ?? []
-  };
-}
-
-function allTasksCompleted(tasks: Task[]): boolean {
-  return tasks.every(t => t.completed);
-}
-
-function toggleTaskDeep(tasks: Task[], taskId: string): Task[] {
-  return tasks.map(task => {
-    if (task.id === taskId) {
-      const newCompleted = !task.completed;
-      return setChildrenCompletion(task, newCompleted);
-    }
-
-    if (task.subtasks?.length) {
-      const updatedSubtasks = toggleTaskDeep(task.subtasks, taskId);
-      const parentCompleted = allTasksCompleted(updatedSubtasks);
-      return { ...task, completed: parentCompleted, subtasks: updatedSubtasks };
-    }
-
-    return task;
-  });
 }
 
 export const useAppStore = create<AppStore>((set, get) => ({
@@ -229,26 +201,13 @@ export const useAppStore = create<AppStore>((set, get) => ({
     set({ loading: true });
 
     try {
-      const { user } = await api.toggleTask(goalId, taskId);
-      const storedUser = get().user;
+      // сервер возвращает { goal, user }
+      const { goal, user } = await api.toggleTask(goalId, taskId);
 
       set({
-        goals: get().goals.map(g =>
-          g.id !== goalId
-            ? g
-            : {
-              ...g,
-              tasks: toggleTaskDeep(g.tasks, taskId), // ← вот оно
-            }
-        ),
-
+        goals: get().goals.map(g => g.id === goalId ? goal : g),
         user: {
-          id: storedUser!.id,
-          name: storedUser!.name,
-          photoUrl: storedUser!.photoUrl,
-          role: storedUser!.role,
-          language: storedUser!.language,
-          timeZone: storedUser!.timeZone,
+          ...get().user!,
           xp: user.xp,
           level: user.level,
           xpInCurrentLevel: user.xpInCurrentLevel,
@@ -256,6 +215,29 @@ export const useAppStore = create<AppStore>((set, get) => ({
         },
       });
 
+    } catch (err) {
+      console.error(err);
+    } finally {
+      set({ loading: false });
+    }
+  },
+
+  updateGoalProgress: async (goalId: string, delta: number) => {
+    set({ loading: true });
+    try {
+      // сервер вернёт { goal, user }
+      const { goal, user } = await api.updateGoalProgress(goalId, delta);
+
+      set({
+        goals: get().goals.map(g => g.id === goalId ? goal : g),
+        user: {
+          ...get().user!,
+          xp: user.xp,
+          level: user.level,
+          xpInCurrentLevel: user.xpInCurrentLevel,
+          requiredXp: user.requiredXp,
+        },
+      });
     } catch (err) {
       console.error(err);
     } finally {

@@ -18,7 +18,7 @@ import { Separator } from "./ui/separator";
 
 import { type CategoryType } from "@/components/GoalCard";
 import {useTranslation} from "react-i18next";
-import {GoalFormData, Goal, CategoryOption, Task, Reward} from "@/types";
+import {GoalFormData, Goal, CategoryOption, Task, Reward, GoalPeriod, GoalType} from "@/types";
 
 
 interface GoalDialogProps {
@@ -61,6 +61,11 @@ export function GoalDialog({
   const [newSubTaskTitles, setNewSubTaskTitles] = useState<Record<string, string>>({});
   const [newSubTaskXps, setNewSubTaskXps] = useState<Record<string, string>>({});
 
+  const [goalType, setGoalType] = useState<GoalType>(goal?.goalType || "TASK");
+  const [goalPeriod, setGoalPeriod] = useState<GoalPeriod>(goal?.goalPeriod || "NONE");
+  const [numericTarget, setNumericTarget] = useState(goal?.targetValue?.toString() || "");
+  const [numericCurrent, setNumericCurrent] = useState(goal?.currentValue?.toString() || "");
+
   useEffect(() => {
     if (goal) {
       setTitle(goal.title || "");
@@ -68,21 +73,53 @@ export function GoalDialog({
       setCategory(goal.category || "personal");
       setDueDate(toInputDate(goal.dueDate));
       setXpReward(goal.xpReward?.toString() || "");
+
+      setGoalType(goal.goalType || "TASK");
+      setGoalPeriod(goal.goalPeriod || "NONE");
+
+      setNumericTarget(
+        goal.targetValue !== undefined && goal.targetValue !== null
+          ? goal.targetValue.toString()
+          : ""
+      );
+
+      setNumericCurrent(
+        goal.currentValue !== undefined && goal.currentValue !== null
+          ? goal.currentValue.toString()
+          : ""
+      );
+
       setTasks(goal.tasks || []);
-      setRewardId(rewards.find((r) => r.goalId === goal?.id)?.id || "none");
+      setRewardId(
+        rewards.find((r) => r.goalId === goal.id)?.id || "none"
+      );
     } else {
-      setTitle("");
-      setDescription("");
-      setCategory("personal");
-      setDueDate("");
-      setXpReward("");
-      setTasks([]);
-      setRewardId("none");
-      setExpandedTasks({});
-      setNewSubTaskTitles({});
-      setNewSubTaskXps({});
+      resetForm();
     }
   }, [goal, open]);
+
+  const resetForm = () => {
+    setTitle("");
+    setDescription("");
+    setCategory("personal");
+    setDueDate("");
+    setXpReward("");
+    setTasks([]);
+    setRewardId("none");
+
+    setGoalType("TASK");
+    setGoalPeriod("NONE");
+    setNumericTarget("");
+    setNumericCurrent("");
+
+    setNewTaskTitle("");
+    setNewTaskXp("");
+    setIsCreatingCategory(false);
+    setNewCategoryName("");
+    setExpandedTasks({});
+    setNewSubTaskTitles({});
+    setNewSubTaskXps({});
+  };
 
   const handleAddCategory = () => {
     if (!newCategoryName.trim()) return;
@@ -209,7 +246,19 @@ export function GoalDialog({
       description,
       category,
       categoryLabel,
-      tasks,
+      goalType,
+      goalPeriod,
+      tasks: goalType === "TASK" ? tasks : [],
+
+      targetValue:
+        goalType === "PROGRESS" && numericTarget
+          ? parseInt(numericTarget)
+          : undefined,
+
+      currentValue:
+        goalType === "PROGRESS" && numericCurrent
+          ? parseInt(numericCurrent)
+          : undefined,
       dueDate: dueDate || undefined,
       xpReward: xpReward ? parseInt(xpReward) : undefined,
       rewardId: rewardId === "none" ? null : rewardId,
@@ -221,19 +270,7 @@ export function GoalDialog({
 
   const handleClose = () => {
     if (!goal) {
-      setTitle("");
-      setDescription("");
-      setCategory("personal");
-      setDueDate("");
-      setXpReward("");
-      setTasks([]);
-      setNewTaskTitle("");
-      setNewTaskXp("");
-      setIsCreatingCategory(false);
-      setNewCategoryName("");
-      setExpandedTasks({});
-      setNewSubTaskTitles({});
-      setNewSubTaskXps({});
+      resetForm();
     }
     onOpenChange(false);
   };
@@ -283,56 +320,18 @@ export function GoalDialog({
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <Label htmlFor="category">Категория *</Label>
-                {!isCreatingCategory ? (
-                  <Button
-                    variant="link"
-                    className="h-auto p-0 text-xs"
-                    onClick={() => setIsCreatingCategory(true)}
-                  >
-                    + Создать
-                  </Button>
-                ) : (
-                  <Button
-                    variant="link"
-                    className="h-auto p-0 text-xs"
-                    onClick={() => setIsCreatingCategory(false)}
-                  >
-                    Отмена
-                  </Button>
-                )}
-              </div>
-
-              {isCreatingCategory ? (
-                <div className="flex gap-2">
-                  <Input
-                    placeholder="Название категории"
-                    value={newCategoryName}
-                    onChange={(e) => setNewCategoryName(e.target.value)}
-                  />
-                  <Button
-                    type="button"
-                    onClick={handleAddCategory}
-                    disabled={!newCategoryName.trim()}
-                  >
-                    OK
-                  </Button>
-                </div>
-              ) : (
-                <Select value={category} onValueChange={(value) => setCategory(value)}>
-                  <SelectTrigger id="category">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {categories.map((option) => (
-                      <SelectItem key={option.value} value={option.value}>
-                        {option.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              )}
+              <Label>Период</Label>
+              <Select value={goalPeriod} onValueChange={(v: GoalPeriod) => setGoalPeriod(v)}>
+                <SelectTrigger>
+                  <SelectValue/>
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="NONE">Нет</SelectItem>
+                  <SelectItem value="DAILY">День</SelectItem>
+                  <SelectItem value="WEEKLY">Неделя</SelectItem>
+                  <SelectItem value="MONTHLY">Месяц</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
 
             <div className="space-y-2">
@@ -345,12 +344,75 @@ export function GoalDialog({
               />
             </div>
           </div>
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <Label htmlFor="category">Категория *</Label>
+              {!isCreatingCategory ? (
+                <Button
+                  variant="link"
+                  className="h-auto p-0 text-xs"
+                  onClick={() => setIsCreatingCategory(true)}
+                >
+                  + Создать
+                </Button>
+              ) : (
+                <Button
+                  variant="link"
+                  className="h-auto p-0 text-xs"
+                  onClick={() => setIsCreatingCategory(false)}
+                >
+                  Отмена
+                </Button>
+              )}
+            </div>
 
+            {isCreatingCategory ? (
+              <div className="flex gap-2">
+                <Input
+                  placeholder="Название категории"
+                  value={newCategoryName}
+                  onChange={(e) => setNewCategoryName(e.target.value)}
+                />
+                <Button
+                  type="button"
+                  onClick={handleAddCategory}
+                  disabled={!newCategoryName.trim()}
+                >
+                  OK
+                </Button>
+              </div>
+            ) : (
+              <Select value={category} onValueChange={(value) => setCategory(value)}>
+                <SelectTrigger id="category">
+                  <SelectValue/>
+                </SelectTrigger>
+                <SelectContent>
+                  {categories.map((option) => (
+                    <SelectItem key={option.value} value={option.value}>
+                      {option.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
+          </div>
+          <div className="space-y-2">
+            <Label>Тип цели</Label>
+            <Select value={goalType} onValueChange={(v: GoalType) => setGoalType(v)}>
+              <SelectTrigger>
+                <SelectValue/>
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="TASK">Задачи</SelectItem>
+                <SelectItem value="PROGRESS">Числовая цель</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
           <div className="space-y-2">
             <Label htmlFor="reward">Награда за цель</Label>
             <Select value={rewardId} onValueChange={(value) => setRewardId(value)}>
               <SelectTrigger id="reward">
-                <SelectValue placeholder="Выберите награду" />
+                <SelectValue placeholder="Выберите награду"/>
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="none">Без награды</SelectItem>
@@ -375,9 +437,30 @@ export function GoalDialog({
             />
           </div>
 
-          <Separator />
 
-          <div className="space-y-3">
+          <Separator/>
+
+          {goalType === "PROGRESS" && (
+            <div className="space-y-2">
+              <Label>Текущий прогресс</Label>
+              <Input
+                type="number"
+                min={0}
+                value={numericCurrent}
+                onChange={(e) => setNumericCurrent(e.target.value)}
+              />
+
+              <Label>Целевое значение</Label>
+              <Input
+                type="number"
+                min={1}
+                value={numericTarget}
+                onChange={(e) => setNumericTarget(e.target.value)}
+              />
+            </div>
+          )}
+
+          {goalType === "TASK" && (<div className="space-y-3">
             <Label>Задачи для достижения цели</Label>
 
             {tasks.map((task) => (
@@ -423,7 +506,7 @@ export function GoalDialog({
                 onChange={(e) => setNewTaskXp(e.target.value)}
               />
               <Button type="button" onClick={() => handleAddTask()} size="icon">
-                <Plus className="size-4" />
+                <Plus className="size-4"/>
               </Button>
             </div>
 
@@ -432,14 +515,14 @@ export function GoalDialog({
                 Добавьте задачи для вашей цели
               </p>
             )}
-          </div>
+          </div>)}
         </div>
 
         <DialogFooter>
           <Button variant="outline" onClick={handleClose}>
             Отмена
           </Button>
-          <Button onClick={handleSave} disabled={!title || tasks.length === 0}>
+          <Button onClick={handleSave} disabled={!title}>
             {goal ? t('goals.save') : t('goals.create')}
           </Button>
         </DialogFooter>

@@ -36,10 +36,19 @@ export interface Goal {
   description?: string;
   category: CategoryType;
   categoryLabel: string;
-  tasks: Task[];
+  tasks: Task[]; // остаётся для обычных целей
   dueDate?: string;
   xpReward?: number;
+
+  // новые поля для числовой цели
+  currentValue?: number; // текущее значение прогресса
+  targetValue?: number;  // целевое значение
+  goalType: GoalType;      // "tasks" | "numeric"
+  goalPeriod?: GoalPeriod; // "daily" | "weekly" | "monthly"
 }
+
+export type GoalType = "TASK" | "PROGRESS";
+export type GoalPeriod = "NONE" | "DAILY" | "WEEKLY" | "MONTHLY";
 
 export interface GoalFormData extends Goal {
   rewardId?: string | null;

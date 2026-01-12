@@ -27,6 +27,7 @@ export default function Goals() {
     addCategory,
     updateReminder,
     updateRewardGoal,
+    updateGoalProgress,
     rewards,
     categories
   } = useAppStore();
@@ -75,6 +76,10 @@ export default function Goals() {
     }
   };
 
+  const handleAddProgress = (id: string, delta: number) => {
+    return updateGoalProgress(id, delta);
+  }
+
   const handleAddCategory = (category: CategoryOption) => {
     addCategory(category);
     toast.success(`Категория "${category.label}" создана`);
@@ -100,11 +105,6 @@ export default function Goals() {
     setEditingReminder(undefined);
   };
 
-  function allTasksCompleted(tasks: Task[]): boolean {
-    return tasks.every(
-      t => t.completed && (!t.subtasks || allTasksCompleted(t.subtasks))
-    );
-  }
 
   function findTaskRecursive(tasks: Task[], taskId: string): Task | null {
     for (const task of tasks) {
@@ -142,12 +142,6 @@ export default function Goals() {
 
     // toggle в сторе
     toggleTask(goalId, taskId);
-
-    // Проверяем выполнена ли вся цель
-    if (allTasksCompleted(goal.tasks)) {
-      addXp(goal.xpReward ?? 0);
-      toast.success(`🎉 Цель выполнена! +${goal.xpReward} XP`);
-    }
   };
 
   return (
@@ -201,6 +195,7 @@ export default function Goals() {
                   onEdit={handleEditGoal}
                   onTaskToggle={handleTaskToggle}
                   onAddReminder={handleAddReminderFromGoal}
+                  onAddProgress={handleAddProgress}
                 />
               </div>
             );

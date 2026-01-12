@@ -70,6 +70,13 @@ export async function toggleTask(goalId: string, taskId: string) {
   });
 }
 
+export async function updateGoalProgress(goalId: string, delta: number) {
+  return fetchJSON(`/api/goals/${goalId}/progress`, {
+    method: "POST",
+    body: JSON.stringify({ delta }),
+  });
+}
+
 // ==========================
 // REWARDS
 // ==========================

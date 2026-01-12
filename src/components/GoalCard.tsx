@@ -10,7 +10,7 @@ import { useState } from "react";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "./ui/collapsible";
 import {useTranslation} from "react-i18next";
 
-import {Reward} from "@/types";
+import {GoalPeriod, GoalType, Reward} from "@/types";
 
 export type CategoryType = string;
 
@@ -29,7 +29,14 @@ interface GoalCardProps {
   description?: string;
   category: CategoryType;
   categoryLabel: string;
-  tasks: Task[];
+
+  goalType?: GoalType;
+  goalPeriod?: GoalPeriod;
+
+  currentValue?: number;
+  targetValue?: number;
+
+  tasks?: Task[];
   dueDate?: string;
   xpReward?: number;
   reward?: Reward | null;
@@ -38,6 +45,7 @@ interface GoalCardProps {
   onEdit?: (id: string) => void;
   onTaskToggle?: (goalId: string, taskId: string, parentId?: string) => void;
   onAddReminder?: (id: string) => void;
+  onAddProgress?: (goalId: string, delta: number) => void;
 }
 
 export function GoalCard({
@@ -47,6 +55,10 @@ export function GoalCard({
                            category,
                            categoryLabel,
                            tasks,
+                           goalType,
+                           goalPeriod,
+                           currentValue,
+                           targetValue,
                            dueDate,
                            xpReward,
                            reward,
@@ -55,13 +67,17 @@ export function GoalCard({
                            onEdit,
                            onTaskToggle,
                            onAddReminder,
+                           onAddProgress
                          }: GoalCardProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [expandedTasks, setExpandedTasks] = useState<Record<string, boolean>>({});
   const [newSubTaskTitles, setNewSubTaskTitles] = useState<Record<string, string>>({});
   const [newSubTaskXps, setNewSubTaskXps] = useState<Record<string, string>>({});
+  const [progressDelta, setProgressDelta] = useState<number>();
 
   const { t } = useTranslation();
+
+  const safeTasks = tasks ?? [];
 
   function countTasks(tasks?: Task[]): number {
     if (!tasks || tasks.length === 0) return 0;
@@ -73,9 +89,18 @@ export function GoalCard({
     return tasks.reduce((sum, t) => sum + (t.completed ? 1 : 0) + countCompleted(t.subtasks), 0);
   }
 
-  const totalTasks = tasks.length;
-  const completedTasks = tasks.reduce((sum, t) => sum + (t.completed ? 1 : 0) + countCompleted(t.subtasks), 0);
-  const progress = totalTasks > 0 ? (completedTasks / countTasks(tasks)) * 100 : 0;
+  const isNumeric = goalType === "PROGRESS";
+
+  const totalTasks = countTasks(safeTasks);
+  const completedTasks = countCompleted(safeTasks);
+
+  const progress = isNumeric
+    ? targetValue && targetValue > 0
+      ? Math.min(((currentValue ?? 0) / targetValue) * 100, 100)
+      : 0
+    : totalTasks > 0
+      ? (completedTasks / totalTasks) * 100
+      : 0;
 
   const handleToggleExpand = (taskId: string) => {
     setExpandedTasks({ ...expandedTasks, [taskId]: !expandedTasks[taskId] });
@@ -134,7 +159,7 @@ export function GoalCard({
         </CardHeader>
         <CardContent className="space-y-2">
           <div className="flex items-center justify-between">
-            <span className="text-muted-foreground">{completedTasks} / {countTasks(tasks)} задач</span>
+            <span className="text-muted-foreground">{completedTasks} / {countTasks(safeTasks)} задач</span>
             {xpReward && <Badge variant="secondary">+{xpReward} XP</Badge>}
           </div>
           {dueDate && (
@@ -173,32 +198,76 @@ export function GoalCard({
         <div>
           <div className="flex items-center justify-between mb-2">
             <span className="text-muted-foreground">{t('goals.progress')}</span>
-            <span className="text-muted-foreground">{completedTasks} / {countTasks(tasks)} {t('goals.tasks_count')}</span>
+            {goalType === "TASK" && (
+              <span className="text-muted-foreground">
+                {completedTasks} / {totalTasks} {t('goals.tasks_count')}
+              </span>
+            )}
+            {goalType === "PROGRESS" && (
+              <span className="text-muted-foreground">
+                {currentValue ?? 0} / {targetValue ?? 0}
+              </span>
+            )}
           </div>
           <Progress value={progress} className="h-2" />
         </div>
 
-        <Collapsible open={isOpen} onOpenChange={setIsOpen}>
-          <CollapsibleTrigger asChild>
-            <Button variant="outline" className="w-full justify-between">
-              <span>{t('goals.tasks')}</span>
-              {isOpen ? <ChevronUp className="size-4" /> : <ChevronDown className="size-4" />}
+        {goalType === "PROGRESS" && (
+          <div className="flex items-center gap-2 mt-2">
+            <input
+              type="number"
+              className="border rounded px-2 py-1 w-full"
+              value={progressDelta}
+              onChange={(e) => setProgressDelta(Number(e.target.value))}
+              placeholder="Добавить значение"
+              min={0}
+            />
+            <Button
+              size="sm"
+              onClick={() => {
+                if (progressDelta !== 0) {
+                  onAddProgress?.(id, progressDelta!);
+                  setProgressDelta(0);
+                }
+              }}
+            >
+              +
             </Button>
-          </CollapsibleTrigger>
-          <CollapsibleContent className="space-y-2 mt-3">
-            {renderTasks(tasks)}
-          </CollapsibleContent>
-        </Collapsible>
+          </div>
+        )}
+
+        {goalType === "TASK" && (
+          <Collapsible open={isOpen} onOpenChange={setIsOpen}>
+            <CollapsibleTrigger asChild>
+              <Button variant="outline" className="w-full justify-between">
+                <span>{t('goals.tasks')}</span>
+                {isOpen ? <ChevronUp className="size-4" /> : <ChevronDown className="size-4" />}
+              </Button>
+            </CollapsibleTrigger>
+            <CollapsibleContent className="space-y-2 mt-3">
+              {renderTasks(safeTasks)}
+            </CollapsibleContent>
+          </Collapsible>
+        )}
 
         <div className="flex items-center justify-between pt-2 border-t">
-          {dueDate && (
-            <div className="flex items-center gap-2 text-muted-foreground mr-4">
-              <Calendar className="size-4" />
-              <span className="whitespace-nowrap">{new Date(dueDate).toISOString().split('T')[0]}</span>
-            </div>
-          )}
+          <div className="flex gap-2 flex-col">
+            {goalPeriod !== "NONE" && (
+              <Badge variant="outline">
+                {goalPeriod === "DAILY" && "Ежедневная"}
+                {goalPeriod === "WEEKLY" && "Еженедельная"}
+                {goalPeriod === "MONTHLY" && "Ежемесячная"}
+              </Badge>
+            )}
+            {dueDate && (
+              <div className="flex items-center gap-2 text-muted-foreground mr-4">
+                <Calendar className="size-4" />
+                <span className="whitespace-nowrap">{new Date(dueDate).toISOString().split('T')[0]}</span>
+              </div>
+            )}
+          </div>
           {(xpReward || reward) && (
-            <div className="flex items-center flex-wrap justify-center">
+            <div className="flex items-center flex-wrap justify-end mb-auto">
               <span className="mr-1">Награда: </span>
               <div className="flex flex-wrap justify-center">
                 {reward && <Badge className="mr-1 my-0.5 bg-purple-500">{reward?.title}</Badge>}
@@ -209,5 +278,5 @@ export function GoalCard({
         </div>
       </CardContent>
     </Card>
-  );
-}
+    );
+  }

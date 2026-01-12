@@ -56,7 +56,7 @@ export function TaskItem({
   };
 
   return (
-    <div className="flex flex-col p-3 rounded-lg border bg-card hover:bg-accent/50 transition-colors">
+    <div className="flex flex-col p-3 rounded-lg border bg-card-group hover:bg-accent/50 transition-colors">
       <div className="flex items-center gap-3">
         {(hasSubtasks || editMode) && (
           <Button variant="ghost" size="icon" onClick={() => onToggleExpand(id)}>
