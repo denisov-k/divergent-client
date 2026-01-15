@@ -7,7 +7,6 @@ import {
   BarChart2,
   Swords,
   Bell,
-  Users
 } from "lucide-react";
 
 const Navigation = () => {
@@ -21,7 +20,7 @@ const Navigation = () => {
     { path: "/rewards", title: t("navigation.rewards"), icon: Gift },
     { path: "/progress", title: t("navigation.progress"), icon: BarChart2 },
     { path: "/reminders", title: t("navigation.reminders"), icon: Bell },
-    { path: "/frens", title: t("navigation.frens"), icon: Users },
+   // { path: "/frens", title: t("navigation.frens"), icon: Users },
   ];
 
   const onClick = (path: To) => {
@@ -64,7 +63,7 @@ const Navigation = () => {
               strokeWidth={2.5}
             />
 
-            <span className="text-center whitespace-normal break-all">
+            <span className="text-center whitespace-normal break-all leading-none mt-0.5">
               {route.title}
             </span>
           </div>
