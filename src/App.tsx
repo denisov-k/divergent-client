@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
+import {BrowserRouter as Router, Routes, Route} from 'react-router-dom'
 import { ProtectedRoute } from '@/components/protected-route'
 
 import Layout from '@/layout/'
@@ -9,8 +9,10 @@ import SignInView from '@/views/auth/sign-in'
 import SignUpView from '@/views/auth/sign-up'
 import ResetPasswordView from '@/views/auth/reset'
 
+import IndexView from '@/views/index'
 import FrensView from '@/views/frens'
 import GoalsView from '@/views/goals'
+import ChallengesView from '@/views/challenges'
 import SettingsView from '@/views/settings'
 import RewardsView from '@/views/rewards'
 import RemindersView from '@/views/reminders'
@@ -25,6 +27,7 @@ function AppRoot() {
 
   const {initialize, initialized, loading, user} = useAppStore();
 
+
   useEffect(() => {
     if (user?.language) {
       i18n.changeLanguage(user.language);
@@ -36,7 +39,6 @@ function AppRoot() {
       initialize();
     }
   }, [initialized, loading]);
-
 
   return (
     <Router>
@@ -65,7 +67,27 @@ function AppRoot() {
           }
         />
         <Route
+          path="/challenges"
+          element={
+            <ProtectedRoute>
+              <Layout header={<Header></Header>} footer={<Footer></Footer>}>
+                <ChallengesView />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
           path="/"
+          element={
+            <ProtectedRoute>
+              <Layout header={<Header></Header>} footer={<Footer></Footer>}>
+                <IndexView />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/goals"
           element={
             <ProtectedRoute>
               <Layout header={<Header></Header>} footer={<Footer></Footer>}>

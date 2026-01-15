@@ -6,22 +6,14 @@ import { Badge } from "./ui/badge";
 import { Button } from "./ui/button";
 import { Calendar, Target, Edit, ChevronDown, ChevronUp, AlarmClock } from "lucide-react";
 import { TaskItem } from "./TaskItem";
-import { useState } from "react";
+import {useEffect, useRef, useState} from "react";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "./ui/collapsible";
 import {useTranslation} from "react-i18next";
 
-import {GoalPeriod, GoalType, Reward} from "@/types";
+import {GoalPeriod, GoalType, Reward, Task} from "@/types";
 
 export type CategoryType = string;
 
-export interface Task {
-  id: string;
-  title: string;
-  completed: boolean;
-  xpReward?: number;
-  dueDate?: string;
-  subtasks?: Task[];
-}
 
 interface GoalCardProps {
   id: string;
@@ -40,12 +32,12 @@ interface GoalCardProps {
   dueDate?: string;
   xpReward?: number;
   reward?: Reward | null;
-  variant?: "compact" | "detailed";
   editMode?: boolean;
   onEdit?: (id: string) => void;
   onTaskToggle?: (goalId: string, taskId: string, parentId?: string) => void;
   onAddReminder?: (id: string) => void;
   onAddProgress?: (goalId: string, delta: number) => void;
+  autoExpand?: boolean;
 }
 
 export function GoalCard({
@@ -62,12 +54,12 @@ export function GoalCard({
                            dueDate,
                            xpReward,
                            reward,
-                           variant = "detailed",
                            editMode = false,
                            onEdit,
                            onTaskToggle,
                            onAddReminder,
-                           onAddProgress
+                           onAddProgress,
+                            autoExpand
                          }: GoalCardProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [expandedTasks, setExpandedTasks] = useState<Record<string, boolean>>({});
@@ -136,45 +128,36 @@ export function GoalCard({
     ));
   };
 
-  if (variant === "compact") {
-    return (
-      <Card className="hover:shadow-md transition-shadow">
-        <CardHeader className="pb-3">
-          <div className="flex items-start justify-between gap-3">
-            <div className="flex-1 min-w-0">
-              <CardTitle className="line-clamp-1">{title}</CardTitle>
-              <div className="flex items-center gap-2 mt-2">
-                <CategoryBadge category={category} label={categoryLabel} />
-              </div>
-            </div>
-            <div className="flex items-center gap-2">
-              <ProgressRing progress={progress} size={50} strokeWidth={4} />
-              {onEdit && (
-                <Button variant="ghost" size="icon" onClick={() => onEdit(id)} className="shrink-0">
-                  <Edit className="size-4" />
-                </Button>
-              )}
-            </div>
-          </div>
-        </CardHeader>
-        <CardContent className="space-y-2">
-          <div className="flex items-center justify-between">
-            <span className="text-muted-foreground">{completedTasks} / {countTasks(safeTasks)} задач</span>
-            {xpReward && <Badge variant="secondary">+{xpReward} XP</Badge>}
-          </div>
-          {dueDate && (
-            <div className="flex items-center gap-2 text-muted-foreground">
-              <Calendar className="size-4" />
-              <span>{dueDate}</span>
-            </div>
-          )}
-        </CardContent>
-      </Card>
-    );
-  }
+  const [highlight, setHighlight] = useState(false);
+  const cardRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!autoExpand) return;
+
+    // Открываем задачи, если цель типа TASK
+    if (goalType === "TASK") {
+      setIsOpen(true);
+    }
+
+    // Скроллим к карточке
+    if (cardRef.current) {
+      cardRef.current.scrollIntoView({
+        behavior: "smooth",
+        block: "center",
+      });
+
+      // Включаем подсветку
+      setHighlight(true);
+
+      const timeout = setTimeout(() => setHighlight(false), 2000); // подсветка 2 сек
+      return () => clearTimeout(timeout);
+    }
+  }, [autoExpand, goalType]);
 
   return (
-    <Card className="hover:shadow-md transition-shadow">
+    <Card className={`hover:shadow-md transition-all
+      ${ highlight ? "bg-blue-50": "bg-white"}`}
+          ref={cardRef}>
       <CardHeader>
         <div className="flex items-start justify-between gap-4">
           <div className="flex-1 min-w-0 space-y-2">
@@ -216,7 +199,7 @@ export function GoalCard({
           <div className="flex items-center gap-2 mt-2">
             <input
               type="number"
-              className="border rounded px-2 py-1 w-full"
+              className="border rounded px-2 py-1 w-full text-sm"
               value={progressDelta}
               onChange={(e) => setProgressDelta(Number(e.target.value))}
               placeholder="Добавить значение"

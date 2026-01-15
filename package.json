@@ -1,7 +1,7 @@
 {
   "name": "divergent-client",
   "private": true,
-  "version": "0.2.8",
+  "version": "0.2.9",
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
@@ -53,6 +53,7 @@
     "react-i18next": "^15.7.3",
     "react-resizable-panels": "^3.0.6",
     "react-router-dom": "^7.0.2",
+    "react-select": "^5.10.2",
     "react-svg": "^16.3.0",
     "recharts": "^3.4.1",
     "sonner": "^2.0.3",
@@ -67,6 +68,7 @@
     "@types/node": "^22.13.1",
     "@types/react": "^18.3.12",
     "@types/react-dom": "^18.3.1",
+    "@types/react-select": "^5.0.0",
     "@vitejs/plugin-basic-ssl": "^2.1.0",
     "@vitejs/plugin-react": "^5.1.1",
     "autoprefixer": "^10.4.22",

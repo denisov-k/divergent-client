@@ -1,10 +1,18 @@
 {
+  "common": {
+    "create": "Создать",
+    "cancel": "Отмена",
+    "close": "Закрыть",
+    "share": "Поделиться",
+    "save": "Сохранить"
+  },
   "profile": {
     "level": "Уровень",
     "description": "Путь к лучшей версии себя"
   },
   "navigation": {
     "goals": "Цели",
+    "challenges": "Челленджи",
     "frens": "Друзья",
     "rewards": "Награды",
     "progress": "Прогресс",
@@ -22,9 +30,34 @@
     "tasks": "Задачи цели",
     "tasks_count": "задач",
     "progress": "Прогресс выполнения",
-    "create": "Создать цель",
+    "create_goal": "Создать цель",
+    "create_challenge": "Создать челендж",
     "save": "Сохранить",
     "title": "Мои цели"
+  },
+  "challenges": {
+    "save": "Сохранить",
+    "empty": "Список пуст",
+    "create": "Создать челлендж",
+    "accept": "Принять участие",
+    "create_first": "Создать челлендж",
+    "title": "Челленджи",
+    "create_title": "Создание челленджа",
+    "create_description": "Заполните информацию о челледже и выберите цели",
+    "goals_count": "целей",
+    "goals": "Цели челленджа",
+    "participants": "Участников: ",
+    "completed": "Выполнена",
+    "pending": "В процессе",
+    "fields": {
+      "title": "Название челленджа",
+      "description": "Описание челленджа",
+      "select_goals": "Выберите цели"
+    },
+    "visibility": {
+      "public": "Публичный",
+      "private": "Приватный"
+    }
   },
   "rewards": {
     "title": "Награды и достижения",

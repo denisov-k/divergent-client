@@ -9,9 +9,9 @@ import { Plus } from "lucide-react";
 import { toast } from "sonner";
 
 import { useAppStore } from "@/stores/useAppStore";
-import {useState} from "react";
+import {useEffect, useRef, useState} from "react";
 import {ReminderDialog} from "@/components/ReminderDialog.tsx";
-import {useNavigate} from "react-router-dom";
+import {useNavigate, useSearchParams} from "react-router-dom";
 import {useTranslation} from "react-i18next";
 
 import {Reminder} from "@/types";
@@ -35,6 +35,11 @@ export default function Goals() {
   const { t } = useTranslation();
 
   const navigate = useNavigate();
+
+  const [searchParams] = useSearchParams();
+  const focusGoalId = searchParams.get("focus");
+
+  const goalRefs = useRef<Record<string, HTMLDivElement | null>>({});
 
   const [goalDialogOpen, setGoalDialogOpen] = useState(false);
   const [editingGoal, setEditingGoal] = useState<Goal | undefined>();
@@ -144,20 +149,41 @@ export default function Goals() {
     toggleTask(goalId, taskId);
   };
 
+  useEffect(() => {
+    if (!focusGoalId) return;
+
+    const el = goalRefs.current[focusGoalId];
+    if (!el) return;
+
+    el.scrollIntoView({
+      behavior: "smooth",
+      block: "center",
+    });
+
+    el.classList.add("ring-2", "ring-primary", "ring-offset-2");
+
+    const timeout = setTimeout(() => {
+      el.classList.remove("ring-2", "ring-primary", "ring-offset-2");
+    }, 2000);
+
+    return () => clearTimeout(timeout);
+  }, [focusGoalId, goals]);
+
   return (
     <div className="flex flex-col px-2 flex-1">
       <div className="flex items-center justify-between py-2">
         <h2>{t('goals.title')}</h2>
-
-        <Button
-          onClick={() => {
-            setEditingGoal(undefined);
-            setGoalDialogOpen(true);
-          }}
-        >
-          <Plus className="size-4 mr-2" />
-          {t('goals.create')}
-        </Button>
+        <div className="gap-2 flex">
+          <Button
+            onClick={() => {
+              setEditingGoal(undefined);
+              setGoalDialogOpen(true);
+            }}
+          >
+            <Plus className="size-4 mr-2" />
+            {t('goals.create_goal')}
+          </Button>
+        </div>
       </div>
 
       {goals.length === 0 ? (
@@ -191,11 +217,11 @@ export default function Goals() {
                 <GoalCard
                   {...goal}
                   reward={reward}
-                  variant="detailed"
                   onEdit={handleEditGoal}
                   onTaskToggle={handleTaskToggle}
                   onAddReminder={handleAddReminderFromGoal}
                   onAddProgress={handleAddProgress}
+                  autoExpand={goal.id === focusGoalId}
                 />
               </div>
             );

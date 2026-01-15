@@ -520,10 +520,10 @@ export function GoalDialog({
 
         <DialogFooter>
           <Button variant="outline" onClick={handleClose}>
-            Отмена
+            {t('common.cancel')}
           </Button>
           <Button onClick={handleSave} disabled={!title}>
-            {goal ? t('goals.save') : t('goals.create')}
+            {goal ? t('common.save') : t('common.create')}
           </Button>
         </DialogFooter>
       </DialogContent>

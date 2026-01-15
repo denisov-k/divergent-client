@@ -1,26 +1,26 @@
-import type { User, Goal, Reward, Reminder } from "@/types/";
-
-import Config from '@/services/Config';
+import type { User, Goal, Reward, Reminder, Challenge } from "@/types/";
+import Config from "@/services/Config";
 
 async function fetchJSON(url: string, options: RequestInit = {}) {
   const res = await fetch(Config.data.api.http.baseURL + url, {
     ...options,
-    credentials: 'include', // ✅ важно для cookie-based auth
+    credentials: "include",
     headers: {
-      'Content-Type': 'application/json',
-      ...(options.headers || {})
-    }
+      "Content-Type": "application/json",
+      ...(options.headers || {}),
+    },
   });
 
   if (!res.ok) throw new Error(`API error: ${res.status}`);
   return res.json();
 }
 
-// Авторизация
+// ==========================
+// AUTH
+// ==========================
 export async function login(tgData: string) {
   return fetchJSON("/api/auth/telegram", {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ tgData }),
   });
 }
@@ -33,20 +33,22 @@ export async function fetchUser() {
 }
 
 export async function updateUser(patch: Partial<User>) {
-  return fetchJSON('/api/user', {
-    method: 'PATCH',
-    headers: { 'Content-Type': 'application/json' },
+  return fetchJSON("/api/user", {
+    method: "PATCH",
     body: JSON.stringify(patch),
-  })
+  });
 }
 
 // ==========================
 // GOALS
 // ==========================
+export async function fetchGoals(): Promise<Goal[]> {
+  return fetchJSON("/api/goals");
+}
+
 export async function createGoal(goal: Goal) {
   return fetchJSON("/api/goals", {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
     body: JSON.stringify(goal),
   });
 }
@@ -54,13 +56,12 @@ export async function createGoal(goal: Goal) {
 export async function updateGoal(goal: Goal) {
   return fetchJSON(`/api/goals/${goal.id}`, {
     method: "PUT",
-    headers: { "Content-Type": "application/json" },
     body: JSON.stringify(goal),
   });
 }
 
 export async function deleteGoal(id: string) {
-  return fetchJSON(`/api/goals/${id}`, { method: 'DELETE' });
+  return fetchJSON(`/api/goals/${id}`, { method: "DELETE" });
 }
 
 export async function toggleTask(goalId: string, taskId: string) {
@@ -78,12 +79,58 @@ export async function updateGoalProgress(goalId: string, delta: number) {
 }
 
 // ==========================
+// CHALLENGES
+// ==========================
+export async function fetchChallenges(): Promise<Challenge[]> {
+  return fetchJSON("/api/challenges");
+}
+
+export async function createChallenge(data: {
+  title: string;
+  description?: string;
+  isPublic: boolean;
+  startsAt?: string;
+  endsAt?: string;
+}): Promise<Challenge> {
+  return fetchJSON("/api/challenges", {
+    method: "POST",
+    body: JSON.stringify(data),
+  });
+}
+
+export async function updateChallenge(
+  id: string,
+  data: {
+    title: string;
+    description?: string;
+    isPublic: boolean;
+    startsAt?: string;
+    endsAt?: string;
+  }
+): Promise<Challenge> {
+  return fetchJSON(`/api/challenges/${id}`, {
+    method: "PATCH",
+    body: JSON.stringify(data),
+  });
+}
+
+export async function acceptChallenge(id: string) {
+  return fetchJSON(`/api/challenges/accept`, {
+    method: "POST",
+    body: JSON.stringify({id}),
+  });
+}
+
+// ==========================
 // REWARDS
 // ==========================
+export async function fetchRewards(): Promise<Reward[]> {
+  return fetchJSON("/api/rewards");
+}
+
 export async function createReward(reward: Reward) {
   return fetchJSON("/api/rewards", {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
     body: JSON.stringify(reward),
   });
 }
@@ -91,7 +138,6 @@ export async function createReward(reward: Reward) {
 export async function updateReward(reward: Reward) {
   return fetchJSON(`/api/rewards/${reward.id}`, {
     method: "PATCH",
-    headers: { "Content-Type": "application/json" },
     body: JSON.stringify(reward),
   });
 }
@@ -103,10 +149,13 @@ export async function claimReward(id: string) {
 // ==========================
 // REMINDERS
 // ==========================
+export async function fetchReminders(): Promise<Reminder[]> {
+  return fetchJSON("/api/reminders");
+}
+
 export async function createReminder(reminder: Reminder) {
   return fetchJSON("/api/reminders", {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
     body: JSON.stringify(reminder),
   });
 }
@@ -114,7 +163,6 @@ export async function createReminder(reminder: Reminder) {
 export async function updateReminder(reminder: Reminder) {
   return fetchJSON(`/api/reminders/${reminder.id}`, {
     method: "PATCH",
-    headers: { "Content-Type": "application/json" },
     body: JSON.stringify(reminder),
   });
 }
@@ -124,26 +172,14 @@ export async function toggleReminder(id: string) {
 }
 
 // ==========================
-// LIST / FETCH ALL
+// FRIENDS / CATEGORIES
 // ==========================
-export async function fetchGoals(): Promise<Goal[]> {
-  return fetchJSON("/api/goals");
-}
-
-export async function fetchRewards(): Promise<Reward[]> {
-  return fetchJSON("/api/rewards");
-}
-
-export async function fetchReminders(): Promise<Reminder[]> {
-  return fetchJSON("/api/reminders");
-}
-
-// если есть сущность friends
 export async function fetchFriends(): Promise<any[]> {
   return fetchJSON("/api/friends");
 }
 
-// категории
-export async function fetchCategories(): Promise<{ value: string; label: string }[]> {
+export async function fetchCategories(): Promise<
+  { value: string; label: string }[]
+> {
   return fetchJSON("/api/categories");
 }

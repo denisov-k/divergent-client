@@ -5,6 +5,7 @@ import {
   Target,
   Gift,
   BarChart2,
+  Swords,
   Bell,
   Users
 } from "lucide-react";
@@ -15,7 +16,8 @@ const Navigation = () => {
   const { pathname } = useLocation();
 
   const routes = [
-    { path: "/", title: t("navigation.goals"), icon: Target },
+    { path: "/goals", title: t("navigation.goals"), icon: Target },
+    { path: "/challenges", title: t("navigation.challenges"), icon: Swords },
     { path: "/rewards", title: t("navigation.rewards"), icon: Gift },
     { path: "/progress", title: t("navigation.progress"), icon: BarChart2 },
     { path: "/reminders", title: t("navigation.reminders"), icon: Bell },

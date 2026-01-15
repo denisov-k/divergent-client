@@ -38,6 +38,7 @@ export interface Goal {
   categoryLabel: string;
   tasks: Task[]; // остаётся для обычных целей
   dueDate?: string;
+  lastCompletedAt?: string;
   xpReward?: number;
 
   // новые поля для числовой цели
@@ -45,6 +46,27 @@ export interface Goal {
   targetValue?: number;  // целевое значение
   goalType: GoalType;      // "tasks" | "numeric"
   goalPeriod?: GoalPeriod; // "daily" | "weekly" | "monthly"
+}
+
+export interface Challenge {
+  id: string;
+  title: string;
+  description: string;
+  goals: Goal[];
+  creatorId: string;
+
+  isPublic: boolean;
+
+  startsAt?: string;
+  endsAt?: string;
+
+  participants: ChallengeParticipant[];
+}
+
+export interface ChallengeParticipant {
+  id: string;
+  challengeId: string;
+  userId: string;
 }
 
 export type GoalType = "TASK" | "PROGRESS";

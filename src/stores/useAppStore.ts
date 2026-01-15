@@ -2,7 +2,7 @@ import { create } from "zustand";
 import * as api from "@/utils/api";
 import { FriendCardProps } from "@/components/FriendCard.tsx";
 
-import type { User, CategoryOption, Goal, Reminder, Reward } from "@/types/";
+import type { User, CategoryOption, Goal, Reminder, Reward, Challenge } from "@/types/";
 
 interface AppStore {
   initialized: boolean;
@@ -10,6 +10,7 @@ interface AppStore {
   user: User | null;
   token: string | null,
   goals: Goal[];
+  challenges: Challenge[];
   rewards: Reward[];
   reminders: Reminder[];
   friends: FriendCardProps[];
@@ -27,6 +28,27 @@ interface AppStore {
 
   addXp: (amount: number) => Promise<void>;
   removeXp: (amount: number) => Promise<void>;
+
+  addChallenge: (data: {
+    title: string;
+    description?: string;
+    isPublic: boolean;
+    startsAt?: string;
+    endsAt?: string;
+  }) => Promise<void>;
+
+  updateChallenge: (
+    id: string,
+    data: {
+      title: string;
+      description?: string;
+      isPublic: boolean;
+      startsAt?: string;
+      endsAt?: string;
+    }
+  ) => Promise<void>;
+
+  acceptChallenge: (id: string) => Promise<void>;
 
   addGoal: (goal: Goal) => Promise<void>;
   addCategory: (category: CategoryOption) => void;
@@ -50,6 +72,7 @@ export const useAppStore = create<AppStore>((set, get) => ({
   user: null,
   token: null,
   goals: [] as Goal[],
+  challenges: [] as Challenge[],
   rewards: [] as Reward[],
   reminders: [] as Reminder[],
   friends: [] as FriendCardProps[],
@@ -119,15 +142,16 @@ export const useAppStore = create<AppStore>((set, get) => ({
       set({ user });
 
       if (user) {
-        const [goals, rewards, reminders, friends, categories] = await Promise.all([
+        const [goals, challenges, rewards, reminders, friends, categories] = await Promise.all([
           api.fetchGoals(),
+          api.fetchChallenges(),
           api.fetchRewards(),
           api.fetchReminders(),
           api.fetchFriends(),
           api.fetchCategories()
         ]);
 
-        set({ goals, rewards, reminders, friends, categories });
+        set({ goals, challenges, rewards, reminders, friends, categories });
       }
     } catch (err) {
       console.error(err);
@@ -145,6 +169,48 @@ export const useAppStore = create<AppStore>((set, get) => ({
     const user = get().user;
     try {
       set({ user: { ...user!, xp: amount } });
+    } catch (err) {
+      console.error(err);
+    } finally {
+      set({ loading: false });
+    }
+  },
+
+  addChallenge: async (data) => {
+    set({ loading: true });
+    try {
+      const challenge = await api.createChallenge(data);
+      set({ challenges: [...get().challenges, challenge] });
+    } catch (err) {
+      console.error(err);
+    } finally {
+      set({ loading: false });
+    }
+  },
+
+  updateChallenge: async (id, data) => {
+    set({ loading: true });
+    try {
+      const updated = await api.updateChallenge(id, data);
+      set({
+        challenges: get().challenges.map((c) =>
+          c.id === updated.id ? updated : c
+        ),
+      });
+    } catch (err) {
+      console.error(err);
+    } finally {
+      set({ loading: false });
+    }
+  },
+
+  acceptChallenge: async (id: string) => {
+    set({ loading: true });
+    try {
+      await api.acceptChallenge(id);
+
+      await get().initialize();
+
     } catch (err) {
       console.error(err);
     } finally {

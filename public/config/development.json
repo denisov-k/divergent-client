@@ -7,7 +7,7 @@
             "manifestURL": "https://localhost:8081/tonconnect-manifest.json"
         },
         "telegram": {
-            "twaURL": "https://t.me/divergent_app_bot/app"
+            "twaURL": "https://t.me/divergent_app_test_bot/start"
         }
     }
 }

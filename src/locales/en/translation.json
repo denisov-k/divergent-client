@@ -1,10 +1,18 @@
 {
+  "common": {
+    "create": "Create",
+    "cancel": "Cancel",
+    "close": "Close",
+    "share": "Share",
+    "save": "Save"
+  },
   "profile": {
     "level": "Level",
     "description": "The path to a better version of yourself"
   },
   "navigation": {
     "goals": "Goals",
+    "challenges": "Challenges",
     "frens": "Frens",
     "rewards": "Rewards",
     "progress": "Progress",
@@ -25,6 +33,26 @@
     "create": "Create goal",
     "save": "Save",
     "title": "My goals"
+  },
+  "challenges": {
+    "save": "Save",
+    "empty": "List is empty",
+    "create": "Create challenge",
+    "create_first": "Create first challenge",
+    "title": "Challenges",
+    "create_title": "Challenge creating",
+    "create_description": "Set information about challenge and choose goals",
+    "goals_count": "goals",
+    "goals": "Goals of challenge",
+    "fields": {
+      "title": "Title",
+      "description": "Description",
+      "select_goals": "Select goals"
+    },
+    "visibility": {
+      "public": "Публичный",
+      "private": "Приватный"
+    }
   },
   "rewards": {
     "title": "Rewards and achievements",
