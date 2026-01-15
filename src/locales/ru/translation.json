@@ -12,7 +12,7 @@
   },
   "navigation": {
     "goals": "Цели",
-    "challenges": "Челленджи",
+    "challenges": "Челенджи",
     "frens": "Друзья",
     "rewards": "Награды",
     "progress": "Прогресс",
@@ -38,20 +38,20 @@
   "challenges": {
     "save": "Сохранить",
     "empty": "Список пуст",
-    "create": "Создать челлендж",
+    "create": "Создать челендж",
     "accept": "Принять участие",
-    "create_first": "Создать челлендж",
-    "title": "Челленджи",
-    "create_title": "Создание челленджа",
+    "create_first": "Создать челендж",
+    "title": "Челенджи",
+    "create_title": "Создание челенджа",
     "create_description": "Заполните информацию о челледже и выберите цели",
     "goals_count": "целей",
-    "goals": "Цели челленджа",
+    "goals": "Цели челенджа",
     "participants": "Участников: ",
     "completed": "Выполнена",
     "pending": "В процессе",
     "fields": {
-      "title": "Название челленджа",
-      "description": "Описание челленджа",
+      "title": "Название челенджа",
+      "description": "Описание челенджа",
       "select_goals": "Выберите цели"
     },
     "visibility": {

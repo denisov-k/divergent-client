@@ -6,7 +6,7 @@ export default function RootRedirect() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Если есть параметр challengeId, редирект на челлендж
+    // Если есть параметр challengeId, редирект на челендж
     const startapp = WebApp.initDataUnsafe?.start_param;
 
     if (startapp?.startsWith("challenge-")) {
