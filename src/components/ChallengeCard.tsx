@@ -29,6 +29,7 @@ export function ChallengeCard({challenge, onShare, onEdit, onLeave, onOpenLink, 
   const [isRulesOpen, setIsRulesOpen] = useState(false);
 
   const {user} = useAppStore();
+  const isCreator = challenge.creatorId === user!.id;
 
   const navigate = useNavigate();
 
@@ -91,7 +92,7 @@ export function ChallengeCard({challenge, onShare, onEdit, onLeave, onOpenLink, 
         <div className="flex items-start justify-between gap-4">
           <div className="flex-1 min-w-0 space-y-2">
             {
-              (challenge.creatorId === user!.id &&
+              (isCreator &&
                 <Badge className="mr-1 bg-purple-600 text-white hover:bg-purple-700">
                   Организатор
                 </Badge>)
@@ -114,7 +115,7 @@ export function ChallengeCard({challenge, onShare, onEdit, onLeave, onOpenLink, 
           <div className="flex items-center gap-2">
             <ProgressRing progress={progress} size={70} strokeWidth={6}/>
             <div className="flex flex-col">
-              {onEdit && (challenge.creatorId === user!.id) && (
+              {onEdit && isCreator && (
                 <Button
                   variant="ghost"
                   size="icon"
@@ -132,7 +133,7 @@ export function ChallengeCard({challenge, onShare, onEdit, onLeave, onOpenLink, 
                   <Share className="size-4"/>
                 </Button>
               )}
-              {onLeave && challenge.participants.some(p => p.userId === user?.id) && (
+              {!isCreator && onLeave && challenge.participants.some(p => p.userId === user?.id) && (
                 <Button
                   variant="ghost"
                   size="icon"
