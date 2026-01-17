@@ -9,12 +9,14 @@ export default function RootRedirect() {
     // Если есть параметр challengeId, редирект на челендж
     const startapp = WebApp.initDataUnsafe?.start_param;
 
+    console.log(startapp);
+
     if (startapp?.startsWith("challenge-")) {
       const challengeId = startapp.replace("challenge-", "");
       navigate(`/challenges?challengeId=${challengeId}`, { replace: true });
     } else {
       // Иначе на главную / GoalsView
-      navigate(`/`, { replace: true });
+      navigate(`/goals`, { replace: true });
     }
   }, [navigate]);
 

@@ -13,15 +13,15 @@ import { AcceptChallengeDialog } from "@/components/AcceptChallengeDialog";
 
 import { ChallengeCard } from "@/components/ChallengeCard";
 import Config from "@/services/Config.ts";
-import {useNavigate, useSearchParams} from "react-router-dom";
+import {useSearchParams} from "react-router-dom";
 
 export default function ChallengesView() {
   const { challenges, goals } = useAppStore();
   const { t } = useTranslation();
   const [searchParams] = useSearchParams();
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
 
-  const { addChallenge, updateChallenge, acceptChallenge } = useAppStore();
+  const { addChallenge, updateChallenge, acceptChallenge, leaveChallenge } = useAppStore();
 
   const [challengeDialogOpen, setChallengeDialogOpen] = useState(false);
   const [editingChallenge, setEditingChallenge] = useState<Challenge | undefined>();
@@ -32,6 +32,8 @@ export default function ChallengesView() {
   const handleSaveChallenge = async (data: {
     title: string;
     description?: string;
+    rules?: string;
+    link?: string;
     isPublic: boolean;
     startsAt?: string;
     endsAt?: string;
@@ -64,6 +66,10 @@ export default function ChallengesView() {
     Telegram.WebApp.openTelegramLink('https://t.me/share/url?url=' + url + '&text=' + text);
   };
 
+  const handleLeaveChallenge = async (id: string) => {
+    await leaveChallenge(id);
+  };
+
   // --- Новый обработчик для открытия AcceptChallengeDialog
   const handleSelectChallenge = (challenge: Challenge) => {
     setSelectedChallenge(challenge);
@@ -77,7 +83,13 @@ export default function ChallengesView() {
 
   const handleAcceptChallenge = async (id: string) => {
     await acceptChallenge(id);
-    navigate('/goals')
+  };
+
+  const handleOpenLink = async (id: string) => {
+    const challenge = challenges.find((c) => c.id === id);
+
+    if (challenge && challenge.link)
+      Telegram.WebApp.openTelegramLink(challenge.link);
   };
 
   useEffect(() => {
@@ -136,6 +148,8 @@ export default function ChallengesView() {
                 onEdit={handleEditChallenge}
                 onShare={handleShareChallenge}
                 onSelect={handleSelectChallenge}
+                onLeave={handleLeaveChallenge}
+                onOpenLink={handleOpenLink}
               />
             </div>
           ))}

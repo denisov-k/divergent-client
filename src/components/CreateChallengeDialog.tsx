@@ -26,6 +26,8 @@ interface CreateChallengeDialogProps {
   onSave: (data: {
     title: string;
     description?: string;
+    rules?: string;
+    link?: string;
     isPublic: boolean;
     startsAt?: string;
     endsAt?: string;
@@ -45,6 +47,8 @@ export function CreateChallengeDialog({
   const [loading, setLoading] = useState(false);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
+  const [rules, setRules] = useState("");
+  const [link, setLink] = useState("");
   const [isPublic, setIsPublic] = useState(true);
   const [startsAt, setStartsAt] = useState("");
   const [endsAt, setEndsAt] = useState("");
@@ -56,6 +60,8 @@ export function CreateChallengeDialog({
     if (challenge) {
       setTitle(challenge.title);
       setDescription(challenge.description ?? "");
+      setRules(challenge.rules ?? "");
+      setLink(challenge.link ?? "");
       setIsPublic(challenge.isPublic);
       setStartsAt(challenge.startsAt?.slice(0, 10) ?? "");
       setEndsAt(challenge.endsAt?.slice(0, 10) ?? "");
@@ -71,6 +77,8 @@ export function CreateChallengeDialog({
   const resetForm = () => {
     setTitle("");
     setDescription("");
+    setRules("");
+    setLink("");
     setIsPublic(true);
     setStartsAt("");
     setEndsAt("");
@@ -85,6 +93,8 @@ export function CreateChallengeDialog({
       await onSave({
         title: title.trim(),
         description: description.trim() || undefined,
+        rules: rules.trim() || undefined,
+        link: link.trim() || undefined,
         isPublic,
         startsAt: startsAt || undefined,
         endsAt: endsAt || undefined,
@@ -118,6 +128,18 @@ export function CreateChallengeDialog({
             placeholder={t("challenges.fields.description")}
             value={description}
             onChange={(e) => setDescription(e.target.value)}
+          />
+
+          <Textarea
+            placeholder={t("challenges.fields.rules")}
+            value={rules}
+            onChange={(e) => setRules(e.target.value)}
+          />
+
+          <Input
+            placeholder={t("challenges.fields.link")}
+            value={link}
+            onChange={(e) => setLink(e.target.value)}
           />
 
           <div className="flex items-center gap-2">

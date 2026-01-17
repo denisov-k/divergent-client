@@ -2,7 +2,7 @@ import { create } from "zustand";
 import * as api from "@/utils/api";
 import { FriendCardProps } from "@/components/FriendCard.tsx";
 
-import type { User, CategoryOption, Goal, Reminder, Reward, Challenge } from "@/types/";
+import type {User, CategoryOption, Goal, Reminder, Reward, Challenge, ChallengeApi} from "@/types/";
 
 interface AppStore {
   initialized: boolean;
@@ -32,6 +32,8 @@ interface AppStore {
   addChallenge: (data: {
     title: string;
     description?: string;
+    rules?: string;
+    link?: string;
     isPublic: boolean;
     startsAt?: string;
     endsAt?: string;
@@ -42,6 +44,8 @@ interface AppStore {
     data: {
       title: string;
       description?: string;
+      rules?: string;
+      link?: string;
       isPublic: boolean;
       startsAt?: string;
       endsAt?: string;
@@ -49,6 +53,7 @@ interface AppStore {
   ) => Promise<void>;
 
   acceptChallenge: (id: string) => Promise<void>;
+  leaveChallenge: (id: string) => Promise<void>;
 
   addGoal: (goal: Goal) => Promise<void>;
   addCategory: (category: CategoryOption) => void;
@@ -192,9 +197,19 @@ export const useAppStore = create<AppStore>((set, get) => ({
     set({ loading: true });
     try {
       const updated = await api.updateChallenge(id, data);
+
+      function normalizeChallenge(c: ChallengeApi): Challenge {
+        return {
+          ...c,
+          goals: c.goals.map((cg) => cg.goal),
+        };
+      }
+
+      const normalized = normalizeChallenge(updated);
+
       set({
         challenges: get().challenges.map((c) =>
-          c.id === updated.id ? updated : c
+          c.id === normalized.id ? normalized : c
         ),
       });
     } catch (err) {
@@ -208,6 +223,20 @@ export const useAppStore = create<AppStore>((set, get) => ({
     set({ loading: true });
     try {
       await api.acceptChallenge(id);
+
+      await get().initialize();
+
+    } catch (err) {
+      console.error(err);
+    } finally {
+      set({ loading: false });
+    }
+  },
+
+  leaveChallenge: async (id: string) => {
+    set({ loading: true });
+    try {
+      await api.leaveChallenge(id);
 
       await get().initialize();
 

@@ -1,6 +1,6 @@
 import {Card, CardContent, CardDescription, CardHeader, CardTitle} from "@/components/ui/card"
 import {Badge} from "@/components/ui/badge"
-import {Calendar, Users, Edit, Share, ChevronUp, ChevronDown} from "lucide-react"
+import {Calendar, Users, Edit, Share, ChevronUp, ChevronDown, DoorOpen} from "lucide-react"
 import {Challenge} from "@/types"
 import {format} from "date-fns"
 import {ProgressRing} from "@/components/ProgressRing.tsx";
@@ -17,12 +17,16 @@ interface Props {
   challenge: Challenge;
   onEdit?: (id: string) => void;
   onShare?: (id: string) => void;
+  onLeave?: (id: string) => void;
+  onOpenLink?: (id: string) => void;
   onSelect?: (challenge: Challenge) => void; // новый проп
 }
 
-export function ChallengeCard({challenge, onShare, onEdit, onSelect}: Props) {
+export function ChallengeCard({challenge, onShare, onEdit, onLeave, onOpenLink, onSelect}: Props) {
   const {t} = useTranslation();
-  const [isOpen, setIsOpen] = useState(false);
+  const [isGoalsOpen, setIsGoalsOpen] = useState(false);
+  const [isLeaderboardOpen, setIsLeaderboardOpen] = useState(false);
+  const [isRulesOpen, setIsRulesOpen] = useState(false);
 
   const {user} = useAppStore();
 
@@ -67,12 +71,15 @@ export function ChallengeCard({challenge, onShare, onEdit, onSelect}: Props) {
     }, 0) / goals.length;
 
   const onGoalClick = (e: ReactMouseEvent, id: string) => {
-    if (challenge.participants.some(p => p.userId === user?.id))
+    if (!challenge.participants.some(p => p.userId === user?.id))
       return;
 
     e.stopPropagation();
     navigate(`/goals?focus=${id}`);
   }
+
+  const leaderboard: NonNullable<Challenge["leaderboard"]> =
+    challenge.leaderboard ?? [];
 
   return (
     <Card className="hover:shadow-md transition-shadow"
@@ -83,14 +90,17 @@ export function ChallengeCard({challenge, onShare, onEdit, onSelect}: Props) {
       <CardHeader>
         <div className="flex items-start justify-between gap-4">
           <div className="flex-1 min-w-0 space-y-2">
-            {(challenge.creatorId === user!.id && <Badge variant="default" className="mr-1">
-                Организатор
-              </Badge>) ||
-
-              (challenge.participants.some(p => p.userId === user?.id) &&
-                <Badge variant="default" className="mr-1">
-                  Участвуете
+            {
+              (challenge.creatorId === user!.id &&
+                <Badge className="mr-1 bg-purple-600 text-white hover:bg-purple-700">
+                  Организатор
                 </Badge>)
+              ||
+              (challenge.participants.some(p => p.userId === user?.id) &&
+                (<Badge variant="default" className="mr-1">
+                  Участвуете
+                </Badge>
+                ))
             }
             {/*<Badge variant={challenge.isPublic ? "secondary" : "outline"}>
               {challenge.isPublic ? "Публичный" : "Приватный"}
@@ -122,6 +132,15 @@ export function ChallengeCard({challenge, onShare, onEdit, onSelect}: Props) {
                   <Share className="size-4"/>
                 </Button>
               )}
+              {onLeave && challenge.participants.some(p => p.userId === user?.id) && (
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={(e) => (e.stopPropagation(), onLeave(challenge.id))}
+                >
+                  <DoorOpen className="size-4"/>
+                </Button>
+              )}
             </div>
           </div>
         </div>
@@ -142,12 +161,12 @@ export function ChallengeCard({challenge, onShare, onEdit, onSelect}: Props) {
         </div>
 
         {/* Цели */}
-        <Collapsible open={isOpen} onOpenChange={setIsOpen}>
+        <Collapsible open={isGoalsOpen} onOpenChange={setIsGoalsOpen}>
           <CollapsibleTrigger asChild>
             <Button variant="outline" className="w-full justify-between"
                     onClick={(e) => e.stopPropagation()}>
               <span>{t("challenges.goals")}</span>
-              {isOpen ? (
+              {isGoalsOpen ? (
                 <ChevronUp className="size-4"/>
               ) : (
                 <ChevronDown className="size-4"/>
@@ -169,6 +188,72 @@ export function ChallengeCard({challenge, onShare, onEdit, onSelect}: Props) {
             ))}
           </CollapsibleContent>
         </Collapsible>
+
+        {/* Топ участников */}
+        <Collapsible open={isLeaderboardOpen} onOpenChange={setIsLeaderboardOpen}>
+          <CollapsibleTrigger asChild>
+            <Button
+              variant="outline"
+              className="w-full justify-between"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <span>Топ участников</span>
+              {isLeaderboardOpen ? (
+                <ChevronUp className="size-4"/>
+              ) : (
+                <ChevronDown className="size-4"/>
+              )}
+            </Button>
+          </CollapsibleTrigger>
+
+          <CollapsibleContent className="mt-3 space-y-2">
+            {leaderboard.map((p, index) => (
+              <div
+                key={p.userId}
+                className="flex items-center justify-between rounded border px-3 py-2 text-sm"
+              >
+                <div className="flex items-center gap-2">
+                  <Badge variant="secondary">#{index + 1}</Badge>
+                  <span>{p.name}</span>
+                </div>
+                <span className="text-muted-foreground">
+                  {p.completedGoals} целей
+                </span>
+              </div>
+            ))}
+          </CollapsibleContent>
+        </Collapsible>
+
+        {challenge.rules && (
+          <Collapsible open={isRulesOpen} onOpenChange={setIsRulesOpen}>
+            <CollapsibleTrigger asChild>
+              <Button
+                variant="outline"
+                className="w-full justify-between"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <span>Правила</span>
+                {isRulesOpen ? (
+                  <ChevronUp className="size-4"/>
+                ) : (
+                  <ChevronDown className="size-4"/>
+                )}
+              </Button>
+            </CollapsibleTrigger>
+
+            <CollapsibleContent className="mt-3 text-sm text-muted-foreground whitespace-pre-line">
+              {challenge.rules}
+            </CollapsibleContent>
+          </Collapsible>
+        )}
+        {
+          onOpenLink && challenge.link &&
+            <div className="flex justify-center">
+              <Button onClick={(e) => (e.stopPropagation(), onOpenLink(challenge.id))}>
+                  Сообщество
+              </Button>
+            </div>
+        }
 
         {/* Нижняя инфа */}
         <div className="flex flex-wrap items-center justify-between gap-4 pt-3 border-t">

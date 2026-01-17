@@ -46,27 +46,51 @@ export interface Goal {
   targetValue?: number;  // целевое значение
   goalType: GoalType;      // "tasks" | "numeric"
   goalPeriod?: GoalPeriod; // "daily" | "weekly" | "monthly"
+  challengeId?: string;
+  challenge?: Challenge;
+}
+
+export interface Leader {
+  completedGoals: number;
+  name: string;
+  progressPercent: number;
+  totalGoals: number;
+  userId: string;
+}
+
+export interface ChallengeGoal {
+  challengeId: string;
+  goalId: string;
+  challenge: Challenge;
+  goal: Goal;
 }
 
 export interface Challenge {
   id: string;
   title: string;
   description: string;
-  goals: Goal[];
+  goals: Goal[]; // ✅ ТОЛЬКО Goal[]
+  leaderboard: Leader[];
   creatorId: string;
-
+  rules?: string;
+  link?: string;
   isPublic: boolean;
-
   startsAt?: string;
   endsAt?: string;
-
   participants: ChallengeParticipant[];
+}
+
+export interface ChallengeApi
+  extends Omit<Challenge, "goals"> {
+  goals: ChallengeGoal[];
 }
 
 export interface ChallengeParticipant {
   id: string;
   challengeId: string;
   userId: string;
+  challenge: Challenge;
+  user: User;
 }
 
 export type GoalType = "TASK" | "PROGRESS";
@@ -101,6 +125,7 @@ export interface Reward {
   icon: RewardIcon;
   isUnlocked: boolean;
   goalId?: string;
+  goal?: Goal;
 }
 
 export interface User {

@@ -1,4 +1,4 @@
-import type { User, Goal, Reward, Reminder, Challenge } from "@/types/";
+import type {User, Goal, Reward, Reminder, Challenge, ChallengeApi} from "@/types/";
 import Config from "@/services/Config";
 
 async function fetchJSON(url: string, options: RequestInit = {}) {
@@ -107,10 +107,17 @@ export async function updateChallenge(
     startsAt?: string;
     endsAt?: string;
   }
-): Promise<Challenge> {
+): Promise<ChallengeApi> {
   return fetchJSON(`/api/challenges/${id}`, {
     method: "PATCH",
     body: JSON.stringify(data),
+  });
+}
+
+export async function leaveChallenge(id: string) {
+  return fetchJSON(`/api/challenges/leave`, {
+    method: "POST",
+    body: JSON.stringify({challengeId: id}),
   });
 }
 

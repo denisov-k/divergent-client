@@ -2,6 +2,9 @@ import { Card, CardContent, CardDescription, CardTitle } from "./ui/card";
 import { Badge } from "./ui/badge";
 import { Button } from "./ui/button";
 import {Trophy, Star, Gift, Crown, Award, Zap, Edit, Target} from "lucide-react";
+import {Goal} from "@/types";
+import {useNavigate} from "react-router-dom";
+import {useAppStore} from "@/stores/useAppStore.ts";
 
 type RewardIcon = "trophy" | "star" | "gift" | "crown" | "award" | "zap";
 
@@ -10,7 +13,7 @@ interface RewardCardProps {
   title: string;
   description: string;
   icon?: RewardIcon;
-  isUnlocked?: boolean;
+  goal?: Goal;
   goalTitle?: string;          // <-- Новое
   onEdit?: (id: string) => void;
 }
@@ -29,11 +32,21 @@ export function RewardCard({
                              title,
                              description,
                              icon = "trophy",
-                             isUnlocked = false,
+                             goal,
                              goalTitle,
                              onEdit,
                            }: RewardCardProps) {
   const Icon = iconMap[icon];
+
+  const navigate = useNavigate();
+  const isFromChallenge = Boolean(goal?.challengeId);
+
+  const isUnlocked = false;
+
+  const { challenges } = useAppStore();
+  const challenge = challenges.find(challenge => challenge.id === goal?.challengeId);
+
+  const canEdit = onEdit && !isFromChallenge;
 
   return (
     <Card
@@ -71,15 +84,28 @@ export function RewardCard({
               {description}
             </CardDescription>
 
+            {isFromChallenge && challenge && (
+              <Badge
+                className="cursor-pointer bg-primary text-white hover:bg-primary/80 mt-2 "
+                onClick={() => navigate({
+                  pathname: "/challenges",
+                  search: `?id=${challenge.id}`,
+                })}
+                title="Перейти к челленджу"
+              >
+                Челлендж: {challenge.title}
+              </Badge>
+            )}
+
             {goalTitle && (
-              <div className="mt-2 flex items-center">
+              <div className="flex items-center mt-1">
                 <Target className="size-3 text-primary mr-1" />
                 <span className="">{goalTitle}</span>
               </div>
             )}
           </div>
 
-          {onEdit && (
+          {onEdit && canEdit && (
             <Button variant="ghost" size="icon" onClick={() => onEdit(id)}>
               <Edit className="size-4" />
             </Button>

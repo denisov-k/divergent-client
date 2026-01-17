@@ -10,7 +10,8 @@ import {useEffect, useRef, useState} from "react";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "./ui/collapsible";
 import {useTranslation} from "react-i18next";
 
-import {GoalPeriod, GoalType, Reward, Task} from "@/types";
+import {Challenge, GoalPeriod, GoalType, Reward, Task} from "@/types";
+import {useNavigate} from "react-router-dom";
 
 export type CategoryType = string;
 
@@ -24,6 +25,7 @@ interface GoalCardProps {
 
   goalType?: GoalType;
   goalPeriod?: GoalPeriod;
+  challenge?: Challenge;
 
   currentValue?: number;
   targetValue?: number;
@@ -47,6 +49,7 @@ export function GoalCard({
                            category,
                            categoryLabel,
                            tasks,
+                           challenge,
                            goalType,
                            goalPeriod,
                            currentValue,
@@ -66,6 +69,10 @@ export function GoalCard({
   const [newSubTaskTitles, setNewSubTaskTitles] = useState<Record<string, string>>({});
   const [newSubTaskXps, setNewSubTaskXps] = useState<Record<string, string>>({});
   const [progressDelta, setProgressDelta] = useState<number>();
+
+  const navigate = useNavigate();
+
+  const isFromChallenge = Boolean(challenge);
 
   const { t } = useTranslation();
 
@@ -171,7 +178,7 @@ export function GoalCard({
           <div className="flex items-center gap-2">
             <ProgressRing progress={progress} size={70} strokeWidth={6} />
             <div className="flex flex-col">
-              {onEdit && <Button variant="ghost" size="icon" onClick={() => onEdit(id)}><Edit className="size-4" /></Button>}
+              {onEdit && !isFromChallenge && <Button variant="ghost" size="icon" onClick={() => onEdit(id)}><Edit className="size-4" /></Button>}
               {onAddReminder && <Button variant="ghost" size="icon" onClick={() => onAddReminder(id)} className="shrink-0" title="Создать напоминание"><AlarmClock className="size-4" /></Button>}
             </div>
           </div>
@@ -242,6 +249,19 @@ export function GoalCard({
                 {goalPeriod === "MONTHLY" && "Ежемесячная"}
               </Badge>
             )}
+            {isFromChallenge && challenge && (
+              <Badge
+                className="cursor-pointer bg-primary text-white hover:bg-primary/80"
+                onClick={() => navigate({
+                  pathname: "/challenges",
+                  search: `?id=${challenge.id}`,
+                })}
+                title="Перейти к челленджу"
+              >
+                Челлендж: {challenge.title}
+              </Badge>
+            )}
+
             {dueDate && (
               <div className="flex items-center gap-2 text-muted-foreground mr-4">
                 <Calendar className="size-4" />
@@ -253,7 +273,18 @@ export function GoalCard({
             <div className="flex items-center flex-wrap justify-end mb-auto">
               <span className="mr-1">Награда: </span>
               <div className="flex flex-wrap justify-center">
-                {reward && <Badge className="mr-1 my-0.5 bg-purple-500">{reward?.title}</Badge>}
+                {reward && (
+                  <Badge
+                    className="mr-1 my-0.5 bg-purple-600 cursor-pointer hover:bg-purple-500"
+                    onClick={() => navigate({
+                      pathname: "/rewards",
+                      search: `?id=${reward.id}`,
+                    })}
+                    title="Перейти к награде"
+                  >
+                    {reward.title}
+                  </Badge>
+                )}
                 {xpReward && <Badge className="my-0.5">+{xpReward} XP</Badge>}
               </div>
             </div>

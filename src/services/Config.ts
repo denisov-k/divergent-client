@@ -3,7 +3,7 @@ import axios, {AxiosResponse} from 'axios';
 let p: Promise<unknown> | null = null;
 
 const ENV_CURRENT = process.env.NODE_ENV;
-const BASE_URL = 'config/{env}.json';
+const BASE_URL = '/config/{env}.json';
 const http = axios.create();
 
 interface ConfigInterface {
