@@ -7,19 +7,22 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from ".
 
 import type { Goal, Reminder } from "@/types";
 import {DAYS_OF_MONTH, DAYS_OF_WEEK} from "@/types";
+import {useTranslation} from "react-i18next";
 
 
 interface ReminderDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSave: (reminder: Reminder) => void;
+  onDelete?: (id: string) => void;
   reminder?: Reminder;
   goals: Goal[];
   initialGoalId?: string;
 }
 
 
-export function ReminderDialog({ open, onOpenChange, onSave, reminder, goals, initialGoalId }: ReminderDialogProps) {
+export function ReminderDialog({ open, onOpenChange, onSave, onDelete, reminder, goals, initialGoalId }: ReminderDialogProps) {
+  const { t } = useTranslation();
   const [title, setTitle] = useState(reminder?.title || "");
   const [time, setTime] = useState(reminder?.time || "09:00");
   const [selectedDays, setSelectedDays] = useState<string[]>(reminder?.daysOfWeek || []);
@@ -99,6 +102,11 @@ export function ReminderDialog({ open, onOpenChange, onSave, reminder, goals, in
       setTaskId("");
     }
     onOpenChange(false);
+  };
+
+  const handleDelete = (id: string) => {
+    if (onDelete)
+      onDelete(id);
   };
 
   return (
@@ -246,6 +254,11 @@ export function ReminderDialog({ open, onOpenChange, onSave, reminder, goals, in
         </div>
 
         <DialogFooter>
+          {reminder &&
+            <Button variant="destructive" onClick={() => handleDelete(reminder!.id)}>
+              {t('common.delete')}
+            </Button>
+          }
           <Button variant="outline" onClick={handleClose}>
             Отмена
           </Button>

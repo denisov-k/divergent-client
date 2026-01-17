@@ -14,7 +14,7 @@ import {useTranslation} from "react-i18next";
 
 export default function Rewards() {
   const { t } = useTranslation();
-  const { rewards, addReward, updateReward, goals } = useAppStore();
+  const { rewards, addReward, updateReward, goals, deleteReward } = useAppStore();
 
   const [rewardDialogOpen, setRewardDialogOpen] = useState(false);
   const [editingReward, setEditingReward] = useState<Reward | undefined>(undefined);
@@ -31,6 +31,14 @@ export default function Rewards() {
       toast.success("Награда создана");
     }
     setEditingReward(undefined);
+  };
+
+  const handleDeleteReward = async (id: string) => {
+    const reward = rewards.find((r) => r.id === id);
+    if (reward) {
+      await deleteReward(reward);
+      setRewardDialogOpen(false);
+    }
   };
 
   // ------------------------------
@@ -98,6 +106,7 @@ export default function Rewards() {
           if (!open) setEditingReward(undefined);
         }}
         onSave={handleSaveReward}
+        onDelete={handleDeleteReward}
         reward={editingReward}
         goals={goals}
       />

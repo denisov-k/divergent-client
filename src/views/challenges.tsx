@@ -8,7 +8,7 @@ import { useAppStore } from "@/stores/useAppStore";
 import {useEffect, useState} from "react";
 import { useTranslation } from "react-i18next";
 
-import { CreateChallengeDialog } from "@/components/CreateChallengeDialog";
+import {ChallengeInput, CreateChallengeDialog} from "@/components/CreateChallengeDialog";
 import { AcceptChallengeDialog } from "@/components/AcceptChallengeDialog";
 
 import { ChallengeCard } from "@/components/ChallengeCard";
@@ -29,17 +29,9 @@ export default function ChallengesView() {
   const [acceptDialogOpen, setAcceptDialogOpen] = useState(false);
   const [selectedChallenge, setSelectedChallenge] = useState<Challenge | undefined>();
 
-  const handleSaveChallenge = async (data: {
-    title: string;
-    description?: string;
-    rules?: string;
-    link?: string;
-    isPublic: boolean;
-    startsAt?: string;
-    endsAt?: string;
-  }) => {
+  const handleSaveChallenge = async (data: ChallengeInput) => {
     if (editingChallenge) {
-      await updateChallenge(editingChallenge.id, data);
+      await updateChallenge(data);
     } else {
       await addChallenge(data);
     }

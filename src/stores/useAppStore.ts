@@ -3,6 +3,7 @@ import * as api from "@/utils/api";
 import { FriendCardProps } from "@/components/FriendCard.tsx";
 
 import type {User, CategoryOption, Goal, Reminder, Reward, Challenge, ChallengeApi} from "@/types/";
+import {ChallengeInput} from "@/components/CreateChallengeDialog.tsx";
 
 interface AppStore {
   initialized: boolean;
@@ -29,44 +30,28 @@ interface AppStore {
   addXp: (amount: number) => Promise<void>;
   removeXp: (amount: number) => Promise<void>;
 
-  addChallenge: (data: {
-    title: string;
-    description?: string;
-    rules?: string;
-    link?: string;
-    isPublic: boolean;
-    startsAt?: string;
-    endsAt?: string;
-  }) => Promise<void>;
+  addChallenge: (challenge: ChallengeInput) => Promise<void>;
 
-  updateChallenge: (
-    id: string,
-    data: {
-      title: string;
-      description?: string;
-      rules?: string;
-      link?: string;
-      isPublic: boolean;
-      startsAt?: string;
-      endsAt?: string;
-    }
-  ) => Promise<void>;
+  updateChallenge: (challenge: ChallengeInput) => Promise<void>;
 
   acceptChallenge: (id: string) => Promise<void>;
   leaveChallenge: (id: string) => Promise<void>;
 
-  addGoal: (goal: Goal) => Promise<void>;
   addCategory: (category: CategoryOption) => void;
+  addGoal: (goal: Goal) => Promise<void>;
+  deleteGoal: (goal: Goal) => Promise<void>;
   updateGoal: (goal: Goal) => Promise<void>;
-  toggleTask: (goalId: string, taskId: string) => Promise<void>;
   updateGoalProgress: (goalId: string, delta: number) => Promise<void>;
+  toggleTask: (goalId: string, taskId: string) => Promise<void>;
 
   addReward: (reward: Reward) => Promise<void>;
+  deleteReward: (reward: Reward) => Promise<void>;
   updateReward: (reward: Reward) => Promise<void>;
   updateRewardGoal: (goalId: string, rewardId?: string) => Promise<void>;
   claimReward: (id: string) => Promise<void>;
 
   addReminder: (reminder: Reminder) => Promise<void>;
+  deleteReminder: (reminder: Reminder) => Promise<void>;
   updateReminder: (reminder: Reminder) => Promise<void>;
   toggleReminder: (id: string) => Promise<void>;
 }
@@ -181,7 +166,7 @@ export const useAppStore = create<AppStore>((set, get) => ({
     }
   },
 
-  addChallenge: async (data) => {
+  addChallenge: async (data: ChallengeInput) => {
     set({ loading: true });
     try {
       const challenge = await api.createChallenge(data);
@@ -193,10 +178,10 @@ export const useAppStore = create<AppStore>((set, get) => ({
     }
   },
 
-  updateChallenge: async (id, data) => {
+  updateChallenge: async (data: ChallengeInput) => {
     set({ loading: true });
     try {
-      const updated = await api.updateChallenge(id, data);
+      const updated = await api.updateChallenge(data);
 
       function normalizeChallenge(c: ChallengeApi): Challenge {
         return {
@@ -267,6 +252,54 @@ export const useAppStore = create<AppStore>((set, get) => ({
     try {
       const newGoal = await api.createGoal(goal);
       set({ goals: [...get().goals, newGoal] });
+    } catch (err) {
+      console.error(err);
+    } finally {
+      set({ loading: false });
+    }
+  },
+
+  deleteGoal: async (goal: Goal) => {
+    set({ loading: true });
+    try {
+      await api.deleteGoal(goal.id);
+
+      set({
+        goals: get().goals.filter((g) => g.id !== goal.id),
+      });
+
+    } catch (err) {
+      console.error(err);
+    } finally {
+      set({ loading: false });
+    }
+  },
+
+  deleteReminder: async (reminder: Reminder) => {
+    set({ loading: true });
+    try {
+      await api.deleteReminder(reminder.id);
+
+      set({
+        reminders: get().reminders.filter((r) => r.id !== reminder.id),
+      });
+
+    } catch (err) {
+      console.error(err);
+    } finally {
+      set({ loading: false });
+    }
+  },
+
+  deleteReward: async (reward: Reward) => {
+    set({ loading: true });
+    try {
+      await api.deleteReward(reward.id);
+
+      set({
+        rewards: get().rewards.filter((r) => r.id !== reward.id),
+      });
+
     } catch (err) {
       console.error(err);
     } finally {

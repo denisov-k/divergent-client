@@ -12,7 +12,7 @@ import {Reminder} from "@/types";
 import { useAppStore } from "@/stores/useAppStore";
 
 export default function Reminders() {
-  const { reminders, goals, addReminder, updateReminder, toggleReminder } = useAppStore();
+  const { reminders, goals, addReminder, updateReminder, toggleReminder, deleteReminder } = useAppStore();
 
   const [reminderDialogOpen, setReminderDialogOpen] = useState(false);
   const [editingReminder, setEditingReminder] = useState<Reminder | undefined>(undefined);
@@ -59,6 +59,14 @@ export default function Reminders() {
       goalTitle: goal?.title,
       taskTitle: task?.title,
     };
+  };
+
+  const handleDeleteReminder = async (id: string) => {
+    const reminder = reminders.find((r) => r.id === id);
+    if (reminder) {
+      await deleteReminder(reminder);
+      setReminderDialogOpen(false);
+    }
   };
 
   return (
@@ -111,6 +119,7 @@ export default function Reminders() {
           if (!open) setEditingReminder(undefined);
         }}
         onSave={handleSaveReminder}
+        onDelete={handleDeleteReminder}
         reminder={editingReminder}
         goals={goals}
       />

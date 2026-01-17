@@ -1,5 +1,6 @@
 import type {User, Goal, Reward, Reminder, Challenge, ChallengeApi} from "@/types/";
 import Config from "@/services/Config";
+import {ChallengeInput} from "@/components/CreateChallengeDialog.tsx";
 
 async function fetchJSON(url: string, options: RequestInit = {}) {
   const res = await fetch(Config.data.api.http.baseURL + url, {
@@ -64,6 +65,14 @@ export async function deleteGoal(id: string) {
   return fetchJSON(`/api/goals/${id}`, { method: "DELETE" });
 }
 
+export async function deleteReminder(id: string) {
+  return fetchJSON(`/api/reminders/${id}`, { method: "DELETE" });
+}
+
+export async function deleteReward(id: string) {
+  return fetchJSON(`/api/rewards/${id}`, { method: "DELETE" });
+}
+
 export async function toggleTask(goalId: string, taskId: string) {
   return fetchJSON(`/api/goals/${goalId}/toggle-task`, {
     method: "PATCH",
@@ -85,30 +94,15 @@ export async function fetchChallenges(): Promise<Challenge[]> {
   return fetchJSON("/api/challenges");
 }
 
-export async function createChallenge(data: {
-  title: string;
-  description?: string;
-  isPublic: boolean;
-  startsAt?: string;
-  endsAt?: string;
-}): Promise<Challenge> {
+export async function createChallenge(data: ChallengeInput): Promise<Challenge> {
   return fetchJSON("/api/challenges", {
     method: "POST",
     body: JSON.stringify(data),
   });
 }
 
-export async function updateChallenge(
-  id: string,
-  data: {
-    title: string;
-    description?: string;
-    isPublic: boolean;
-    startsAt?: string;
-    endsAt?: string;
-  }
-): Promise<ChallengeApi> {
-  return fetchJSON(`/api/challenges/${id}`, {
+export async function updateChallenge(data: ChallengeInput): Promise<ChallengeApi> {
+  return fetchJSON(`/api/challenges/${data.id}`, {
     method: "PATCH",
     body: JSON.stringify(data),
   });

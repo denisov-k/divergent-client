@@ -23,17 +23,13 @@ interface CreateChallengeDialogProps {
   onOpenChange: (open: boolean) => void;
   challenge?: Challenge;
   goals: Goal[];
-  onSave: (data: {
-    title: string;
-    description?: string;
-    rules?: string;
-    link?: string;
-    isPublic: boolean;
-    startsAt?: string;
-    endsAt?: string;
-    goalIds: string[];
-  }) => Promise<void> | void;
+  onSave: (data: ChallengeInput) => Promise<void> | void;
 }
+
+export type ChallengeInput = Omit<
+  Challenge,
+  "goals" | "leaderboard" | "creatorId" | "participants"
+>;
 
 export function CreateChallengeDialog({
                                         open,
@@ -91,6 +87,7 @@ export function CreateChallengeDialog({
     setLoading(true);
     try {
       await onSave({
+        id: challenge?.id || "",
         title: title.trim(),
         description: description.trim() || undefined,
         rules: rules.trim() || undefined,

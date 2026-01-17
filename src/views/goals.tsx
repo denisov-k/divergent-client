@@ -28,6 +28,7 @@ export default function Goals() {
     updateReminder,
     updateRewardGoal,
     updateGoalProgress,
+    deleteGoal,
     rewards,
     categories
   } = useAppStore();
@@ -78,6 +79,14 @@ export default function Goals() {
     if (goal) {
       setEditingGoal(goal);
       setGoalDialogOpen(true);
+    }
+  };
+
+  const handleDeleteGoal = async (id: string) => {
+    const goal = goals.find((g) => g.id === id);
+    if (goal) {
+      await deleteGoal(goal);
+      setGoalDialogOpen(false);
     }
   };
 
@@ -237,6 +246,7 @@ export default function Goals() {
           if (!open) setEditingGoal(undefined);
         }}
         onSave={handleSaveGoal}
+        onDelete={handleDeleteGoal}
         goal={editingGoal}
         categories={categories}
         rewards={rewards}

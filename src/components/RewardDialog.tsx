@@ -8,12 +8,14 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from ".
 import { Trophy, Star, Gift, Crown, Award, Zap } from "lucide-react";
 
 import {Goal, Reward, RewardIcon} from "@/types";
+import {useTranslation} from "react-i18next";
 
 
 interface RewardDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSave: (reward: Reward) => void;
+  onDelete: (id: string) => void;
   reward?: Reward;
   goals: Goal[];
 }
@@ -27,7 +29,8 @@ const iconOptions = [
   { value: "zap", label: "Молния", Icon: Zap },
 ];
 
-export function RewardDialog({ open, onOpenChange, onSave, reward, goals }: RewardDialogProps) {
+export function RewardDialog({ open, onOpenChange, onSave, onDelete, reward, goals }: RewardDialogProps) {
+  const { t } = useTranslation();
   const [title, setTitle] = useState(reward?.title || "");
   const [description, setDescription] = useState(reward?.description || "");
   const [icon, setIcon] = useState<RewardIcon>(reward?.icon || "trophy");
@@ -71,6 +74,11 @@ export function RewardDialog({ open, onOpenChange, onSave, reward, goals }: Rewa
       setIcon("trophy");
     }
     onOpenChange(false);
+  };
+
+  const handleDelete = (id: string) => {
+    if (onDelete)
+      onDelete(id);
   };
 
   return (
@@ -155,6 +163,11 @@ export function RewardDialog({ open, onOpenChange, onSave, reward, goals }: Rewa
         </div>
 
         <DialogFooter>
+          {reward &&
+            <Button variant="destructive" onClick={() => handleDelete(reward!.id)}>
+              {t('common.delete')}
+            </Button>
+          }
           <Button variant="outline" onClick={handleClose}>
             Отмена
           </Button>

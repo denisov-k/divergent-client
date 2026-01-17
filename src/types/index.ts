@@ -68,8 +68,9 @@ export interface ChallengeGoal {
 export interface Challenge {
   id: string;
   title: string;
-  description: string;
-  goals: Goal[]; // ✅ ТОЛЬКО Goal[]
+  description?: string;
+  goals: Goal[];
+  goalIds: string[];
   leaderboard: Leader[];
   creatorId: string;
   rules?: string;

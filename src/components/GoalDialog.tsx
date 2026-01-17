@@ -25,6 +25,7 @@ interface GoalDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSave: (data: GoalFormData) => void;
+  onDelete: (id: string) => void;
   goal?: Goal;
   categories: CategoryOption[];
   rewards: Reward[];
@@ -35,6 +36,7 @@ export function GoalDialog({
                              open,
                              onOpenChange,
                              onSave,
+                             onDelete,
                              goal,
                              categories,
                              rewards,
@@ -273,6 +275,10 @@ export function GoalDialog({
       resetForm();
     }
     onOpenChange(false);
+  };
+
+  const handleDelete = (id: string) => {
+    onDelete(id);
   };
 
   function toInputDate(value?: string | null) {
@@ -519,6 +525,11 @@ export function GoalDialog({
         </div>
 
         <DialogFooter>
+          {goal &&
+            <Button variant="destructive" onClick={() => handleDelete(goal!.id)}>
+              {t('common.delete')}
+            </Button>
+          }
           <Button variant="outline" onClick={handleClose}>
             {t('common.cancel')}
           </Button>
