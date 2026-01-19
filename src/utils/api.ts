@@ -115,6 +115,13 @@ export async function leaveChallenge(id: string) {
   });
 }
 
+export async function payChallenge(id: string, method: string) {
+  return fetchJSON(`/api/payments/create`, {
+    method: "POST",
+    body: JSON.stringify({challengeId: id, method}),
+  });
+}
+
 export async function acceptChallenge(id: string) {
   return fetchJSON(`/api/challenges/accept`, {
     method: "POST",

@@ -174,7 +174,7 @@ export function ChallengeCard({challenge, onShare, onEdit, onLeave, onOpenLink, 
               )}
             </Button>
           </CollapsibleTrigger>
-          <CollapsibleContent className="space-y-2 mt-3">
+          <CollapsibleContent className="space-y-2 mt-2">
             {goals.map((goal) => (
               <div
                 key={goal.id}
@@ -191,39 +191,41 @@ export function ChallengeCard({challenge, onShare, onEdit, onLeave, onOpenLink, 
         </Collapsible>
 
         {/* Топ участников */}
-        <Collapsible open={isLeaderboardOpen} onOpenChange={setIsLeaderboardOpen}>
-          <CollapsibleTrigger asChild>
-            <Button
-              variant="outline"
-              className="w-full justify-between"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <span>Топ участников</span>
-              {isLeaderboardOpen ? (
-                <ChevronUp className="size-4"/>
-              ) : (
-                <ChevronDown className="size-4"/>
-              )}
-            </Button>
-          </CollapsibleTrigger>
-
-          <CollapsibleContent className="mt-3 space-y-2">
-            {leaderboard.map((p, index) => (
-              <div
-                key={p.userId}
-                className="flex items-center justify-between rounded border px-3 py-2 text-sm"
+        {leaderboard.length &&
+          <Collapsible open={isLeaderboardOpen} onOpenChange={setIsLeaderboardOpen}>
+            <CollapsibleTrigger asChild>
+              <Button
+                variant="outline"
+                className="w-full justify-between"
+                onClick={(e) => e.stopPropagation()}
               >
-                <div className="flex items-center gap-2">
-                  <Badge variant="secondary">#{index + 1}</Badge>
-                  <span>{p.name}</span>
+                <span>Топ участников</span>
+                {isLeaderboardOpen ? (
+                  <ChevronUp className="size-4"/>
+                ) : (
+                  <ChevronDown className="size-4"/>
+                )}
+              </Button>
+            </CollapsibleTrigger>
+
+            <CollapsibleContent className="mt-2 space-y-2">
+              {leaderboard.map((p, index) => (
+                <div
+                  key={p.userId}
+                  className="flex items-center justify-between rounded border px-3 py-2 text-sm"
+                >
+                  <div className="flex items-center gap-2">
+                    <Badge variant="secondary">#{index + 1}</Badge>
+                    <span>{p.name}</span>
+                  </div>
+                  <span className="text-muted-foreground">
+                    {p.completedGoals} целей
+                  </span>
                 </div>
-                <span className="text-muted-foreground">
-                  {p.completedGoals} целей
-                </span>
-              </div>
-            ))}
-          </CollapsibleContent>
-        </Collapsible>
+              ))}
+            </CollapsibleContent>
+          </Collapsible>
+          || null}
 
         {challenge.rules && (
           <Collapsible open={isRulesOpen} onOpenChange={setIsRulesOpen}>
@@ -242,18 +244,22 @@ export function ChallengeCard({challenge, onShare, onEdit, onLeave, onOpenLink, 
               </Button>
             </CollapsibleTrigger>
 
-            <CollapsibleContent className="mt-3 text-sm text-muted-foreground whitespace-pre-line">
+            <CollapsibleContent className="mt-2 text-sm text-muted-foreground whitespace-pre-line">
               {challenge.rules}
             </CollapsibleContent>
           </Collapsible>
         )}
+        <div className="flex justify-between border p-2 text-sm font-medium rounded-md">
+          <span>Стоимость участия</span>
+          <span>{challenge.price ? challenge.price + ' руб.' : 'Бесплатно'}</span>
+        </div>
         {
           onOpenLink && challenge.link &&
-            <div className="flex justify-center">
-              <Button onClick={(e) => (e.stopPropagation(), onOpenLink(challenge.id))}>
-                  Сообщество
-              </Button>
-            </div>
+          <div className="flex justify-center">
+            <Button onClick={(e) => (e.stopPropagation(), onOpenLink(challenge.id))}>
+              Сообщество
+            </Button>
+          </div>
         }
 
         {/* Нижняя инфа */}

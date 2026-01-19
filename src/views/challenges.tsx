@@ -1,6 +1,6 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Challenge } from "@/types";
+import {Challenge, PaymentMethod} from "@/types";
 
 import { Plus } from "lucide-react";
 
@@ -14,6 +14,7 @@ import { AcceptChallengeDialog } from "@/components/AcceptChallengeDialog";
 import { ChallengeCard } from "@/components/ChallengeCard";
 import Config from "@/services/Config.ts";
 import {useSearchParams} from "react-router-dom";
+import {SelectPaymentMethodDialog} from "@/components/SelectPaymentMethodDialog.tsx";
 
 export default function ChallengesView() {
   const { challenges, goals } = useAppStore();
@@ -21,10 +22,13 @@ export default function ChallengesView() {
   const [searchParams] = useSearchParams();
   // const navigate = useNavigate();
 
-  const { addChallenge, updateChallenge, acceptChallenge, leaveChallenge } = useAppStore();
+  const { addChallenge, updateChallenge, acceptChallenge, leaveChallenge, payChallenge } = useAppStore();
 
   const [challengeDialogOpen, setChallengeDialogOpen] = useState(false);
   const [editingChallenge, setEditingChallenge] = useState<Challenge | undefined>();
+
+  const [paymentDialogOpen, setPaymentDialogOpen] = useState(false);
+  const [paymentChallenge, setPaymentChallenge] = useState<Challenge | null>(null);
 
   const [acceptDialogOpen, setAcceptDialogOpen] = useState(false);
   const [selectedChallenge, setSelectedChallenge] = useState<Challenge | undefined>();
@@ -74,7 +78,24 @@ export default function ChallengesView() {
   };
 
   const handleAcceptChallenge = async (id: string) => {
-    await acceptChallenge(id);
+    const challenge = challenges.find((c) => c.id === id);
+    if (!challenge) return;
+
+    if (challenge.price && challenge.price > 0) {
+      setPaymentChallenge(challenge);
+      setPaymentDialogOpen(true);
+    } else {
+      await acceptChallenge(challenge);
+    }
+  };
+
+  const handlePaymentSelect = async (method: PaymentMethod) => {
+    if (!paymentChallenge) return;
+
+    await payChallenge(paymentChallenge, method);
+
+    setPaymentDialogOpen(false);
+    setPaymentChallenge(null);
   };
 
   const handleOpenLink = async (id: string) => {
@@ -154,6 +175,12 @@ export default function ChallengesView() {
         onOpenChange={handleOpenChange}
         challenge={editingChallenge}
         onSave={handleSaveChallenge}
+      />
+
+      <SelectPaymentMethodDialog
+        open={paymentDialogOpen}
+        onOpenChange={setPaymentDialogOpen}
+        onSelect={handlePaymentSelect}
       />
 
       {selectedChallenge && (

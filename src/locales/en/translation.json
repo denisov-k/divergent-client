@@ -50,6 +50,7 @@
       "description": "Description",
       "rules": "Rules",
       "link": "Link",
+      "price": "Price of participation (in rubles)",
       "select_goals": "Select goals"
     },
     "visibility": {

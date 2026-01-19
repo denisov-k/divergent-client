@@ -2,7 +2,7 @@ import { create } from "zustand";
 import * as api from "@/utils/api";
 import { FriendCardProps } from "@/components/FriendCard.tsx";
 
-import type {User, CategoryOption, Goal, Reminder, Reward, Challenge, ChallengeApi} from "@/types/";
+import type {User, CategoryOption, Goal, Reminder, Reward, Challenge, ChallengeApi, PaymentMethod} from "@/types/";
 import {ChallengeInput} from "@/components/CreateChallengeDialog.tsx";
 
 interface AppStore {
@@ -34,8 +34,10 @@ interface AppStore {
 
   updateChallenge: (challenge: ChallengeInput) => Promise<void>;
 
-  acceptChallenge: (id: string) => Promise<void>;
+  acceptChallenge: (challenge: Challenge) => Promise<void>;
   leaveChallenge: (id: string) => Promise<void>;
+  payChallenge: (challenge: Challenge, method: PaymentMethod) => Promise<void>;
+  redirectToRobokassa: (data: any) => void;
 
   addCategory: (category: CategoryOption) => void;
   addGoal: (goal: Goal) => Promise<void>;
@@ -204,10 +206,10 @@ export const useAppStore = create<AppStore>((set, get) => ({
     }
   },
 
-  acceptChallenge: async (id: string) => {
+  acceptChallenge: async (challenge: Challenge) => {
     set({ loading: true });
     try {
-      await api.acceptChallenge(id);
+      await api.acceptChallenge(challenge.id);
 
       await get().initialize();
 
@@ -230,6 +232,53 @@ export const useAppStore = create<AppStore>((set, get) => ({
     } finally {
       set({ loading: false });
     }
+  },
+
+  payChallenge: async (challenge: Challenge, method: PaymentMethod) => {
+    const redirectToRobokassa = get().redirectToRobokassa;
+
+    set({ loading: true });
+    try {
+
+      const res = await api.payChallenge(challenge.id, method);
+
+      if (method === 'ROBOKASSA')
+        redirectToRobokassa(res);
+
+      // await get().initialize();
+
+    } catch (err) {
+      console.error(err);
+    } finally {
+      set({ loading: false });
+    }
+  },
+
+  redirectToRobokassa(data) {
+    console.log(data);
+    const form = document.createElement("form");
+    form.method = "POST";
+    form.action = data.invoice.url;
+
+    const fields = [
+      ["MerchantLogin", data.invoice.login],
+      ["OutSum", data.payment.amount.toFixed(2)],
+      ["InvId", "1"],
+      ["SignatureValue", data.invoice.signature],
+      ["IsTest", "1"],
+      //["Description", "Оплата участия в челендже"],
+    ];
+
+    fields.forEach(([key, value]) => {
+      const input = document.createElement("input");
+      input.type = "hidden";
+      input.name = key;
+      input.value = value;
+      form.appendChild(input);
+    });
+
+    document.body.appendChild(form);
+    form.submit();
   },
 
   removeXp: async (amount: number) => {

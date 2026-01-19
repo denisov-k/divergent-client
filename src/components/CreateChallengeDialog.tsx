@@ -11,12 +11,12 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Textarea } from "@/components/ui/textarea";
 import { useTranslation } from "react-i18next";
 import { Challenge, Goal } from "@/types";
 
 import Select from "react-select";
+import {Label} from "@/components/ui/label.tsx";
 
 interface CreateChallengeDialogProps {
   open: boolean;
@@ -45,6 +45,7 @@ export function CreateChallengeDialog({
   const [description, setDescription] = useState("");
   const [rules, setRules] = useState("");
   const [link, setLink] = useState("");
+  const [price, setPrice] = useState("");
   const [isPublic, setIsPublic] = useState(true);
   const [startsAt, setStartsAt] = useState("");
   const [endsAt, setEndsAt] = useState("");
@@ -58,6 +59,7 @@ export function CreateChallengeDialog({
       setDescription(challenge.description ?? "");
       setRules(challenge.rules ?? "");
       setLink(challenge.link ?? "");
+      setPrice(challenge.price ? String(challenge.price) : "");
       setIsPublic(challenge.isPublic);
       setStartsAt(challenge.startsAt?.slice(0, 10) ?? "");
       setEndsAt(challenge.endsAt?.slice(0, 10) ?? "");
@@ -75,6 +77,7 @@ export function CreateChallengeDialog({
     setDescription("");
     setRules("");
     setLink("");
+    setPrice("");
     setIsPublic(true);
     setStartsAt("");
     setEndsAt("");
@@ -93,6 +96,7 @@ export function CreateChallengeDialog({
         rules: rules.trim() || undefined,
         link: link.trim() || undefined,
         isPublic,
+        price: Number(price),
         startsAt: startsAt || undefined,
         endsAt: endsAt || undefined,
         goalIds: selectedGoals.map((g) => g.value),
@@ -115,49 +119,98 @@ export function CreateChallengeDialog({
         </DialogHeader>
 
         <div className="space-y-4">
-          <Input
-            placeholder={t("challenges.fields.title")}
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-          />
-
-          <Textarea
-            placeholder={t("challenges.fields.description")}
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-          />
-
-          <Textarea
-            placeholder={t("challenges.fields.rules")}
-            value={rules}
-            onChange={(e) => setRules(e.target.value)}
-          />
-
-          <Input
-            placeholder={t("challenges.fields.link")}
-            value={link}
-            onChange={(e) => setLink(e.target.value)}
-          />
-
-          <div className="flex items-center gap-2">
-            <Checkbox
-              checked={isPublic}
-              onCheckedChange={(checked) => setIsPublic(!!checked)}
+          <div className="space-y-2">
+            <Label htmlFor="rules">{t("challenges.fields.title")}</Label>
+            <Input
+              id="title"
+              placeholder={t("challenges.fields.title")}
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
             />
-            <span className="text-sm">{t("challenges.visibility.public")}</span>
           </div>
 
-          <Select
-            isMulti
-            options={goals.map((g) => ({value: g.id, label: g.title}))}
-            value={selectedGoals}
-            onChange={(values) => setSelectedGoals(values as { value: string; label: string }[])}
-            placeholder={t("challenges.fields.select_goals")}
-          />
+          <div className="space-y-2">
+            <Label htmlFor="rules">{t("challenges.fields.description")}</Label>
+            <Textarea
+              id="description"
+              placeholder={t("challenges.fields.description")}
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="rules">{t("challenges.fields.rules")}</Label>
+            <Textarea
+              id="rules"
+              placeholder={t("challenges.fields.rules")}
+              value={rules}
+              onChange={(e) => setRules(e.target.value)}
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="link">Ссылка на сообщество</Label>
+            <Input
+              id="link"
+              placeholder={t("challenges.fields.link")}
+              value={link}
+              onChange={(e) => setLink(e.target.value)}
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="price">{t("challenges.fields.price")}</Label>
+            <Input
+              placeholder={t("challenges.fields.price")}
+              id="price"
+              value={price}
+              type="number"
+              onChange={(e) => setPrice(e.target.value)}
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="visibility">{t("challenges.fields.visibility")}</Label>
+            <Select
+              id="visibility"
+              className="text-sm"
+              options={[
+                {value: true, label: t("challenges.visibility.public")},
+                {value: false, label: t("challenges.visibility.private")},
+              ]}
+              value={
+                isPublic
+                  ? {value: true, label: t("challenges.visibility.public")}
+                  : {value: false, label: t("challenges.visibility.private")}
+              }
+              onChange={(option) => setIsPublic(option?.value ?? true)}
+              placeholder={t("challenges.fields.select_visibility")}
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="goals">{t("challenges.fields.goals")}</Label>
+            <Select
+              id="goals"
+              className="text-sm"
+              isMulti
+              options={goals.map((g) => ({value: g.id, label: g.title}))}
+              value={selectedGoals}
+              onChange={(values) => setSelectedGoals(values as { value: string; label: string }[])}
+              placeholder={t("challenges.fields.select_goals")}
+            />
+          </div>
 
           <div className="grid grid-cols-2 gap-3">
-            <Input type="date" value={startsAt} onChange={(e) => setStartsAt(e.target.value)}/>
-            <Input type="date" value={endsAt} onChange={(e) => setEndsAt(e.target.value)}/>
+            <div className="space-y-2">
+            <Label htmlFor="startDate">{t("challenges.fields.start_date")}</Label>
+              <Input id="startDate" type="date" value={startsAt} onChange={(e) => setStartsAt(e.target.value)}/>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="endDate">{t("challenges.fields.end_date")}</Label>
+              <Input id="endDate" type="date" value={endsAt} onChange={(e) => setEndsAt(e.target.value)}/>
+            </div>
           </div>
         </div>
 

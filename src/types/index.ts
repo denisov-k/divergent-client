@@ -78,6 +78,7 @@ export interface Challenge {
   isPublic: boolean;
   startsAt?: string;
   endsAt?: string;
+  price?: number;
   participants: ChallengeParticipant[];
 }
 
@@ -140,4 +141,23 @@ export interface User {
   photoUrl: string
   language: string
   timeZone: string
+}
+
+export type PaymentMethod = "ROBOKASSA" | "STARS";
+
+export type PaymentStatus = "PENDING" | "SUCCESS" | "FAILED" | "CANCELLED";
+
+export interface Payment {
+  id: string;
+  userId: string;
+  user: User;
+  challengeId: string;
+  challenge: Challenge;
+  amount: number;
+  currency: string;
+  method: PaymentMethod;
+  status: PaymentStatus;
+  metadata?: JSON;
+  createdAt: string;
+  updatedAt: string;
 }
