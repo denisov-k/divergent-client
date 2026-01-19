@@ -234,7 +234,7 @@ export function GoalCard({
                 {isOpen ? <ChevronUp className="size-4" /> : <ChevronDown className="size-4" />}
               </Button>
             </CollapsibleTrigger>
-            <CollapsibleContent className="space-y-2 mt-3">
+            <CollapsibleContent className="space-y-2 mt-2">
               {renderTasks(safeTasks)}
             </CollapsibleContent>
           </Collapsible>

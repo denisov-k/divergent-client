@@ -163,6 +163,7 @@ export default function ChallengesView() {
                 onSelect={handleSelectChallenge}
                 onLeave={handleLeaveChallenge}
                 onOpenLink={handleOpenLink}
+                onAccept={handleAcceptChallenge}
               />
             </div>
           ))}

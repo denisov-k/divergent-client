@@ -70,97 +70,99 @@ export function AcceptChallengeDialog({ challenge, isOpen, onOpenChange, onAccep
           </div>
         </div>
 
-        {totalGoals > 0 && (
-          <Collapsible open={showGoals} onOpenChange={setShowGoals} className="mt-4">
-            <CollapsibleTrigger asChild>
-              <Button variant="outline" className="w-full justify-between">
-                <span>{t("challenges.goals")}</span>
-                {showGoals ? (
-                  <ChevronUp className="size-4"/>
-                ) : (
-                  <ChevronDown className="size-4"/>
-                )}
-              </Button>
-            </CollapsibleTrigger>
-            <CollapsibleContent className="space-y-2 dark:border-gray-700 pt-2">
-              {challenge.goals.map(goal => (
-                <div key={goal.id}
-                     className="flex items-center justify-between p-2 rounded border hover:bg-gray-100 dark:hover:bg-gray-700 transition">
-                  <span className="text-sm">{goal.title}</span>
-                  <Badge variant={goal.lastCompletedAt ? "secondary" : "outline"}>
-                    {goal.lastCompletedAt ? t("challenges.completed") : t("challenges.pending")}
-                  </Badge>
-                </div>
-              ))}
-            </CollapsibleContent>
-          </Collapsible>
-        )}
-
-        {challenge.rules && (
-          <Collapsible open={isRulesOpen} onOpenChange={setIsRulesOpen}>
-            <CollapsibleTrigger asChild>
-              <Button
-                variant="outline"
-                className="w-full justify-between"
-                onClick={(e) => e.stopPropagation()}
-              >
-                <span>Правила</span>
-                {isRulesOpen ? (
-                  <ChevronUp className="size-4"/>
-                ) : (
-                  <ChevronDown className="size-4"/>
-                )}
-              </Button>
-            </CollapsibleTrigger>
-
-            <CollapsibleContent className="mt-2 text-sm text-muted-foreground whitespace-pre-line">
-              {challenge.rules}
-            </CollapsibleContent>
-          </Collapsible>
-        )}
-
-        {leaderboard.length &&
-          <Collapsible open={isLeaderboardOpen} onOpenChange={setIsLeaderboardOpen}>
-            <CollapsibleTrigger asChild>
-              <Button
-                variant="outline"
-                className="w-full justify-between"
-                onClick={(e) => e.stopPropagation()}
-              >
-                <span>Топ участников</span>
-                {isLeaderboardOpen ? (
-                  <ChevronUp className="size-4"/>
-                ) : (
-                  <ChevronDown className="size-4"/>
-                )}
-              </Button>
-            </CollapsibleTrigger>
-
-            <CollapsibleContent className="mt-2 space-y-2">
-              {leaderboard.map((p, index) => (
-                <div
-                  key={p.userId}
-                  className="flex items-center justify-between rounded border px-3 py-2 text-sm"
-                >
-                  <div className="flex items-center gap-2">
-                    <Badge variant="secondary">#{index + 1}</Badge>
-                    <span>{p.name}</span>
+        <div className="flex flex-col gap-2">
+          {totalGoals > 0 && (
+            <Collapsible open={showGoals} onOpenChange={setShowGoals} className="mt-2">
+              <CollapsibleTrigger asChild>
+                <Button variant="outline" className="w-full justify-between">
+                  <span>{t("challenges.goals")}</span>
+                  {showGoals ? (
+                    <ChevronUp className="size-4"/>
+                  ) : (
+                    <ChevronDown className="size-4"/>
+                  )}
+                </Button>
+              </CollapsibleTrigger>
+              <CollapsibleContent className="space-y-2 dark:border-gray-700 pt-2">
+                {challenge.goals.map(goal => (
+                  <div key={goal.id}
+                       className="flex items-center justify-between p-2 rounded border hover:bg-gray-100 dark:hover:bg-gray-700 transition">
+                    <span className="text-sm">{goal.title}</span>
+                    <Badge variant={goal.lastCompletedAt ? "secondary" : "outline"}>
+                      {goal.lastCompletedAt ? t("challenges.completed") : t("challenges.pending")}
+                    </Badge>
                   </div>
-                  <span className="text-muted-foreground">
-                    {p.completedGoals} целей
-                  </span>
-                </div>
-              ))}
-            </CollapsibleContent>
-          </Collapsible>
-          || null}
+                ))}
+              </CollapsibleContent>
+            </Collapsible>
+          )}
 
-        <div className="flex justify-between border p-2 text-sm font-medium rounded-md">
-          <span>Стоимость участия</span>
-          <span>{challenge.price ? challenge.price + ' руб.' : 'Бесплатно'}</span>
+          {challenge.rules && (
+            <Collapsible open={isRulesOpen} onOpenChange={setIsRulesOpen}>
+              <CollapsibleTrigger asChild>
+                <Button
+                  variant="outline"
+                  className="w-full justify-between"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <span>Правила</span>
+                  {isRulesOpen ? (
+                    <ChevronUp className="size-4"/>
+                  ) : (
+                    <ChevronDown className="size-4"/>
+                  )}
+                </Button>
+              </CollapsibleTrigger>
+
+              <CollapsibleContent className="mt-2 text-sm text-muted-foreground whitespace-pre-line">
+                {challenge.rules}
+              </CollapsibleContent>
+            </Collapsible>
+          )}
+
+          {leaderboard.length &&
+            <Collapsible open={isLeaderboardOpen} onOpenChange={setIsLeaderboardOpen}>
+              <CollapsibleTrigger asChild>
+                <Button
+                  variant="outline"
+                  className="w-full justify-between"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <span>Топ участников</span>
+                  {isLeaderboardOpen ? (
+                    <ChevronUp className="size-4"/>
+                  ) : (
+                    <ChevronDown className="size-4"/>
+                  )}
+                </Button>
+              </CollapsibleTrigger>
+
+              <CollapsibleContent className="mt-2 space-y-2">
+                {leaderboard.map((p, index) => (
+                  <div
+                    key={p.userId}
+                    className="flex items-center justify-between rounded border px-3 py-2 text-sm"
+                  >
+                    <div className="flex items-center gap-2">
+                      <Badge variant="secondary">#{index + 1}</Badge>
+                      <span>{p.name}</span>
+                    </div>
+                    <span className="text-muted-foreground">
+                      {p.completedGoals} целей
+                    </span>
+                  </div>
+                ))}
+              </CollapsibleContent>
+            </Collapsible>
+            || null}
+
+          <div className="flex justify-between border p-2 text-sm font-medium rounded-md">
+            <span>Стоимость участия</span>
+            <span>{challenge.price ? challenge.price + ' руб.' : 'Бесплатно'}</span>
+          </div>
         </div>
 
-        <DialogFooter className="mt-6 flex justify-end gap-2">
+        <DialogFooter className="mt-4 flex justify-end gap-2">
           <Button variant="outline" onClick={() => onOpenChange(false)}>
             {t("common.close")}
           </Button>

@@ -17,12 +17,13 @@ interface Props {
   challenge: Challenge;
   onEdit?: (id: string) => void;
   onShare?: (id: string) => void;
+  onAccept?: (id: string) => void;
   onLeave?: (id: string) => void;
   onOpenLink?: (id: string) => void;
   onSelect?: (challenge: Challenge) => void; // новый проп
 }
 
-export function ChallengeCard({challenge, onShare, onEdit, onLeave, onOpenLink, onSelect}: Props) {
+export function ChallengeCard({challenge, onShare, onEdit, onAccept, onLeave, onOpenLink, onSelect}: Props) {
   const {t} = useTranslation();
   const [isGoalsOpen, setIsGoalsOpen] = useState(false);
   const [isLeaderboardOpen, setIsLeaderboardOpen] = useState(false);
@@ -71,8 +72,10 @@ export function ChallengeCard({challenge, onShare, onEdit, onLeave, onOpenLink, 
       return sum;
     }, 0) / goals.length;
 
+  const isParticipant = challenge.participants.some(p => p.userId === user!.id); // предполагаем, что есть флаг
+
   const onGoalClick = (e: ReactMouseEvent, id: string) => {
-    if (!challenge.participants.some(p => p.userId === user?.id))
+    if (!isParticipant)
       return;
 
     e.stopPropagation();
@@ -97,7 +100,7 @@ export function ChallengeCard({challenge, onShare, onEdit, onLeave, onOpenLink, 
                   Организатор
                 </Badge>)
               ||
-              (challenge.participants.some(p => p.userId === user?.id) &&
+              (isParticipant &&
                 (<Badge variant="default" className="mr-1">
                   Участвуете
                 </Badge>
@@ -133,7 +136,7 @@ export function ChallengeCard({challenge, onShare, onEdit, onLeave, onOpenLink, 
                   <Share className="size-4"/>
                 </Button>
               )}
-              {!isCreator && onLeave && challenge.participants.some(p => p.userId === user?.id) && (
+              {!isCreator && onLeave && isParticipant && (
                 <Button
                   variant="ghost"
                   size="icon"
@@ -147,9 +150,9 @@ export function ChallengeCard({challenge, onShare, onEdit, onLeave, onOpenLink, 
         </div>
       </CardHeader>
 
-      <CardContent className="space-y-4">
+      <CardContent className="space-y-2">
         {/* Прогресс */}
-        <div>
+        <div className="pb-2">
           <div className="flex items-center justify-between mb-2">
             <span className="text-muted-foreground">
               {t("goals.progress")}
@@ -174,7 +177,7 @@ export function ChallengeCard({challenge, onShare, onEdit, onLeave, onOpenLink, 
               )}
             </Button>
           </CollapsibleTrigger>
-          <CollapsibleContent className="space-y-2 mt-2">
+          <CollapsibleContent className="space-y-2 my-2">
             {goals.map((goal) => (
               <div
                 key={goal.id}
@@ -189,6 +192,29 @@ export function ChallengeCard({challenge, onShare, onEdit, onLeave, onOpenLink, 
             ))}
           </CollapsibleContent>
         </Collapsible>
+
+        {challenge.rules && (
+          <Collapsible open={isRulesOpen} onOpenChange={setIsRulesOpen}>
+            <CollapsibleTrigger asChild>
+              <Button
+                variant="outline"
+                className="w-full justify-between"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <span>Правила</span>
+                {isRulesOpen ? (
+                  <ChevronUp className="size-4"/>
+                ) : (
+                  <ChevronDown className="size-4"/>
+                )}
+              </Button>
+            </CollapsibleTrigger>
+
+            <CollapsibleContent className="my-2 text-sm text-muted-foreground whitespace-pre-line">
+              {challenge.rules}
+            </CollapsibleContent>
+          </Collapsible>
+        )}
 
         {/* Топ участников */}
         {leaderboard.length &&
@@ -208,7 +234,7 @@ export function ChallengeCard({challenge, onShare, onEdit, onLeave, onOpenLink, 
               </Button>
             </CollapsibleTrigger>
 
-            <CollapsibleContent className="mt-2 space-y-2">
+            <CollapsibleContent className="my-2 space-y-2">
               {leaderboard.map((p, index) => (
                 <div
                   key={p.userId}
@@ -227,40 +253,30 @@ export function ChallengeCard({challenge, onShare, onEdit, onLeave, onOpenLink, 
           </Collapsible>
           || null}
 
-        {challenge.rules && (
-          <Collapsible open={isRulesOpen} onOpenChange={setIsRulesOpen}>
-            <CollapsibleTrigger asChild>
-              <Button
-                variant="outline"
-                className="w-full justify-between"
-                onClick={(e) => e.stopPropagation()}
-              >
-                <span>Правила</span>
-                {isRulesOpen ? (
-                  <ChevronUp className="size-4"/>
-                ) : (
-                  <ChevronDown className="size-4"/>
-                )}
-              </Button>
-            </CollapsibleTrigger>
-
-            <CollapsibleContent className="mt-2 text-sm text-muted-foreground whitespace-pre-line">
-              {challenge.rules}
-            </CollapsibleContent>
-          </Collapsible>
-        )}
         <div className="flex justify-between border p-2 text-sm font-medium rounded-md">
           <span>Стоимость участия</span>
           <span>{challenge.price ? challenge.price + ' руб.' : 'Бесплатно'}</span>
         </div>
-        {
-          onOpenLink && challenge.link &&
-          <div className="flex justify-center">
-            <Button onClick={(e) => (e.stopPropagation(), onOpenLink(challenge.id))}>
-              Сообщество
-            </Button>
-          </div>
-        }
+
+        <div className="flex justify-center">
+          {
+            onOpenLink && challenge.link &&
+            <div className="flex justify-center py-2">
+              <Button onClick={(e) => (e.stopPropagation(), onOpenLink(challenge.id))}>
+                Сообщество
+              </Button>
+            </div>
+          }
+          {!isParticipant && onAccept && (
+            <div className="flex justify-center py-2">
+              <Button className="bg-blue-600 text-white hover:bg-blue-700" onClick={(e) => {
+                e.stopPropagation(), onAccept(challenge.id);
+              }}>
+                {t("challenges.accept")}
+              </Button>
+            </div>
+          )}
+        </div>
 
         {/* Нижняя инфа */}
         <div className="flex flex-wrap items-center justify-between gap-4 pt-3 border-t">
