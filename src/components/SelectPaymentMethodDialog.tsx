@@ -37,7 +37,7 @@ export function SelectPaymentMethodDialog({
             onClick={() => onSelect("STARS")}
           >
             <div className="flex items-center gap-3">
-              <Star />
+              <Star/>
               <span>{t("payments.stars")}</span>
             </div>
           </Card>
@@ -47,10 +47,20 @@ export function SelectPaymentMethodDialog({
             onClick={() => onSelect("ROBOKASSA")}
           >
             <div className="flex items-center gap-3">
-              <CreditCard />
+              <CreditCard/>
               <span>{t("payments.card")}</span>
             </div>
           </Card>
+        </div>
+        <div className="flex justify-end">
+          <a
+            href="/oferta.docx"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-blue-500 hover:underline"
+          >
+            Публичная оферта
+          </a>
         </div>
 
         <DialogFooter className="mt-4">

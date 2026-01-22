@@ -5,6 +5,8 @@ import { FriendCardProps } from "@/components/FriendCard.tsx";
 import type {User, CategoryOption, Goal, Reminder, Reward, Challenge, ChallengeApi, PaymentMethod} from "@/types/";
 import {ChallengeInput} from "@/components/CreateChallengeDialog.tsx";
 
+import WebApp from '@twa-dev/sdk';
+
 interface AppStore {
   initialized: boolean;
   loading: boolean;
@@ -38,6 +40,7 @@ interface AppStore {
   leaveChallenge: (id: string) => Promise<void>;
   payChallenge: (challenge: Challenge, method: PaymentMethod) => Promise<void>;
   redirectToRobokassa: (data: any) => void;
+  redirectToTelegram: (data: any) => void;
 
   addCategory: (category: CategoryOption) => void;
   addGoal: (goal: Goal) => Promise<void>;
@@ -236,6 +239,7 @@ export const useAppStore = create<AppStore>((set, get) => ({
 
   payChallenge: async (challenge: Challenge, method: PaymentMethod) => {
     const redirectToRobokassa = get().redirectToRobokassa;
+    const redirectToTelegram = get().redirectToTelegram;
 
     set({ loading: true });
     try {
@@ -244,6 +248,8 @@ export const useAppStore = create<AppStore>((set, get) => ({
 
       if (method === 'ROBOKASSA')
         redirectToRobokassa(res);
+      else if (method === 'STARS')
+        redirectToTelegram(res);
 
       // await get().initialize();
 
@@ -255,30 +261,40 @@ export const useAppStore = create<AppStore>((set, get) => ({
   },
 
   redirectToRobokassa(data) {
-    console.log(data);
+    const { url, fields } = data.invoice;
+
     const form = document.createElement("form");
     form.method = "POST";
-    form.action = data.invoice.url;
+    form.action = url;
 
-    const fields = [
-      ["MerchantLogin", data.invoice.login],
-      ["OutSum", data.payment.amount.toFixed(2)],
-      ["InvId", "1"],
-      ["SignatureValue", data.invoice.signature],
-      ["IsTest", "1"],
-      //["Description", "Оплата участия в челендже"],
-    ];
-
-    fields.forEach(([key, value]) => {
+    Object.entries(fields).forEach(([name, value]) => {
       const input = document.createElement("input");
       input.type = "hidden";
-      input.name = key;
-      input.value = value;
+      input.name = name;
+      input.value = String(value);
       form.appendChild(input);
     });
 
     document.body.appendChild(form);
     form.submit();
+  },
+
+  redirectToTelegram(data) {
+    WebApp.openInvoice(data.invoiceLink, async (status) => {
+      console.log(status)
+      if (status === "paid") {
+        const [goals, challenges, rewards, reminders, friends, categories] = await Promise.all([
+          api.fetchGoals(),
+          api.fetchChallenges(),
+          api.fetchRewards(),
+          api.fetchReminders(),
+          api.fetchFriends(),
+          api.fetchCategories()
+        ]);
+
+        set({ goals, challenges, rewards, reminders, friends, categories });
+      }
+    });
   },
 
   removeXp: async (amount: number) => {

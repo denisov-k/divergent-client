@@ -258,7 +258,7 @@ export function ChallengeCard({challenge, onShare, onEdit, onAccept, onLeave, on
           <span>{challenge.price ? challenge.price + ' руб.' : 'Бесплатно'}</span>
         </div>
 
-        <div className="flex justify-center">
+        <div className="flex justify-center gap-2">
           {
             onOpenLink && challenge.link &&
             <div className="flex justify-center py-2">

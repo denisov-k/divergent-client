@@ -1,7 +1,7 @@
 {
   "name": "divergent-client",
   "private": true,
-  "version": "0.2.12",
+  "version": "0.2.13",
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
