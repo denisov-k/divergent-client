@@ -83,9 +83,37 @@ export function GoalCard({
     return tasks.reduce((sum, t) => sum + 1 + countTasks(t.subtasks), 0);
   }
 
-  function countCompleted(tasks?: Task[]): number {
+  function isTaskCompletedInPeriod(task: Task, goalPeriod?: GoalPeriod) {
+    if (!task.lastCompletedAt || !goalPeriod || goalPeriod === "NONE") return false;
+
+    const date = new Date(task.lastCompletedAt);
+    const now = new Date();
+
+    if (goalPeriod === "DAILY") {
+      return date.toDateString() === now.toDateString();
+    }
+
+    if (goalPeriod === "WEEKLY") {
+      const week = (d: Date) => {
+        const onejan = new Date(d.getFullYear(), 0, 1);
+        return Math.ceil((((d.getTime() - onejan.getTime()) / 86400000) + onejan.getDay() + 1) / 7);
+      };
+      return date.getFullYear() === now.getFullYear() && week(date) === week(now);
+    }
+
+    if (goalPeriod === "MONTHLY") {
+      return date.getFullYear() === now.getFullYear() && date.getMonth() === now.getMonth();
+    }
+
+    return false;
+  }
+
+  function countCompleted(tasks?: Task[], goalPeriod?: GoalPeriod): number {
     if (!tasks || tasks.length === 0) return 0;
-    return tasks.reduce((sum, t) => sum + (t.lastCompletedAt ? 1 : 0) + countCompleted(t.subtasks), 0);
+    return tasks.reduce(
+      (sum, t) => sum + (isTaskCompletedInPeriod(t, goalPeriod) ? 1 : 0) + countCompleted(t.subtasks, goalPeriod),
+      0
+    );
   }
 
   const isNumeric = goalType === "PROGRESS";
