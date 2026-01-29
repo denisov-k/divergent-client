@@ -14,16 +14,25 @@ export default function Progress() {
   // ==========================
   const currentXp = user?.xp;
   const completedTasks = goals.reduce(
-    (acc, goal) => acc + goal.tasks.filter((t) => t.completed).length,
+    (acc, goal) =>
+      acc + (goal.tasks?.filter(t => !!t.lastCompletedAt).length || 0),
     0
   );
-  const totalTasks = goals.reduce((acc, goal) => acc + goal.tasks.length, 0);
-  const completedGoals = goals.filter((g) => g.tasks.every((t) => t.completed)).length;
+  const totalTasks = goals.reduce(
+    (acc, goal) => acc + (goal.tasks?.length || 0),
+    0
+  );
+
+  const completedGoals = goals.filter(
+    g => g.tasks?.length && g.tasks.every(t => !!t.lastCompletedAt)
+  ).length;
 
   // Данные по категориям
   const categoryMap: Record<string, number> = {};
-  goals.forEach((g) => {
-    categoryMap[g.categoryLabel] = (categoryMap[g.categoryLabel] || 0) + g.tasks.filter((t) => t.completed).length;
+  goals.forEach(g => {
+    categoryMap[g.categoryLabel] =
+      (categoryMap[g.categoryLabel] || 0) +
+      (g.tasks?.filter(t => !!t.lastCompletedAt).length || 0);
   });
   const categoryData = Object.entries(categoryMap).map(([name, value]) => ({ name, value }));
 

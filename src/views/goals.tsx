@@ -15,6 +15,7 @@ import {useNavigate, useSearchParams} from "react-router-dom";
 import {useTranslation} from "react-i18next";
 
 import {Reminder} from "@/types";
+import CreateReportDialog from "@/components/CreateReportDialog.tsx";
 
 export default function Goals() {
   const {
@@ -25,6 +26,7 @@ export default function Goals() {
     addXp,
     addReminder,
     addCategory,
+    addReport,
     updateReminder,
     updateRewardGoal,
     updateGoalProgress,
@@ -44,6 +46,9 @@ export default function Goals() {
 
   const [goalDialogOpen, setGoalDialogOpen] = useState(false);
   const [editingGoal, setEditingGoal] = useState<Goal | undefined>();
+
+  const [createReportDialogOpen, setCreateReportDialogOpen] = useState(false);
+  const [reportTaskId, setReportTaskId] = useState<string | null>(null);
 
   const [reminderDialogOpen, setReminderDialogOpen] = useState(false);
   const [editingReminder, setEditingReminder] = useState<Reminder | undefined>(undefined);
@@ -119,6 +124,26 @@ export default function Goals() {
     setEditingReminder(undefined);
   };
 
+  const handleSaveReport = async ({
+    file,
+    comment,
+  }: {
+    file: File;
+    comment?: string;
+  }) => {
+    if (!reportTaskId) return;
+
+    const formData = new FormData();
+    formData.append("file", file);
+    if (comment) formData.append("comment", comment);
+
+    await addReport(reportTaskId, formData);
+
+    toast.success("Отчёт отправлен, задача выполнена");
+
+    setCreateReportDialogOpen(false);
+    setReportTaskId(null);
+  };
 
   function findTaskRecursive(tasks: Task[], taskId: string): Task | null {
     for (const task of tasks) {
@@ -140,22 +165,30 @@ export default function Goals() {
     const goal = goals.find((g) => g.id === goalId);
     if (!goal) return;
 
-    // --- Рекурсивно ищем задачу ---
     const task = findTaskRecursive(goal.tasks, taskId);
     if (!task) return;
 
-    const newCompleted = !task.completed;
+    const newCompleted = !task.lastCompletedAt;
 
-    // XP + Toast
+    // ❗ если требуется отчёт — сначала модалка
+    if (
+      newCompleted &&
+      goal.challenge?.requiresReport
+    ) {
+      setReportTaskId(taskId);
+      setCreateReportDialogOpen(true);
+      return;
+    }
+
+    // обычное выполнение
     if (newCompleted) {
       addXp(task.xpReward || 0);
-      toast.success(`+${task.xpReward} XP`);
+      toast.success(`+${task.xpReward ?? 0} XP`);
     } else {
       addXp(-(task.xpReward || 0));
     }
 
-    // toggle в сторе
-    toggleTask(goalId, taskId);
+    toggleTask(taskId);
   };
 
   useEffect(() => {
@@ -265,6 +298,14 @@ export default function Goals() {
         reminder={editingReminder}
         goals={goals}
         initialGoalId={selectedGoalIdForReminder}
+      />
+      <CreateReportDialog
+        open={createReportDialogOpen}
+        onOpenChange={(open) => {
+          setCreateReportDialogOpen(open);
+          if (!open) setReportTaskId(null);
+        }}
+        onSubmit={handleSaveReport}
       />
     </div>
   );

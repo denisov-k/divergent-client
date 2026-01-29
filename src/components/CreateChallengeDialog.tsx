@@ -47,6 +47,7 @@ export function CreateChallengeDialog({
   const [link, setLink] = useState("");
   const [price, setPrice] = useState("");
   const [isPublic, setIsPublic] = useState(true);
+  const [requiresReport, setRequiresReport] = useState(false);
   const [startsAt, setStartsAt] = useState("");
   const [endsAt, setEndsAt] = useState("");
   const [selectedGoals, setSelectedGoals] = useState<{ label: string; value: string }[]>([]);
@@ -61,6 +62,7 @@ export function CreateChallengeDialog({
       setLink(challenge.link ?? "");
       setPrice(challenge.price ? String(challenge.price) : "");
       setIsPublic(challenge.isPublic);
+      setRequiresReport(challenge.requiresReport);
       setStartsAt(challenge.startsAt?.slice(0, 10) ?? "");
       setEndsAt(challenge.endsAt?.slice(0, 10) ?? "");
       setSelectedGoals(
@@ -79,6 +81,7 @@ export function CreateChallengeDialog({
     setLink("");
     setPrice("");
     setIsPublic(true);
+    setRequiresReport(false);
     setStartsAt("");
     setEndsAt("");
     setSelectedGoals([]);
@@ -96,6 +99,8 @@ export function CreateChallengeDialog({
         rules: rules.trim() || undefined,
         link: link.trim() || undefined,
         isPublic,
+        reports: [], // FIXME
+        requiresReport,
         price: Number(price),
         startsAt: startsAt || undefined,
         endsAt: endsAt || undefined,
@@ -110,7 +115,7 @@ export function CreateChallengeDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[480px]">
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>{challenge ? t("challenges.edit_title") : t("challenges.create_title")}</DialogTitle>
           <DialogDescription>
@@ -190,6 +195,25 @@ export function CreateChallengeDialog({
           </div>
 
           <div className="space-y-2">
+            <Label htmlFor="requiresReport">{t("challenges.fields.requiresReport")}</Label>
+            <Select
+              id="requiresReport"
+              className="text-sm"
+              options={[
+                {value: true, label: t("common.yes")},
+                {value: false, label: t("common.no")},
+              ]}
+              value={
+                requiresReport
+                  ? {value: true, label: t("common.yes")}
+                  : {value: false, label: t("common.no")}
+              }
+              onChange={(option) => setRequiresReport(option?.value ?? true)}
+              placeholder={t("challenges.fields.requiresReport")}
+            />
+          </div>
+
+          <div className="space-y-2">
             <Label htmlFor="goals">{t("challenges.fields.goals")}</Label>
             <Select
               id="goals"
@@ -204,7 +228,7 @@ export function CreateChallengeDialog({
 
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-2">
-            <Label htmlFor="startDate">{t("challenges.fields.start_date")}</Label>
+              <Label htmlFor="startDate">{t("challenges.fields.start_date")}</Label>
               <Input id="startDate" type="date" value={startsAt} onChange={(e) => setStartsAt(e.target.value)}/>
             </div>
             <div className="space-y-2">
@@ -219,7 +243,7 @@ export function CreateChallengeDialog({
             {t("common.cancel")}
           </Button>
           <Button onClick={handleSubmit} disabled={!title.trim() || loading}>
-          {challenge ? t("common.save") : t("common.create")}
+            {challenge ? t("common.save") : t("common.create")}
           </Button>
         </DialogFooter>
       </DialogContent>

@@ -22,7 +22,7 @@ export const DAYS_OF_MONTH = Array.from({ length: 31 }, (_, i) => i + 1);
 export interface Task {
   id: string;
   title: string;
-  completed: boolean;
+  lastCompletedAt: string;
   xpReward?: number;
   dueDate?: string;
   subtasks?: Task[];
@@ -72,6 +72,7 @@ export interface Challenge {
   goals: Goal[];
   goalIds: string[];
   leaderboard: Leader[];
+  requiresReport: boolean;
   creatorId: string;
   rules?: string;
   link?: string;
@@ -80,11 +81,35 @@ export interface Challenge {
   endsAt?: string;
   price?: number;
   participants: ChallengeParticipant[];
+  reports: Report[];
 }
 
 export interface ChallengeApi
   extends Omit<Challenge, "goals"> {
   goals: ChallengeGoal[];
+}
+
+export interface Report {
+  id: string;
+  challengeId: string;
+  userId: string;
+  challenge: Challenge;
+  taskCompletion: TaskCompletion;
+  user: User;
+  fileType: string;
+  fileUrl: string;
+  comment?: string;
+  createdAt: string;
+}
+
+export interface TaskCompletion {
+  id: string;
+  userId: string;
+  user: User;
+  taskId: string;
+  task: Task;
+  createdAt: string;
+  report?: Report;
 }
 
 export interface ChallengeParticipant {

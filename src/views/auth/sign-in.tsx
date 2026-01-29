@@ -5,6 +5,8 @@ import { ReactSVG } from "react-svg"
 import LogoIcon from '@/assets/images/logo-icon.svg'
 import Logo from '@/assets/images/logo.svg'
 
+import WebApp from '@twa-dev/sdk';
+
 import { useAppStore } from '@/stores/useAppStore'
 import { z, ZodError } from 'zod'
 import './index.css'
@@ -21,8 +23,8 @@ export default function SignIn() {
   const [searchParams] = useSearchParams()
   const navigate = useNavigate()
   const { user, loading, login } = useAppStore()
-  // @ts-ignore
-  const isTelegramClient = !!window.Telegram?.WebApp?.initData
+
+  const isTelegramClient = !!WebApp;
   const redirect = searchParams.get('redirect')
 
   // Редирект если уже есть пользователь

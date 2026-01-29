@@ -6,15 +6,46 @@ import { Input } from "./ui/input";
 import React, { useState } from "react";
 import { Task } from "@/types";
 
+import { startOfWeek, endOfWeek, startOfMonth, endOfMonth } from "date-fns";
+
+function isTaskDoneForPeriod(task: { lastCompletedAt?: string }, goalPeriod: string) {
+  if (!task.lastCompletedAt) return false;
+
+  const last = new Date(task.lastCompletedAt!);
+
+  switch(goalPeriod) {
+    case "DAILY": {
+      const today = new Date();
+      today.setHours(0,0,0,0);
+      return last >= today && last < new Date(today.getTime() + 24*60*60*1000);
+    }
+    case "WEEKLY": {
+      const start = startOfWeek(new Date());
+      const end = endOfWeek(new Date());
+      return last >= start && last <= end;
+    }
+    case "MONTHLY": {
+      const start = startOfMonth(new Date());
+      const end = endOfMonth(new Date());
+      return last >= start && last <= end;
+    }
+    case "NONE":
+    default:
+      return true; // разовая цель
+  }
+}
+
+
 export interface TaskItemProps {
   id: string;
   title: string;
-  completed: boolean;
+  lastCompletedAt?: string;
   xpReward?: number;
   dueDate?: string;
   subtasks?: Task[];
   expanded?: boolean;
   editMode?: boolean;
+  goalPeriod: string;
 
   onToggle: (id: string, parentId?: string) => void;
   onRemove: (id: string, parentId?: string) => void;
@@ -32,12 +63,13 @@ export interface TaskItemProps {
 export function TaskItem({
                            id,
                            title,
-                           completed,
+                           lastCompletedAt,
                            xpReward,
                            dueDate,
                            subtasks = [],
                            expanded = false,
                            editMode = false,
+                           goalPeriod,
                            onToggle,
                            onRemove,
                            onToggleExpand,
@@ -66,14 +98,14 @@ export function TaskItem({
 
         <Checkbox
           id={id}
-          checked={completed}
+          checked={isTaskDoneForPeriod({ lastCompletedAt }, goalPeriod)}
           onCheckedChange={() => onToggle(id, parentId)}
         />
 
         <div className="flex-1 min-w-0">
           <label
             htmlFor={id}
-            className={`block cursor-pointer ${completed ? "line-through text-muted-foreground" : ""}`}
+            className={`block cursor-pointer ${lastCompletedAt ? "line-through text-muted-foreground" : ""}`}
           >
             {title}
           </label>
@@ -90,7 +122,7 @@ export function TaskItem({
           <Badge variant="secondary" className="shrink-0">
             +{xpReward} XP
           </Badge>
-        )}
+        ) || null}
 
         {editMode && (
           <Button variant="ghost" size="icon" onClick={() => onRemove(id, parentId)}>
@@ -106,6 +138,7 @@ export function TaskItem({
             <TaskItem
               key={subtask.id}
               {...subtask}
+              goalPeriod={goalPeriod}
               onToggle={onToggle}
               onRemove={onRemove}
               onToggleExpand={toggleExpand}

@@ -85,7 +85,7 @@ export function GoalCard({
 
   function countCompleted(tasks?: Task[]): number {
     if (!tasks || tasks.length === 0) return 0;
-    return tasks.reduce((sum, t) => sum + (t.completed ? 1 : 0) + countCompleted(t.subtasks), 0);
+    return tasks.reduce((sum, t) => sum + (t.lastCompletedAt ? 1 : 0) + countCompleted(t.subtasks), 0);
   }
 
   const isNumeric = goalType === "PROGRESS";
@@ -120,6 +120,7 @@ export function GoalCard({
       <TaskItem
         key={task.id}
         {...task}
+        goalPeriod={goalPeriod ?? "NONE"}
         parentId={parentId}
         onToggle={(taskId, pId) => onTaskToggle?.(id, taskId, pId)}
         onRemove={handleRemoveTask}

@@ -1,5 +1,7 @@
 {
   "common": {
+    "yes": "Да",
+    "no": "Нет",
     "create": "Создать",
     "cancel": "Отмена",
     "close": "Закрыть",
@@ -51,6 +53,8 @@
     "goals_count": "целей",
     "goals": "Цели челенджа",
     "participants": "Участников: ",
+    "reports": "Отчёты",
+    "noReports": "Отчёты отсутствуют",
     "completed": "Выполнена",
     "pending": "В процессе",
     "fields": {
@@ -63,7 +67,8 @@
       "goals": "Цели",
       "start_date": "Дата начала",
       "end_date": "Дата конца",
-      "visibility": "Доступ"
+      "visibility": "Доступ",
+      "requiresReport": "Отчетность"
     },
     "visibility": {
       "public": "Публичный",

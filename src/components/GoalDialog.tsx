@@ -142,7 +142,7 @@ export function GoalDialog({
     const newTask: Task = {
       id: generateId(),
       title: newTaskTitle,
-      completed: false,
+      lastCompletedAt: "",
       xpReward: newTaskXp ? parseInt(newTaskXp) : undefined,
       parentId: null,
       subtasks: [],
@@ -184,7 +184,7 @@ export function GoalDialog({
     const newSubTask: Task = {
       id: generateId(),
       title,
-      completed: false,
+      lastCompletedAt: "",
       xpReward: xp,
       parentId,
       subtasks: [],
@@ -213,14 +213,17 @@ export function GoalDialog({
   };
 
   function toggleTaskRecursive(tasks: Task[], taskId: string): Task[] {
-    return tasks.map((task) => {
+    return tasks.map(task => {
       if (task.id === taskId) {
-        // нашли нужную задачу
-        return { ...task, completed: !task.completed };
+        return {
+          ...task,
+          lastCompletedAt: task.lastCompletedAt
+            ? "" // снять отметку
+            : new Date().toISOString(), // поставить отметку сейчас
+        };
       }
 
       if (task.subtasks?.length) {
-        // продолжаем рекурсию
         return {
           ...task,
           subtasks: toggleTaskRecursive(task.subtasks, taskId),
@@ -474,7 +477,7 @@ export function GoalDialog({
                 key={task.id}
                 id={task.id}
                 title={task.title}
-                completed={task.completed}
+                lastCompletedAt={task.lastCompletedAt}
                 editMode={true}
                 xpReward={task.xpReward}
                 dueDate={task.dueDate}
@@ -488,6 +491,7 @@ export function GoalDialog({
                 setNewSubTaskTitles={setNewSubTaskTitles}
                 setNewSubTaskXps={setNewSubTaskXps}
                 handleAddSubTask={handleAddSubTask}
+                goalPeriod={goalPeriod ?? "NONE"}
               />
             ))}
 

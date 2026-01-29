@@ -2,10 +2,11 @@ import { create } from "zustand";
 import * as api from "@/utils/api";
 import { FriendCardProps } from "@/components/FriendCard.tsx";
 
-import type {User, CategoryOption, Goal, Reminder, Reward, Challenge, ChallengeApi, PaymentMethod} from "@/types/";
+import {User, CategoryOption, Goal, Reminder, Reward, Challenge, ChallengeApi, PaymentMethod, Report} from "@/types/";
 import {ChallengeInput} from "@/components/CreateChallengeDialog.tsx";
 
 import WebApp from '@twa-dev/sdk';
+import Config from "@/services/Config.ts";
 
 interface AppStore {
   initialized: boolean;
@@ -18,6 +19,7 @@ interface AppStore {
   reminders: Reminder[];
   friends: FriendCardProps[];
   categories: CategoryOption[];
+  reports: Record<string, Report[]>;
 
   initialize: () => Promise<void>;
 
@@ -47,7 +49,10 @@ interface AppStore {
   deleteGoal: (goal: Goal) => Promise<void>;
   updateGoal: (goal: Goal) => Promise<void>;
   updateGoalProgress: (goalId: string, delta: number) => Promise<void>;
-  toggleTask: (goalId: string, taskId: string) => Promise<void>;
+  toggleTask: (taskId: string) => Promise<void>;
+  addReport: (taskId: string, data: FormData) => Promise<void>;
+  getReports: (challengeId: string) => Promise<void>;
+  downloadReport: (report: Report) => Promise<void>;
 
   addReward: (reward: Reward) => Promise<void>;
   deleteReward: (reward: Reward) => Promise<void>;
@@ -72,6 +77,7 @@ export const useAppStore = create<AppStore>((set, get) => ({
   reminders: [] as Reminder[],
   friends: [] as FriendCardProps[],
   categories: [] as CategoryOption[],
+  reports: {},
 
   // ==========================
   // AUTH
@@ -390,15 +396,15 @@ export const useAppStore = create<AppStore>((set, get) => ({
     }
   },
 
-  toggleTask: async (goalId: string, taskId: string) => {
+  toggleTask: async (taskId: string) => {
     set({ loading: true });
 
     try {
       // сервер возвращает { goal, user }
-      const { goal, user } = await api.toggleTask(goalId, taskId);
+      const { goal, user } = await api.toggleTask(taskId);
 
       set({
-        goals: get().goals.map(g => g.id === goalId ? goal : g),
+        goals: get().goals.map(g => g.id === goal.id ? goal : g),
         user: {
           ...get().user!,
           xp: user.xp,
@@ -412,6 +418,64 @@ export const useAppStore = create<AppStore>((set, get) => ({
       console.error(err);
     } finally {
       set({ loading: false });
+    }
+  },
+
+  addReport: async (taskId: string, data: FormData) => {
+    set({ loading: true });
+
+    try {
+      // сервер возвращает { goal, user }
+      const { goal, user } = await api.addReport(taskId, data);
+
+      set({
+        goals: get().goals.map(g => g.id === goal.id ? goal : g),
+        user: {
+          ...get().user!,
+          xp: user.xp,
+          level: user.level,
+          xpInCurrentLevel: user.xpInCurrentLevel,
+          requiredXp: user.requiredXp,
+        },
+      });
+
+    } catch (err) {
+      console.error(err);
+    } finally {
+      set({ loading: false });
+    }
+  },
+
+  getReports: async (challengeId: string) => {
+    const res = await api.getReports(challengeId);
+
+    set((state) => ({
+      reports: {
+        ...state.reports,
+        [challengeId]: res, // ← массив с сервера
+      },
+    }));
+  },
+
+  downloadReport: async (report: Report) => {
+    try {
+      const fileUrl = report.fileUrl.startsWith("http")
+        ? report.fileUrl
+        : `${Config.data.api.http.baseURL}${report.fileUrl}`;
+
+      const res = await fetch(fileUrl, { credentials: "include" });
+      const blob = await res.blob();
+
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `${report.user.name} - ${report.taskCompletion.task.title}`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    } catch (err) {
+      console.error("Download failed", err);
     }
   },
 

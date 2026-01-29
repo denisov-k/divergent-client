@@ -15,14 +15,17 @@ import { ChallengeCard } from "@/components/ChallengeCard";
 import Config from "@/services/Config.ts";
 import {useSearchParams} from "react-router-dom";
 import {SelectPaymentMethodDialog} from "@/components/SelectPaymentMethodDialog.tsx";
+import {ReportsDialog} from "@/components/ReportsDialog.tsx";
 
 export default function ChallengesView() {
-  const { challenges, goals } = useAppStore();
+  const { challenges, goals, reports } = useAppStore();
+
   const { t } = useTranslation();
   const [searchParams] = useSearchParams();
   // const navigate = useNavigate();
 
-  const { addChallenge, updateChallenge, acceptChallenge, leaveChallenge, payChallenge } = useAppStore();
+  const { addChallenge, updateChallenge, acceptChallenge,
+    leaveChallenge, payChallenge, getReports, downloadReport } = useAppStore();
 
   const [challengeDialogOpen, setChallengeDialogOpen] = useState(false);
   const [editingChallenge, setEditingChallenge] = useState<Challenge | undefined>();
@@ -30,8 +33,11 @@ export default function ChallengesView() {
   const [paymentDialogOpen, setPaymentDialogOpen] = useState(false);
   const [paymentChallenge, setPaymentChallenge] = useState<Challenge | null>(null);
 
+  const [reportsDialogOpen, setReportsDialogOpen] = useState(false);
   const [acceptDialogOpen, setAcceptDialogOpen] = useState(false);
   const [selectedChallenge, setSelectedChallenge] = useState<Challenge | undefined>();
+
+  const selectedChallengeReports = selectedChallenge ? reports[selectedChallenge.id] ?? [] : [];
 
   const handleSaveChallenge = async (data: ChallengeInput) => {
     if (editingChallenge) {
@@ -75,6 +81,33 @@ export default function ChallengesView() {
   const handleAcceptDialogClose = () => {
     setSelectedChallenge(undefined);
     setAcceptDialogOpen(false);
+  };
+
+  const handleOpenReports = async (id: string) => {
+    const challenge = challenges.find((c) => c.id === id);
+    if (!challenge) return;
+
+    setSelectedChallenge(challenge);
+    setReportsDialogOpen(true);
+
+    await getReports(challenge.id);
+  };
+
+  const handleDownloadReport = async (reportId: string) => {
+    // 1️⃣ Найдём отчёт в объекте reports по выбранному challenge
+    if (!selectedChallenge) return;
+
+    const challengeReports = reports[selectedChallenge.id] ?? [];
+    const report = challengeReports.find(r => r.id === reportId);
+    if (!report) return;
+
+    // 2️⃣ Скачиваем через store
+    await downloadReport(report);
+  };
+
+  const handleReportsDialogClose = () => {
+    setSelectedChallenge(undefined);
+    setReportsDialogOpen(false);
   };
 
   const handleAcceptChallenge = async (id: string) => {
@@ -163,6 +196,7 @@ export default function ChallengesView() {
                 onSelect={handleSelectChallenge}
                 onLeave={handleLeaveChallenge}
                 onOpenLink={handleOpenLink}
+                onOpenReports={handleOpenReports}
                 onAccept={handleAcceptChallenge}
               />
             </div>
@@ -191,6 +225,16 @@ export default function ChallengesView() {
           onOpenChange={handleAcceptDialogClose}
           onAccept={handleAcceptChallenge}
           onShare={handleShareChallenge}
+        />
+      )}
+
+      {selectedChallenge && (
+        <ReportsDialog
+          challenge={selectedChallenge}
+          reports={selectedChallengeReports}
+          isOpen={reportsDialogOpen}
+          onOpenChange={handleReportsDialogClose}
+          onDownload={handleDownloadReport}
         />
       )}
     </div>

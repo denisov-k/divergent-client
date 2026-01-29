@@ -1,13 +1,15 @@
-import type {User, Goal, Reward, Reminder, Challenge, ChallengeApi} from "@/types/";
+import type {Challenge, ChallengeApi, Goal, Reminder, Reward, User} from "@/types/";
 import Config from "@/services/Config";
 import {ChallengeInput} from "@/components/CreateChallengeDialog.tsx";
 
 async function fetchJSON(url: string, options: RequestInit = {}) {
+  const isFormData = options.body instanceof FormData;
+
   const res = await fetch(Config.data.api.http.baseURL + url, {
     ...options,
     credentials: "include",
     headers: {
-      "Content-Type": "application/json",
+      ...(!isFormData ? { "Content-Type": "application/json" } : {}),
       ...(options.headers || {}),
     },
   });
@@ -73,11 +75,42 @@ export async function deleteReward(id: string) {
   return fetchJSON(`/api/rewards/${id}`, { method: "DELETE" });
 }
 
-export async function toggleTask(goalId: string, taskId: string) {
-  return fetchJSON(`/api/goals/${goalId}/toggle-task`, {
-    method: "PATCH",
+export async function toggleTask(taskId: string) {
+  return fetchJSON(`/api/tasks/toggle`, {
+    method: "POST",
     body: JSON.stringify({ taskId }),
   });
+}
+
+export async function addReport(taskId: string, data: FormData) {
+  const res = await fetchJSON(`/api/tasks/${taskId}/report`, {
+    method: "POST",
+    body: data, // FormData напрямую
+  });
+
+  return res as Promise<{ goal: Goal; user: User }>;
+}
+
+export async function getReports(challengeId: string) {
+  return await fetchJSON(`/api/challenges/${challengeId}/reports`, {
+    method: "GET",
+  });
+}
+
+export async function downloadReport(reportId: string): Promise<Blob> {
+  const res = await fetch(
+    Config.data.api.http.baseURL + `/api/reports/${reportId}/download`,
+    {
+      method: "GET",
+      credentials: "include",
+    }
+  );
+
+  if (!res.ok) {
+    throw new Error(`Download error: ${res.status}`);
+  }
+
+  return await res.blob();
 }
 
 export async function updateGoalProgress(goalId: string, delta: number) {

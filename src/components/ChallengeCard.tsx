@@ -20,10 +20,11 @@ interface Props {
   onAccept?: (id: string) => void;
   onLeave?: (id: string) => void;
   onOpenLink?: (id: string) => void;
+  onOpenReports?: (id: string) => void;
   onSelect?: (challenge: Challenge) => void; // новый проп
 }
 
-export function ChallengeCard({challenge, onShare, onEdit, onAccept, onLeave, onOpenLink, onSelect}: Props) {
+export function ChallengeCard({challenge, onShare, onEdit, onAccept, onLeave, onOpenLink, onOpenReports, onSelect}: Props) {
   const {t} = useTranslation();
   const [isGoalsOpen, setIsGoalsOpen] = useState(false);
   const [isLeaderboardOpen, setIsLeaderboardOpen] = useState(false);
@@ -264,6 +265,14 @@ export function ChallengeCard({challenge, onShare, onEdit, onAccept, onLeave, on
             <div className="flex justify-center py-2">
               <Button onClick={(e) => (e.stopPropagation(), onOpenLink(challenge.id))}>
                 Сообщество
+              </Button>
+            </div>
+          }
+          {
+            onOpenReports &&
+            <div className="flex justify-center py-2">
+              <Button onClick={(e) => (e.stopPropagation(), onOpenReports(challenge.id))}>
+                Отчёты
               </Button>
             </div>
           }
