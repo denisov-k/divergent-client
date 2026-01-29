@@ -119,7 +119,7 @@ export function GoalCard({
   const isNumeric = goalType === "PROGRESS";
 
   const totalTasks = countTasks(safeTasks);
-  const completedTasks = countCompleted(safeTasks);
+  const completedTasks = countCompleted(safeTasks, goalPeriod);
 
   const progress = isNumeric
     ? targetValue && targetValue > 0
