@@ -105,7 +105,7 @@ export function TaskItem({
         <div className="flex-1 min-w-0">
           <label
             htmlFor={id}
-            className={`block cursor-pointer ${lastCompletedAt ? "line-through text-muted-foreground" : ""}`}
+            className={`block cursor-pointer ${isTaskDoneForPeriod({ lastCompletedAt }, goalPeriod) ? "line-through text-muted-foreground" : ""}`}
           >
             {title}
           </label>
