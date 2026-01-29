@@ -1,13 +1,13 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/card";
-import { Progress } from "./ui/progress";
-import { CategoryBadge } from "./CategoryBadge";
-import { ProgressRing } from "./ProgressRing";
-import { Badge } from "./ui/badge";
-import { Button } from "./ui/button";
-import { Calendar, Target, Edit, ChevronDown, ChevronUp, AlarmClock } from "lucide-react";
-import { TaskItem } from "./TaskItem";
+import {Card, CardContent, CardDescription, CardHeader, CardTitle} from "./ui/card";
+import {Progress} from "./ui/progress";
+import {CategoryBadge} from "./CategoryBadge";
+import {ProgressRing} from "./ProgressRing";
+import {Badge} from "./ui/badge";
+import {Button} from "./ui/button";
+import {Calendar, Target, Edit, ChevronDown, ChevronUp, AlarmClock} from "lucide-react";
+import {TaskItem} from "./TaskItem";
 import {useEffect, useRef, useState} from "react";
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "./ui/collapsible";
+import {Collapsible, CollapsibleContent, CollapsibleTrigger} from "./ui/collapsible";
 import {useTranslation} from "react-i18next";
 
 import {Challenge, GoalPeriod, GoalType, Reward, Task} from "@/types";
@@ -62,7 +62,7 @@ export function GoalCard({
                            onTaskToggle,
                            onAddReminder,
                            onAddProgress,
-                            autoExpand
+                           autoExpand
                          }: GoalCardProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [expandedTasks, setExpandedTasks] = useState<Record<string, boolean>>({});
@@ -74,7 +74,7 @@ export function GoalCard({
 
   const isFromChallenge = Boolean(challenge);
 
-  const { t } = useTranslation();
+  const {t} = useTranslation();
 
   const safeTasks = tasks ?? [];
 
@@ -102,13 +102,13 @@ export function GoalCard({
       : 0;
 
   const handleToggleExpand = (taskId: string) => {
-    setExpandedTasks({ ...expandedTasks, [taskId]: !expandedTasks[taskId] });
+    setExpandedTasks({...expandedTasks, [taskId]: !expandedTasks[taskId]});
   };
 
   const handleAddSubTask = (parentId: string) => {
     console.log("Add subtask to", parentId, newSubTaskTitles[parentId], newSubTaskXps[parentId]);
-    setNewSubTaskTitles({ ...newSubTaskTitles, [parentId]: "" });
-    setNewSubTaskXps({ ...newSubTaskXps, [parentId]: "" });
+    setNewSubTaskTitles({...newSubTaskTitles, [parentId]: ""});
+    setNewSubTaskXps({...newSubTaskXps, [parentId]: ""});
   };
 
   const handleRemoveTask = (taskId: string, parentId?: string) => {
@@ -164,23 +164,26 @@ export function GoalCard({
 
   return (
     <Card className={`hover:shadow-md transition-all
-      ${ highlight ? "bg-blue-50": "bg-white"}`}
+      ${highlight ? "bg-blue-50" : "bg-white"}`}
           ref={cardRef}>
       <CardHeader>
         <div className="flex items-start justify-between gap-4">
           <div className="flex-1 min-w-0 space-y-2">
             <div className="flex items-center gap-2">
-              <Target className="size-5 text-primary" />
-              <CategoryBadge category={category} label={categoryLabel} />
+              <Target className="size-5 text-primary"/>
+              <CategoryBadge category={category} label={categoryLabel}/>
             </div>
             <CardTitle>{title}</CardTitle>
             {description && <CardDescription>{description}</CardDescription>}
           </div>
           <div className="flex items-center gap-2">
-            <ProgressRing progress={progress} size={70} strokeWidth={6} />
+            <ProgressRing progress={progress} size={70} strokeWidth={6}/>
             <div className="flex flex-col">
-              {onEdit && !isFromChallenge && <Button variant="ghost" size="icon" onClick={() => onEdit(id)}><Edit className="size-4" /></Button>}
-              {onAddReminder && <Button variant="ghost" size="icon" onClick={() => onAddReminder(id)} className="shrink-0" title="Создать напоминание"><AlarmClock className="size-4" /></Button>}
+              {onEdit && !isFromChallenge &&
+                <Button variant="ghost" size="icon" onClick={() => onEdit(id)}><Edit className="size-4"/></Button>}
+              {onAddReminder &&
+                <Button variant="ghost" size="icon" onClick={() => onAddReminder(id)} className="shrink-0"
+                        title="Создать напоминание"><AlarmClock className="size-4"/></Button>}
             </div>
           </div>
         </div>
@@ -200,7 +203,7 @@ export function GoalCard({
               </span>
             )}
           </div>
-          <Progress value={progress} className="h-2" />
+          <Progress value={progress} className="h-2"/>
         </div>
 
         {goalType === "PROGRESS" && (
@@ -232,7 +235,7 @@ export function GoalCard({
             <CollapsibleTrigger asChild>
               <Button variant="outline" className="w-full justify-between">
                 <span>{t('goals.tasks')}</span>
-                {isOpen ? <ChevronUp className="size-4" /> : <ChevronDown className="size-4" />}
+                {isOpen ? <ChevronUp className="size-4"/> : <ChevronDown className="size-4"/>}
               </Button>
             </CollapsibleTrigger>
             <CollapsibleContent className="space-y-2 mt-2">
@@ -251,21 +254,23 @@ export function GoalCard({
               </Badge>
             )}
             {isFromChallenge && challenge && (
-              <Badge
-                className="cursor-pointer bg-primary text-white hover:bg-primary/80"
-                onClick={() => navigate({
-                  pathname: "/challenges",
-                  search: `?id=${challenge.id}`,
-                })}
-                title="Перейти к челленджу"
-              >
-                Челлендж: {challenge.title}
-              </Badge>
+              <div className="flex items-center flex-wrap justify-end mb-auto">
+                <Badge
+                  className="cursor-pointer bg-primary text-white hover:bg-primary/80"
+                  onClick={() => navigate({
+                    pathname: "/challenges",
+                    search: `?id=${challenge.id}`,
+                  })}
+                  title="Перейти к челленджу"
+                >
+                  {challenge.title}
+                </Badge>
+              </div>
             )}
 
             {dueDate && (
               <div className="flex items-center gap-2 text-muted-foreground mr-4">
-                <Calendar className="size-4" />
+                <Calendar className="size-4"/>
                 <span className="whitespace-nowrap">{new Date(dueDate).toISOString().split('T')[0]}</span>
               </div>
             )}
@@ -293,5 +298,5 @@ export function GoalCard({
         </div>
       </CardContent>
     </Card>
-    );
-  }
+  );
+}

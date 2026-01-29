@@ -269,7 +269,7 @@ export function ChallengeCard({challenge, onShare, onEdit, onAccept, onLeave, on
             </div>
           }
           {
-            onOpenReports &&
+            onOpenReports && isCreator &&
             <div className="flex justify-center py-2">
               <Button onClick={(e) => (e.stopPropagation(), onOpenReports(challenge.id))}>
                 Отчёты

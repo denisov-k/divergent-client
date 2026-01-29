@@ -168,7 +168,7 @@ export interface User {
   timeZone: string
 }
 
-export type PaymentMethod = "ROBOKASSA" | "STARS";
+export type PaymentMethod = "YOUKASSA" | "STARS";
 
 export type PaymentStatus = "PENDING" | "SUCCESS" | "FAILED" | "CANCELLED";
 

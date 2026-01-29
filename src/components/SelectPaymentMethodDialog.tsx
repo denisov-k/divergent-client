@@ -44,7 +44,7 @@ export function SelectPaymentMethodDialog({
 
           <Card
             className="p-3 cursor-pointer hover:bg-muted transition"
-            onClick={() => onSelect("ROBOKASSA")}
+            onClick={() => onSelect("YOUKASSA")}
           >
             <div className="flex items-center gap-3">
               <CreditCard/>

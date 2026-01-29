@@ -244,7 +244,6 @@ export const useAppStore = create<AppStore>((set, get) => ({
   },
 
   payChallenge: async (challenge: Challenge, method: PaymentMethod) => {
-    const redirectToRobokassa = get().redirectToRobokassa;
     const redirectToTelegram = get().redirectToTelegram;
 
     set({ loading: true });
@@ -252,12 +251,7 @@ export const useAppStore = create<AppStore>((set, get) => ({
 
       const res = await api.payChallenge(challenge.id, method);
 
-      if (method === 'ROBOKASSA')
-        redirectToRobokassa(res);
-      else if (method === 'STARS')
-        redirectToTelegram(res);
-
-      // await get().initialize();
+      redirectToTelegram(res);
 
     } catch (err) {
       console.error(err);
