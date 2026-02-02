@@ -282,7 +282,7 @@ export function GoalCard({
               </Badge>
             )}
             {isFromChallenge && challenge && (
-              <div className="flex items-center flex-wrap justify-end mb-auto">
+              <div className="flex items-center flex-wrap justify-start mb-auto">
                 <Badge
                   className="cursor-pointer bg-primary text-white hover:bg-primary/80"
                   onClick={() => navigate({
