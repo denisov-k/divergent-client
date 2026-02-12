@@ -45,16 +45,14 @@ export interface Goal {
   currentValue?: number; // текущее значение прогресса
   targetValue?: number;  // целевое значение
   goalType: GoalType;      // "tasks" | "numeric"
-  goalPeriod?: GoalPeriod; // "daily" | "weekly" | "monthly"
+  goalPeriod: GoalPeriod; // "daily" | "weekly" | "monthly"
   challengeId?: string;
   challenge?: Challenge;
 }
 
 export interface Leader {
-  completedGoals: number;
+  xp: number;
   name: string;
-  progressPercent: number;
-  totalGoals: number;
   userId: string;
 }
 
@@ -141,6 +139,8 @@ export interface Reminder {
   isActive: boolean;
   goalId?: string;
   taskId?: string;
+  goal?: Goal;
+  task?: Task;
 }
 
 export type RewardIcon = "trophy" | "star" | "gift" | "crown" | "award" | "zap";

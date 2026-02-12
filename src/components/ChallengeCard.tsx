@@ -1,7 +1,7 @@
 import {Card, CardContent, CardDescription, CardHeader, CardTitle} from "@/components/ui/card"
 import {Badge} from "@/components/ui/badge"
-import {Calendar, Users, Edit, Share, ChevronUp, ChevronDown, DoorOpen} from "lucide-react"
-import {Challenge} from "@/types"
+import {Calendar, Users, Edit, Share, ChevronUp, ChevronDown, DoorOpen, Swords} from "lucide-react"
+import {Challenge, Leader} from "@/types"
 import {format} from "date-fns"
 import {ProgressRing} from "@/components/ProgressRing.tsx";
 import {Button} from "@/components/ui/button.tsx";
@@ -21,7 +21,7 @@ interface Props {
   onLeave?: (id: string) => void;
   onOpenLink?: (id: string) => void;
   onOpenReports?: (id: string) => void;
-  onSelect?: (challenge: Challenge) => void; // новый проп
+  onSelect?: (challenge: Challenge) => void;
 }
 
 export function ChallengeCard({challenge, onShare, onEdit, onAccept, onLeave, onOpenLink, onOpenReports, onSelect}: Props) {
@@ -30,7 +30,9 @@ export function ChallengeCard({challenge, onShare, onEdit, onAccept, onLeave, on
   const [isLeaderboardOpen, setIsLeaderboardOpen] = useState(false);
   const [isRulesOpen, setIsRulesOpen] = useState(false);
 
-  const {user} = useAppStore();
+  const [leaderboard, setLeaderboard] = useState<Leader[]>([]);
+
+  const {user, getLeaderboard} = useAppStore();
   const isCreator = challenge.creatorId === user!.id;
 
   const navigate = useNavigate();
@@ -73,6 +75,23 @@ export function ChallengeCard({challenge, onShare, onEdit, onAccept, onLeave, on
       return sum;
     }, 0) / goals.length;
 
+  const getGoalStatus = (goal: typeof goals[0]) => {
+    return goal.lastCompletedAt ? "COMPLETED" : "NOT_COMPLETED";
+  };
+
+  const allGoalsCompleted = goals.every(goal => getGoalStatus(goal) === "COMPLETED");
+
+  let challengeStatus: "COMPLETED" | "FAILED" | "ACTIVE";
+
+  const now = new Date();
+  if (allGoalsCompleted) {
+    challengeStatus = "COMPLETED";
+  } else if (challenge.endsAt && new Date(challenge.endsAt) < now) {
+    challengeStatus = "FAILED"; // дата прошла, цели не выполнены
+  } else {
+    challengeStatus = "ACTIVE"; // ещё можно успеть
+  }
+
   const isParticipant = challenge.participants.some(p => p.userId === user!.id); // предполагаем, что есть флаг
 
   const onGoalClick = (e: ReactMouseEvent, id: string) => {
@@ -83,18 +102,31 @@ export function ChallengeCard({challenge, onShare, onEdit, onAccept, onLeave, on
     navigate(`/goals?focus=${id}`);
   }
 
-  const leaderboard: NonNullable<Challenge["leaderboard"]> =
-    challenge.leaderboard ?? [];
+  const onLeaderboardClick = async (id: string) => {
+    if (isLeaderboardOpen)
+      return;
+    const leaderboard = await getLeaderboard(id);
+    setLeaderboard(leaderboard);
+  }
+
 
   return (
-    <Card className="hover:shadow-md transition-shadow"
-          onClick={() => {
-            onSelect?.(challenge);
-          }}
+    <Card className={`
+        hover:shadow-md transition-shadow
+        ${challengeStatus === "COMPLETED" ? "bg-green-50/40" : ""}
+        ${challengeStatus === "FAILED" ? "bg-red-50/40" : ""}
+      `}
+      onClick={() => {
+        onSelect?.(challenge);
+      }}
     >
       <CardHeader>
         <div className="flex items-start justify-between gap-4">
           <div className="flex-1 min-w-0 space-y-2">
+            <div className="flex items-center gap-2">
+              <Swords className="size-5 text-primary"></Swords>
+              <CardTitle>{challenge.title}</CardTitle>
+            </div>
             {
               (isCreator &&
                 <Badge className="mr-1 bg-purple-600 text-white hover:bg-purple-700">
@@ -103,21 +135,34 @@ export function ChallengeCard({challenge, onShare, onEdit, onAccept, onLeave, on
               ||
               (isParticipant &&
                 (<Badge variant="default" className="mr-1">
-                  Участвуете
-                </Badge>
+                    Участвуете
+                  </Badge>
                 ))
             }
-            {/*<Badge variant={challenge.isPublic ? "secondary" : "outline"}>
-              {challenge.isPublic ? "Публичный" : "Приватный"}
-            </Badge>*/}
-            <CardTitle>{challenge.title}</CardTitle>
             {challenge.description && (
               <CardDescription>{challenge.description}</CardDescription>
+            )}
+            {challengeStatus !== "ACTIVE" && (
+              <Badge
+                className={
+                  challengeStatus === "COMPLETED"
+                    ? "bg-green-600"
+                    : challengeStatus === "FAILED"
+                      ? "bg-red-400"
+                      : "bg-accent text-foreground"
+                }
+              >
+                {challengeStatus === "COMPLETED"
+                  ? "Выполнен"
+                  : challengeStatus === "FAILED"
+                    ? "Не выполнен"
+                    : "В процессе"}
+              </Badge>
             )}
           </div>
 
           <div className="flex items-center gap-2">
-            <ProgressRing progress={progress} size={70} strokeWidth={6}/>
+            <ProgressRing progress={progress * 100} size={70} strokeWidth={6}/>
             <div className="flex flex-col">
               {onEdit && isCreator && (
                 <Button
@@ -168,7 +213,7 @@ export function ChallengeCard({challenge, onShare, onEdit, onAccept, onLeave, on
         {/* Цели */}
         <Collapsible open={isGoalsOpen} onOpenChange={setIsGoalsOpen}>
           <CollapsibleTrigger asChild>
-            <Button variant="outline" className="w-full justify-between"
+            <Button variant="transparent" className="w-full justify-between"
                     onClick={(e) => e.stopPropagation()}>
               <span>{t("challenges.goals")}</span>
               {isGoalsOpen ? (
@@ -198,7 +243,7 @@ export function ChallengeCard({challenge, onShare, onEdit, onAccept, onLeave, on
           <Collapsible open={isRulesOpen} onOpenChange={setIsRulesOpen}>
             <CollapsibleTrigger asChild>
               <Button
-                variant="outline"
+                variant="transparent"
                 className="w-full justify-between"
                 onClick={(e) => e.stopPropagation()}
               >
@@ -218,41 +263,40 @@ export function ChallengeCard({challenge, onShare, onEdit, onAccept, onLeave, on
         )}
 
         {/* Топ участников */}
-        {leaderboard.length &&
-          <Collapsible open={isLeaderboardOpen} onOpenChange={setIsLeaderboardOpen}>
-            <CollapsibleTrigger asChild>
-              <Button
-                variant="outline"
-                className="w-full justify-between"
-                onClick={(e) => e.stopPropagation()}
-              >
-                <span>Топ участников</span>
-                {isLeaderboardOpen ? (
-                  <ChevronUp className="size-4"/>
-                ) : (
-                  <ChevronDown className="size-4"/>
-                )}
-              </Button>
-            </CollapsibleTrigger>
+        <Collapsible open={isLeaderboardOpen} onOpenChange={setIsLeaderboardOpen}>
+          <CollapsibleTrigger asChild>
+            <Button
+              variant="transparent"
+              className="w-full justify-between"
+              onClick={(e) => (e.stopPropagation(), onLeaderboardClick(challenge.id))}
+            >
+              <span>Топ участников</span>
+              {isLeaderboardOpen ? (
+                <ChevronUp className="size-4"/>
+              ) : (
+                <ChevronDown className="size-4"/>
+              )}
+            </Button>
+          </CollapsibleTrigger>
 
-            <CollapsibleContent className="my-2 space-y-2">
-              {leaderboard.map((p, index) => (
-                <div
-                  key={p.userId}
-                  className="flex items-center justify-between rounded border px-3 py-2 text-sm"
-                >
-                  <div className="flex items-center gap-2">
-                    <Badge variant="secondary">#{index + 1}</Badge>
-                    <span>{p.name}</span>
-                  </div>
-                  <span className="text-muted-foreground">
-                    {p.completedGoals} целей
-                  </span>
+          <CollapsibleContent className="my-2 space-y-2">
+            {leaderboard.map((p, index) => (
+              <div
+                key={p.userId}
+                className="flex items-center justify-between rounded border px-3 py-2 text-sm"
+              >
+                <div className="flex items-center gap-2">
+                  <Badge variant="secondary">#{index + 1}</Badge>
+                  <span>{p.name}</span>
                 </div>
-              ))}
-            </CollapsibleContent>
-          </Collapsible>
-          || null}
+                <span className="text-muted-foreground">
+                  {p.xp} XP
+                </span>
+              </div>
+            ))}
+          </CollapsibleContent>
+        </Collapsible>
+
 
         <div className="flex justify-between border p-2 text-sm font-medium rounded-md">
           <span>Стоимость участия</span>
@@ -269,7 +313,7 @@ export function ChallengeCard({challenge, onShare, onEdit, onAccept, onLeave, on
             </div>
           }
           {
-            onOpenReports && isCreator && challenge.requiresReport &&
+            onOpenReports && /*isCreator &&*/ challenge.requiresReport &&
             <div className="flex justify-center py-2">
               <Button onClick={(e) => (e.stopPropagation(), onOpenReports(challenge.id))}>
                 Отчёты

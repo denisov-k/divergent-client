@@ -12,6 +12,7 @@ interface RewardCardProps {
   id: string;
   title: string;
   description: string;
+  isUnlocked: boolean;
   icon?: RewardIcon;
   goal?: Goal;
   goalTitle?: string;          // <-- Новое
@@ -29,6 +30,7 @@ const iconMap = {
 
 export function RewardCard({
                              id,
+                             isUnlocked,
                              title,
                              description,
                              icon = "trophy",
@@ -41,8 +43,6 @@ export function RewardCard({
   const navigate = useNavigate();
   const isFromChallenge = Boolean(goal?.challengeId);
 
-  const isUnlocked = false;
-
   const { challenges } = useAppStore();
   const challenge = challenges.find(challenge => challenge.id === goal?.challengeId);
 
@@ -52,7 +52,7 @@ export function RewardCard({
     <Card
       className={`transition-all ${
         isUnlocked
-          ? "border-green-500 bg-green-500/5"
+          ? "bg-green-50/40"
           : ""
       }`}
     >

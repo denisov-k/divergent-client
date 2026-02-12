@@ -22,7 +22,7 @@ export default function SignIn() {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [searchParams] = useSearchParams()
   const navigate = useNavigate()
-  const { user, loading, login } = useAppStore()
+  const { user, loading, login, initialize } = useAppStore()
 
   const isTelegramClient = !!WebApp;
   const redirect = searchParams.get('redirect')
@@ -73,6 +73,7 @@ export default function SignIn() {
       // @ts-expect-error
       const data = window.Telegram.WebApp.initData
       await login(data)
+      await initialize();
     } catch (err) {
       console.error('Telegram auth failed', err)
     }

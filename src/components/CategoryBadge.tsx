@@ -32,7 +32,7 @@ export function CategoryBadge({ category, label }: CategoryBadgeProps) {
   const Icon = config.icon;
 
   return (
-    <Badge variant="outline" className={`gap-1.5 ${config.color}`}>
+    <Badge variant="outline" className={`flex gap-1.5 ${config.color}`}>
       <Icon className="size-3" />
       {label}
     </Badge>

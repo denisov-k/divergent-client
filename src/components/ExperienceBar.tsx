@@ -12,7 +12,7 @@ export function ExperienceBar({ currentXp, requiredXp, level }: ExperienceBarPro
   const { t } = useTranslation();
 
   return (
-    <div className="space-y-2">
+    <div className="">
       <div className="flex items-center justify-between gap-4">
         <div className="flex items-center gap-2">
           <span className="text-muted-foreground">{t('profile.level')} {level}</span>

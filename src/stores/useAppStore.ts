@@ -1,8 +1,19 @@
-import { create } from "zustand";
+import {create} from "zustand";
 import * as api from "@/utils/api";
-import { FriendCardProps } from "@/components/FriendCard.tsx";
+import {FriendCardProps} from "@/components/FriendCard.tsx";
 
-import {User, CategoryOption, Goal, Reminder, Reward, Challenge, ChallengeApi, PaymentMethod, Report} from "@/types/";
+import {
+  CategoryOption,
+  Challenge,
+  ChallengeApi,
+  Goal,
+  Leader,
+  PaymentMethod,
+  Reminder,
+  Report,
+  Reward,
+  User
+} from "@/types/";
 import {ChallengeInput} from "@/components/CreateChallengeDialog.tsx";
 
 import WebApp from '@twa-dev/sdk';
@@ -35,14 +46,13 @@ interface AppStore {
   removeXp: (amount: number) => Promise<void>;
 
   addChallenge: (challenge: ChallengeInput) => Promise<void>;
-
   updateChallenge: (challenge: ChallengeInput) => Promise<void>;
+  getLeaderboard: (id: string) => Promise<Leader[]>;
 
   acceptChallenge: (challenge: Challenge) => Promise<void>;
   leaveChallenge: (id: string) => Promise<void>;
   payChallenge: (challenge: Challenge, method: PaymentMethod) => Promise<void>;
-  redirectToRobokassa: (data: any) => void;
-  redirectToTelegram: (data: any) => void;
+  redirectToTelegram: (link: string) => void;
 
   addCategory: (category: CategoryOption) => void;
   addGoal: (goal: Goal) => Promise<void>;
@@ -215,6 +225,18 @@ export const useAppStore = create<AppStore>((set, get) => ({
     }
   },
 
+  getLeaderboard: async (id: string) => {
+    set({ loading: true });
+    try {
+      return await api.fetchLeaderboard(id);
+
+    } catch (err) {
+      console.error(err);
+    } finally {
+      set({ loading: false });
+    }
+  },
+
   acceptChallenge: async (challenge: Challenge) => {
     set({ loading: true });
     try {
@@ -251,7 +273,7 @@ export const useAppStore = create<AppStore>((set, get) => ({
 
       const res = await api.payChallenge(challenge.id, method);
 
-      redirectToTelegram(res);
+      redirectToTelegram(res.invoiceLink);
 
     } catch (err) {
       console.error(err);
@@ -260,28 +282,8 @@ export const useAppStore = create<AppStore>((set, get) => ({
     }
   },
 
-  redirectToRobokassa(data) {
-    const { url, fields } = data.invoice;
-
-    const form = document.createElement("form");
-    form.method = "POST";
-    form.action = url;
-
-    Object.entries(fields).forEach(([name, value]) => {
-      const input = document.createElement("input");
-      input.type = "hidden";
-      input.name = name;
-      input.value = String(value);
-      form.appendChild(input);
-    });
-
-    document.body.appendChild(form);
-    form.submit();
-  },
-
-  redirectToTelegram(data) {
-    WebApp.openInvoice(data.invoiceLink, async (status) => {
-      console.log(status)
+  redirectToTelegram(link) {
+    WebApp.openInvoice(link, async (status) => {
       if (status === "paid") {
         const [goals, challenges, rewards, reminders, friends, categories] = await Promise.all([
           api.fetchGoals(),
@@ -407,6 +409,17 @@ export const useAppStore = create<AppStore>((set, get) => ({
           requiredXp: user.requiredXp,
         },
       });
+
+      if (goal.challenges.length) {
+        const challenges = await api.fetchChallenges();
+        set({ challenges });
+      }
+
+      if (goal.reward) {
+        const rewards = await api.fetchRewards();
+        set({ rewards });
+      }
+
 
     } catch (err) {
       console.error(err);

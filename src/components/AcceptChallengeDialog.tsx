@@ -6,7 +6,7 @@ import { ProgressRing } from "./ProgressRing";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "./ui/collapsible";
 import { useState } from "react";
 import { format } from "date-fns";
-import { Challenge } from "@/types";
+import {Challenge, Leader} from "@/types";
 import { useTranslation } from "react-i18next";
 import {useAppStore} from "@/stores/useAppStore.ts";
 
@@ -24,17 +24,42 @@ export function AcceptChallengeDialog({ challenge, isOpen, onOpenChange, onAccep
   const [isLeaderboardOpen, setIsLeaderboardOpen] = useState(false);
 
   const { t } = useTranslation();
-  const {user} = useAppStore();
+  const {user, getLeaderboard} = useAppStore();
 
   const totalGoals = challenge.goals.length;
   const completedGoals = challenge.goals.filter(g => g.lastCompletedAt).length;
   const progress = totalGoals === 0 ? 0 : completedGoals / totalGoals;
 
-  const leaderboard: NonNullable<Challenge["leaderboard"]> =
-    challenge.leaderboard ?? [];
+  const [leaderboard, setLeaderboard] = useState<Leader[]>([]);
+
+  const goals = challenge.goals;
 
   // Если пользователь уже участник, кнопку "Принять" скрываем
   const isParticipant = challenge.participants.some(p => p.userId === user!.id); // предполагаем, что есть флаг
+
+  const getGoalStatus = (goal: typeof goals[0]) => {
+    return goal.lastCompletedAt ? "COMPLETED" : "NOT_COMPLETED";
+  };
+
+  const allGoalsCompleted = goals.every(goal => getGoalStatus(goal) === "COMPLETED");
+
+  let challengeStatus: "COMPLETED" | "FAILED" | "ACTIVE";
+
+  const now = new Date();
+  if (allGoalsCompleted) {
+    challengeStatus = "COMPLETED";
+  } else if (challenge.endsAt && new Date(challenge.endsAt) < now) {
+    challengeStatus = "FAILED"; // дата прошла, цели не выполнены
+  } else {
+    challengeStatus = "ACTIVE"; // ещё можно успеть
+  }
+
+  const onLeaderboardClick = async (id: string) => {
+    if (isLeaderboardOpen)
+      return;
+    const leaderboard = await getLeaderboard(id);
+    setLeaderboard(leaderboard);
+  }
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
@@ -48,7 +73,7 @@ export function AcceptChallengeDialog({ challenge, isOpen, onOpenChange, onAccep
         )}
 
         <div className="flex items-center gap-6 mt-4">
-          <ProgressRing progress={progress} size={70} strokeWidth={7}/>
+          <ProgressRing progress={progress * 100} size={70} strokeWidth={7}/>
 
           <div className="flex flex-col gap-2">
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
@@ -67,6 +92,23 @@ export function AcceptChallengeDialog({ challenge, isOpen, onOpenChange, onAccep
             <Badge variant={challenge.isPublic ? "secondary" : "outline"} className="mt-1">
               {challenge.isPublic ? t("challenges.visibility.public") : t("challenges.visibility.private")}
             </Badge>
+            {challengeStatus !== "ACTIVE" && (
+              <Badge
+                className={
+                  challengeStatus === "COMPLETED"
+                    ? "bg-green-600"
+                    : challengeStatus === "FAILED"
+                      ? "bg-red-400"
+                      : "bg-accent text-foreground"
+                }
+              >
+                {challengeStatus === "COMPLETED"
+                  ? "Выполнен"
+                  : challengeStatus === "FAILED"
+                    ? "Не выполнен"
+                    : "В процессе"}
+              </Badge>
+            )}
           </div>
         </div>
 
@@ -120,41 +162,41 @@ export function AcceptChallengeDialog({ challenge, isOpen, onOpenChange, onAccep
             </Collapsible>
           )}
 
-          {leaderboard.length &&
-            <Collapsible open={isLeaderboardOpen} onOpenChange={setIsLeaderboardOpen}>
-              <CollapsibleTrigger asChild>
-                <Button
-                  variant="outline"
-                  className="w-full justify-between"
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  <span>Топ участников</span>
-                  {isLeaderboardOpen ? (
-                    <ChevronUp className="size-4"/>
-                  ) : (
-                    <ChevronDown className="size-4"/>
-                  )}
-                </Button>
-              </CollapsibleTrigger>
 
-              <CollapsibleContent className="mt-2 space-y-2">
-                {leaderboard.map((p, index) => (
-                  <div
-                    key={p.userId}
-                    className="flex items-center justify-between rounded border px-3 py-2 text-sm"
-                  >
-                    <div className="flex items-center gap-2">
-                      <Badge variant="secondary">#{index + 1}</Badge>
-                      <span>{p.name}</span>
-                    </div>
-                    <span className="text-muted-foreground">
-                      {p.completedGoals} целей
-                    </span>
+          <Collapsible open={isLeaderboardOpen} onOpenChange={setIsLeaderboardOpen}>
+            <CollapsibleTrigger asChild>
+              <Button
+                variant="transparent"
+                className="w-full justify-between"
+                onClick={(e) => (e.stopPropagation(), onLeaderboardClick(challenge.id))}
+              >
+                <span>Топ участников</span>
+                {isLeaderboardOpen ? (
+                  <ChevronUp className="size-4"/>
+                ) : (
+                  <ChevronDown className="size-4"/>
+                )}
+              </Button>
+            </CollapsibleTrigger>
+
+            <CollapsibleContent className="my-2 space-y-2">
+              {leaderboard.map((p, index) => (
+                <div
+                  key={p.userId}
+                  className="flex items-center justify-between rounded border px-3 py-2 text-sm"
+                >
+                  <div className="flex items-center gap-2">
+                    <Badge variant="secondary">#{index + 1}</Badge>
+                    <span>{p.name}</span>
                   </div>
-                ))}
-              </CollapsibleContent>
-            </Collapsible>
-            || null}
+                  <span className="text-muted-foreground">
+                  {p.xp} XP
+                </span>
+                </div>
+              ))}
+            </CollapsibleContent>
+          </Collapsible>
+
 
           <div className="flex justify-between border p-2 text-sm font-medium rounded-md">
             <span>Стоимость участия</span>

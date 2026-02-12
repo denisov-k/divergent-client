@@ -49,18 +49,6 @@ export default function Reminders() {
     toggleReminder(id);
   };
 
-  // ------------------------------
-  // Получение связанных целей и задач
-  // ------------------------------
-  const getReminderDetails = (reminder: Reminder) => {
-    const goal = goals.find((g) => g.id === reminder.goalId);
-    const task = goal?.tasks.find((t) => t.id === reminder.taskId);
-    return {
-      goalTitle: goal?.title,
-      taskTitle: task?.title,
-    };
-  };
-
   const handleDeleteReminder = async (id: string) => {
     const reminder = reminders.find((r) => r.id === id);
     if (reminder) {
@@ -97,13 +85,10 @@ export default function Reminders() {
       ) : (
         <div className="grid gap-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4  overflow-auto">
           {reminders.map((reminder) => {
-            const { goalTitle, taskTitle } = getReminderDetails(reminder);
             return (
               <ReminderCard
                 key={reminder.id}
                 {...reminder}
-                goalTitle={goalTitle}
-                taskTitle={taskTitle}
                 onToggle={() => handleToggleReminder(reminder.id)}
                 onEdit={handleEditReminder}
               />

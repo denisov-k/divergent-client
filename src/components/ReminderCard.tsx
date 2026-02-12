@@ -4,7 +4,7 @@ import { Button } from "./ui/button";
 import { Bell, Clock, Repeat, Edit, Target } from "lucide-react";
 import { Switch } from "./ui/switch";
 
-import { DAYS_OF_WEEK } from "@/types";
+import {DAYS_OF_WEEK, Goal, Task} from "@/types";
 
 const DAY_LABEL_MAP = Object.fromEntries(
   DAYS_OF_WEEK.map(d => [d.key, d.label])
@@ -14,11 +14,11 @@ interface ReminderCardProps {
   id: string;
   title: string;
   time: string;
+  goal?: Goal;
+  task?: Task;
   daysOfWeek?: string[];
   daysOfMonth?: number[];
   isActive: boolean;
-  goalTitle?: string;
-  taskTitle?: string;
   onToggle?: () => void;
   onEdit?: (id: string) => void;
 }
@@ -27,11 +27,11 @@ export function ReminderCard({
      id,
      title,
      time,
+     goal,
+     task,
      daysOfWeek = [],
      daysOfMonth = [],
      isActive,
-     goalTitle,
-     taskTitle,
      onToggle,
      onEdit,
    }: ReminderCardProps) {
@@ -92,19 +92,19 @@ export function ReminderCard({
         )}
 
         {/* Цель и задача */}
-        {(goalTitle || taskTitle) && (
+        {(task || goal) && (
           <div className="pt-2 border-t">
             <div className="flex items-start gap-2">
               <Target className="size-4 text-primary mt-0.5" />
               <div className="flex-1 min-w-0">
-                {goalTitle && (
+                {goal && (
                   <p className="text-sm">
-                    <span className="text-muted-foreground">Цель:</span> {goalTitle}
+                    <span className="text-muted-foreground">Цель:</span> {goal.title}
                   </p>
                 )}
-                {taskTitle && (
+                {task && (
                   <p className="text-sm text-muted-foreground">
-                    {taskTitle}
+                    {task.title}
                   </p>
                 )}
               </div>

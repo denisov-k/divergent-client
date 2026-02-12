@@ -157,6 +157,29 @@ export default function Goals() {
     return null;
   }
 
+  function isTaskCompletedThisPeriod(task: Task, goalPeriod: string) {
+    if (!task.lastCompletedAt) return false;
+    const last = new Date(task.lastCompletedAt);
+    const now = new Date();
+
+    if (goalPeriod === "DAILY") return last.toDateString() === now.toDateString();
+
+    if (goalPeriod === "WEEKLY") {
+      const week = (d: Date) => {
+        const onejan = new Date(d.getFullYear(), 0, 1);
+        return Math.ceil((((d.getTime() - onejan.getTime()) / 86400000) + onejan.getDay() + 1) / 7);
+      };
+      return last.getFullYear() === now.getFullYear() && week(last) === week(now);
+    }
+
+    if (goalPeriod === "MONTHLY") {
+      return last.getFullYear() === now.getFullYear() && last.getMonth() === now.getMonth();
+    }
+
+    return true; // NONE
+  }
+
+
 
   // ------------------------------
   // Переключить задачу
@@ -168,7 +191,7 @@ export default function Goals() {
     const task = findTaskRecursive(goal.tasks, taskId);
     if (!task) return;
 
-    const newCompleted = !task.lastCompletedAt;
+    const newCompleted = !isTaskCompletedThisPeriod(task, goal.goalPeriod);
 
     // ❗ если требуется отчёт — сначала модалка
     if (

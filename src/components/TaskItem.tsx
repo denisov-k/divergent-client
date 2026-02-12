@@ -102,7 +102,7 @@ export function TaskItem({
           onCheckedChange={() => onToggle(id, parentId)}
         />
 
-        <div className="flex-1 min-w-0">
+        <div className="flex-1 min-w-0 min-h-8 flex items-center">
           <label
             htmlFor={id}
             className={`block cursor-pointer ${isTaskDoneForPeriod({ lastCompletedAt }, goalPeriod) ? "line-through text-muted-foreground" : ""}`}

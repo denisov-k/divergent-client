@@ -138,6 +138,7 @@ export default function ChallengesView() {
       Telegram.WebApp.openTelegramLink(challenge.link);
   };
 
+
   useEffect(() => {
     // Проверяем параметр startapp
     const challengeId = searchParams.get("challengeId");

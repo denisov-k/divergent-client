@@ -23,12 +23,14 @@ interface GoalCardProps {
   category: CategoryType;
   categoryLabel: string;
 
-  goalType?: GoalType;
-  goalPeriod?: GoalPeriod;
+  goalType: GoalType;
+  goalPeriod: GoalPeriod;
   challenge?: Challenge;
 
   currentValue?: number;
   targetValue?: number;
+
+  lastCompletedAt?: string;
 
   tasks?: Task[];
   dueDate?: string;
@@ -56,6 +58,7 @@ export function GoalCard({
                            targetValue,
                            dueDate,
                            xpReward,
+                           lastCompletedAt,
                            reward,
                            editMode = false,
                            onEdit,
@@ -129,6 +132,26 @@ export function GoalCard({
       ? (completedTasks / totalTasks) * 100
       : 0;
 
+  const now = new Date();
+  const due = dueDate ? new Date(dueDate) : null;
+  const completedAt = lastCompletedAt ? new Date(lastCompletedAt) : null;
+
+  const isExpired = due ? now > due : false;
+  const wasCompleted = Boolean(completedAt);
+
+  let goalStatus: "ACTIVE" | "COMPLETED" | "FAILED" = "ACTIVE";
+
+  if (wasCompleted) {
+    // если важно учитывать выполнение после дедлайна:
+    if (due && completedAt! > due) {
+      goalStatus = "FAILED"; // выполнено, но поздно
+    } else {
+      goalStatus = "COMPLETED";
+    }
+  } else if (isExpired) {
+    goalStatus = "FAILED";
+  }
+
   const handleToggleExpand = (taskId: string) => {
     setExpandedTasks({...expandedTasks, [taskId]: !expandedTasks[taskId]});
   };
@@ -191,18 +214,36 @@ export function GoalCard({
   }, [autoExpand, goalType]);
 
   return (
-    <Card className={`hover:shadow-md transition-all
-      ${highlight ? "bg-blue-50" : "bg-white"}`}
-          ref={cardRef}>
+    <Card
+      className={`
+        hover:shadow-md transition-all border
+        ${highlight ? "bg-blue-50" : "bg-white"}
+        ${goalStatus === "COMPLETED" ? "bg-green-50/40" : ""}
+        ${goalStatus === "FAILED" ? "bg-red-50/40" : ""}
+      `}
+      ref={cardRef}
+    >
       <CardHeader>
         <div className="flex items-start justify-between gap-4">
           <div className="flex-1 min-w-0 space-y-2">
             <div className="flex items-center gap-2">
               <Target className="size-5 text-primary"/>
-              <CategoryBadge category={category} label={categoryLabel}/>
+              <CardTitle>{title}</CardTitle>
             </div>
-            <CardTitle>{title}</CardTitle>
+            <CategoryBadge category={category} label={categoryLabel}/>
             {description && <CardDescription>{description}</CardDescription>}
+
+            {goalStatus !== "ACTIVE" && (
+              <Badge
+                className={`
+                    ${goalStatus === "COMPLETED"
+                  ? "bg-green-600 text-white"
+                  : "bg-red-600 text-white"}
+                  `}
+              >
+                {goalStatus === "COMPLETED" ? "Выполнена" : "Не выполнена"}
+              </Badge>
+            )}
           </div>
           <div className="flex items-center gap-2">
             <ProgressRing progress={progress} size={70} strokeWidth={6}/>
@@ -238,7 +279,7 @@ export function GoalCard({
           <div className="flex items-center gap-2 mt-2">
             <input
               type="number"
-              className="border rounded px-2 py-1 w-full text-sm"
+              className="border rounded px-2 py-1 w-full text-sm bg-transparent"
               value={progressDelta}
               onChange={(e) => setProgressDelta(Number(e.target.value))}
               placeholder="Добавить значение"
@@ -261,7 +302,7 @@ export function GoalCard({
         {goalType === "TASK" && (
           <Collapsible open={isOpen} onOpenChange={setIsOpen}>
             <CollapsibleTrigger asChild>
-              <Button variant="outline" className="w-full justify-between">
+              <Button variant="transparent" className="w-full justify-between">
                 <span>{t('goals.tasks')}</span>
                 {isOpen ? <ChevronUp className="size-4"/> : <ChevronDown className="size-4"/>}
               </Button>

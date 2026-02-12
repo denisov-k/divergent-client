@@ -141,6 +141,12 @@ export async function updateChallenge(data: ChallengeInput): Promise<ChallengeAp
   });
 }
 
+export async function fetchLeaderboard(id: string) {
+  return fetchJSON(`/api/challenges/${id}/leaderboard`, {
+    method: "GET"
+  });
+}
+
 export async function leaveChallenge(id: string) {
   return fetchJSON(`/api/challenges/leave`, {
     method: "POST",
