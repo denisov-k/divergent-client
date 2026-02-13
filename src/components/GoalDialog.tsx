@@ -11,6 +11,7 @@ import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 import { Textarea } from "./ui/textarea";
+import { DatePickerInput } from "./ui/date-picker";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
 import { TaskItem } from "./TaskItem";
 import { Plus } from "lucide-react";
@@ -45,7 +46,9 @@ export function GoalDialog({
   const [title, setTitle] = useState(goal?.title || "");
   const [description, setDescription] = useState(goal?.description || "");
   const [category, setCategory] = useState<CategoryType>(goal?.category || "personal");
-  const [dueDate, setDueDate] = useState(toInputDate(goal?.dueDate));
+  const [dueDate, setDueDate] = useState<Date | undefined>(
+    goal?.dueDate ? new Date(goal.dueDate) : undefined
+  );
   const [xpReward, setXpReward] = useState(goal?.xpReward?.toString() || "");
   const [tasks, setTasks] = useState<Task[]>(goal?.tasks || []);
   const [newTaskTitle, setNewTaskTitle] = useState("");
@@ -73,7 +76,7 @@ export function GoalDialog({
       setTitle(goal.title || "");
       setDescription(goal.description || "");
       setCategory(goal.category || "personal");
-      setDueDate(toInputDate(goal.dueDate));
+      setDueDate(goal.dueDate ? new Date(goal.dueDate) : undefined);
       setXpReward(goal.xpReward?.toString() || "");
 
       setGoalType(goal.goalType || "TASK");
@@ -98,13 +101,13 @@ export function GoalDialog({
     } else {
       resetForm();
     }
-  }, [goal, open]);
+  }, [goal, open, rewards]);
 
   const resetForm = () => {
     setTitle("");
     setDescription("");
     setCategory("personal");
-    setDueDate("");
+    setDueDate(undefined);
     setXpReward("");
     setTasks([]);
     setRewardId("none");
@@ -264,7 +267,7 @@ export function GoalDialog({
         goalType === "PROGRESS" && numericCurrent
           ? parseInt(numericCurrent)
           : undefined,
-      dueDate: dueDate || undefined,
+      dueDate: dueDate ? dueDate.toISOString() : undefined,
       xpReward: xpReward ? parseInt(xpReward) : undefined,
       rewardId: rewardId === "none" ? null : rewardId,
     };
@@ -283,11 +286,6 @@ export function GoalDialog({
   const handleDelete = (id: string) => {
     onDelete(id);
   };
-
-  function toInputDate(value?: string | null) {
-    if (!value) return "";
-    return value.split("T")[0]; // YYYY-MM-DD
-  }
 
   return (
     <Dialog
@@ -345,11 +343,9 @@ export function GoalDialog({
 
             <div className="space-y-2">
               <Label htmlFor="dueDate">Срок выполнения</Label>
-              <Input
-                id="dueDate"
-                type="date"
+              <DatePickerInput
                 value={dueDate}
-                onChange={(e) => setDueDate(e.target.value)}
+                onChange={setDueDate}
               />
             </div>
           </div>

@@ -17,6 +17,7 @@ import { Challenge, Goal } from "@/types";
 
 import Select from "react-select";
 import {Label} from "@/components/ui/label.tsx";
+import {DatePickerInput} from "@/components/ui/date-picker.tsx";
 
 interface CreateChallengeDialogProps {
   open: boolean;
@@ -229,12 +230,16 @@ export function CreateChallengeDialog({
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-2">
               <Label htmlFor="startDate">{t("challenges.fields.start_date")}</Label>
-              <Input id="startDate" type="date" value={startsAt} onChange={(e) => setStartsAt(e.target.value)}/>
-            </div>
+              <DatePickerInput
+                value={startsAt ? new Date(startsAt) : undefined}
+                onChange={(date) => setStartsAt(date ? date.toISOString().slice(0, 10) : "")}
+              />            </div>
             <div className="space-y-2">
               <Label htmlFor="endDate">{t("challenges.fields.end_date")}</Label>
-              <Input id="endDate" type="date" value={endsAt} onChange={(e) => setEndsAt(e.target.value)}/>
-            </div>
+              <DatePickerInput
+                value={endsAt ? new Date(endsAt) : undefined}
+                onChange={(date) => setEndsAt(date ? date.toISOString().slice(0, 10) : "")}
+              />            </div>
           </div>
         </div>
 
