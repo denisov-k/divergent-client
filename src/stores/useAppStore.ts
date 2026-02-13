@@ -5,7 +5,7 @@ import {FriendCardProps} from "@/components/FriendCard.tsx";
 import {
   CategoryOption,
   Challenge,
-  ChallengeApi,
+  ChallengeApi, ChallengeParticipant,
   Goal,
   Leader,
   PaymentMethod,
@@ -61,7 +61,9 @@ interface AppStore {
   updateGoalProgress: (goalId: string, delta: number) => Promise<void>;
   toggleTask: (taskId: string) => Promise<void>;
   addReport: (taskId: string, data: FormData) => Promise<void>;
-  getReports: (challengeId: string) => Promise<void>;
+  getReports: (challengeId: string) => Promise<Report[]>;
+  getParticipants: (challengeId: string) => Promise<ChallengeParticipant[]>;
+  kickParticipant: (challengeId: string, userId: string) => Promise<void>;
   downloadReport: (report: Report) => Promise<void>;
 
   addReward: (reward: Reward) => Promise<void>;
@@ -454,14 +456,37 @@ export const useAppStore = create<AppStore>((set, get) => ({
   },
 
   getReports: async (challengeId: string) => {
-    const res = await api.getReports(challengeId);
+    set({ loading: true });
+    try {
+      return await api.getReports(challengeId);
 
-    set((state) => ({
-      reports: {
-        ...state.reports,
-        [challengeId]: res, // ← массив с сервера
-      },
-    }));
+    } catch (err) {
+      console.error(err);
+    } finally {
+      set({ loading: false });
+    }
+  },
+  getParticipants: async (challengeId: string) => {
+    set({ loading: true });
+    try {
+      return await api.getParticipants(challengeId);
+
+    } catch (err) {
+      console.error(err);
+    } finally {
+      set({ loading: false });
+    }
+  },
+  kickParticipant: async (challengeId: string, userId: string) => {
+    set({ loading: true });
+    try {
+      return await api.kickParticipant(challengeId, userId);
+
+    } catch (err) {
+      console.error(err);
+    } finally {
+      set({ loading: false });
+    }
   },
 
   downloadReport: async (report: Report) => {

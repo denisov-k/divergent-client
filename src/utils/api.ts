@@ -96,6 +96,17 @@ export async function getReports(challengeId: string) {
     method: "GET",
   });
 }
+export async function getParticipants(challengeId: string) {
+  return await fetchJSON(`/api/challenges/${challengeId}/participants`, {
+    method: "GET",
+  });
+}
+
+export async function kickParticipant(challengeId: string, userId: string) {
+  return await fetchJSON(`/api/challenges/${challengeId}/participants/${userId}`, {
+    method: "DELETE",
+  });
+}
 
 export async function downloadReport(reportId: string): Promise<Blob> {
   const res = await fetch(

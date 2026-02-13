@@ -86,7 +86,7 @@ export function AcceptChallengeDialog({ challenge, isOpen, onOpenChange, onAccep
 
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
               <Users size={16}/>
-              <span>{t("challenges.participants")} {challenge.participants.length}</span>
+              <span>{t("challenges.participants_count")} {challenge.participants.length}</span>
             </div>
 
             <Badge variant={challenge.isPublic ? "secondary" : "outline"} className="mt-1">

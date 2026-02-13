@@ -1,6 +1,6 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import {Challenge, PaymentMethod} from "@/types";
+import {Challenge, ChallengeParticipant, PaymentMethod, Report} from "@/types";
 
 import { Plus } from "lucide-react";
 
@@ -15,17 +15,17 @@ import { ChallengeCard } from "@/components/ChallengeCard";
 import Config from "@/services/Config.ts";
 import {useSearchParams} from "react-router-dom";
 import {SelectPaymentMethodDialog} from "@/components/SelectPaymentMethodDialog.tsx";
-import {ReportsDialog} from "@/components/ReportsDialog.tsx";
+import {ChallengeParticipantDialog} from "@/components/ChallengeParticipantDialog.tsx";
 
 export default function ChallengesView() {
-  const { challenges, goals, reports } = useAppStore();
+  const { challenges, goals } = useAppStore();
 
   const { t } = useTranslation();
   const [searchParams] = useSearchParams();
   // const navigate = useNavigate();
 
   const { addChallenge, updateChallenge, acceptChallenge,
-    leaveChallenge, payChallenge, getReports, downloadReport } = useAppStore();
+    leaveChallenge, payChallenge, getReports, getParticipants, kickParticipant, downloadReport } = useAppStore();
 
   const [challengeDialogOpen, setChallengeDialogOpen] = useState(false);
   const [editingChallenge, setEditingChallenge] = useState<Challenge | undefined>();
@@ -37,7 +37,8 @@ export default function ChallengesView() {
   const [acceptDialogOpen, setAcceptDialogOpen] = useState(false);
   const [selectedChallenge, setSelectedChallenge] = useState<Challenge | undefined>();
 
-  const selectedChallengeReports = selectedChallenge ? reports[selectedChallenge.id] ?? [] : [];
+  const [reports, setReports] = useState<Report[]>([]);
+  const [participants, setParticipants] = useState<ChallengeParticipant[]>([]);
 
   const handleSaveChallenge = async (data: ChallengeInput) => {
     if (editingChallenge) {
@@ -83,22 +84,25 @@ export default function ChallengesView() {
     setAcceptDialogOpen(false);
   };
 
-  const handleOpenReports = async (id: string) => {
+  const handleOpenParticipants = async (id: string) => {
     const challenge = challenges.find((c) => c.id === id);
     if (!challenge) return;
 
+    const reports = await getReports(challenge.id);
+    setReports(reports);
+
+    const participants = await getParticipants(challenge.id);
+    setParticipants(participants);
+
     setSelectedChallenge(challenge);
     setReportsDialogOpen(true);
-
-    await getReports(challenge.id);
   };
 
   const handleDownloadReport = async (reportId: string) => {
     // 1️⃣ Найдём отчёт в объекте reports по выбранному challenge
     if (!selectedChallenge) return;
 
-    const challengeReports = reports[selectedChallenge.id] ?? [];
-    const report = challengeReports.find(r => r.id === reportId);
+    const report = reports.find(r => r.id === reportId);
     if (!report) return;
 
     // 2️⃣ Скачиваем через store
@@ -129,6 +133,13 @@ export default function ChallengesView() {
 
     setPaymentDialogOpen(false);
     setPaymentChallenge(null);
+  };
+
+  const handleKick = async (challengeId: string, userId: string) => {
+    await kickParticipant(challengeId, userId);
+
+    const participants = await getParticipants(challengeId);
+    setParticipants(participants);
   };
 
   const handleOpenLink = async (id: string) => {
@@ -197,7 +208,7 @@ export default function ChallengesView() {
                 onSelect={handleSelectChallenge}
                 onLeave={handleLeaveChallenge}
                 onOpenLink={handleOpenLink}
-                onOpenReports={handleOpenReports}
+                onOpenParticipants={handleOpenParticipants}
                 onAccept={handleAcceptChallenge}
               />
             </div>
@@ -230,12 +241,14 @@ export default function ChallengesView() {
       )}
 
       {selectedChallenge && (
-        <ReportsDialog
+        <ChallengeParticipantDialog
           challenge={selectedChallenge}
-          reports={selectedChallengeReports}
+          reports={reports}
           isOpen={reportsDialogOpen}
           onOpenChange={handleReportsDialogClose}
           onDownload={handleDownloadReport}
+          onKick={handleKick}
+          participants={participants}
         />
       )}
     </div>

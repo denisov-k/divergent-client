@@ -20,11 +20,11 @@ interface Props {
   onAccept?: (id: string) => void;
   onLeave?: (id: string) => void;
   onOpenLink?: (id: string) => void;
-  onOpenReports?: (id: string) => void;
+  onOpenParticipants?: (id: string) => void;
   onSelect?: (challenge: Challenge) => void;
 }
 
-export function ChallengeCard({challenge, onShare, onEdit, onAccept, onLeave, onOpenLink, onOpenReports, onSelect}: Props) {
+export function ChallengeCard({challenge, onShare, onEdit, onAccept, onLeave, onOpenLink, onOpenParticipants, onSelect}: Props) {
   const {t} = useTranslation();
   const [isGoalsOpen, setIsGoalsOpen] = useState(false);
   const [isLeaderboardOpen, setIsLeaderboardOpen] = useState(false);
@@ -79,20 +79,23 @@ export function ChallengeCard({challenge, onShare, onEdit, onAccept, onLeave, on
     return goal.lastCompletedAt ? "COMPLETED" : "NOT_COMPLETED";
   };
 
+  const isParticipant = challenge.participants.some(p => p.userId === user!.id); // предполагаем, что есть флаг
+
   const allGoalsCompleted = goals.every(goal => getGoalStatus(goal) === "COMPLETED");
 
   let challengeStatus: "COMPLETED" | "FAILED" | "ACTIVE";
 
   const now = new Date();
-  if (allGoalsCompleted) {
+  if (!isParticipant) {
+    // Пользователь не участвует — челлендж просто активен
+    challengeStatus = "ACTIVE";
+  } else if (allGoalsCompleted) {
     challengeStatus = "COMPLETED";
   } else if (challenge.endsAt && new Date(challenge.endsAt) < now) {
-    challengeStatus = "FAILED"; // дата прошла, цели не выполнены
+    challengeStatus = "FAILED";
   } else {
-    challengeStatus = "ACTIVE"; // ещё можно успеть
+    challengeStatus = "ACTIVE";
   }
-
-  const isParticipant = challenge.participants.some(p => p.userId === user!.id); // предполагаем, что есть флаг
 
   const onGoalClick = (e: ReactMouseEvent, id: string) => {
     if (!isParticipant)
@@ -313,10 +316,10 @@ export function ChallengeCard({challenge, onShare, onEdit, onAccept, onLeave, on
             </div>
           }
           {
-            onOpenReports && /*isCreator &&*/ challenge.requiresReport &&
+            onOpenParticipants && isCreator &&
             <div className="flex justify-center py-2">
-              <Button onClick={(e) => (e.stopPropagation(), onOpenReports(challenge.id))}>
-                Отчёты
+              <Button onClick={(e) => (e.stopPropagation(), onOpenParticipants(challenge.id))}>
+                Участники
               </Button>
             </div>
           }

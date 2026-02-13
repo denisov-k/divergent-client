@@ -52,9 +52,11 @@
     "create_description": "Заполните информацию о челледже и выберите цели",
     "goals_count": "целей",
     "goals": "Цели челенджа",
-    "participants": "Участников: ",
+    "participants_count": "Участников: ",
+    "participants": "участники",
     "reports": "Отчёты",
     "noReports": "Отчёты отсутствуют",
+    "kick": "Исключить",
     "completed": "Выполнена",
     "pending": "В процессе",
     "fields": {
