@@ -46,12 +46,15 @@ export function AcceptChallengeDialog({ challenge, isOpen, onOpenChange, onAccep
   let challengeStatus: "COMPLETED" | "FAILED" | "ACTIVE";
 
   const now = new Date();
-  if (allGoalsCompleted) {
+  if (!isParticipant) {
+    // Пользователь не участвует — челлендж просто активен
+    challengeStatus = "ACTIVE";
+  } else if (allGoalsCompleted) {
     challengeStatus = "COMPLETED";
   } else if (challenge.endsAt && new Date(challenge.endsAt) < now) {
-    challengeStatus = "FAILED"; // дата прошла, цели не выполнены
+    challengeStatus = "FAILED";
   } else {
-    challengeStatus = "ACTIVE"; // ещё можно успеть
+    challengeStatus = "ACTIVE";
   }
 
   const onLeaderboardClick = async (id: string) => {
