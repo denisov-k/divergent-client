@@ -10,7 +10,7 @@ export default function Settings() {
   if (!user) return null;
 
   return (
-    <div className="max-w-3xl mx-auto p-6 space-y-6">
+    <div className="space-y-2 py-2 justify-center flex flex-col">
       <div className="bg-white shadow rounded-lg p-6 space-y-4">
         <h2 className="text-xl font-semibold">{t('settings.title')}</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -34,13 +34,14 @@ export default function Settings() {
         <LanguageSwitcher/>
         <TimezoneSelector></TimezoneSelector>
       </div>
-
-      <button
-        onClick={signOut}
-        className="w-full py-2 px-4 bg-red-500 text-white font-semibold rounded-lg hover:bg-red-600 transition"
-      >
-        {t('settings.sign_out')}
-      </button>
+      <div className="flex justify-center">
+        <button
+          onClick={signOut}
+          className="py-2 px-4 bg-red-500 text-white font-semibold rounded-lg hover:bg-red-600 transition w-26"
+        >
+          {t('settings.sign_out')}
+        </button>
+      </div>
     </div>
   );
 }

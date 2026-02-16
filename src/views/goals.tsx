@@ -98,6 +98,9 @@ export default function Goals() {
   const handleAddProgress = (id: string, delta: number) => {
     return updateGoalProgress(id, delta);
   }
+  const handleGoToProgress = (id: string) => {
+    return navigate(`/progress?goalId=${id}`);
+  }
 
   const handleAddCategory = (category: CategoryOption) => {
     addCategory(category);
@@ -286,6 +289,7 @@ export default function Goals() {
                   onTaskToggle={handleTaskToggle}
                   onAddReminder={handleAddReminderFromGoal}
                   onAddProgress={handleAddProgress}
+                  onGoToProgress={handleGoToProgress}
                   autoExpand={goal.id === focusGoalId}
                 />
               </div>

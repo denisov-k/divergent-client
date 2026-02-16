@@ -101,6 +101,11 @@ export async function getParticipants(challengeId: string) {
     method: "GET",
   });
 }
+export async function getActivity(goalId: string) {
+  return await fetchJSON(`/api/goals/${goalId}/activity`, {
+    method: "GET",
+  });
+}
 
 export async function kickParticipant(challengeId: string, userId: string) {
   return await fetchJSON(`/api/challenges/${challengeId}/participants/${userId}`, {

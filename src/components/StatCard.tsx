@@ -14,7 +14,7 @@ interface StatCardProps {
 
 export function StatCard({ title, value, icon: Icon, description, trend }: StatCardProps) {
   return (
-    <Card>
+    <Card className="my-1">
       <CardHeader className="flex flex-row items-center justify-between pb-2">
         <CardTitle className="text-sm">{title}</CardTitle>
         <Icon className="size-4 text-muted-foreground" />

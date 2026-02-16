@@ -86,6 +86,12 @@ export function ChallengeCard({challenge, onShare, onEdit, onAccept, onLeave, on
   let challengeStatus: "COMPLETED" | "FAILED" | "ACTIVE";
 
   const now = new Date();
+  const challengeStart = challenge.startsAt ? new Date(challenge.startsAt) : null;
+
+// Прибавляем один день к дате старта
+  const hasStarted = challengeStart
+    ? new Date(challengeStart.getTime() + 24 * 60 * 60 * 1000) <= now
+    : false;
   if (!isParticipant) {
     // Пользователь не участвует — челлендж просто активен
     challengeStatus = "ACTIVE";
@@ -323,7 +329,7 @@ export function ChallengeCard({challenge, onShare, onEdit, onAccept, onLeave, on
               </Button>
             </div>
           }
-          {!isParticipant && onAccept && (
+          {!isParticipant && onAccept && !hasStarted && (
             <div className="flex justify-center py-2">
               <Button className="bg-blue-600 text-white hover:bg-blue-700" onClick={(e) => {
                 e.stopPropagation(), onAccept(challenge.id);

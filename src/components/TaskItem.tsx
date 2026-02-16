@@ -45,6 +45,7 @@ export interface TaskItemProps {
   subtasks?: Task[];
   expanded?: boolean;
   editMode?: boolean;
+  disabled?: boolean;
   goalPeriod: string;
 
   onToggle: (id: string, parentId?: string) => void;
@@ -78,7 +79,8 @@ export function TaskItem({
                            setNewSubTaskTitles,
                            setNewSubTaskXps,
                            handleAddSubTask,
-                           parentId
+                           parentId,
+                           disabled,
                          }: TaskItemProps) {
   const hasSubtasks = subtasks.length > 0;
   const [expandedTasks, setExpandedTasks] = useState<Record<string, boolean>>({});
@@ -100,6 +102,7 @@ export function TaskItem({
           id={id}
           checked={isTaskDoneForPeriod({ lastCompletedAt }, goalPeriod)}
           onCheckedChange={() => onToggle(id, parentId)}
+          disabled={disabled}
         />
 
         <div className="flex-1 min-w-0 min-h-8 flex items-center">
@@ -150,6 +153,7 @@ export function TaskItem({
               parentId={id}
               expanded={expandedTasks[subtask.id]}
               editMode={editMode}
+              disabled={disabled}
             />
           ))}
         </div>

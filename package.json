@@ -1,7 +1,7 @@
 {
   "name": "divergent-client",
   "private": true,
-  "version": "0.2.18",
+  "version": "0.2.19",
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
@@ -41,6 +41,7 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "cmdk": "^1.1.1",
+    "dayjs": "^1.11.19",
     "embla-carousel-react": "^8.6.0",
     "i18next": "^25.5.2",
     "input-otp": "^1.4.2",

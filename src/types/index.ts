@@ -28,6 +28,7 @@ export interface Task {
   subtasks?: Task[];
   expanded?: boolean;
   parentId?: string | null;
+  completions?: TaskCompletion[];
 }
 
 export interface Goal {
@@ -170,19 +171,10 @@ export interface User {
 
 export type PaymentMethod = "YOUKASSA" | "STARS";
 
-export type PaymentStatus = "PENDING" | "SUCCESS" | "FAILED" | "CANCELLED";
 
-export interface Payment {
-  id: string;
-  userId: string;
-  user: User;
-  challengeId: string;
-  challenge: Challenge;
-  amount: number;
-  currency: string;
-  method: PaymentMethod;
-  status: PaymentStatus;
-  metadata?: JSON;
-  createdAt: string;
-  updatedAt: string;
-}
+export type GridItem = {
+  periodStart: string;
+  completed: number;
+  total: number;
+  status: "empty" | "partial" | "full";
+};

@@ -4,8 +4,6 @@ import {useAppStore} from "@/stores/useAppStore.ts";
 export function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { user, initialized } = useAppStore();
 
-  console.log(user);
-
   if (!initialized) {
     return (
       <div className="min-h-screen flex items-center justify-center">

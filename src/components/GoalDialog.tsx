@@ -267,7 +267,11 @@ export function GoalDialog({
         goalType === "PROGRESS" && numericCurrent
           ? parseInt(numericCurrent)
           : undefined,
-      dueDate: dueDate ? dueDate.toISOString() : undefined,
+      dueDate: dueDate
+        ? dueDate.getFullYear() + "-" +
+        String(dueDate.getMonth() + 1).padStart(2, "0") + "-" +
+        String(dueDate.getDate()).padStart(2, "0")
+        : undefined,
       xpReward: xpReward ? parseInt(xpReward) : undefined,
       rewardId: rewardId === "none" ? null : rewardId,
     };

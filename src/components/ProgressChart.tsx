@@ -19,7 +19,7 @@ export function ProgressChart({
   xAxisKey = "name" 
 }: ProgressChartProps) {
   return (
-    <Card>
+    <Card className="relative overflow-hidden my-1">
       <CardHeader>
         <CardTitle>{title}</CardTitle>
         {description && <CardDescription>{description}</CardDescription>}
@@ -65,7 +65,7 @@ export function ProgressChart({
                 className="text-xs"
                 tick={{ fill: 'var(--muted-foreground)' }}
               />
-              <Tooltip 
+              <Tooltip
                 contentStyle={{ 
                   backgroundColor: 'var(--card)',
                   border: '1px solid var(--border)',

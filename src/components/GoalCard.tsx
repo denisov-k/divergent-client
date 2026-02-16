@@ -4,7 +4,7 @@ import {CategoryBadge} from "./CategoryBadge";
 import {ProgressRing} from "./ProgressRing";
 import {Badge} from "./ui/badge";
 import {Button} from "./ui/button";
-import {Calendar, Target, Edit, ChevronDown, ChevronUp, AlarmClock} from "lucide-react";
+import {Calendar, Target, Edit, ChevronDown, ChevronUp, AlarmClock, BarChart2} from "lucide-react";
 import {TaskItem} from "./TaskItem";
 import {useEffect, useRef, useState} from "react";
 import {Collapsible, CollapsibleContent, CollapsibleTrigger} from "./ui/collapsible";
@@ -41,6 +41,7 @@ interface GoalCardProps {
   onTaskToggle?: (goalId: string, taskId: string, parentId?: string) => void;
   onAddReminder?: (id: string) => void;
   onAddProgress?: (goalId: string, delta: number) => void;
+  onGoToProgress: (id: string) => void;
   autoExpand?: boolean;
 }
 
@@ -65,6 +66,7 @@ export function GoalCard({
                            onTaskToggle,
                            onAddReminder,
                            onAddProgress,
+                           onGoToProgress,
                            autoExpand
                          }: GoalCardProps) {
   const [isOpen, setIsOpen] = useState(false);
@@ -133,7 +135,11 @@ export function GoalCard({
       : 0;
 
   const now = new Date();
-  const due = dueDate ? new Date(dueDate) : null;
+  let due = null;
+  if (dueDate) {
+    due = new Date(dueDate);
+    due.setDate(due.getDate() + 1);
+  }
   const completedAt = lastCompletedAt ? new Date(lastCompletedAt) : null;
 
   const isExpired = due ? now > due : false;
@@ -183,6 +189,7 @@ export function GoalCard({
         handleAddSubTask={handleAddSubTask}
         expanded={expandedTasks[task.id]}
         editMode={editMode}
+        disabled={isExpired}
       />
     ));
   };
@@ -253,6 +260,8 @@ export function GoalCard({
               {onAddReminder &&
                 <Button variant="ghost" size="icon" onClick={() => onAddReminder(id)} className="shrink-0"
                         title="Создать напоминание"><AlarmClock className="size-4"/></Button>}
+              <Button variant="ghost" size="icon" onClick={() => onGoToProgress(id)} className="shrink-0"
+                      title="Прогресс"><BarChart2 className="size-4"/></Button>
             </div>
           </div>
         </div>
@@ -287,6 +296,7 @@ export function GoalCard({
             />
             <Button
               size="sm"
+              variant="transparent"
               onClick={() => {
                 if (progressDelta !== 0) {
                   onAddProgress?.(id, progressDelta!);

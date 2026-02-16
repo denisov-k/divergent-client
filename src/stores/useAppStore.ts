@@ -6,7 +6,7 @@ import {
   CategoryOption,
   Challenge,
   ChallengeApi, ChallengeParticipant,
-  Goal,
+  Goal, GridItem,
   Leader,
   PaymentMethod,
   Reminder,
@@ -59,6 +59,7 @@ interface AppStore {
   deleteGoal: (goal: Goal) => Promise<void>;
   updateGoal: (goal: Goal) => Promise<void>;
   updateGoalProgress: (goalId: string, delta: number) => Promise<void>;
+  getActivity: (goalId: string) => Promise<GridItem[]>;
   toggleTask: (taskId: string) => Promise<void>;
   addReport: (taskId: string, data: FormData) => Promise<void>;
   getReports: (challengeId: string) => Promise<Report[]>;
@@ -534,6 +535,18 @@ export const useAppStore = create<AppStore>((set, get) => ({
     }
   },
 
+  getActivity: async (goalId: string) => {
+    set({ loading: true });
+    try {
+      return await api.getActivity(goalId);
+
+    } catch (err) {
+      console.error(err);
+    } finally {
+      set({ loading: false });
+    }
+  },
+
   // ==========================
   // REWARDS
   // ==========================
@@ -566,8 +579,6 @@ export const useAppStore = create<AppStore>((set, get) => ({
   updateRewardGoal: async (goalId: string, rewardId?: string) =>
     set((state) => ({
       rewards: state.rewards.map((r) => {
-        console.log(rewardId, goalId)
-
         if (r.id === rewardId) {
           // новая/редактируемая награда
           return { ...r, goalId: goalId === "none" ? undefined : goalId };

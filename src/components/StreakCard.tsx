@@ -12,7 +12,7 @@ const daysOfWeek = ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"];
 
 export function StreakCard({ currentStreak, longestStreak, streakDays }: StreakCardProps) {
   return (
-    <Card className="border-orange-200 bg-gradient-to-br from-orange-50/50 to-transparent my-4">
+    <Card className="border-orange-200 bg-gradient-to-br from-orange-50/50 to-transparent my-1">
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Flame className="size-5 text-orange-500" />
