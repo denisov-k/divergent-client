@@ -99,7 +99,7 @@ export function PeriodCalendar({ goal, data, loading }: Props) {
           </div>
         ) : (
           <div className="overflow-x-auto w-full" ref={scrollRef}>
-            <div className="min-w-max mx-auto">
+            <div className="min-w-max mx-auto flex justify-center">
               <table className="table-auto border-separate border-spacing-[2px]">
                 <thead>
                 <tr>

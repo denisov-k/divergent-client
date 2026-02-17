@@ -106,6 +106,11 @@ export async function getActivity(goalId: string) {
     method: "GET",
   });
 }
+export async function getGoalXp(goalId: string) {
+  return await fetchJSON(`/api/goals/${goalId}/xp`, {
+    method: "GET",
+  });
+}
 
 export async function kickParticipant(challengeId: string, userId: string) {
   return await fetchJSON(`/api/challenges/${challengeId}/participants/${userId}`, {

@@ -60,6 +60,7 @@ interface AppStore {
   updateGoal: (goal: Goal) => Promise<void>;
   updateGoalProgress: (goalId: string, delta: number) => Promise<void>;
   getActivity: (goalId: string) => Promise<GridItem[]>;
+  getGoalXp: (goalId: string) => Promise<number>;
   toggleTask: (taskId: string) => Promise<void>;
   addReport: (taskId: string, data: FormData) => Promise<void>;
   getReports: (challengeId: string) => Promise<Report[]>;
@@ -539,6 +540,17 @@ export const useAppStore = create<AppStore>((set, get) => ({
     set({ loading: true });
     try {
       return await api.getActivity(goalId);
+
+    } catch (err) {
+      console.error(err);
+    } finally {
+      set({ loading: false });
+    }
+  },
+  getGoalXp: async (goalId: string) => {
+    set({ loading: true });
+    try {
+      return await api.getGoalXp(goalId);
 
     } catch (err) {
       console.error(err);

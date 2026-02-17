@@ -434,7 +434,7 @@ export function GoalDialog({
             </Select>
           </div>
 
-          <div className="space-y-2">
+          {/*<div className="space-y-2">
             <Label htmlFor="xpReward">Награда за цель (XP)</Label>
             <Input
               id="xpReward"
@@ -444,7 +444,7 @@ export function GoalDialog({
               value={xpReward}
               onChange={(e) => setXpReward(e.target.value)}
             />
-          </div>
+          </div>*/}
 
 
           <Separator/>

@@ -154,6 +154,7 @@ export interface Reward {
   isUnlocked: boolean;
   goalId?: string;
   goal?: Goal;
+  xpRequires?: number;
 }
 
 export interface User {

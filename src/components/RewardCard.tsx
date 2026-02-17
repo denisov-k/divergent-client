@@ -12,6 +12,7 @@ interface RewardCardProps {
   id: string;
   title: string;
   description: string;
+  xpRequires?: number;
   isUnlocked: boolean;
   icon?: RewardIcon;
   goal?: Goal;
@@ -33,6 +34,7 @@ export function RewardCard({
                              isUnlocked,
                              title,
                              description,
+                             xpRequires,
                              icon = "trophy",
                              goal,
                              goalTitle,
@@ -103,6 +105,19 @@ export function RewardCard({
                 <span className="">{goalTitle}</span>
               </div>
             )}
+
+            {xpRequires && !isUnlocked && (
+              <div className="flex items-center gap-2 mt-2">
+
+                <Badge
+                  variant="secondary"
+                  className="bg-yellow-100 text-yellow-700"
+                >
+
+                  Требуется {xpRequires} XP
+                </Badge>
+              </div>
+            ) || null}
           </div>
 
           {onEdit && canEdit && (

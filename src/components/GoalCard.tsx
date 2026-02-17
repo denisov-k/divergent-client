@@ -370,7 +370,7 @@ export function GoalCard({
                     {reward.title}
                   </Badge>
                 )}
-                {xpReward && <Badge className="my-0.5">+{xpReward} XP</Badge>}
+                {/*xpReward && <Badge className="my-0.5">+{xpReward} XP</Badge>*/}
               </div>
             </div>
           )}

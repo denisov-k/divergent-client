@@ -12,11 +12,14 @@ import {PeriodCalendar} from "@/components/PeriodCalendar.tsx";
 import {GridItem} from "@/types";
 
 export default function Progress() {
-  const { user, goals, rewards, getActivity } = useAppStore();
+  const { user, goals, rewards, getActivity, getGoalXp } = useAppStore();
   const navigate = useNavigate();
 
   const [searchParams] = useSearchParams();
   const goalId = searchParams.get("goalId");
+
+  const [xp, setXp] = useState<number>(0);
+  //const [loadingXp, setLoadingXp] = useState(false);
 
   const [activity, setActivity] = useState<GridItem[]>([]);
   const [loadingActivity, setLoadingActivity] = useState(false);
@@ -34,7 +37,6 @@ export default function Progress() {
   // ==========================
   // Вычисляем статистику
   // ==========================
-  const currentXp = user?.xp;
 
   const completedGoals = filteredGoals.filter(
     g => g.tasks?.length && g.tasks.every(t => !!t.lastCompletedAt)
@@ -133,6 +135,22 @@ export default function Progress() {
   };
 
   useEffect(() => {
+    const loadXp = async () => {
+      try {
+        //setLoadingXp(true);
+
+        const xp = selectedGoal ? await getGoalXp(selectedGoal.id) : user!.xp;
+
+        setXp(xp);
+      } finally {
+        //setLoadingXp(false);
+      }
+    };
+
+    loadXp();
+  }, [selectedGoal, getGoalXp]);
+
+  useEffect(() => {
     if (!selectedGoal || selectedGoal.goalType !== "TASK") return;
 
     const loadActivity = async () => {
@@ -183,7 +201,7 @@ export default function Progress() {
         <div className="grid gap-2 md:grid-cols-4">
           <StatCard
             title="Всего XP"
-            value={currentXp || ""}
+            value={xp}
             icon={Zap}
             description="Накоплено опыта"
             trend={{value: 12, isPositive: true}}

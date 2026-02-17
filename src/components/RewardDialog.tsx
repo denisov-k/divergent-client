@@ -33,6 +33,7 @@ export function RewardDialog({ open, onOpenChange, onSave, onDelete, reward, goa
   const { t } = useTranslation();
   const [title, setTitle] = useState(reward?.title || "");
   const [description, setDescription] = useState(reward?.description || "");
+  const [xpRequires, setXpRequires] = useState(reward?.xpRequires || "");
   const [icon, setIcon] = useState<RewardIcon>(reward?.icon || "trophy");
   const [goalId, setGoalId] = useState(reward?.goalId || "");
 
@@ -42,6 +43,7 @@ export function RewardDialog({ open, onOpenChange, onSave, onDelete, reward, goa
       setDescription(reward.description || "");
       setIcon(reward.icon || "trophy");
       setGoalId(reward.goalId || "");
+      setXpRequires(reward.xpRequires || "");
     }
 
     if (open && !reward) {
@@ -49,6 +51,7 @@ export function RewardDialog({ open, onOpenChange, onSave, onDelete, reward, goa
       setDescription("");
       setIcon("trophy");
       setGoalId("");
+      setXpRequires("");
     }
   }, [reward, open]);
 
@@ -60,6 +63,7 @@ export function RewardDialog({ open, onOpenChange, onSave, onDelete, reward, goa
       description,
       icon,
       goalId,
+      xpRequires: Number(xpRequires),
       isUnlocked: reward?.isUnlocked || false,
     };
 
@@ -159,6 +163,17 @@ export function RewardDialog({ open, onOpenChange, onSave, onDelete, reward, goa
               </SelectContent>
             </Select>
 
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="xp-requires">Требуется XP *</Label>
+            <Input
+              id="xp-requires"
+              placeholder=""
+              type="number"
+              value={xpRequires}
+              onChange={(e) => setXpRequires(e.target.value)}
+            />
           </div>
         </div>
 

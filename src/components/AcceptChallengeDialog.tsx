@@ -140,7 +140,7 @@ export function AcceptChallengeDialog({ challenge, isOpen, onOpenChange, onAccep
                        className="flex items-center justify-between p-2 rounded border hover:bg-gray-100 dark:hover:bg-gray-700 transition">
                     <span className="text-sm">{goal.title}</span>
                     <Badge variant={goal.lastCompletedAt ? "secondary" : "outline"}>
-                      {goal.lastCompletedAt ? t("challenges.completed") : t("challenges.pending")}
+                      {goal.lastCompletedAt ? t("challenges.completed") : ""}
                     </Badge>
                   </div>
                 ))}
