@@ -13,7 +13,7 @@ export default function RootRedirect() {
 
     if (startapp?.startsWith("challenge-")) {
       const challengeId = startapp.replace("challenge-", "");
-      navigate(`/challenges?challengeId=${challengeId}`, { replace: true });
+      navigate(`/challenges?id=${challengeId}`, { replace: true });
     } else {
       // Иначе на главную / GoalsView
       navigate(`/goals`, { replace: true });

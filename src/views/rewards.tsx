@@ -5,16 +5,20 @@ import { RewardDialog } from "@/components/RewardDialog";
 
 import { Plus } from "lucide-react";
 import { toast } from "sonner";
-import { useState } from "react";
+import {useState} from "react";
 
 import {Reward} from "@/types"
 
 import { useAppStore } from "@/stores/useAppStore";
 import {useTranslation} from "react-i18next";
+import {useSearchParams} from "react-router-dom";
 
 export default function Rewards() {
   const { t } = useTranslation();
   const { rewards, addReward, updateReward, goals, deleteReward } = useAppStore();
+
+  const [searchParams] = useSearchParams();
+  const focusId = searchParams.get("id");
 
   const [rewardDialogOpen, setRewardDialogOpen] = useState(false);
   const [editingReward, setEditingReward] = useState<Reward | undefined>(undefined);
@@ -93,6 +97,7 @@ export default function Rewards() {
                 {...reward}
                 onEdit={handleEditReward}
                 goalTitle={goals.find(g => g.id === reward.goalId)?.title}
+                focused={reward.id === focusId}
               />
             </div>
           ))}

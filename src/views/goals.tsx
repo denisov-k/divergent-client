@@ -9,7 +9,7 @@ import { Plus } from "lucide-react";
 import { toast } from "sonner";
 
 import { useAppStore } from "@/stores/useAppStore";
-import {useEffect, useRef, useState} from "react";
+import { useState} from "react";
 import {ReminderDialog} from "@/components/ReminderDialog.tsx";
 import {useNavigate, useSearchParams} from "react-router-dom";
 import {useTranslation} from "react-i18next";
@@ -40,9 +40,7 @@ export default function Goals() {
   const navigate = useNavigate();
 
   const [searchParams] = useSearchParams();
-  const focusGoalId = searchParams.get("focus");
-
-  const goalRefs = useRef<Record<string, HTMLDivElement | null>>({});
+  const focusId = searchParams.get("id");
 
   const [goalDialogOpen, setGoalDialogOpen] = useState(false);
   const [editingGoal, setEditingGoal] = useState<Goal | undefined>();
@@ -217,10 +215,10 @@ export default function Goals() {
     toggleTask(taskId);
   };
 
-  useEffect(() => {
-    if (!focusGoalId) return;
+  /*useEffect(() => {
+    if (!focusId) return;
 
-    const el = goalRefs.current[focusGoalId];
+    const el = goalRefs.current[focusId];
     if (!el) return;
 
     el.scrollIntoView({
@@ -235,7 +233,7 @@ export default function Goals() {
     }, 2000);
 
     return () => clearTimeout(timeout);
-  }, [focusGoalId, goals]);
+  }, [focusId, goals]);*/
 
   return (
     <div className="flex flex-col px-2 flex-1">
@@ -290,7 +288,7 @@ export default function Goals() {
                   onAddReminder={handleAddReminderFromGoal}
                   onAddProgress={handleAddProgress}
                   onGoToProgress={handleGoToProgress}
-                  autoExpand={goal.id === focusGoalId}
+                  autoExpand={goal.id === focusId}
                 />
               </div>
             );

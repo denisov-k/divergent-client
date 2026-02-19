@@ -112,7 +112,7 @@ export function ChallengeCard({challenge, onShare, onEdit, onAccept, onLeave, on
       return;
 
     e.stopPropagation();
-    navigate(`/goals?focus=${id}`);
+    navigate(`/goals?id=${id}`);
   }
 
   const onLeaderboardClick = async (id: string) => {

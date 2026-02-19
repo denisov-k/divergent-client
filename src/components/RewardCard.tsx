@@ -5,6 +5,7 @@ import {Trophy, Star, Gift, Crown, Award, Zap, Edit, Target} from "lucide-react"
 import {Goal} from "@/types";
 import {useNavigate} from "react-router-dom";
 import {useAppStore} from "@/stores/useAppStore.ts";
+import {useEffect, useRef, useState} from "react";
 
 type RewardIcon = "trophy" | "star" | "gift" | "crown" | "award" | "zap";
 
@@ -18,6 +19,7 @@ interface RewardCardProps {
   goal?: Goal;
   goalTitle?: string;          // <-- Новое
   onEdit?: (id: string) => void;
+  focused: boolean;
 }
 
 const iconMap = {
@@ -39,24 +41,40 @@ export function RewardCard({
                              goal,
                              goalTitle,
                              onEdit,
+                             focused,
                            }: RewardCardProps) {
   const Icon = iconMap[icon];
 
   const navigate = useNavigate();
   const isFromChallenge = Boolean(goal?.challengeId);
 
+  const [highlight, setHighlight] = useState(false);
+  const cardRef = useRef<HTMLDivElement>(null);
+
   const { challenges } = useAppStore();
   const challenge = challenges.find(challenge => challenge.id === goal?.challengeId);
 
   const canEdit = onEdit && !isFromChallenge;
 
+  useEffect(() => {
+    if (!cardRef.current) return;
+    if (!focused) return;
+
+    cardRef.current.scrollIntoView({ behavior: "smooth", block: "center" });
+    setHighlight(true);
+
+    const timeout = setTimeout(() => setHighlight(false), 2000); // подсветка 2 сек
+    return () => clearTimeout(timeout);
+  }, [id]);
+
   return (
     <Card
-      className={`transition-all ${
-        isUnlocked
-          ? "bg-green-50/40"
-          : ""
-      }`}
+      ref={cardRef}
+      className={`
+        transition-all
+        ${isUnlocked ? "bg-green-50/40" : ""}
+        ${highlight ? "ring-2 ring-primary ring-offset-2" : ""}
+      `}
     >
       <CardContent className="px-6 [&:last-child]:pb-6 pt-6">
         <div className="flex gap-4 items-center">

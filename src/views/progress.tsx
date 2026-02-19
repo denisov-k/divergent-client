@@ -53,32 +53,30 @@ export default function Progress() {
 
   // Пример данных по опыту за неделю (можно подключить реальный источник)
   const weeklyXpData = useMemo(() => {
+    if (!activity) return [];
+
+    // последние 7 дней, от сегодня назад
     const days = Array.from({ length: 7 }).map((_, i) =>
       dayjs().subtract(6 - i, "day")
     );
 
-    const result = days.map((day) => ({
-      name: day.format("dd"), // Пн, Вт и тд
+    const result = days.map(day => ({
+      name: day.format("dd"),           // Пн, Вт и т.д.
       value: 0,
       date: day.format("YYYY-MM-DD"),
     }));
 
-    filteredGoals.forEach(goal => {
-      goal.tasks?.forEach(task => {
-        if (!task.lastCompletedAt) return;
-
-        const taskDate = dayjs(task.lastCompletedAt).format("YYYY-MM-DD");
-
-        const dayIndex = result.findIndex(d => d.date === taskDate);
-        if (dayIndex !== -1) {
-          result[dayIndex].value += task.xpReward || 0;
-        }
-      });
+    // суммируем xp из activity.data
+    activity.data.forEach(item => {
+      const date = dayjs(item.periodStart).format("YYYY-MM-DD");
+      const dayIndex = result.findIndex(d => d.date === date);
+      if (dayIndex !== -1) {
+        result[dayIndex].value += item.xp || 0;
+      }
     });
 
     return result.map(({ name, value }) => ({ name, value }));
-  }, [filteredGoals]);
-
+  }, [activity]);
 
   const last7 = activity?.data.slice(-7).map(d => d.status !== "empty");
 
@@ -154,7 +152,7 @@ export default function Progress() {
         )}
 
         {/* Статистика */}
-        <div className="grid gap-2 md:grid-cols-4">
+        <div className="grid md:grid-cols-4">
           <StatCard
             title="Всего XP"
             value={xp}
@@ -190,7 +188,7 @@ export default function Progress() {
         }
 
         {/* Графики */}
-        <div className="grid gap-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 ">
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 ">
           <ProgressChart
             type="line"
             title="Опыт за неделю"
