@@ -6,7 +6,7 @@ import {
   CategoryOption,
   Challenge,
   ChallengeApi, ChallengeParticipant,
-  Goal, GridItem,
+  Goal, GoalActivity,
   Leader,
   PaymentMethod,
   Reminder,
@@ -59,7 +59,7 @@ interface AppStore {
   deleteGoal: (goal: Goal) => Promise<void>;
   updateGoal: (goal: Goal) => Promise<void>;
   updateGoalProgress: (goalId: string, delta: number) => Promise<void>;
-  getActivity: (goalId: string) => Promise<GridItem[]>;
+  getActivity: (goalId: string) => Promise<GoalActivity>;
   getGoalXp: (goalId: string) => Promise<number>;
   toggleTask: (taskId: string) => Promise<void>;
   addReport: (taskId: string, data: FormData) => Promise<void>;

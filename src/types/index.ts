@@ -178,4 +178,12 @@ export type GridItem = {
   completed: number;
   total: number;
   status: "empty" | "partial" | "full";
+  xp: number;
 };
+
+export type GoalActivity = {
+  currentStreak: number;
+  longestStreak: number;
+  period: GoalPeriod;
+  data: GridItem[];
+}

@@ -2,8 +2,9 @@
 
 import { useEffect, useRef } from "react";
 import dayjs from "dayjs";
-import "dayjs/locale/ru";
-import { Goal, GridItem } from "@/types";
+
+import isoWeek from "dayjs/plugin/isoWeek";
+import {Goal, GoalActivity} from "@/types";
 
 import {
   Card,
@@ -13,48 +14,63 @@ import {
   CardDescription,
 } from "./ui/card";
 
-dayjs.locale("ru");
+
+dayjs.extend(isoWeek);
 
 const DAYS_OF_WEEK = ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"];
 
 type Props = {
   goal: Goal;
-  data: GridItem[];
+  activity: GoalActivity;
   loading?: boolean;
 };
 
-export function PeriodCalendar({ goal, data, loading }: Props) {
+export function PeriodCalendar({ goal, activity, loading }: Props) {
+  if (!goal) return null;
+
   const scrollRef = useRef<HTMLDivElement>(null);
 
   const daysToShow = 365;
   const today = dayjs();
 
-  // Генерация дат
-  const dates = Array.from({ length: daysToShow }).map((_, i) =>
-    today.subtract(daysToShow - 1 - i, "day")
+  // Нормализуем даты для сопоставления
+  const dateMap = new Map(
+    activity.data.map(d => [dayjs(d.periodStart).format("YYYY-MM-DD"), d.status])
   );
 
-  const dateMap = new Map(data.map(d => [d.periodStart, d.status]));
+  // 1. Генерация дат с выравниванием по понедельнику
+  const firstDate = today.subtract(daysToShow - 1, "day").startOf("isoWeek");
+  const lastDate = today;
 
-  // Разбиваем на недели
-  const weeks: (dayjs.Dayjs | null)[][] = [];
-  let week: (dayjs.Dayjs | null)[] = [];
-
-  dates.forEach(date => {
-    week.push(date);
-    if (week.length === 7) {
-      weeks.push(week);
-      week = [];
-    }
-  });
-  if (week.length) {
-    while (week.length < 7) week.push(null);
-    weeks.push(week);
+  const dates: dayjs.Dayjs[] = [];
+  let current = firstDate;
+  while (current.isBefore(lastDate) || current.isSame(lastDate, "day")) {
+    dates.push(current);
+    current = current.add(1, "day");
   }
 
-  // Месяцы для верхней строки
+  // 2. Разбиваем на недели
+  const weeks: (dayjs.Dayjs | null)[][] = [];
+  let currentWeek: (dayjs.Dayjs | null)[] = [];
+
+  dates.forEach(date => {
+    currentWeek.push(date);
+    if (currentWeek.length === 7) {
+      weeks.push(currentWeek);
+      currentWeek = [];
+    }
+  });
+
+  if (currentWeek.length > 0) {
+    while (currentWeek.length < 7) {
+      currentWeek.push(null);
+    }
+    weeks.push(currentWeek);
+  }
+
+  // 3. Строим верхнюю строку месяцев
   const monthLabels: { month: string; colspan: number }[] = [];
-  let lastMonth = weeks[0].find(d => d)?.month();
+  let lastMonth = weeks[0].find(d => d !== null)?.month();
   let colspan = 0;
 
   weeks.forEach(w => {
@@ -63,27 +79,30 @@ export function PeriodCalendar({ goal, data, loading }: Props) {
     if (month === lastMonth) {
       colspan++;
     } else {
-      monthLabels.push({
-        month: dayjs().month(lastMonth!).format("MMM").replace(".", ""),
-        colspan,
-      });
+      if (lastMonth !== undefined) {
+        monthLabels.push({
+          month: dayjs().month(lastMonth).format("MMM").replace(".", ""),
+          colspan,
+        });
+      }
       lastMonth = month;
       colspan = 1;
     }
   });
-  monthLabels.push({
-    month: dayjs().month(lastMonth!).format("MMM").replace(".", ""),
-    colspan,
-  });
 
-  // Скролл в конец при монтировании
+  if (lastMonth !== undefined) {
+    monthLabels.push({
+      month: dayjs().month(lastMonth).format("MMM").replace(".", ""),
+      colspan,
+    });
+  }
+
+  // 4. Скролл в конец при монтировании
   useEffect(() => {
     if (scrollRef.current) {
       scrollRef.current.scrollLeft = scrollRef.current.scrollWidth;
     }
   }, []);
-
-  if (!goal) return null;
 
   return (
     <Card className="my-1">
@@ -105,7 +124,11 @@ export function PeriodCalendar({ goal, data, loading }: Props) {
                 <tr>
                   <td></td>
                   {monthLabels.map((m, idx) => (
-                    <td key={idx} colSpan={m.colspan} className="text-xs text-center">
+                    <td
+                      key={idx}
+                      colSpan={m.colspan}
+                      className="text-xs text-center"
+                    >
                       {m.month}
                     </td>
                   ))}
@@ -125,9 +148,10 @@ export function PeriodCalendar({ goal, data, loading }: Props) {
                           </td>
                         );
 
-                      const status = dateMap.get(date.format("YYYY-MM-DD")) || "empty";
+                      const status =
+                        dateMap.get(date.format("YYYY-MM-DD")) || "empty";
 
-                      let bgColor = "bg-gray-200"; // empty
+                      let bgColor = "bg-gray-200";
                       if (status === "partial") bgColor = "bg-yellow-300";
                       if (status === "full") bgColor = "bg-green-300";
 

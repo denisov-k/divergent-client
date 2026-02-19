@@ -22,7 +22,7 @@ export function Profile() {
       <div className="flex-1 space-y-4">
         <div>
           <div className="flex justify-between items-center">
-            <h1>{name}</h1>
+            <h3>{name}</h3>
             <button
               onClick={goToSettings}
               className="p-2 rounded hover:bg-gray-200"

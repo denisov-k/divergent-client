@@ -87,10 +87,14 @@ export function ChallengeCard({challenge, onShare, onEdit, onAccept, onLeave, on
 
   const now = new Date();
   const challengeStart = challenge.startsAt ? new Date(challenge.startsAt) : null;
+  const challengeEnd = challenge.endsAt ? new Date(challenge.endsAt) : null;
 
 // Прибавляем один день к дате старта
   const hasStarted = challengeStart
     ? new Date(challengeStart.getTime() + 24 * 60 * 60 * 1000) <= now
+    : false;
+  const hasEnded = challengeEnd
+    ? new Date(challengeEnd.getTime() + 24 * 60 * 60 * 1000) <= now
     : false;
   if (!isParticipant) {
     // Пользователь не участвует — челлендж просто активен
@@ -121,7 +125,8 @@ export function ChallengeCard({challenge, onShare, onEdit, onAccept, onLeave, on
 
   return (
     <Card className={`
-        hover:shadow-md transition-shadow
+        hover:shadow-md transition-all
+        ${(hasEnded || hasStarted) && !isParticipant ? "opacity-60" : ""}
         ${challengeStatus === "COMPLETED" ? "bg-green-50/40" : ""}
         ${challengeStatus === "FAILED" ? "bg-red-50/40" : ""}
       `}
@@ -171,7 +176,7 @@ export function ChallengeCard({challenge, onShare, onEdit, onAccept, onLeave, on
           </div>
 
           <div className="flex items-center gap-2">
-            <ProgressRing progress={progress * 100} size={70} strokeWidth={6}/>
+            { isParticipant && <ProgressRing progress={progress * 100} size={70} strokeWidth={6}/> }
             <div className="flex flex-col">
               {onEdit && isCreator && (
                 <Button
@@ -206,18 +211,20 @@ export function ChallengeCard({challenge, onShare, onEdit, onAccept, onLeave, on
       </CardHeader>
 
       <CardContent className="space-y-2">
-        {/* Прогресс */}
-        <div className="pb-2">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-muted-foreground">
-              {t("goals.progress")}
-            </span>
-            <span className="text-muted-foreground">
-              {completedGoals} / {goals.length} {t("challenges.goals_count")}
-            </span>
+        {/* Прогресс */
+          isParticipant &&
+          <div className="pb-2">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-muted-foreground">
+                {t("goals.progress")}
+              </span>
+              <span className="text-muted-foreground">
+                {completedGoals} / {goals.length} {t("challenges.goals_count")}
+              </span>
+            </div>
+            <Progress value={progress * 100} className="h-2"/>
           </div>
-          <Progress value={progress * 100} className="h-2"/>
-        </div>
+        }
 
         {/* Цели */}
         <Collapsible open={isGoalsOpen} onOpenChange={setIsGoalsOpen}>
@@ -314,7 +321,7 @@ export function ChallengeCard({challenge, onShare, onEdit, onAccept, onLeave, on
 
         <div className="flex justify-center gap-2">
           {
-            onOpenLink && challenge.link &&
+            onOpenLink && challenge.link && isParticipant &&
             <div className="flex justify-center py-2">
               <Button onClick={(e) => (e.stopPropagation(), onOpenLink(challenge.id))}>
                 Сообщество
@@ -329,7 +336,7 @@ export function ChallengeCard({challenge, onShare, onEdit, onAccept, onLeave, on
               </Button>
             </div>
           }
-          {!isParticipant && onAccept && !hasStarted && (
+          {!isParticipant && onAccept && !hasStarted && !hasEnded && (
             <div className="flex justify-center py-2">
               <Button className="bg-blue-600 text-white hover:bg-blue-700" onClick={(e) => {
                 e.stopPropagation(), onAccept(challenge.id);

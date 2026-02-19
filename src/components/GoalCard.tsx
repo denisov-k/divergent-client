@@ -172,6 +172,12 @@ export function GoalCard({
     console.log("Remove task", taskId, "parent:", parentId);
   };
 
+
+  const challengeStart = challenge && challenge.startsAt ? new Date(challenge.startsAt) : null;
+  const challengeHasStarted = challengeStart
+    ? new Date(challengeStart.getTime() + 24 * 60 * 60 * 1000) <= now
+    : true;
+
   const renderTasks = (tasks: Task[], parentId?: string) => {
     return tasks.map((task) => (
       <TaskItem
@@ -189,7 +195,7 @@ export function GoalCard({
         handleAddSubTask={handleAddSubTask}
         expanded={expandedTasks[task.id]}
         editMode={editMode}
-        disabled={isExpired}
+        disabled={isExpired || !challengeHasStarted}
       />
     ));
   };

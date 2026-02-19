@@ -153,7 +153,6 @@ export default function ChallengesView() {
   useEffect(() => {
     // Проверяем параметр startapp
     const challengeId = searchParams.get("challengeId");
-    console.log(challengeId);
 
     if (challengeId) {
       const challenge = challenges.find((c) => c.id === challengeId);

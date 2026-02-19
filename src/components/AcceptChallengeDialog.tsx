@@ -47,10 +47,14 @@ export function AcceptChallengeDialog({ challenge, isOpen, onOpenChange, onAccep
 
   const now = new Date();
   const challengeStart = challenge.startsAt ? new Date(challenge.startsAt) : null;
+  const challengeEnd = challenge.endsAt ? new Date(challenge.endsAt) : null;
 
   // Прибавляем один день к дате старта
   const hasStarted = challengeStart
     ? new Date(challengeStart.getTime() + 24 * 60 * 60 * 1000) <= now
+    : false;
+  const hasEnded = challengeEnd
+    ? new Date(challengeEnd.getTime() + 24 * 60 * 60 * 1000) <= now
     : false;
   if (!isParticipant) {
     // Пользователь не участвует — челлендж просто активен
@@ -222,7 +226,7 @@ export function AcceptChallengeDialog({ challenge, isOpen, onOpenChange, onAccep
             <Share2 size={16} className="mr-1"/> {t("common.share")}
           </Button>
 
-          {!isParticipant && !hasStarted && (
+          {!isParticipant && !hasStarted && !hasEnded && (
             <Button className="bg-blue-600 text-white hover:bg-blue-700" onClick={() => {
               onAccept(challenge.id);
               onOpenChange(false);

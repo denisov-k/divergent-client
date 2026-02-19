@@ -9,7 +9,7 @@ import {useNavigate, useSearchParams} from "react-router-dom";
 import {useEffect, useMemo, useState} from "react";
 import dayjs from "dayjs";
 import {PeriodCalendar} from "@/components/PeriodCalendar.tsx";
-import {GridItem} from "@/types";
+import {GoalActivity} from "@/types";
 
 export default function Progress() {
   const { user, goals, rewards, getActivity, getGoalXp } = useAppStore();
@@ -21,7 +21,7 @@ export default function Progress() {
   const [xp, setXp] = useState<number>(0);
   //const [loadingXp, setLoadingXp] = useState(false);
 
-  const [activity, setActivity] = useState<GridItem[]>([]);
+  const [activity, setActivity] = useState<GoalActivity>();
   const [loadingActivity, setLoadingActivity] = useState(false);
 
   const selectedGoal = useMemo(
@@ -80,51 +80,7 @@ export default function Progress() {
   }, [filteredGoals]);
 
 
-  const { currentStreak, longestStreak, streakDays } = useMemo(() => {
-    const completedDates = new Set<string>();
-
-    filteredGoals.forEach(goal => {
-      goal.tasks?.forEach(task => {
-        if (task.lastCompletedAt) {
-          completedDates.add(
-            dayjs(task.lastCompletedAt).format("YYYY-MM-DD")
-          );
-        }
-      });
-    });
-
-    let current = 0;
-    let longest = 0;
-    let temp = 0;
-
-    const today = dayjs();
-
-    for (let i = 0; i < 365; i++) {
-      const date = today.subtract(i, "day").format("YYYY-MM-DD");
-
-      if (completedDates.has(date)) {
-        temp++;
-        if (i === current) current++;
-      } else {
-        longest = Math.max(longest, temp);
-        temp = 0;
-        if (i === current) break;
-      }
-    }
-
-    longest = Math.max(longest, temp);
-
-    const last7 = Array.from({ length: 7 }).map((_, i) => {
-      const date = today.subtract(6 - i, "day").format("YYYY-MM-DD");
-      return completedDates.has(date);
-    });
-
-    return {
-      currentStreak: current,
-      longestStreak: longest,
-      streakDays: last7,
-    };
-  }, [filteredGoals]);
+  const last7 = activity?.data.slice(-7).map(d => d.status !== "empty");
 
   const handleGoalChange = (value: string) => {
     if (!value) {
@@ -159,7 +115,7 @@ export default function Progress() {
 
         const res = await getActivity(selectedGoal.id);
 
-        setActivity(res || []);
+        setActivity(res);
       } finally {
         setLoadingActivity(false);
       }
@@ -189,10 +145,10 @@ export default function Progress() {
       </div>
 
       <div className='overflow-y-auto flex flex-col'>
-        {selectedGoal && selectedGoal.goalType === 'TASK' && (
+        {selectedGoal && selectedGoal.goalType === 'TASK' && activity && (
           <PeriodCalendar
             goal={selectedGoal}
-            data={activity}
+            activity={activity}
             loading={loadingActivity}
           />
         )}
@@ -204,7 +160,7 @@ export default function Progress() {
             value={xp}
             icon={Zap}
             description="Накоплено опыта"
-            trend={{value: 12, isPositive: true}}
+            /*trend={{value: 12, isPositive: true}}*/
           />
           {!selectedGoal &&
             <StatCard
@@ -225,11 +181,11 @@ export default function Progress() {
         </div>
 
         {/* Серия выполнений */}
-        {selectedGoal && selectedGoal.goalType === 'TASK' &&
+        {selectedGoal && selectedGoal.goalType === 'TASK' && activity &&
           <StreakCard
-            currentStreak={currentStreak}
-            longestStreak={longestStreak}
-            streakDays={streakDays}
+            currentStreak={activity.currentStreak}
+            longestStreak={activity.longestStreak}
+            streakDays={last7!}
           />
         }
 
