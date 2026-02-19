@@ -175,7 +175,7 @@ export function GoalCard({
 
   const challengeStart = challenge && challenge.startsAt ? new Date(challenge.startsAt) : null;
   const challengeHasStarted = challengeStart
-    ? new Date(challengeStart.getTime() + 24 * 60 * 60 * 1000) <= now
+    ? new Date(challengeStart.getTime()) <= now
     : true;
 
   const renderTasks = (tasks: Task[], parentId?: string) => {
