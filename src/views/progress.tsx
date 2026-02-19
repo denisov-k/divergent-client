@@ -153,13 +153,15 @@ export default function Progress() {
 
         {/* Статистика */}
         <div className="grid md:grid-cols-4">
-          <StatCard
-            title="Всего XP"
-            value={xp}
-            icon={Zap}
-            description="Накоплено опыта"
-            /*trend={{value: 12, isPositive: true}}*/
-          />
+          {selectedGoal &&
+            <StatCard
+              title="XP за цель"
+              value={xp}
+              icon={Zap}
+              description="Накоплено опыта"
+              /*trend={{value: 12, isPositive: true}}*/
+            />
+          }
           {!selectedGoal &&
             <StatCard
               title="Завершено целей"
@@ -189,13 +191,15 @@ export default function Progress() {
 
         {/* Графики */}
         <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 ">
-          <ProgressChart
-            type="line"
-            title="Опыт за неделю"
-            description="Ваш заработанный опыт по дням"
-            data={weeklyXpData}
-            dataKey="value"
-          />
+          {selectedGoal && selectedGoal.goalType === "TASK" &&
+            <ProgressChart
+              type="line"
+              title="Опыт за неделю"
+              description="Ваш заработанный опыт по дням"
+              data={weeklyXpData}
+              dataKey="value"
+            />
+          }
           {!selectedGoal &&
             <ProgressChart
               type="bar"

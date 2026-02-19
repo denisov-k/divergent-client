@@ -13,6 +13,7 @@ import {
   CardTitle,
   CardDescription,
 } from "./ui/card";
+import {Activity} from "lucide-react";
 
 
 dayjs.extend(isoWeek);
@@ -106,11 +107,13 @@ export function PeriodCalendar({ goal, activity, loading }: Props) {
 
   return (
     <Card className="my-1">
-      <CardHeader>
-        <CardTitle>Активность</CardTitle>
-        <CardDescription>Отслеживайте выполнение задач</CardDescription>
+      <CardHeader className="flex flex-row items-center justify-between pb-2">
+        <div>
+          <CardTitle className="text-sm">Активность</CardTitle>
+          <CardDescription>Прогресс в календарном виде</CardDescription>
+        </div>
+        <Activity className="size-5 text-muted-foreground" />
       </CardHeader>
-
       <CardContent>
         {loading ? (
           <div className="py-6 text-sm text-muted-foreground">

@@ -189,28 +189,23 @@ export default function ChallengesView() {
         </Card>
       ) : (
         /* List */
-        <div className="flex flex-wrap gap-2 overflow-auto flex-1">
+        <div className="grid gap-2 overflow-auto
+            grid-cols-1
+            sm:grid-cols-2
+            lg:grid-cols-3
+            xl:grid-cols-4">
           {challenges.map((challenge) => (
-            <div
+            <ChallengeCard
               key={challenge.id}
-              className="
-                w-full
-                sm:w-[calc(50%-0.25rem)]
-                lg:w-[calc(33.333%-0.4rem)]
-                xl:w-[calc(25%-0.4rem)]
-              "
-            >
-              <ChallengeCard
-                challenge={challenge}
-                onEdit={handleEditChallenge}
-                onShare={handleShareChallenge}
-                onSelect={handleSelectChallenge}
-                onLeave={handleLeaveChallenge}
-                onOpenLink={handleOpenLink}
-                onOpenParticipants={handleOpenParticipants}
-                onAccept={handleAcceptChallenge}
-              />
-            </div>
+              challenge={challenge}
+              onEdit={handleEditChallenge}
+              onShare={handleShareChallenge}
+              onSelect={handleSelectChallenge}
+              onLeave={handleLeaveChallenge}
+              onOpenLink={handleOpenLink}
+              onOpenParticipants={handleOpenParticipants}
+              onAccept={handleAcceptChallenge}
+            />
           ))}
         </div>
       )}

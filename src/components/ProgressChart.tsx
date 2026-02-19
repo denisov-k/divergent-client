@@ -1,5 +1,6 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/card";
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
+import {ChartSpline} from "lucide-react";
 
 interface ProgressChartProps {
   type: "line" | "bar";
@@ -20,9 +21,12 @@ export function ProgressChart({
 }: ProgressChartProps) {
   return (
     <Card className="relative overflow-hidden my-1">
-      <CardHeader>
-        <CardTitle>{title}</CardTitle>
-        {description && <CardDescription>{description}</CardDescription>}
+      <CardHeader className="flex flex-row items-center justify-between pb-2">
+        <div>
+          <CardTitle className="text-sm">{title}</CardTitle>
+          {description && <CardDescription>{description}</CardDescription>}
+        </div>
+        <ChartSpline className="size-5 text-muted-foreground" />
       </CardHeader>
       <CardContent>
         <ResponsiveContainer width="100%" height={300}>

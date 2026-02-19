@@ -1,5 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
-import { Flame } from "lucide-react";
+import {Flame} from "lucide-react";
 import { Badge } from "./ui/badge";
 import dayjs from "dayjs";
 import "dayjs/locale/ru";
@@ -22,11 +22,9 @@ export function StreakCard({ currentStreak, longestStreak, streakDays }: StreakC
 
   return (
     <Card className="border-orange-200 bg-gradient-to-br from-orange-50/50 to-transparent my-1">
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Flame className="size-5 text-orange-500" />
-          Серия выполнений
-        </CardTitle>
+      <CardHeader className="flex flex-row items-center justify-between pb-2">
+        <CardTitle className="text-sm">Серия выполнений</CardTitle>
+        <Flame className="size-5 text-orange-500" />
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="flex items-center justify-between">

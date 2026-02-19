@@ -266,31 +266,26 @@ export default function Goals() {
           </CardContent>
         </Card>
       ) : (
-        <div className="flex flex-wrap gap-2 overflow-auto flex-1">
+        <div className="grid gap-2 overflow-auto
+            grid-cols-1
+            sm:grid-cols-2
+            lg:grid-cols-3
+            xl:grid-cols-4">
           {goals.map((goal) => {
             const reward = rewards.find((r) => r.goalId === goal.id) || null;
 
             return (
-              <div
+              <GoalCard
+                {...goal}
                 key={goal.id}
-                className="
-                  w-full
-                  sm:w-[calc(50%-0.25rem)]
-                  lg:w-[calc(33.333%-0.4rem)]
-                  xl:w-[calc(25%-0.4rem)]
-                "
-              >
-                <GoalCard
-                  {...goal}
-                  reward={reward}
-                  onEdit={handleEditGoal}
-                  onTaskToggle={handleTaskToggle}
-                  onAddReminder={handleAddReminderFromGoal}
-                  onAddProgress={handleAddProgress}
-                  onGoToProgress={handleGoToProgress}
-                  autoExpand={goal.id === focusId}
-                />
-              </div>
+                reward={reward}
+                onEdit={handleEditGoal}
+                onTaskToggle={handleTaskToggle}
+                onAddReminder={handleAddReminderFromGoal}
+                onAddProgress={handleAddProgress}
+                onGoToProgress={handleGoToProgress}
+                autoExpand={goal.id === focusId}
+              />
             );
           })}
         </div>

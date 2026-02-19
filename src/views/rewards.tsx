@@ -82,24 +82,19 @@ export default function Rewards() {
           </CardContent>
         </Card>
       ) : (
-        <div className="flex flex-wrap gap-2 overflow-auto">
+        <div className="grid gap-2 overflow-auto
+            grid-cols-1
+            sm:grid-cols-2
+            lg:grid-cols-3
+            xl:grid-cols-4">
           {rewards.map((reward) => (
-            <div
+            <RewardCard
+              {...reward}
               key={reward.id}
-              className="
-                w-full
-                sm:w-[calc(50%-0.25rem)]
-                lg:w-[calc(33.333%-0.4rem)]
-                xl:w-[calc(25%-0.4rem)]
-              "
-            >
-              <RewardCard
-                {...reward}
-                onEdit={handleEditReward}
-                goalTitle={goals.find(g => g.id === reward.goalId)?.title}
-                focused={reward.id === focusId}
-              />
-            </div>
+              onEdit={handleEditReward}
+              goalTitle={goals.find(g => g.id === reward.goalId)?.title}
+              focused={reward.id === focusId}
+            />
           ))}
         </div>
       )}
