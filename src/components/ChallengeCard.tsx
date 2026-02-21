@@ -125,6 +125,7 @@ export function ChallengeCard({challenge, onShare, onEdit, onAccept, onLeave, on
 
   return (
     <Card className={`
+        mb-2 break-inside-avoid
         hover:shadow-md transition-all
         ${(hasEnded || hasStarted) && !isParticipant ? "opacity-60" : ""}
         ${challengeStatus === "COMPLETED" ? "bg-green-50/40" : ""}

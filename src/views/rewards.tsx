@@ -82,11 +82,11 @@ export default function Rewards() {
           </CardContent>
         </Card>
       ) : (
-        <div className="grid gap-2 overflow-auto
-            grid-cols-1
-            sm:grid-cols-2
-            lg:grid-cols-3
-            xl:grid-cols-4">
+        <div className="columns-1
+          sm:columns-2
+          lg:columns-3
+          xl:columns-4
+          gap-2">
           {rewards.map((reward) => (
             <RewardCard
               {...reward}

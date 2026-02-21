@@ -39,7 +39,7 @@ export function ReminderCard({
   const hasDates = daysOfMonth.length > 0;
 
   return (
-    <Card className={`transition-all ${isActive ? "border-primary" : "opacity-60"}`}>
+    <Card className={`mb-2 break-inside-avoid transition-all ${isActive ? "border-primary" : "opacity-60"}`}>
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">

@@ -83,7 +83,11 @@ export default function Reminders() {
           </CardContent>
         </Card>
       ) : (
-        <div className="grid gap-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 overflow-auto">
+        <div className="columns-1
+          sm:columns-2
+          lg:columns-3
+          xl:columns-4
+          gap-2">
           {reminders.map((reminder) => {
             return (
               <ReminderCard

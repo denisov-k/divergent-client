@@ -71,7 +71,7 @@ export function RewardCard({
     <Card
       ref={cardRef}
       className={`
-        transition-all
+        transition-all mb-2 break-inside-avoid
         ${isUnlocked ? "bg-green-50/40" : ""}
         ${highlight ? "ring-2 ring-primary ring-offset-2" : ""}
       `}

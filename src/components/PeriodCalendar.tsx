@@ -106,7 +106,7 @@ export function PeriodCalendar({ goal, activity, loading }: Props) {
   }, []);
 
   return (
-    <Card className="my-1">
+    <Card className="">
       <CardHeader className="flex flex-row items-center justify-between pb-2">
         <div>
           <CardTitle className="text-sm">Активность</CardTitle>

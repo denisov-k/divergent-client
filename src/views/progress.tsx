@@ -78,7 +78,7 @@ export default function Progress() {
     return result.map(({ name, value }) => ({ name, value }));
   }, [activity]);
 
-  const last7 = activity?.data.slice(-7).map(d => d.status !== "empty");
+  const last7 = activity?.data.slice(-7).map(d => d.status === "full");
 
   const handleGoalChange = (value: string) => {
     if (!value) {
@@ -142,7 +142,7 @@ export default function Progress() {
         </select>
       </div>
 
-      <div className='overflow-y-auto flex flex-col'>
+      <div className='overflow-y-auto flex flex-col gap-2'>
         {selectedGoal && selectedGoal.goalType === 'TASK' && activity && (
           <PeriodCalendar
             goal={selectedGoal}
@@ -152,7 +152,11 @@ export default function Progress() {
         )}
 
         {/* Статистика */}
-        <div className="grid md:grid-cols-4">
+        <div className="columns-1
+          sm:columns-2
+          lg:columns-3
+          xl:columns-4
+          gap-2">
           {selectedGoal &&
             <StatCard
               title="XP за цель"
@@ -190,7 +194,11 @@ export default function Progress() {
         }
 
         {/* Графики */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 ">
+        <div className="columns-1
+          sm:columns-2
+          lg:columns-3
+          xl:columns-4
+          gap-2">
           {selectedGoal && selectedGoal.goalType === "TASK" &&
             <ProgressChart
               type="line"

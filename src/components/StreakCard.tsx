@@ -21,7 +21,7 @@ export function StreakCard({ currentStreak, longestStreak, streakDays }: StreakC
   const {t} = useTranslation();
 
   return (
-    <Card className="border-orange-200 bg-gradient-to-br from-orange-50/50 to-transparent my-1">
+    <Card className="border-orange-200 bg-gradient-to-br from-orange-50/50 to-transparent">
       <CardHeader className="flex flex-row items-center justify-between pb-2">
         <CardTitle className="text-sm">Серия выполнений</CardTitle>
         <Flame className="size-5 text-orange-500" />

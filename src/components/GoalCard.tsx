@@ -229,6 +229,7 @@ export function GoalCard({
   return (
     <Card
       className={`
+        mb-2 break-inside-avoid
         hover:shadow-md transition-all border
         ${highlight ? "bg-blue-50" : "bg-white"}
         ${goalStatus === "COMPLETED" ? "bg-green-50/40" : ""}
