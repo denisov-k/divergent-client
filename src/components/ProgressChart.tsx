@@ -20,7 +20,7 @@ export function ProgressChart({
   xAxisKey = "name" 
 }: ProgressChartProps) {
   return (
-    <Card className="relative overflow-hidden mb-1 break-inside-avoid">
+    <Card className="relative overflow-hidden mb-2 break-inside-avoid">
       <CardHeader className="flex flex-row items-center justify-between pb-2">
         <div>
           <CardTitle className="text-sm">{title}</CardTitle>

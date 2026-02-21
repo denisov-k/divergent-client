@@ -182,23 +182,16 @@ export default function Progress() {
               description={`Из ${rewards.length} наград`}
             />
           }
-        </div>
+          {/* Серия выполнений */}
+          {selectedGoal && selectedGoal.goalType === 'TASK' && activity &&
+            <StreakCard
+              currentStreak={activity.currentStreak}
+              longestStreak={activity.longestStreak}
+              streakDays={last7!}
+            />
+          }
 
-        {/* Серия выполнений */}
-        {selectedGoal && selectedGoal.goalType === 'TASK' && activity &&
-          <StreakCard
-            currentStreak={activity.currentStreak}
-            longestStreak={activity.longestStreak}
-            streakDays={last7!}
-          />
-        }
-
-        {/* Графики */}
-        <div className="columns-1
-          sm:columns-2
-          lg:columns-3
-          xl:columns-4
-          gap-2">
+          {/* Графики */}
           {selectedGoal && selectedGoal.goalType === "TASK" &&
             <ProgressChart
               type="line"
