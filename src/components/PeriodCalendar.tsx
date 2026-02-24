@@ -132,7 +132,7 @@ export function PeriodCalendar({ goal, activity, loading }: Props) {
                       colSpan={m.colspan}
                       className="text-xs text-center"
                     >
-                      {m.month}
+                      {m.colspan > 1 ? m.month : ""}
                     </td>
                   ))}
                 </tr>

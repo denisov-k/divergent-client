@@ -13,6 +13,7 @@ import { DateTime } from "luxon";
 
 import {Challenge, GoalPeriod, GoalType, Reward, Task} from "@/types";
 import {useNavigate} from "react-router-dom";
+import {useAppStore} from "@/stores/useAppStore.ts";
 
 export type CategoryType = string;
 
@@ -77,6 +78,8 @@ export function GoalCard({
   const [progressDelta, setProgressDelta] = useState<number>();
 
   const navigate = useNavigate();
+
+  const { user } = useAppStore();
 
   const isFromChallenge = Boolean(challenge);
 
@@ -173,11 +176,36 @@ export function GoalCard({
     console.log("Remove task", taskId, "parent:", parentId);
   };
 
+  function hasChallengeStartedForUser(challengeStart: Date, userTimeZone: string) {
+    if (!challengeStart) return true;
 
-  const challengeStart = challenge && challenge.startsAt ? new Date(challenge.startsAt) : null;
-  const challengeHasStarted = challengeStart
-    ? new Date(challengeStart.getTime()) <= now
-    : true;
+    const now = new Date();
+
+    // Получаем "текущую дату" в таймзоне пользователя
+    const nowInUserTZ = new Date(
+      new Intl.DateTimeFormat("en-US", {
+        timeZone: userTimeZone,
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+      }).format(now)
+    );
+
+    // Дата старта челленджа (только год/месяц/день) для сравнения
+    const startInUserTZ = new Date(
+      new Intl.DateTimeFormat("en-US", {
+        timeZone: userTimeZone,
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+      }).format(challengeStart)
+    );
+
+    return startInUserTZ <= nowInUserTZ;
+  }
+
+  const challengeHasStarted = challenge && challenge.startsAt ?
+    hasChallengeStartedForUser(new Date(challenge.startsAt), user!.timeZone) : null;
 
   const renderTasks = (tasks: Task[], parentId?: string) => {
     return tasks.map((task) => (
