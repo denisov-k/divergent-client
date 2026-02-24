@@ -9,6 +9,7 @@ import {TaskItem} from "./TaskItem";
 import {useEffect, useRef, useState} from "react";
 import {Collapsible, CollapsibleContent, CollapsibleTrigger} from "./ui/collapsible";
 import {useTranslation} from "react-i18next";
+import { DateTime } from "luxon";
 
 import {Challenge, GoalPeriod, GoalType, Reward, Task} from "@/types";
 import {useNavigate} from "react-router-dom";
@@ -91,23 +92,19 @@ export function GoalCard({
   function isTaskCompletedInPeriod(task: Task, goalPeriod?: GoalPeriod) {
     if (!task.lastCompletedAt || !goalPeriod || goalPeriod === "NONE") return false;
 
-    const date = new Date(task.lastCompletedAt);
-    const now = new Date();
+    const date = DateTime.fromJSDate(new Date(task.lastCompletedAt));
+    const now = DateTime.now();
 
     if (goalPeriod === "DAILY") {
-      return date.toDateString() === now.toDateString();
+      return date.hasSame(now, "day");
     }
 
     if (goalPeriod === "WEEKLY") {
-      const week = (d: Date) => {
-        const onejan = new Date(d.getFullYear(), 0, 1);
-        return Math.ceil((((d.getTime() - onejan.getTime()) / 86400000) + onejan.getDay() + 1) / 7);
-      };
-      return date.getFullYear() === now.getFullYear() && week(date) === week(now);
+      return date.hasSame(now, "week");
     }
 
     if (goalPeriod === "MONTHLY") {
-      return date.getFullYear() === now.getFullYear() && date.getMonth() === now.getMonth();
+      return date.hasSame(now, "month");
     }
 
     return false;
