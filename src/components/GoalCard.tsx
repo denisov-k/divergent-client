@@ -90,7 +90,11 @@ export function GoalCard({
   }
 
   function isTaskCompletedInPeriod(task: Task, goalPeriod?: GoalPeriod) {
-    if (!task.lastCompletedAt || !goalPeriod || goalPeriod === "NONE") return false;
+    if (!task.lastCompletedAt || !goalPeriod) return false;
+
+    if (goalPeriod === "NONE") {
+      return !!task.lastCompletedAt;
+    }
 
     const date = DateTime.fromJSDate(new Date(task.lastCompletedAt));
     const now = DateTime.now();
