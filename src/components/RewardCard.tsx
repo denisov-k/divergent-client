@@ -104,7 +104,7 @@ export function RewardCard({
               {description}
             </CardDescription>
 
-            <div className="gap-2 flex">
+            <div className="gap-2 flex flex-wrap">
               {goal && goalTitle && (
                 <Badge
                   className="cursor-pointer bg-primary text-white hover:bg-primary/80"

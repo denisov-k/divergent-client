@@ -140,7 +140,7 @@ export function ChallengeCard({challenge, onShare, onEdit, onAccept, onLeave, on
               <Swords className="size-5 text-primary"></Swords>
               <CardTitle>{challenge.title}</CardTitle>
             </div>
-            <div className="flex gap-2">
+            <div className="flex gap-2 flex-wrap">
               {
                 (isCreator &&
                   <Badge variant="outline">

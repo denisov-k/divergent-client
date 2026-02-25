@@ -96,7 +96,7 @@ export function ReminderCard({
 
         {/* Цель и задача */}
         {(task || goal) && (
-          <div className="pt-2 border-t gap-2 flex">
+          <div className="pt-2 border-t gap-2 flex flex-wrap">
             {goal && (
               <Badge
                 className="cursor-pointer bg-primary text-white hover:bg-primary/80"
