@@ -121,7 +121,7 @@ export function RewardCard({
 
               {isFromChallenge && challenge && (
                 <Badge
-                  className="mr-1 cursor-pointer bg-orange-400 hover:bg-orange-300 text-white"
+                  className="mr-1 cursor-pointer bg-orange-500 hover:bg-orange-400 text-white"
                   onClick={() => navigate({
                     pathname: "/challenges",
                     search: `?id=${challenge.id}`,

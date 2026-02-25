@@ -135,42 +135,44 @@ export function ChallengeCard({challenge, onShare, onEdit, onAccept, onLeave, on
     >
       <CardHeader>
         <div className="flex items-start justify-between gap-4">
-          <div className="flex-1 min-w-0 space-y-2">
+          <div className="flex flex-1 min-w-0 gap-2 flex-col">
             <div className="flex items-center gap-2">
               <Swords className="size-5 text-primary"></Swords>
               <CardTitle>{challenge.title}</CardTitle>
             </div>
-            {
-              (isCreator &&
-                <Badge variant="outline" className="mr-1">
-                  Организатор
-                </Badge>)
-              ||
-              (isParticipant &&
-                (<Badge variant="outline" className="mr-1">
-                    Участвуете
-                  </Badge>
-                ))
-            }
+            <div className="flex gap-2">
+              {
+                (isCreator &&
+                  <Badge variant="outline">
+                    Организатор
+                  </Badge>)
+                ||
+                (isParticipant &&
+                  (<Badge variant="outline">
+                      Участвуете
+                    </Badge>
+                  ))
+              }
+              {challengeStatus !== "ACTIVE" && (
+                <Badge
+                  className={
+                    challengeStatus === "COMPLETED"
+                      ? "bg-green-500"
+                      : challengeStatus === "FAILED"
+                        ? "bg-red-500"
+                        : "bg-accent text-foreground"
+                  }
+                >
+                  {challengeStatus === "COMPLETED"
+                    ? "Выполнен"
+                    : challengeStatus === "FAILED"
+                      ? "Не выполнен"
+                      : "В процессе"}
+                </Badge>
+              )}
+            </div>
             {challenge.description && (
               <CardDescription>{challenge.description}</CardDescription>
-            )}
-            {challengeStatus !== "ACTIVE" && (
-              <Badge
-                className={
-                  challengeStatus === "COMPLETED"
-                    ? "bg-green-600"
-                    : challengeStatus === "FAILED"
-                      ? "bg-red-400"
-                      : "bg-accent text-foreground"
-                }
-              >
-                {challengeStatus === "COMPLETED"
-                  ? "Выполнен"
-                  : challengeStatus === "FAILED"
-                    ? "Не выполнен"
-                    : "В процессе"}
-              </Badge>
             )}
           </div>
 
