@@ -1,7 +1,7 @@
 import { Card, CardContent, CardDescription, CardTitle } from "./ui/card";
 import { Badge } from "./ui/badge";
 import { Button } from "./ui/button";
-import {Trophy, Star, Gift, Crown, Award, Zap, Edit, Target} from "lucide-react";
+import {Trophy, Star, Gift, Crown, Award, Zap, Edit, Target, Swords} from "lucide-react";
 import {Goal} from "@/types";
 import {useNavigate} from "react-router-dom";
 import {useAppStore} from "@/stores/useAppStore.ts";
@@ -90,7 +90,7 @@ export function RewardCard({
             />
           </div>
 
-          <div className="flex-1 min-w-0">
+          <div className="flex flex-col flex-1 min-w-0 gap-2">
             <div className="flex items-center gap-2">
               <CardTitle>{title}</CardTitle>
               {isUnlocked && (
@@ -100,33 +100,40 @@ export function RewardCard({
               )}
             </div>
 
-            <CardDescription className="mt-1">
+            <CardDescription>
               {description}
             </CardDescription>
 
-            {isFromChallenge && challenge && (
-              <Badge
-                className="cursor-pointer bg-primary text-white hover:bg-primary/80 mt-2 "
-                onClick={() => navigate({
-                  pathname: "/challenges",
-                  search: `?id=${challenge.id}`,
-                })}
-                title="Перейти к челленджу"
-              >
-                Челлендж: {challenge.title}
-              </Badge>
-            )}
+            <div className="gap-2 flex">
+              {goal && goalTitle && (
+                <Badge
+                  className="cursor-pointer bg-primary text-white hover:bg-primary/80"
+                  onClick={() => navigate({
+                    pathname: "/goals",
+                    search: `?id=${goal.id}`,
+                  })}
+                  title="Перейти к цели"
+                >
+                  <Target />
+                  <span className="">{goalTitle}</span>
+                </Badge>
+              )}
 
-            {goalTitle && (
-              <div className="flex items-center mt-1">
-                <Target className="size-3 text-primary mr-1" />
-                <span className="">{goalTitle}</span>
-              </div>
-            )}
+              {isFromChallenge && challenge && (
+                <Badge
+                  className="mr-1 cursor-pointer bg-orange-400 hover:bg-orange-300 text-white"
+                  onClick={() => navigate({
+                    pathname: "/challenges",
+                    search: `?id=${challenge.id}`,
+                  })}
+                  title="Перейти к челленджу"
+                >
+                  <Swords></Swords>
+                  {challenge.title}
+                </Badge>
+              )}
 
-            {xpRequires && !isUnlocked && (
-              <div className="flex items-center gap-2 mt-2">
-
+              {xpRequires && !isUnlocked && (
                 <Badge
                   variant="secondary"
                   className="bg-yellow-100 text-yellow-700"
@@ -134,8 +141,8 @@ export function RewardCard({
 
                   Требуется {xpRequires} XP
                 </Badge>
-              </div>
-            ) || null}
+              ) || null}
+            </div>
           </div>
 
           {onEdit && canEdit && (

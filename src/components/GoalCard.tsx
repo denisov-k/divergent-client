@@ -4,7 +4,7 @@ import {CategoryBadge} from "./CategoryBadge";
 import {ProgressRing} from "./ProgressRing";
 import {Badge} from "./ui/badge";
 import {Button} from "./ui/button";
-import {Calendar, Target, Edit, ChevronDown, ChevronUp, AlarmClock, BarChart2} from "lucide-react";
+import {Calendar, Target, Edit, ChevronDown, ChevronUp, AlarmClock, BarChart2, Gift, Swords} from "lucide-react";
 import {TaskItem} from "./TaskItem";
 import {useEffect, useRef, useState} from "react";
 import {Collapsible, CollapsibleContent, CollapsibleTrigger} from "./ui/collapsible";
@@ -60,7 +60,6 @@ export function GoalCard({
                            currentValue,
                            targetValue,
                            dueDate,
-                           xpReward,
                            lastCompletedAt,
                            reward,
                            editMode = false,
@@ -261,8 +260,6 @@ export function GoalCard({
         mb-2 break-inside-avoid
         hover:shadow-md transition-all border
         ${highlight ? "bg-blue-50" : "bg-white"}
-        ${goalStatus === "COMPLETED" ? "bg-green-50/40" : ""}
-        ${goalStatus === "FAILED" ? "bg-red-50/40" : ""}
       `}
       ref={cardRef}
     >
@@ -371,38 +368,39 @@ export function GoalCard({
             {isFromChallenge && challenge && (
               <div className="flex items-center flex-wrap justify-start mb-auto">
                 <Badge
-                  className="cursor-pointer bg-primary text-white hover:bg-primary/80"
+                  className="cursor-pointer bg-orange-400 text-white hover:bg-orange-300"
                   onClick={() => navigate({
                     pathname: "/challenges",
                     search: `?id=${challenge.id}`,
                   })}
                   title="Перейти к челленджу"
                 >
+                  <Swords></Swords>
                   {challenge.title}
                 </Badge>
               </div>
             )}
 
             {dueDate && (
-              <div className="flex items-center gap-2 text-muted-foreground mr-4">
-                <Calendar className="size-4"/>
+              <div className="flex items-center gap-1 text-muted-foreground">
+                <Calendar className="size-4" />
                 <span className="whitespace-nowrap">{new Date(dueDate).toISOString().split('T')[0]}</span>
               </div>
             )}
           </div>
-          {(xpReward || reward) && (
+          {reward && (
             <div className="flex items-center flex-wrap justify-end mb-auto">
-              <span className="mr-1">Награда: </span>
               <div className="flex flex-wrap justify-center">
                 {reward && (
                   <Badge
-                    className="mr-1 my-0.5 bg-purple-600 cursor-pointer hover:bg-purple-500"
+                    className="bg-purple-600 cursor-pointer hover:bg-purple-500"
                     onClick={() => navigate({
                       pathname: "/rewards",
                       search: `?id=${reward.id}`,
                     })}
                     title="Перейти к награде"
                   >
+                    <Gift></Gift>
                     {reward.title}
                   </Badge>
                 )}

@@ -128,8 +128,6 @@ export function ChallengeCard({challenge, onShare, onEdit, onAccept, onLeave, on
         mb-2 break-inside-avoid
         hover:shadow-md transition-all
         ${(hasEnded || hasStarted) && !isParticipant ? "opacity-60" : ""}
-        ${challengeStatus === "COMPLETED" ? "bg-green-50/40" : ""}
-        ${challengeStatus === "FAILED" ? "bg-red-50/40" : ""}
       `}
       onClick={() => {
         onSelect?.(challenge);
@@ -144,12 +142,12 @@ export function ChallengeCard({challenge, onShare, onEdit, onAccept, onLeave, on
             </div>
             {
               (isCreator &&
-                <Badge className="mr-1 bg-purple-600 text-white hover:bg-purple-700">
+                <Badge variant="outline" className="mr-1">
                   Организатор
                 </Badge>)
               ||
               (isParticipant &&
-                (<Badge variant="default" className="mr-1">
+                (<Badge variant="outline" className="mr-1">
                     Участвуете
                   </Badge>
                 ))
@@ -350,7 +348,7 @@ export function ChallengeCard({challenge, onShare, onEdit, onAccept, onLeave, on
 
         {/* Нижняя инфа */}
         <div className="flex flex-wrap items-center justify-between gap-4 pt-3 border-t">
-          <div className="flex items-center gap-2 text-muted-foreground">
+          <div className="flex items-center gap-1 text-muted-foreground">
             <Calendar className="size-4"/>
             <span>
               {challenge.startsAt
@@ -363,11 +361,9 @@ export function ChallengeCard({challenge, onShare, onEdit, onAccept, onLeave, on
             </span>
           </div>
 
-          <div className="flex items-center gap-3">
-            <div className="flex items-center gap-1 text-muted-foreground">
-              <Users className="size-4"/>
-              {challenge.participants.length}
-            </div>
+          <div className="flex items-center gap-1 text-muted-foreground">
+            <Users className="size-4"/>
+            {challenge.participants.length}
           </div>
         </div>
       </CardContent>

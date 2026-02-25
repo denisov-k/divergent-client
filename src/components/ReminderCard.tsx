@@ -1,10 +1,11 @@
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { Badge } from "./ui/badge";
 import { Button } from "./ui/button";
-import { Bell, Clock, Repeat, Edit, Target } from "lucide-react";
+import {Bell, Clock, Repeat, Edit, Target, CircleCheck} from "lucide-react";
 import { Switch } from "./ui/switch";
 
 import {DAYS_OF_WEEK, Goal, Task} from "@/types";
+import {useNavigate} from "react-router-dom";
 
 const DAY_LABEL_MAP = Object.fromEntries(
   DAYS_OF_WEEK.map(d => [d.key, d.label])
@@ -37,6 +38,8 @@ export function ReminderCard({
    }: ReminderCardProps) {
   const hasDays = daysOfWeek.length > 0;
   const hasDates = daysOfMonth.length > 0;
+
+  const navigate = useNavigate();
 
   return (
     <Card className={`mb-2 break-inside-avoid transition-all ${isActive ? "border-primary" : "opacity-60"}`}>
@@ -93,22 +96,33 @@ export function ReminderCard({
 
         {/* Цель и задача */}
         {(task || goal) && (
-          <div className="pt-2 border-t">
-            <div className="flex items-start gap-2">
-              <Target className="size-4 text-primary mt-0.5" />
-              <div className="flex-1 min-w-0">
-                {goal && (
-                  <p className="text-sm">
-                    <span className="text-muted-foreground">Цель:</span> {goal.title}
-                  </p>
-                )}
-                {task && (
-                  <p className="text-sm text-muted-foreground">
-                    {task.title}
-                  </p>
-                )}
-              </div>
-            </div>
+          <div className="pt-2 border-t gap-2 flex">
+            {goal && (
+              <Badge
+                className="cursor-pointer bg-primary text-white hover:bg-primary/80"
+                onClick={() => navigate({
+                  pathname: "/goals",
+                  search: `?id=${goal.id}`,
+                })}
+                title="Перейти к цели"
+              >
+                <Target />
+                <span className="">{goal.title}</span>
+              </Badge>
+            )}
+            {goal && task && (
+              <Badge
+                className="cursor-pointer bg-primary text-white hover:bg-primary/80"
+                onClick={() => navigate({
+                  pathname: "/goals",
+                  search: `?id=${goal.id}`,
+                })}
+                title="Перейти к задаче"
+              >
+                <CircleCheck />
+                <span className="">{task.title}</span>
+              </Badge>
+            )}
           </div>
         )}
       </CardContent>
