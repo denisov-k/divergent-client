@@ -356,8 +356,8 @@ export function GoalCard({
           </Collapsible>
         )}
 
-        <div className="flex items-center justify-between pt-2 border-t">
-          <div className="flex gap-2 flex-col">
+        <div className="pt-2 border-t columns-2">
+          <div className="flex gap-2 flex-col break-inside-avoid">
             {goalPeriod !== "NONE" && (
               <Badge variant="outline">
                 {goalPeriod === "DAILY" && "Ежедневная"}
@@ -368,7 +368,7 @@ export function GoalCard({
             {isFromChallenge && challenge && (
               <div className="flex items-center flex-wrap justify-start mb-auto">
                 <Badge
-                  className="cursor-pointer bg-orange-500 text-white hover:bg-orange-400 w-min"
+                  className="cursor-pointer bg-orange-500 text-white hover:bg-orange-400 "
                   onClick={() => navigate({
                     pathname: "/challenges",
                     search: `?id=${challenge.id}`,
@@ -389,11 +389,11 @@ export function GoalCard({
             )}
           </div>
           {reward && (
-            <div className="flex items-center flex-wrap justify-end mb-auto">
+            <div className="flex items-center flex-wrap justify-end mb-auto break-inside-avoid">
               <div className="flex flex-wrap justify-center">
                 {reward && (
                   <Badge
-                    className="bg-purple-500 cursor-pointer hover:bg-purple-400 w-min"
+                    className="bg-purple-500 cursor-pointer hover:bg-purple-400"
                     onClick={() => navigate({
                       pathname: "/rewards",
                       search: `?id=${reward.id}`,
