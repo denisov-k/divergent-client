@@ -375,7 +375,7 @@ export function GoalCard({
                   })}
                   title="Перейти к челленджу"
                 >
-                  <Swords className="size-5"></Swords>
+                  <Swords size={14} className="shrink-0"></Swords>
                   {challenge.title}
                 </Badge>
               </div>
@@ -400,7 +400,7 @@ export function GoalCard({
                     })}
                     title="Перейти к награде"
                   >
-                    <Gift></Gift>
+                    <Gift size={14}></Gift>
                     {reward.title}
                   </Badge>
                 )}

@@ -94,7 +94,7 @@ export function RewardCard({
             <div className="flex items-center gap-2">
               <CardTitle>{title}</CardTitle>
               {isUnlocked && (
-                <Badge variant="default" className="bg-green-600">
+                <Badge variant="default" className="bg-green-500">
                   Получено
                 </Badge>
               )}
