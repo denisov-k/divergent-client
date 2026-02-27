@@ -368,14 +368,14 @@ export function GoalCard({
             {isFromChallenge && challenge && (
               <div className="flex items-center flex-wrap justify-start mb-auto">
                 <Badge
-                  className="cursor-pointer bg-orange-500 text-white hover:bg-orange-400"
+                  className="cursor-pointer bg-orange-500 text-white hover:bg-orange-400 w-min"
                   onClick={() => navigate({
                     pathname: "/challenges",
                     search: `?id=${challenge.id}`,
                   })}
                   title="Перейти к челленджу"
                 >
-                  <Swords></Swords>
+                  <Swords className="size-5"></Swords>
                   {challenge.title}
                 </Badge>
               </div>
@@ -393,7 +393,7 @@ export function GoalCard({
               <div className="flex flex-wrap justify-center">
                 {reward && (
                   <Badge
-                    className="bg-purple-500 cursor-pointer hover:bg-purple-400"
+                    className="bg-purple-500 cursor-pointer hover:bg-purple-400 w-min"
                     onClick={() => navigate({
                       pathname: "/rewards",
                       search: `?id=${reward.id}`,
