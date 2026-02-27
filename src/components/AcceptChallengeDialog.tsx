@@ -82,7 +82,7 @@ export function AcceptChallengeDialog({ challenge, isOpen, onOpenChange, onAccep
         </DialogHeader>
 
         {challenge.description && (
-          <p className="text-sm text-muted-foreground mt-2">{challenge.description}</p>
+          <p className="text-sm text-muted-foreground mt-2 whitespace-break-spaces">{challenge.description}</p>
         )}
 
         <div className="flex items-center gap-6 mt-4">
