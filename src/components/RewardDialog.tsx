@@ -93,7 +93,7 @@ export function RewardDialog({ open, onOpenChange, onSave, onDelete, reward, goa
         else onOpenChange(true);    // открывается → просто открыть
       }}
     >
-      <DialogContent className="max-w-md">
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>{reward ? "Редактировать награду" : "Создать новую награду"}</DialogTitle>
           <DialogDescription>

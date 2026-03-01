@@ -26,7 +26,7 @@ export function SelectPaymentMethodDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-sm">
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>{t("payments.select_method")}</DialogTitle>
         </DialogHeader>
@@ -51,16 +51,6 @@ export function SelectPaymentMethodDialog({
               <span>{t("payments.card")}</span>
             </div>
           </Card>
-        </div>
-        <div className="flex justify-end">
-          <a
-            href="/oferta.docx"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-blue-500 hover:underline"
-          >
-            Публичная оферта
-          </a>
         </div>
 
         <DialogFooter className="mt-4">

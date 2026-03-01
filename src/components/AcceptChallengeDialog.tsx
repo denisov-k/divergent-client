@@ -76,7 +76,7 @@ export function AcceptChallengeDialog({ challenge, isOpen, onOpenChange, onAccep
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-lg w-full p-6 rounded-2xl shadow-lg">
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="text-lg font-semibold">{challenge.title}</DialogTitle>
         </DialogHeader>

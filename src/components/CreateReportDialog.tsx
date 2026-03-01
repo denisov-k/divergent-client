@@ -49,7 +49,7 @@ export default function CreateReportDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Отчёт о выполнении</DialogTitle>
         </DialogHeader>
