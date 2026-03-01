@@ -105,6 +105,7 @@
     color: var(--foreground);
     font-family: 'Montserrat', sans-serif;
     touch-action: none;
+    position: relative;
   }
 
   /* Typography */
