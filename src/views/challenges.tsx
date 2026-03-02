@@ -16,6 +16,7 @@ import Config from "@/services/Config.ts";
 import {useSearchParams} from "react-router-dom";
 import {SelectPaymentMethodDialog} from "@/components/SelectPaymentMethodDialog.tsx";
 import {ChallengeParticipantDialog} from "@/components/ChallengeParticipantDialog.tsx";
+import {MessageDialog} from "@/components/MessageDialog.tsx";
 
 export default function ChallengesView() {
   const { challenges, goals } = useAppStore();
@@ -24,7 +25,7 @@ export default function ChallengesView() {
   const [searchParams] = useSearchParams();
   // const navigate = useNavigate();
 
-  const { addChallenge, updateChallenge, acceptChallenge,
+  const { addChallenge, updateChallenge, acceptChallenge, sendMessageToParticipants,
     leaveChallenge, payChallenge, getReports, getParticipants, kickParticipant, downloadReport } = useAppStore();
 
   const [challengeDialogOpen, setChallengeDialogOpen] = useState(false);
@@ -36,6 +37,7 @@ export default function ChallengesView() {
   const [reportsDialogOpen, setReportsDialogOpen] = useState(false);
   const [acceptDialogOpen, setAcceptDialogOpen] = useState(false);
   const [selectedChallenge, setSelectedChallenge] = useState<Challenge | undefined>();
+  const [isMessageOpen, setIsMessageOpen] = useState(false);
 
   const [reports, setReports] = useState<Report[]>([]);
   const [participants, setParticipants] = useState<ChallengeParticipant[]>([]);
@@ -134,6 +136,10 @@ export default function ChallengesView() {
     setPaymentDialogOpen(false);
     setPaymentChallenge(null);
   };
+
+  const handleSendMessage = async (challengeId: string, text: string) => {
+    await sendMessageToParticipants(challengeId, text);
+  }
 
   const handleKick = async (challengeId: string, userId: string) => {
     await kickParticipant(challengeId, userId);
@@ -242,7 +248,20 @@ export default function ChallengesView() {
           onOpenChange={handleReportsDialogClose}
           onDownload={handleDownloadReport}
           onKick={handleKick}
+          onOpenMessageDialog={() => {
+            setReportsDialogOpen(false); // если нужно закрыть первый
+            setIsMessageOpen(true);
+          }}
           participants={participants}
+        />
+      )}
+
+      {selectedChallenge && (
+        <MessageDialog
+          challenge={selectedChallenge}
+          isOpen={isMessageOpen}
+          onOpenChange={setIsMessageOpen}
+          onSend={handleSendMessage}
         />
       )}
     </div>

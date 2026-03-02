@@ -118,6 +118,13 @@ export async function kickParticipant(challengeId: string, userId: string) {
   });
 }
 
+export async function sendMessageToParticipants(challengeId: string, text: string) {
+  return await fetchJSON(`/api/challenges/${challengeId}/message`, {
+    method: "POST",
+    body: JSON.stringify({ text })
+  });
+}
+
 export async function downloadReport(reportId: string): Promise<Blob> {
   const res = await fetch(
     Config.data.api.http.baseURL + `/api/reports/${reportId}/download`,

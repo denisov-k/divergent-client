@@ -14,7 +14,8 @@ interface ChallengeParticipantDialogProps {
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
   onDownload: (reportId: string) => void;
-  onKick: (challengeId: string, userId: string) => void; // 👈 добавляем
+  onKick: (challengeId: string, userId: string) => void;
+  onOpenMessageDialog: () => void;
 }
 
 export function ChallengeParticipantDialog({
@@ -24,7 +25,8 @@ export function ChallengeParticipantDialog({
                                              isOpen,
                                              onOpenChange,
                                              onDownload,
-                                             onKick
+                                             onKick,
+                                             onOpenMessageDialog
                                            }: ChallengeParticipantDialogProps) {
   const [openUsers, setOpenUsers] = useState<Record<string, boolean>>({});
   const {t} = useTranslation();
@@ -58,6 +60,13 @@ export function ChallengeParticipantDialog({
             <p className="text-sm text-muted-foreground">
               {t("challenges.noParticipants")}
             </p>
+          ) || (
+            <Button
+              variant="secondary"
+              onClick={onOpenMessageDialog}
+            >
+              {t("challenges.sendMessage")}
+            </Button>
           )}
 
           {participants.map((participant) => {

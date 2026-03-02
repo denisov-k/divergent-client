@@ -66,6 +66,7 @@ interface AppStore {
   getReports: (challengeId: string) => Promise<Report[]>;
   getParticipants: (challengeId: string) => Promise<ChallengeParticipant[]>;
   kickParticipant: (challengeId: string, userId: string) => Promise<void>;
+  sendMessageToParticipants: (challengeId: string, message: string) => Promise<void>;
   downloadReport: (report: Report) => Promise<void>;
 
   addReward: (reward: Reward) => Promise<void>;
@@ -483,6 +484,17 @@ export const useAppStore = create<AppStore>((set, get) => ({
     set({ loading: true });
     try {
       return await api.kickParticipant(challengeId, userId);
+
+    } catch (err) {
+      console.error(err);
+    } finally {
+      set({ loading: false });
+    }
+  },
+  sendMessageToParticipants: async (challengeId: string, text: string) => {
+    set({ loading: true });
+    try {
+      return await api.sendMessageToParticipants(challengeId, text);
 
     } catch (err) {
       console.error(err);
