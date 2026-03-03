@@ -17,13 +17,14 @@ import {useSearchParams} from "react-router-dom";
 import {SelectPaymentMethodDialog} from "@/components/SelectPaymentMethodDialog.tsx";
 import {ChallengeParticipantDialog} from "@/components/ChallengeParticipantDialog.tsx";
 import {MessageDialog} from "@/components/MessageDialog.tsx";
+import {LeaveChallengeDialog} from "@/components/LeaveChallengeDialog.tsx";
 
 export default function ChallengesView() {
   const { challenges, goals } = useAppStore();
 
   const { t } = useTranslation();
   const [searchParams] = useSearchParams();
-  // const navigate = useNavigate();
+  const focusId = searchParams.get("id");
 
   const { addChallenge, updateChallenge, acceptChallenge, sendMessageToParticipants,
     leaveChallenge, payChallenge, getReports, getParticipants, kickParticipant, downloadReport } = useAppStore();
@@ -34,6 +35,7 @@ export default function ChallengesView() {
   const [paymentDialogOpen, setPaymentDialogOpen] = useState(false);
   const [paymentChallenge, setPaymentChallenge] = useState<Challenge | null>(null);
 
+  const [leaveDialogOpen, setLeaveDialogOpen] = useState(false);
   const [reportsDialogOpen, setReportsDialogOpen] = useState(false);
   const [acceptDialogOpen, setAcceptDialogOpen] = useState(false);
   const [selectedChallenge, setSelectedChallenge] = useState<Challenge | undefined>();
@@ -71,8 +73,21 @@ export default function ChallengesView() {
     Telegram.WebApp.openTelegramLink('https://t.me/share/url?url=' + url + '&text=' + text);
   };
 
-  const handleLeaveChallenge = async (id: string) => {
-    await leaveChallenge(id);
+  const handleLeaveChallenge = (id: string) => {
+    const challenge = challenges.find((c) => c.id === id);
+    if (!challenge) return;
+
+    setSelectedChallenge(challenge);
+    setLeaveDialogOpen(true);
+  };
+
+  const handleConfirmLeave = async () => {
+    if (!selectedChallenge) return;
+
+    await leaveChallenge(selectedChallenge.id);
+
+    setLeaveDialogOpen(false);
+    setSelectedChallenge(undefined);
   };
 
   // --- Новый обработчик для открытия AcceptChallengeDialog
@@ -157,16 +172,13 @@ export default function ChallengesView() {
 
 
   useEffect(() => {
-    // Проверяем параметр startapp
-    const challengeId = searchParams.get("id");
-
-    if (challengeId) {
-      const challenge = challenges.find((c) => c.id === challengeId);
+    if (focusId) {
+      const challenge = challenges.find((c) => c.id === focusId);
       if (challenge) {
         handleSelectChallenge(challenge);
       }
     }
-  }, [searchParams, challenges]);
+  }, [focusId, challenges]);
 
   return (
     <div className="flex flex-col px-2 flex-1">
@@ -204,6 +216,7 @@ export default function ChallengesView() {
             <ChallengeCard
               key={challenge.id}
               challenge={challenge}
+              focused={challenge.id === focusId}
               onEdit={handleEditChallenge}
               onShare={handleShareChallenge}
               onSelect={handleSelectChallenge}
@@ -264,6 +277,12 @@ export default function ChallengesView() {
           onSend={handleSendMessage}
         />
       )}
+
+      <LeaveChallengeDialog
+        open={leaveDialogOpen}
+        onOpenChange={setLeaveDialogOpen}
+        onConfirm={handleConfirmLeave}
+      />
     </div>
   );
 }

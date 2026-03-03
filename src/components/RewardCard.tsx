@@ -65,7 +65,7 @@ export function RewardCard({
 
     const timeout = setTimeout(() => setHighlight(false), 2000); // подсветка 2 сек
     return () => clearTimeout(timeout);
-  }, [id]);
+  }, [focused]);
 
   return (
     <Card
@@ -73,7 +73,7 @@ export function RewardCard({
       className={`
         transition-all mb-2 break-inside-avoid
         ${isUnlocked ? "bg-green-50/40" : ""}
-        ${highlight ? "ring-2 ring-primary ring-offset-2" : ""}
+        ${highlight ? "bg-blue-50" : "bg-white"}
       `}
     >
       <CardContent className="px-6 [&:last-child]:pb-6 pt-6">

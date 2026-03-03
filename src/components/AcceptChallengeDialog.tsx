@@ -143,9 +143,11 @@ export function AcceptChallengeDialog({ challenge, isOpen, onOpenChange, onAccep
                   <div key={goal.id}
                        className="flex items-center justify-between p-2 rounded border hover:bg-gray-100 dark:hover:bg-gray-700 transition">
                     <span className="text-sm">{goal.title}</span>
-                    <Badge variant={goal.lastCompletedAt ? "secondary" : "outline"}>
-                      {goal.lastCompletedAt ? t("challenges.completed") : ""}
-                    </Badge>
+                    {goal.lastCompletedAt &&
+                      <Badge variant={goal.lastCompletedAt ? "secondary" : "outline"}>
+                        {t("challenges.completed")}
+                      </Badge>
+                    }
                   </div>
                 ))}
               </CollapsibleContent>

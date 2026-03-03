@@ -7,7 +7,7 @@ import {ProgressRing} from "@/components/ProgressRing.tsx";
 import {Button} from "@/components/ui/button.tsx";
 import {Progress} from "@/components/ui/progress";
 import {Collapsible, CollapsibleContent, CollapsibleTrigger} from "@/components/ui/collapsible.tsx";
-import {useState} from "react";
+import {useEffect, useRef, useState} from "react";
 import {useTranslation} from "react-i18next";
 import {useNavigate} from "react-router-dom";
 import {useAppStore} from "@/stores/useAppStore.ts";
@@ -15,6 +15,7 @@ import { MouseEvent as ReactMouseEvent } from "react";
 
 interface Props {
   challenge: Challenge;
+  focused: boolean;
   onEdit?: (id: string) => void;
   onShare?: (id: string) => void;
   onAccept?: (id: string) => void;
@@ -24,7 +25,8 @@ interface Props {
   onSelect?: (challenge: Challenge) => void;
 }
 
-export function ChallengeCard({challenge, onShare, onEdit, onAccept, onLeave, onOpenLink, onOpenParticipants, onSelect}: Props) {
+export function ChallengeCard({challenge, focused, onShare, onEdit, onAccept, onLeave, onOpenLink, onOpenParticipants, onSelect}: Props) {
+  const cardRef = useRef<HTMLDivElement>(null);
   const {t} = useTranslation();
   const [isGoalsOpen, setIsGoalsOpen] = useState(false);
   const [isLeaderboardOpen, setIsLeaderboardOpen] = useState(false);
@@ -122,6 +124,12 @@ export function ChallengeCard({challenge, onShare, onEdit, onAccept, onLeave, on
     setLeaderboard(leaderboard);
   }
 
+  useEffect(() => {
+    if (!cardRef.current) return;
+    if (!focused) return;
+
+    cardRef.current.scrollIntoView({ behavior: "smooth", block: "center" });
+  }, [focused]);
 
   return (
     <Card className={`
