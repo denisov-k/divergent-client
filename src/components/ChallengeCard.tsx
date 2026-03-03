@@ -132,7 +132,9 @@ export function ChallengeCard({challenge, focused, onShare, onEdit, onAccept, on
   }, [focused]);
 
   return (
-    <Card className={`
+    <Card
+      ref={cardRef}
+      className={`
         mb-2 break-inside-avoid
         hover:shadow-md transition-all
         ${(hasEnded || hasStarted) && !isParticipant ? "opacity-60" : ""}
