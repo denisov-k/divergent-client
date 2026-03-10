@@ -12,7 +12,7 @@ import {
   Reminder,
   Report,
   Reward,
-  User
+  User, AIChatResponse
 } from "@/types/";
 import {ChallengeInput} from "@/components/CreateChallengeDialog.tsx";
 
@@ -68,6 +68,7 @@ interface AppStore {
   kickParticipant: (challengeId: string, userId: string) => Promise<void>;
   sendMessageToParticipants: (challengeId: string, message: string) => Promise<void>;
   downloadReport: (report: Report) => Promise<void>;
+  chatAI: (prompt: string) => Promise<AIChatResponse>
 
   addReward: (reward: Reward) => Promise<void>;
   deleteReward: (reward: Reward) => Promise<void>;
@@ -522,6 +523,18 @@ export const useAppStore = create<AppStore>((set, get) => ({
       URL.revokeObjectURL(url);
     } catch (err) {
       console.error("Download failed", err);
+    }
+  },
+
+  chatAI: async (message: string) => {
+    set({ loading: true });
+    try {
+      return await api.chatAI(message);
+
+    } catch (err) {
+      console.error(err);
+    } finally {
+      set({ loading: false });
     }
   },
 

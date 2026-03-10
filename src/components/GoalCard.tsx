@@ -393,7 +393,7 @@ export function GoalCard({
               <div className="flex flex-wrap justify-center">
                 {reward && (
                   <Badge
-                    className="bg-purple-500 cursor-pointer hover:bg-purple-400"
+                    className="bg-green-500 cursor-pointer hover:bg-green-400"
                     onClick={() => navigate({
                       pathname: "/rewards",
                       search: `?id=${reward.id}`,

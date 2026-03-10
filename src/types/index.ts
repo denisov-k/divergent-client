@@ -187,3 +187,36 @@ export type GoalActivity = {
   period: GoalPeriod;
   data: GridItem[];
 }
+
+export type GeneratedGoal = {
+  goal: {
+    title: string
+    description: string | null
+    goalPeriod: "NONE" | "DAILY" | "WEEKLY" | "MONTHLY"
+    category: string | null
+    categoryLabel: string | null
+    dueDate: string | null
+  }
+  tasks: {
+    title: string
+    xpReward: number | null
+    subtasks?: { title: string }[] | null
+  }[]
+  reminders: {
+    title: string
+    time: string
+    daysOfWeek: string[]
+    daysOfMonth: number[]
+  }[]
+  reward: {
+    title: string
+    description?: string | null
+    icon?: string | null
+    xpRequires?: number | null
+  }
+}
+
+export type AIChatResponse = {
+  message: string
+  goalDraft: GeneratedGoal | null
+}

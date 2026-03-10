@@ -5,7 +5,7 @@ import {GoalFormData, Goal, CategoryOption, Task} from "@/types";
 
 import { GoalCard } from "@/components/GoalCard";
 
-import { Plus } from "lucide-react";
+import { Plus, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 
 import { useAppStore } from "@/stores/useAppStore";
@@ -16,6 +16,7 @@ import {useTranslation} from "react-i18next";
 
 import {Reminder} from "@/types";
 import CreateReportDialog from "@/components/CreateReportDialog.tsx";
+import AiGenerateGoalDialog from "@/components/AiDialog.tsx";
 
 export default function Goals() {
   const {
@@ -52,6 +53,7 @@ export default function Goals() {
   const [editingReminder, setEditingReminder] = useState<Reminder | undefined>(undefined);
   const [selectedGoalIdForReminder, setSelectedGoalIdForReminder] = useState<string | undefined>(undefined);
 
+  const [aiOpen, setAiOpen] = useState(false)
   // ------------------------------
   // Сохранение цели
   // ------------------------------
@@ -249,6 +251,15 @@ export default function Goals() {
             <Plus className="size-4 mr-2" />
             {t('goals.create_goal')}
           </Button>
+          <Button
+            className="bg-purple-500 hover:bg-purple-400"
+            onClick={() => {
+              setAiOpen(true);
+            }}
+          >
+            <Sparkles className="size-4 mr-2" />
+            {t('goals.open_ai')}
+          </Button>
         </div>
       </div>
 
@@ -326,6 +337,13 @@ export default function Goals() {
           if (!open) setReportTaskId(null);
         }}
         onSubmit={handleSaveReport}
+      />
+      <AiGenerateGoalDialog
+        open={aiOpen}
+        onOpenChange={setAiOpen}
+        onGoalCreated={(data) => {
+          console.log("AI goal", data)
+        }}
       />
     </div>
   );

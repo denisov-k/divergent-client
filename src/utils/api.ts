@@ -125,6 +125,13 @@ export async function sendMessageToParticipants(challengeId: string, text: strin
   });
 }
 
+export async function chatAI(message: string) {
+  return await fetchJSON(`/api/ai/chat`, {
+    method: "POST",
+    body: JSON.stringify({ message })
+  });
+}
+
 export async function downloadReport(reportId: string): Promise<Blob> {
   const res = await fetch(
     Config.data.api.http.baseURL + `/api/reports/${reportId}/download`,
