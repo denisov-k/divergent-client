@@ -126,7 +126,7 @@ export default function AiChatDialog({
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className="sm:max-w-lg text-sm">
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>{t("ai.title")}</DialogTitle>
         </DialogHeader>
@@ -219,7 +219,9 @@ function GoalDraftPreview({
   onAdd: (goal: Goal, messageId: string) => void
 }) {
   const { t } = useTranslation()
-  const { addDraft } = useAppStore()
+  const { addDraft, categories } = useAppStore()
+
+  const categoryLabel = categories.find(c => c.value === draft.goal.category)!.label;
 
   const handleAdd = async () => {
     if (!messageId) return;
@@ -240,7 +242,7 @@ function GoalDraftPreview({
         <Target className="size-4 text-primary"/>
         <span>{draft.goal.title}</span>
       </div>
-      <CategoryBadge category={draft.goal.category} label={draft.goal.categoryLabel}/>
+      <CategoryBadge category={draft.goal.category} label={categoryLabel}/>
 
       {draft.goal.description && (
         <div>

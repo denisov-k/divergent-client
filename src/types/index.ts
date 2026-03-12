@@ -193,7 +193,6 @@ export type Draft = {
     description: string | null
     goalPeriod: "NONE" | "DAILY" | "WEEKLY" | "MONTHLY"
     category: string
-    categoryLabel: string
     dueDate: string | null
   }
   tasks: Task[]
