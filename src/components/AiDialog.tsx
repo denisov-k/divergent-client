@@ -9,7 +9,7 @@ import {
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
 import { Badge } from "@/components/ui/badge"
-import {Calendar, Target} from "lucide-react"
+import {Calendar, Clock, Target} from "lucide-react"
 
 import {AIChatResponse, Task, ChatMessage, Draft, Goal} from "@/types"
 import { useAppStore } from "@/stores/useAppStore"
@@ -234,7 +234,7 @@ function GoalDraftPreview({
   };
 
   return (
-    <div className="flex border p-2 rounded bg-gray-50 gap-2 flex-col">
+    <div className="flex border p-4 rounded bg-gray-50 gap-2 flex-col">
       {/* Goal */}
       <div className="font-medium flex gap-2 items-center">
         <Target className="size-4 text-primary"/>
@@ -289,10 +289,13 @@ function GoalDraftPreview({
             {t("ai.reminders")}
           </div>
 
-          <ul className="ml-4 space-y-1">
+          <ul className="space-y-1">
             {draft.reminders.map((r, i) => (
               <li key={i} className="flex space-y-1 flex-col">
-                <span>{r.title}</span>
+                <div className="flex items-center gap-1">
+                  <Clock size="12"></Clock>
+                  <span>{r.title}</span>
+                </div>
                 {r.daysOfWeek?.length > 0 && (
                   <div className="flex gap-2 flex-wrap">
                     {[...r.daysOfWeek]
@@ -343,7 +346,7 @@ function GoalDraftPreview({
             {t("ai.reward")}
           </div>
 
-          <div className="ml-4 flex items-start gap-2">
+          <div className="flex items-start gap-2">
 
 
             <div className="flex flex-col gap-2">
