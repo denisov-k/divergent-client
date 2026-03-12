@@ -126,14 +126,14 @@ export default function AiChatDialog({
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-2xl max-h-[90vh] text-sm flex flex-col">
         <DialogHeader>
           <DialogTitle>{t("ai.title")}</DialogTitle>
         </DialogHeader>
 
         <div
           ref={scrollRef}
-          className="space-y-2 max-h-96 overflow-y-auto p-2 bg-gray-50 rounded"
+          className="flex-1 overflow-y-auto p-2 bg-gray-50 rounded space-y-2"
         >
           {history.map((m, i) => (
             <ChatMessageItem
@@ -145,7 +145,7 @@ export default function AiChatDialog({
           ))}
         </div>
 
-        <div className="space-y-2">
+        <div className="space-y-2 mt-2">
           <Textarea
             placeholder={t("ai.placeholder")}
             value={prompt}
@@ -154,9 +154,7 @@ export default function AiChatDialog({
           />
 
           {error && (
-            <div className="text-red-500">
-              {error}
-            </div>
+            <div className="text-red-500">{error}</div>
           )}
         </div>
 
