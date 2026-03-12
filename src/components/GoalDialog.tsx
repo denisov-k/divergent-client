@@ -246,14 +246,11 @@ export function GoalDialog({
   };
 
   const handleSave = () => {
-    const categoryLabel = categories.find((opt) => opt.value === category)?.label || category;
-
     const goalData: GoalFormData = {
       id: goal?.id || Date.now().toString(),
       title,
       description,
       category,
-      categoryLabel,
       goalType,
       goalPeriod,
       tasks: goalType === "TASK" ? tasks : [],

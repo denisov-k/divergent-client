@@ -12,7 +12,7 @@ import {
   Reminder,
   Report,
   Reward,
-  User, AIChatResponse
+  User, AIChatResponse, ChatMessage
 } from "@/types/";
 import {ChallengeInput} from "@/components/CreateChallengeDialog.tsx";
 
@@ -42,9 +42,6 @@ interface AppStore {
   logout: () => void;
   refreshUser: () => Promise<void>;
 
-  addXp: (amount: number) => Promise<void>;
-  removeXp: (amount: number) => Promise<void>;
-
   addChallenge: (challenge: ChallengeInput) => Promise<void>;
   updateChallenge: (challenge: ChallengeInput) => Promise<void>;
   getLeaderboard: (id: string) => Promise<Leader[]>;
@@ -68,7 +65,9 @@ interface AppStore {
   kickParticipant: (challengeId: string, userId: string) => Promise<void>;
   sendMessageToParticipants: (challengeId: string, message: string) => Promise<void>;
   downloadReport: (report: Report) => Promise<void>;
-  chatAI: (prompt: string) => Promise<AIChatResponse>
+  chatAI: (prompt: string) => Promise<AIChatResponse>;
+  getChatHistory: () => Promise<ChatMessage[]>;
+  addDraft: (messageId: string) => Promise<Goal>;
 
   addReward: (reward: Reward) => Promise<void>;
   deleteReward: (reward: Reward) => Promise<void>;
@@ -175,21 +174,6 @@ export const useAppStore = create<AppStore>((set, get) => ({
       set({ user: null });
     } finally {
       set({ initialized: true, loading: false });
-    }
-  },
-
-  // ==========================
-  // XP SYSTEM
-  // ==========================
-  addXp: async (amount: number) => {
-    set({ loading: true });
-    const user = get().user;
-    try {
-      set({ user: { ...user!, xp: amount } });
-    } catch (err) {
-      console.error(err);
-    } finally {
-      set({ loading: false });
     }
   },
 
@@ -303,18 +287,6 @@ export const useAppStore = create<AppStore>((set, get) => ({
         set({ goals, challenges, rewards, reminders, friends, categories });
       }
     });
-  },
-
-  removeXp: async (amount: number) => {
-    set({ loading: true });
-    const user = get().user;
-    try {
-      set({ user: { ...user!, xp: amount } });
-    } catch (err) {
-      console.error(err);
-    } finally {
-      set({ loading: false });
-    }
   },
 
   // ==========================
@@ -533,6 +505,58 @@ export const useAppStore = create<AppStore>((set, get) => ({
 
     } catch (err) {
       console.error(err);
+    } finally {
+      set({ loading: false });
+    }
+  },
+
+  getChatHistory: async () => {
+    set({ loading: true });
+    try {
+      return await api.getChatHistory();
+
+    } catch (err) {
+      console.error(err);
+    } finally {
+      set({ loading: false });
+    }
+  },
+
+  addDraft: async (messageId: string) => {
+    set({ loading: true });
+    try {
+      // Сервер возвращает созданный драфт со всеми зависимостями
+      const draft = await api.addDraft(messageId);
+      const { goal, reward, reminders } = draft;
+
+      // --- Обновляем цели ---
+      set((state) => ({
+        goals: state.goals.some(g => g.id === goal.id)
+          ? state.goals.map(g => (g.id === goal.id ? goal : g))
+          : [...state.goals, goal],
+      }));
+
+      // --- Обновляем награду ---
+      if (reward) {
+        set((state) => ({
+          rewards: state.rewards.some(r => r.id === reward.id)
+            ? state.rewards.map(r => (r.id === reward.id ? reward : r))
+            : [...state.rewards, reward],
+        }));
+      }
+
+      // --- Обновляем напоминания ---
+      if (reminders?.length) {
+        set((state) => ({
+          reminders: [...state.reminders.filter(r =>
+            !reminders.find((dr: Reminder) => dr.id === r.id)), ...reminders],
+        }));
+      }
+
+      return goal;
+    } catch (err) {
+      console.error(err);
+      throw err;
     } finally {
       set({ loading: false });
     }

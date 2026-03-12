@@ -132,6 +132,19 @@ export async function chatAI(message: string) {
   });
 }
 
+export async function getChatHistory() {
+  return await fetchJSON(`/api/ai/chat`, {
+    method: "GET",
+  });
+}
+
+export async function addDraft(messageId: string) {
+  return await fetchJSON(`/api/ai/add_draft`, {
+    method: "POST",
+    body: JSON.stringify({ messageId })
+  });
+}
+
 export async function downloadReport(reportId: string): Promise<Blob> {
   const res = await fetch(
     Config.data.api.http.baseURL + `/api/reports/${reportId}/download`,

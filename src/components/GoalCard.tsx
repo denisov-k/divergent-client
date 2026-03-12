@@ -22,8 +22,7 @@ interface GoalCardProps {
   id: string;
   title: string;
   description?: string;
-  category: CategoryType;
-  categoryLabel: string;
+  category: string;
 
   goalType: GoalType;
   goalPeriod: GoalPeriod;
@@ -52,7 +51,6 @@ export function GoalCard({
                            title,
                            description,
                            category,
-                           categoryLabel,
                            tasks,
                            challenge,
                            goalType,
@@ -78,11 +76,13 @@ export function GoalCard({
 
   const navigate = useNavigate();
 
-  const { user } = useAppStore();
+  const { user, categories } = useAppStore();
 
   const isFromChallenge = Boolean(challenge);
 
   const {t} = useTranslation();
+
+  const categoryLabel = categories.find(c => c.value === category)!.label;
 
   const safeTasks = tasks ?? [];
 
@@ -223,7 +223,7 @@ export function GoalCard({
         handleAddSubTask={handleAddSubTask}
         expanded={expandedTasks[task.id]}
         editMode={editMode}
-        disabled={isExpired || !challengeHasStarted}
+        disabled={isExpired || (challenge && !challengeHasStarted)}
       />
     ));
   };

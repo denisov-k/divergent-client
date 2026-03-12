@@ -36,7 +36,6 @@ export interface Goal {
   title: string;
   description?: string;
   category: CategoryType;
-  categoryLabel: string;
   tasks: Task[]; // остаётся для обычных целей
   dueDate?: string;
   lastCompletedAt?: string;
@@ -188,20 +187,16 @@ export type GoalActivity = {
   data: GridItem[];
 }
 
-export type GeneratedGoal = {
+export type Draft = {
   goal: {
     title: string
     description: string | null
     goalPeriod: "NONE" | "DAILY" | "WEEKLY" | "MONTHLY"
-    category: string | null
-    categoryLabel: string | null
+    category: string
+    categoryLabel: string
     dueDate: string | null
   }
-  tasks: {
-    title: string
-    xpReward: number | null
-    subtasks?: { title: string }[] | null
-  }[]
+  tasks: Task[]
   reminders: {
     title: string
     time: string
@@ -216,7 +211,17 @@ export type GeneratedGoal = {
   }
 }
 
+export type ChatMessage = {
+  role: "user" | "assistant"
+  content: string
+  goalDraft?: Draft | null
+  id?: string;
+  isDraftAdded: boolean;
+}
+
 export type AIChatResponse = {
+  id: string
   message: string
-  goalDraft: GeneratedGoal | null
+  goalDraft: Draft | null
+  isDraftAdded: boolean;
 }

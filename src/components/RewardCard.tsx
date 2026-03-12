@@ -1,13 +1,12 @@
 import { Card, CardContent, CardDescription, CardTitle } from "./ui/card";
 import { Badge } from "./ui/badge";
 import { Button } from "./ui/button";
-import {Trophy, Star, Gift, Crown, Award, Zap, Edit, Target, Swords} from "lucide-react";
+import {RewardIcon, RewardIconType} from "@/components/RewardIcon.tsx";
+import {Edit, Target, Swords} from "lucide-react";
 import {Goal} from "@/types";
 import {useNavigate} from "react-router-dom";
 import {useAppStore} from "@/stores/useAppStore.ts";
 import {useEffect, useRef, useState} from "react";
-
-type RewardIcon = "trophy" | "star" | "gift" | "crown" | "award" | "zap";
 
 interface RewardCardProps {
   id: string;
@@ -15,21 +14,12 @@ interface RewardCardProps {
   description: string;
   xpRequires?: number;
   isUnlocked: boolean;
-  icon?: RewardIcon;
+  icon?: RewardIconType;
   goal?: Goal;
   goalTitle?: string;          // <-- Новое
   onEdit?: (id: string) => void;
   focused: boolean;
 }
-
-const iconMap = {
-  trophy: Trophy,
-  star: Star,
-  gift: Gift,
-  crown: Crown,
-  award: Award,
-  zap: Zap,
-};
 
 export function RewardCard({
                              id,
@@ -43,8 +33,6 @@ export function RewardCard({
                              onEdit,
                              focused,
                            }: RewardCardProps) {
-  const Icon = iconMap[icon];
-
   const navigate = useNavigate();
   const isFromChallenge = Boolean(goal?.challengeId);
 
@@ -83,11 +71,7 @@ export function RewardCard({
               isUnlocked ? "bg-green-500/10" : "bg-muted"
             }`}
           >
-            <Icon
-              className={`size-6 ${
-                isUnlocked ? "text-green-600" : "text-muted-foreground"
-              }`}
-            />
+            <RewardIcon icon={icon} colorClass={isUnlocked ? "text-green-600" : "text-muted-foreground"} />
           </div>
 
           <div className="flex flex-col flex-1 min-w-0 gap-2">

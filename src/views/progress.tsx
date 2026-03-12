@@ -43,14 +43,20 @@ export default function Progress() {
   ).length;
 
   // Данные по категориям
+  const { categories } = useAppStore();
+
   const categoryMap: Record<string, number> = {};
   filteredGoals.forEach(g => {
-    categoryMap[g.categoryLabel] =
-      (categoryMap[g.categoryLabel] || 0) +
+    // безопасно достаем label из стора
+    const categoryLabel =
+      categories.find(c => c.value === g.category)?.label || "Без категории";
+
+    categoryMap[categoryLabel] =
+      (categoryMap[categoryLabel] || 0) +
       (g.tasks?.filter(t => !!t.lastCompletedAt).length || 0);
   });
-  const categoryData = Object.entries(categoryMap).map(([name, value]) => ({ name, value }));
 
+  const categoryData = Object.entries(categoryMap).map(([name, value]) => ({ name, value }));
   // Пример данных по опыту за неделю (можно подключить реальный источник)
   const weeklyXpData = useMemo(() => {
     if (!activity) return [];

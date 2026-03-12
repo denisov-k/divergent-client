@@ -24,7 +24,6 @@ export default function Goals() {
     addGoal,
     updateGoal,
     toggleTask,
-    addXp,
     addReminder,
     addCategory,
     addReport,
@@ -208,34 +207,15 @@ export default function Goals() {
 
     // обычное выполнение
     if (newCompleted) {
-      addXp(task.xpReward || 0);
       toast.success(`+${task.xpReward ?? 0} XP`);
-    } else {
-      addXp(-(task.xpReward || 0));
     }
 
     toggleTask(taskId);
   };
 
-  /*useEffect(() => {
-    if (!focusId) return;
-
-    const el = goalRefs.current[focusId];
-    if (!el) return;
-
-    el.scrollIntoView({
-      behavior: "smooth",
-      block: "center",
-    });
-
-    el.classList.add("ring-2", "ring-primary", "ring-offset-2");
-
-    const timeout = setTimeout(() => {
-      el.classList.remove("ring-2", "ring-primary", "ring-offset-2");
-    }, 2000);
-
-    return () => clearTimeout(timeout);
-  }, [focusId, goals]);*/
+  const onDraftAdded = (goal: Goal) => {
+    console.log(goal);
+  }
 
   return (
     <div className="flex flex-col px-2 flex-1">
@@ -341,9 +321,7 @@ export default function Goals() {
       <AiGenerateGoalDialog
         open={aiOpen}
         onOpenChange={setAiOpen}
-        onGoalCreated={(data) => {
-          console.log("AI goal", data)
-        }}
+        onDraftAdded={onDraftAdded}
       />
     </div>
   );
