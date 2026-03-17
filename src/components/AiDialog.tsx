@@ -11,7 +11,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { Badge } from "@/components/ui/badge"
 import {Calendar, Clock, Target} from "lucide-react"
 
-import {AIChatResponse, Task, ChatMessage, Draft, Goal} from "@/types"
+import {AIChatResponse, Task, ChatMessage, Draft, Goal, DAYS_OF_WEEK} from "@/types"
 import { useAppStore } from "@/stores/useAppStore"
 import { useTranslation } from "react-i18next"
 import { RewardIcon, RewardIconType } from "@/components/RewardIcon"
@@ -23,15 +23,9 @@ interface Props {
   onDraftAdded: (goal: Goal) => void
 }
 
-const daysMap: Record<string, string> = {
-  "1": "Пн",
-  "2": "Вт",
-  "3": "Ср",
-  "4": "Чт",
-  "5": "Пт",
-  "6": "Сб",
-  "7": "Вс",
-}
+const daysMap = Object.fromEntries(
+  DAYS_OF_WEEK.map(d => [d.key, d.label])
+) as Record<string, string>
 
 export default function AiChatDialog({
   open,
@@ -299,13 +293,8 @@ function GoalDraftPreview({
                 {r.daysOfWeek?.length > 0 && (
                   <div className="flex gap-2 flex-wrap">
                     {[...r.daysOfWeek]
-                      .sort((a, b) => Number(a) - Number(b))
                       .map((d) => (
-                        <Badge
-                          key={d}
-                          variant="outline"
-                          className="px-1.5 py-0"
-                        >
+                        <Badge key={d} variant="outline" className="px-1.5 py-0">
                           {daysMap[d] ?? d}
                         </Badge>
                       ))}

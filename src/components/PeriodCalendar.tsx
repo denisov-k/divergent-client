@@ -4,7 +4,7 @@ import { useEffect, useRef } from "react";
 import dayjs from "dayjs";
 
 import isoWeek from "dayjs/plugin/isoWeek";
-import {Goal, GoalActivity} from "@/types";
+import {DAYS_OF_WEEK, Goal, GoalActivity} from "@/types";
 
 import {
   Card,
@@ -18,7 +18,7 @@ import {Activity} from "lucide-react";
 
 dayjs.extend(isoWeek);
 
-const DAYS_OF_WEEK = ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"];
+const dayLabels = DAYS_OF_WEEK.map(d => d.label);
 
 type Props = {
   goal: Goal;
@@ -27,9 +27,18 @@ type Props = {
 };
 
 export function PeriodCalendar({ goal, activity, loading }: Props) {
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!goal) return;
+
+    if (scrollRef.current) {
+      scrollRef.current.scrollLeft = scrollRef.current.scrollWidth;
+    }
+  }, [goal]);
+
   if (!goal) return null;
 
-  const scrollRef = useRef<HTMLDivElement>(null);
 
   const daysToShow = 365;
   const today = dayjs();
@@ -98,13 +107,6 @@ export function PeriodCalendar({ goal, activity, loading }: Props) {
     });
   }
 
-  // 4. Скролл в конец при монтировании
-  useEffect(() => {
-    if (scrollRef.current) {
-      scrollRef.current.scrollLeft = scrollRef.current.scrollWidth;
-    }
-  }, []);
-
   return (
     <Card className="">
       <CardHeader className="flex flex-row items-center justify-between pb-2">
@@ -139,7 +141,7 @@ export function PeriodCalendar({ goal, activity, loading }: Props) {
                 </thead>
 
                 <tbody>
-                {DAYS_OF_WEEK.map((day, rowIdx) => (
+                {dayLabels.map((day, rowIdx) => (
                   <tr key={day} className="h-4">
                     <td className="text-xs align-middle pr-1">{day}</td>
                     {weeks.map((week, colIdx) => {
