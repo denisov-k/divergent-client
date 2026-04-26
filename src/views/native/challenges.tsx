@@ -1,4 +1,5 @@
-﻿import { Alert, Linking, Pressable, ScrollView, Share, Text, View } from "react-native";
+﻿import { useEffect } from "react";
+import { Alert, Linking, Pressable, ScrollView, Share, Text, View } from "react-native";
 
 import { ActionChip } from "@/components/native/ActionChip";
 import { ChallengeDetailsSheet } from "@/components/native/ChallengeDetailsSheet";
@@ -7,9 +8,14 @@ import { EmptyStateCard } from "@/components/native/EmptyStateCard";
 import { ScreenHeader } from "@/components/native/ScreenHeader";
 import { SelectPaymentMethodSheet } from "@/components/native/SelectPaymentMethodSheet";
 import { SurfaceCard } from "@/components/native/SurfaceCard";
+import { buildChallengeShareUrl } from "@/platform/appUrl";
 import { useChallengesScreen } from "@/shared/screens/challenges/useChallengesScreen";
 
-export default function NativeChallengesScreen() {
+export default function NativeChallengesScreen(props: {
+  focusId?: string | null;
+  paymentId?: string | null;
+  onConsumeLinkState?: () => void;
+}) {
   const {
     challenges,
     goals,
@@ -20,6 +26,7 @@ export default function NativeChallengesScreen() {
     paymentDialogOpen,
     reportsDialogOpen,
     selectedChallenge,
+    paymentSyncStatus,
     closeChallengeDialog,
     setPaymentDialogOpen,
     openCreateChallenge,
@@ -35,17 +42,47 @@ export default function NativeChallengesScreen() {
     selectPaymentMethod,
     kickChallengeParticipant,
     openChallengeLink,
+    clearPaymentSyncStatus,
   } = useChallengesScreen({
+    focusId: props.focusId,
+    paymentId: props.paymentId,
     onShareChallenge: async (id) => {
+      const url = buildChallengeShareUrl(id);
       await Share.share({
-        url: `https://divergent.local/challenges?id=${id}`,
-        message: `Посмотри этот челлендж: https://divergent.local/challenges?id=${id}`,
+        url,
+        message: `Посмотри этот челлендж: ${url}`,
       });
     },
     onOpenLink: (url) => {
       void Linking.openURL(url);
     },
   });
+
+  useEffect(() => {
+    if (!props.focusId && !props.paymentId) {
+      return;
+    }
+
+    props.onConsumeLinkState?.();
+  }, [props.focusId, props.paymentId, props.onConsumeLinkState]);
+
+  useEffect(() => {
+    if (!paymentSyncStatus) {
+      return;
+    }
+
+    if (paymentSyncStatus.status === "SUCCESS") {
+      Alert.alert("Оплата подтверждена", "Вы успешно присоединились к челленджу.");
+    } else if (paymentSyncStatus.status === "PENDING") {
+      Alert.alert("Платеж обрабатывается", "Провайдер еще не подтвердил оплату. Проверим статус чуть позже.");
+    } else if (paymentSyncStatus.status === "CANCELLED") {
+      Alert.alert("Оплата отменена", "Вы можете попробовать снова, когда будете готовы.");
+    } else {
+      Alert.alert("Статус оплаты не получен", "Не удалось подтвердить оплату. Попробуйте открыть челлендж еще раз.");
+    }
+
+    clearPaymentSyncStatus();
+  }, [paymentSyncStatus, clearPaymentSyncStatus]);
 
   const handleAcceptChallenge = async (id: string) => {
     const result = await acceptSelectedChallenge(id);
@@ -169,7 +206,7 @@ export default function NativeChallengesScreen() {
                         borderRadius: 999,
                       }}
                     >
-                      <Text style={{ color: "#1d4ed8" }}>Нужен отчёт</Text>
+                      <Text style={{ color: "#1d4ed8" }}>Нужен отчет</Text>
                     </View>
                   )}
                 </View>
@@ -189,7 +226,7 @@ export default function NativeChallengesScreen() {
                     </View>
                   ))}
                   {challenge.goals.length > 3 && (
-                    <Text style={{ color: "#64748b" }}>И ещё {challenge.goals.length - 3} целей</Text>
+                    <Text style={{ color: "#64748b" }}>И еще {challenge.goals.length - 3} целей</Text>
                   )}
                 </View>
 

@@ -1,10 +1,10 @@
-{
+﻿{
+    "app": {
+        "publicURL": "https://divergentclub.ru"
+    },
     "api": {
         "http": {
             "baseURL": "https://server.divergentclub.ru"
-        },
-        "ton": {
-            "manifestURL": "https://divergentclub.ru/tonconnect-manifest.json"
         },
         "telegram": {
             "twaURL": "https://t.me/divergent_app_bot/start"

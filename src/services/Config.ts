@@ -1,4 +1,4 @@
-import axios, { AxiosResponse } from "axios";
+﻿import axios, { AxiosResponse } from "axios";
 
 let p: Promise<unknown> | null = null;
 
@@ -26,16 +26,15 @@ function resolveRuntimeEnv() {
 
 interface ConfigInterface {
   data: {
+    app: {
+      publicURL: string;
+    };
     api: {
       http: {
         baseURL: string;
       };
       telegram: {
         twaURL: string;
-      };
-      ton: {
-        manifestURL: string;
-        wallet: string;
       };
     };
   };
@@ -45,16 +44,15 @@ interface ConfigInterface {
 
 const Config: ConfigInterface = {
   data: {
+    app: {
+      publicURL: "",
+    },
     api: {
       http: {
         baseURL: "",
       },
       telegram: {
         twaURL: "",
-      },
-      ton: {
-        manifestURL: "",
-        wallet: "",
       },
     },
   },

@@ -3,6 +3,7 @@
 import { ActionChip } from "@/components/native/ActionChip";
 import { FieldInput } from "@/components/native/FieldInput";
 import { InfoRow } from "@/components/native/InfoRow";
+import { platformCapabilities } from "@/platform/capabilities";
 import { ScreenHeader } from "@/components/native/ScreenHeader";
 import { SurfaceCard } from "@/components/native/SurfaceCard";
 import { useSettingsScreen } from "@/shared/screens/settings/useSettingsScreen";
@@ -52,6 +53,15 @@ export default function NativeSettingsScreen() {
           <InfoRow label="ID" value={user.id} />
           <InfoRow label="Роль" value={user.role || "user"} />
           <InfoRow label="Email" value={user.email || "Не указан"} />
+        </SurfaceCard>
+
+        <SurfaceCard>
+          <Text style={{ fontSize: 16, fontWeight: "600", color: "#0f172a" }}>Platform capabilities</Text>
+          <InfoRow label="Telegram login" value={platformCapabilities.telegramLogin ? "Доступен" : "Только web"} />
+          <InfoRow
+            label="File persistence"
+            value={platformCapabilities.nativeFilePersistence ? "Прямое сохранение" : "Через внешнюю ссылку"}
+          />
         </SurfaceCard>
 
         <SurfaceCard>

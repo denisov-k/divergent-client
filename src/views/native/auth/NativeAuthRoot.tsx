@@ -4,6 +4,7 @@ import { z, ZodError } from "zod";
 
 import { ActionChip } from "@/components/native/ActionChip";
 import { FieldInput } from "@/components/native/FieldInput";
+import { platformCapabilities } from "@/platform/capabilities";
 import { ScreenHeader } from "@/components/native/ScreenHeader";
 import { SectionTabs } from "@/components/native/SectionTabs";
 import { SurfaceCard } from "@/components/native/SurfaceCard";
@@ -197,6 +198,15 @@ export default function NativeAuthRoot() {
       />
 
       <ScrollView contentContainerStyle={{ padding: 16, gap: 12 }}>
+        {!platformCapabilities.telegramLogin && (
+          <SurfaceCard>
+            <Text style={{ fontSize: 16, fontWeight: "700", color: "#0f172a" }}>Возможности mobile runtime</Text>
+            <Text style={{ color: "#64748b" }}>
+              Telegram login сейчас остаётся web-only сценарием и не включён в standalone mobile runtime.
+            </Text>
+          </SurfaceCard>
+        )}
+
         <SectionTabs
           tabs={[
             { key: "signin", label: "Вход" },

@@ -1,10 +1,10 @@
-{
+﻿{
+    "app": {
+        "publicURL": "https://fulgent-serenity-nonegregious.ngrok-free.dev"
+    },
     "api": {
         "http": {
             "baseURL": "https://fulgent-serenity-nonegregious.ngrok-free.dev"
-        },
-        "ton": {
-            "manifestURL": "https://fulgent-serenity-nonegregious.ngrok-free.dev/tonconnect-manifest.json"
         },
         "telegram": {
             "twaURL": "https://t.me/divergent_app_test_bot/start"

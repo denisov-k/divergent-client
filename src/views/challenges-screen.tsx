@@ -1,4 +1,4 @@
-import { Plus } from "lucide-react";
+﻿import { Plus } from "lucide-react";
 import { useSearchParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
@@ -10,6 +10,7 @@ import { LeaveChallengeDialog } from "@/components/LeaveChallengeDialog";
 import { SelectPaymentMethodDialog } from "@/components/SelectPaymentMethodDialog";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { buildChallengeShareUrl } from "@/platform/appUrl";
 import { openExternalLink, shareLink } from "@/platform/browser";
 import { useChallengesScreen } from "@/shared/screens/challenges/useChallengesScreen";
 
@@ -53,7 +54,7 @@ export default function ChallengesScreen() {
     focusId,
     paymentId,
     onShareChallenge: (id) => {
-      const url = `${window.location.origin}/challenges?id=${id}`;
+      const url = buildChallengeShareUrl(id);
       void shareLink(url);
     },
     onOpenLink: openExternalLink,

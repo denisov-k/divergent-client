@@ -8,9 +8,8 @@ Current native runtime uses Expo entrypoint:
 Required env vars for standalone mobile runs:
 
 - `EXPO_PUBLIC_API_BASE_URL`
+- `EXPO_PUBLIC_APP_PUBLIC_URL` (recommended for share/deep links; falls back to API URL)
 - `EXPO_PUBLIC_TELEGRAM_BOT_URL` (optional)
-- `EXPO_PUBLIC_TON_MANIFEST_URL` (optional)
-- `EXPO_PUBLIC_TON_WALLET` (optional)
 
 Recommended first run:
 
@@ -23,4 +22,4 @@ Notes:
 
 - web still uses `public/config/*.json`
 - native uses `Config.native.ts` and does not fetch `/config/*.json`
-- session persistence is currently in-memory in native runtime; replacing it with secure storage is a good next step
+- mobile session persistence already goes through native session adapter

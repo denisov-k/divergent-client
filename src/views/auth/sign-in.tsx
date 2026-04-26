@@ -11,6 +11,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { platformCapabilities } from "@/platform/capabilities";
 import { createTelegramLoginUrl } from "@/platform/telegram";
 import { redirectToUrl } from "@/platform/browser";
 import { useAppStore } from "@/stores/useAppStore";
@@ -174,27 +175,31 @@ export default function SignIn() {
               {isSubmitting ? "Signing in..." : "Sign in"}
             </Button>
 
-            <div className="flex items-center gap-3 py-1">
-              <div className="h-px flex-1 bg-border" />
-              <span className="text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground">
-                or
-              </span>
-              <div className="h-px flex-1 bg-border" />
-            </div>
+            {platformCapabilities.telegramLogin && (
+              <>
+                <div className="flex items-center gap-3 py-1">
+                  <div className="h-px flex-1 bg-border" />
+                  <span className="text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground">
+                    or
+                  </span>
+                  <div className="h-px flex-1 bg-border" />
+                </div>
 
-            <div className="rounded-xl border border-border bg-muted/40 p-4">
-              <p className="mb-3 text-sm text-foreground">Continue with Telegram</p>
-              <Button
-                type="button"
-                variant="outline"
-                size="lg"
-                className="w-full bg-background"
-                disabled={isBusy}
-                onClick={() => redirectToUrl(createTelegramLoginUrl(redirect || "/"))}
-              >
-                Sign in with Telegram
-              </Button>
-            </div>
+                <div className="rounded-xl border border-border bg-muted/40 p-4">
+                  <p className="mb-3 text-sm text-foreground">Continue with Telegram</p>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="lg"
+                    className="w-full bg-background"
+                    disabled={isBusy}
+                    onClick={() => redirectToUrl(createTelegramLoginUrl(redirect || "/"))}
+                  >
+                    Sign in with Telegram
+                  </Button>
+                </div>
+              </>
+            )}
 
             <div className="flex items-center justify-between gap-3 pt-2 text-sm">
               <a href="/signup" className="text-primary underline-offset-4 hover:underline">

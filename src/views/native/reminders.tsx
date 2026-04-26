@@ -2,16 +2,31 @@
 
 import { ActionChip } from "@/components/native/ActionChip";
 import { EmptyStateCard } from "@/components/native/EmptyStateCard";
+import { ReminderFormSheet } from "@/components/native/ReminderFormSheet";
 import { ScreenHeader } from "@/components/native/ScreenHeader";
 import { SurfaceCard } from "@/components/native/SurfaceCard";
 import { useRemindersScreen } from "@/shared/screens/reminders/useRemindersScreen";
+
+const WEEK_DAY_LABELS: Record<string, string> = {
+  mon: "Пн",
+  tue: "Вт",
+  wed: "Ср",
+  thu: "Чт",
+  fri: "Пт",
+  sat: "Сб",
+  sun: "Вс",
+};
 
 export default function NativeRemindersScreen() {
   const {
     reminders,
     goals,
+    reminderDialogOpen,
+    editingReminder,
+    closeReminderDialog,
     openCreateReminder,
     openEditReminder,
+    saveReminder,
     toggleReminderState,
     removeReminder,
   } = useRemindersScreen();
@@ -66,7 +81,7 @@ export default function NativeRemindersScreen() {
                         borderRadius: 999,
                       }}
                     >
-                      <Text style={{ color: "#334155" }}>{day}</Text>
+                      <Text style={{ color: "#334155" }}>{WEEK_DAY_LABELS[day] ?? day}</Text>
                     </View>
                   ))}
                   {reminder.daysOfMonth.map((day) => (
@@ -84,7 +99,7 @@ export default function NativeRemindersScreen() {
                   ))}
                 </View>
 
-                <View style={{ flexDirection: "row", gap: 8 }}>
+                <View style={{ flexDirection: "row", gap: 8, flexWrap: "wrap" }}>
                   <ActionChip
                     onPress={() => void toggleReminderState(reminder.id)}
                     tone={reminder.isActive ? "success" : "secondary"}
@@ -101,6 +116,15 @@ export default function NativeRemindersScreen() {
           })
         )}
       </ScrollView>
+
+      <ReminderFormSheet
+        open={reminderDialogOpen}
+        reminder={editingReminder}
+        goals={goals}
+        onOpenChange={closeReminderDialog}
+        onSave={saveReminder}
+        onDelete={removeReminder}
+      />
     </View>
   );
 }

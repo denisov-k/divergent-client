@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+﻿import { useEffect, useState } from "react";
 
 import { useAppStore } from "@/stores/useAppStore";
 import type { Challenge, ChallengeParticipant, PaymentMethod, Report } from "@/types";
@@ -35,6 +35,10 @@ export function useChallengesScreen(options: {
   const [selectedChallenge, setSelectedChallenge] = useState<Challenge | undefined>();
   const [reports, setReports] = useState<Report[]>([]);
   const [participants, setParticipants] = useState<ChallengeParticipant[]>([]);
+  const [paymentSyncStatus, setPaymentSyncStatus] = useState<{
+    paymentId: string;
+    status: "PENDING" | "SUCCESS" | "FAILED" | "CANCELLED";
+  } | null>(null);
 
   const openCreateChallenge = () => {
     setEditingChallenge(undefined);
@@ -175,7 +179,7 @@ export function useChallengesScreen(options: {
   };
 
   useEffect(() => {
-    if (!options.focusId) {
+    if (!options.focusId || options.paymentId) {
       return;
     }
 
@@ -183,14 +187,20 @@ export function useChallengesScreen(options: {
     if (challenge) {
       selectChallenge(challenge);
     }
-  }, [options.focusId, challenges]);
+  }, [options.focusId, options.paymentId, challenges]);
 
   useEffect(() => {
     if (!options.paymentId) {
       return;
     }
 
-    void syncPaymentStatus(options.paymentId);
+    void (async () => {
+      const status = await syncPaymentStatus(options.paymentId!);
+      setPaymentSyncStatus({
+        paymentId: options.paymentId!,
+        status,
+      });
+    })();
   }, [options.paymentId, syncPaymentStatus]);
 
   return {
@@ -205,6 +215,7 @@ export function useChallengesScreen(options: {
     reportsDialogOpen,
     acceptDialogOpen,
     selectedChallenge,
+    paymentSyncStatus,
     setPaymentDialogOpen,
     setLeaveDialogOpen,
     openCreateChallenge,
@@ -223,5 +234,6 @@ export function useChallengesScreen(options: {
     selectPaymentMethod,
     kickChallengeParticipant,
     openChallengeLink,
+    clearPaymentSyncStatus: () => setPaymentSyncStatus(null),
   };
 }

@@ -1,14 +1,13 @@
 ﻿type NativeConfigData = {
+  app: {
+    publicURL: string;
+  };
   api: {
     http: {
       baseURL: string;
     };
     telegram: {
       twaURL: string;
-    };
-    ton: {
-      manifestURL: string;
-      wallet: string;
     };
   };
 };
@@ -17,6 +16,9 @@ let p: Promise<unknown> | null = null;
 
 const Config = {
   data: {
+    app: {
+      publicURL: "",
+    },
     api: {
       http: {
         baseURL: "",
@@ -24,16 +26,13 @@ const Config = {
       telegram: {
         twaURL: "",
       },
-      ton: {
-        manifestURL: "",
-        wallet: "",
-      },
     },
   } satisfies NativeConfigData,
   init() {
     if (!p) {
       p = new Promise((resolve, reject) => {
         const baseURL = process.env.EXPO_PUBLIC_API_BASE_URL || "";
+        const publicURL = process.env.EXPO_PUBLIC_APP_PUBLIC_URL || baseURL;
 
         if (!baseURL) {
           reject(
@@ -45,16 +44,15 @@ const Config = {
         }
 
         this.data = {
+          app: {
+            publicURL,
+          },
           api: {
             http: {
               baseURL,
             },
             telegram: {
               twaURL: process.env.EXPO_PUBLIC_TELEGRAM_BOT_URL || "",
-            },
-            ton: {
-              manifestURL: process.env.EXPO_PUBLIC_TON_MANIFEST_URL || "",
-              wallet: process.env.EXPO_PUBLIC_TON_WALLET || "",
             },
           },
         };
