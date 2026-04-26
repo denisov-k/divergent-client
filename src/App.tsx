@@ -1,44 +1,52 @@
-import {BrowserRouter as Router, Routes, Route} from 'react-router-dom'
-import { ProtectedRoute } from '@/components/protected-route'
+// src/App.tsx
+import React, { useEffect } from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { ProtectedRoute } from '@/components/protected-route';
 
-import Layout from '@/layout/'
+import Layout from '@/layout';
 import Header from '@/layout/Header';
 import Footer from '@/layout/Footer';
 
-import SignInView from '@/views/auth/sign-in'
-import SignUpView from '@/views/auth/sign-up'
-import ResetPasswordView from '@/views/auth/reset'
+import SignInView from '@/views/auth/sign-in';
+import SignUpView from '@/views/auth/sign-up';
+import ResetPasswordView from '@/views/auth/reset';
 
-import IndexView from '@/views/index'
-import FrensView from '@/views/frens'
-import GoalsView from '@/views/goals'
-import ChallengesView from '@/views/challenges'
-import SettingsView from '@/views/settings'
-import RewardsView from '@/views/rewards'
-import RemindersView from '@/views/reminders'
-import ProgressView from '@/views/progress'
+import IndexView from '@/views/index';
+import FrensView from '@/views/frens';
+import GoalsView from '@/views/goals';
+import ChallengesView from '@/views/challenges';
+import SettingsView from '@/views/settings';
+import RewardsView from '@/views/rewards';
+import RemindersView from '@/views/reminders';
+import ProgressView from '@/views/progress';
 
-import {useAppStore} from "@/stores/useAppStore.ts";
-import {useEffect} from "react";
-
+import { useAppStore } from '@/stores/useAppStore';
 import i18n from './i18n';
 
 function AppRoot() {
+  const { initialize, initialized, loading, user } = useAppStore();
 
-  const {initialize, initialized, loading, user} = useAppStore();
-
-
+  // Установка языка при смене пользователя
   useEffect(() => {
     if (user?.language) {
       i18n.changeLanguage(user.language);
     }
   }, [user?.language]);
 
+  // Инициализация приложения
   useEffect(() => {
     if (!initialized && !loading) {
       initialize();
     }
   }, [initialized, loading]);
+
+  const renderProtected = (component: React.ReactNode) => (
+    <ProtectedRoute>
+      <Layout header={<Header />} footer={<Footer />}>
+        {component}
+      </Layout>
+    </ProtectedRoute>
+  );
 
   return (
     <Router>
@@ -46,89 +54,18 @@ function AppRoot() {
         <Route path="/signin" element={<SignInView />} />
         <Route path="/signup" element={<SignUpView />} />
         <Route path="/reset" element={<ResetPasswordView />} />
-        <Route
-          path="/progress"
-          element={
-            <ProtectedRoute>
-              <Layout header={<Header></Header>} footer={<Footer></Footer>}>
-                <ProgressView />
-              </Layout>
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/frens"
-          element={
-            <ProtectedRoute>
-              <Layout header={<Header></Header>} footer={<Footer></Footer>}>
-                <FrensView />
-              </Layout>
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/challenges"
-          element={
-            <ProtectedRoute>
-              <Layout header={<Header></Header>} footer={<Footer></Footer>}>
-                <ChallengesView />
-              </Layout>
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/"
-          element={
-            <ProtectedRoute>
-              <Layout header={<Header></Header>} footer={<Footer></Footer>}>
-                <IndexView />
-              </Layout>
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/goals"
-          element={
-            <ProtectedRoute>
-              <Layout header={<Header></Header>} footer={<Footer></Footer>}>
-                <GoalsView />
-              </Layout>
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/settings"
-          element={
-            <ProtectedRoute>
-              <Layout header={<Header></Header>} footer={<Footer></Footer>}>
-                <SettingsView />
-              </Layout>
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/rewards"
-          element={
-            <ProtectedRoute>
-              <Layout header={<Header></Header>} footer={<Footer></Footer>}>
-                <RewardsView />
-              </Layout>
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/reminders"
-          element={
-            <ProtectedRoute>
-              <Layout header={<Header></Header>} footer={<Footer></Footer>}>
-                <RemindersView />
-              </Layout>
-            </ProtectedRoute>
-          }
-        />
+
+        <Route path="/" element={renderProtected(<IndexView />)} />
+        <Route path="/frens" element={renderProtected(<FrensView />)} />
+        <Route path="/goals" element={renderProtected(<GoalsView />)} />
+        <Route path="/challenges" element={renderProtected(<ChallengesView />)} />
+        <Route path="/settings" element={renderProtected(<SettingsView />)} />
+        <Route path="/rewards" element={renderProtected(<RewardsView />)} />
+        <Route path="/reminders" element={renderProtected(<RemindersView />)} />
+        <Route path="/progress" element={renderProtected(<ProgressView />)} />
       </Routes>
     </Router>
-  )
+  );
 }
 
-export default AppRoot
+export default AppRoot;

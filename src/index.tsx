@@ -1,3 +1,5 @@
+// src/index.tsx
+import React from 'react';
 import ReactDOM from 'react-dom/client';
 import AppRoot from './App.tsx';
 import WebApp from '@twa-dev/sdk';
@@ -5,19 +7,23 @@ import './index.css';
 import Config from './services/Config';
 import './i18n';
 
-//import { AuthProvider } from '@/hooks/use-auth';
-
+// Инициализация WebApp
 WebApp.ready();
 
-console.log(WebApp)
 if (WebApp.version !== '6.0') {
   WebApp.requestFullscreen();
   WebApp.disableVerticalSwipes();
-  WebApp.setBackgroundColor("#0d0d10");
+  WebApp.setBackgroundColor('#0d0d10');
 }
 
+// Инициализация конфигурации приложения
 Config.init().then(() => {
-  ReactDOM.createRoot(document.getElementById('root')!).render(
-    <AppRoot />
+  const root = document.getElementById('root');
+  if (!root) throw new Error('Root element not found');
+
+  ReactDOM.createRoot(root).render(
+    <React.StrictMode>
+      <AppRoot />
+    </React.StrictMode>
   );
 });

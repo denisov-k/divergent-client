@@ -1,0 +1,18 @@
+{
+  "android": {
+    "package": "com.anonymous.divergentclient"
+  },
+  "extra": {
+    "eas": {
+      "projectId": "63f44398-912c-4439-8efe-0d474e65d1ae"
+    }
+  },
+  "expo": {
+    "ios": {
+      "bundleIdentifier": "com.anonymous.divergentclient",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
+    }
+  }
+}
