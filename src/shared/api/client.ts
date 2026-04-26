@@ -18,9 +18,17 @@ async function fetchJSON(url: string, options: RequestInit = {}) {
     },
   });
 
-  if (!res.ok) throw new Error(`API error: ${res.status}`);
-
   const contentType = res.headers.get("content-type") || "";
+  if (!res.ok) {
+    if (contentType.includes("application/json")) {
+      const data = (await res.json()) as { error?: string };
+      throw new Error(data.error || `API error: ${res.status}`);
+    }
+
+    const text = await res.text();
+    throw new Error(text || `API error: ${res.status}`);
+  }
+
   if (!contentType.includes("application/json")) {
     const text = await res.text();
     throw new Error(`Expected JSON but received ${contentType || "unknown content type"}: ${text.slice(0, 120)}`);
@@ -49,6 +57,20 @@ export async function logout() {
   });
 }
 
+export async function requestPasswordReset(email: string): Promise<{ ok: true; resetUrl?: string }> {
+  return fetchJSON("/api/auth/password-reset/request", {
+    method: "POST",
+    body: JSON.stringify({ email }),
+  });
+}
+
+export async function confirmPasswordReset(token: string, password: string) {
+  return fetchJSON("/api/auth/password-reset/confirm", {
+    method: "POST",
+    body: JSON.stringify({ token, password }),
+  });
+}
+
 export async function fetchUser() {
   return fetchJSON("/api/user");
 }
@@ -57,6 +79,13 @@ export async function updateUser(patch: Partial<User>) {
   return fetchJSON("/api/user", {
     method: "PATCH",
     body: JSON.stringify(patch),
+  });
+}
+
+export async function setCredentials(password: string, email?: string, currentPassword?: string) {
+  return fetchJSON("/api/user/credentials", {
+    method: "POST",
+    body: JSON.stringify({ email, password, currentPassword }),
   });
 }
 

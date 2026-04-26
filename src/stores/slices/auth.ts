@@ -64,9 +64,25 @@ export const createAuthSlice: StoreSlice<AuthSlice> = (set, get) => ({
     set({ user: updated });
   },
 
+  setCredentials: async (password, email, currentPassword) => {
+    set({ loading: true });
+    try {
+      const user = await api.setCredentials(password, email, currentPassword);
+      set({ user });
+    } catch (err) {
+      console.error(err);
+      throw err;
+    } finally {
+      set({ loading: false });
+    }
+  },
+
   passwordReset: async (email) => {
-    console.log(email);
-    throw new Error("Password reset is not implemented yet");
+    return api.requestPasswordReset(email);
+  },
+
+  confirmPasswordReset: async (token, password) => {
+    await api.confirmPasswordReset(token, password);
   },
 
   logout: () => {

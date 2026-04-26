@@ -39,6 +39,7 @@ export default function SignIn() {
   const redirect = searchParams.get("redirect");
   const telegramError = searchParams.get("error");
   const telegramErrorDetail = searchParams.get("error_detail");
+  const resetStatus = searchParams.get("reset");
 
   useEffect(() => {
     if (loading) return;
@@ -49,7 +50,14 @@ export default function SignIn() {
   }, [user, loading, navigate, redirect]);
 
   useEffect(() => {
-    if (!telegramError) return;
+    if (!telegramError && !resetStatus) return;
+
+    if (resetStatus === "success") {
+      setErrors({
+        submit: "Password updated. You can sign in with your new password now.",
+      });
+      return;
+    }
 
     setErrors({
       submit:
@@ -57,7 +65,7 @@ export default function SignIn() {
           ? `Telegram sign in failed. Please try again.${telegramErrorDetail ? ` (${telegramErrorDetail})` : ""}`
           : "Telegram sign in is not available right now.",
     });
-  }, [telegramError, telegramErrorDetail]);
+  }, [telegramError, telegramErrorDetail, resetStatus]);
 
   const handleSubmit = async (data: typeof formData) => {
     try {

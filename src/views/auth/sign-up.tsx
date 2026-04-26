@@ -53,8 +53,6 @@ export default function SignUp() {
       const referrerId = searchParams.get('referrerId') as string;
       const referrerLinkId = searchParams.get('referrerLinkId') as string;
 
-      console.log(referrerLinkId);
-
       // Attempt sign up
       await signup(validatedData.email, validatedData.password, validatedData.name, referrerId, referrerLinkId)
       navigate('/')

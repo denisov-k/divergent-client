@@ -1,5 +1,5 @@
 import { type ChangeEvent, useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import { z, ZodError } from 'zod'
 
 import { Button } from '@/components/ui/button';
@@ -13,25 +13,45 @@ import {
 import { Input } from '@/components/ui/input';
 import { useAppStore } from '@/stores/useAppStore';
 
-const signInSchema = z.object({
+const requestResetSchema = z.object({
   email: z.string().email('Invalid email address'),
 })
 
+const confirmResetSchema = z.object({
+  password: z
+    .string()
+    .min(8, 'Password must be at least 8 characters')
+    .regex(/[A-Z]/, 'Password must contain at least one uppercase letter')
+    .regex(/[a-z]/, 'Password must contain at least one lowercase letter')
+    .regex(/[0-9]/, 'Password must contain at least one number'),
+  confirmPassword: z.string(),
+}).refine((data) => data.password === data.confirmPassword, {
+  path: ['confirmPassword'],
+  message: 'Passwords do not match',
+})
+
 export default function Reset() {
+  const [searchParams] = useSearchParams();
+  const resetToken = searchParams.get('token');
   const [formData, setFormData] = useState({
     email: '',
+    password: '',
+    confirmPassword: '',
   })
   const [errors, setErrors] = useState<{
     email?: string;
+    password?: string;
+    confirmPassword?: string;
     submit?: string;
+    success?: string;
   }>({})
   const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
-  const { user, passwordReset } = useAppStore();
+  const { user, passwordReset, confirmPasswordReset } = useAppStore();
+  const [resetUrl, setResetUrl] = useState<string | null>(null);
 
 
   useEffect(() => {
-    console.log('[sign-in] user:', user)
     if (user) {
       navigate('/')
     }
@@ -41,24 +61,33 @@ export default function Reset() {
     try {
       setIsSubmitting(true)
       setErrors({})
-      
-      // Validate the form data
-      const validatedData = signInSchema.parse(data)
-      
-      // Attempt sign in
-      await passwordReset(validatedData.email)
-      console.log('[sign-in] signed in!')
+
+      if (resetToken) {
+        const validatedData = confirmResetSchema.parse(data)
+        await confirmPasswordReset(resetToken, validatedData.password)
+        navigate('/signin?reset=success')
+        return
+      }
+
+      const validatedData = requestResetSchema.parse(data)
+      const response = await passwordReset(validatedData.email)
+      setResetUrl(response.resetUrl || null)
+      setErrors({
+        success: response.resetUrl
+          ? 'Reset link generated. Continue with the link below.'
+          : 'If an account with this email exists, a reset link has been created.',
+      })
     } catch (error) {
       if (error instanceof ZodError) {
         const formattedErrors: Record<string, string> = {}
         error.errors.forEach((err) => {
           if (err.path) {
-            formattedErrors[err.path[0]] = err.message
+            formattedErrors[String(err.path[0])] = err.message
           }
         })
         setErrors(formattedErrors)
       } else {
-        setErrors({ submit: 'Password reset is not available yet in the new auth flow.' })
+        setErrors({ submit: resetToken ? 'Failed to reset password. The link may be invalid or expired.' : 'Failed to request password reset. Please try again.' })
       }
     } finally {
       setIsSubmitting(false)
@@ -88,7 +117,9 @@ export default function Reset() {
         <CardHeader className="space-y-2 pb-0 text-center">
           <CardTitle className="text-2xl text-foreground">Reset password</CardTitle>
           <CardDescription className="text-sm text-muted-foreground">
-            Password reset is not wired yet, but you can leave your email here for the future flow.
+            {resetToken
+              ? 'Choose a new password for your account.'
+              : 'Enter your email and we will generate a password reset link.'}
           </CardDescription>
         </CardHeader>
 
@@ -110,7 +141,8 @@ export default function Reset() {
                 type="email"
                 value={formData.email}
                 onChange={handleChange}
-                required
+                required={!resetToken}
+                disabled={Boolean(resetToken)}
                 placeholder="you@example.com"
                 aria-invalid={Boolean(errors.email)}
                 className="h-11 border-border bg-input-background text-foreground placeholder:text-muted-foreground"
@@ -120,10 +152,73 @@ export default function Reset() {
               )}
             </div>
 
+            {resetToken && (
+              <>
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between gap-3">
+                    <label htmlFor="password" className="text-sm font-medium text-foreground">
+                      New password
+                    </label>
+                    <span className="text-xs text-muted-foreground">
+                      8+ chars, upper/lowercase and number
+                    </span>
+                  </div>
+                  <Input
+                    id="password"
+                    name="password"
+                    type="password"
+                    value={formData.password}
+                    onChange={handleChange}
+                    required
+                    placeholder="Create a new password"
+                    aria-invalid={Boolean(errors.password)}
+                    className="h-11 border-border bg-input-background text-foreground placeholder:text-muted-foreground"
+                  />
+                  {errors.password && (
+                    <p className="text-sm text-red-400">{errors.password}</p>
+                  )}
+                </div>
+
+                <div className="space-y-2">
+                  <label htmlFor="confirmPassword" className="text-sm font-medium text-foreground">
+                    Confirm password
+                  </label>
+                  <Input
+                    id="confirmPassword"
+                    name="confirmPassword"
+                    type="password"
+                    value={formData.confirmPassword}
+                    onChange={handleChange}
+                    required
+                    placeholder="Repeat the new password"
+                    aria-invalid={Boolean(errors.confirmPassword)}
+                    className="h-11 border-border bg-input-background text-foreground placeholder:text-muted-foreground"
+                  />
+                  {errors.confirmPassword && (
+                    <p className="text-sm text-red-400">{errors.confirmPassword}</p>
+                  )}
+                </div>
+              </>
+            )}
+
             {errors.submit && (
               <p className="rounded-md border border-red-500/20 bg-red-500/10 px-3 py-2 text-sm text-red-300">
                 {errors.submit}
               </p>
+            )}
+
+            {errors.success && (
+              <div className="rounded-md border border-emerald-500/20 bg-emerald-500/10 px-3 py-2 text-sm text-emerald-700">
+                <p>{errors.success}</p>
+                {resetUrl && (
+                  <a
+                    href={resetUrl}
+                    className="mt-2 inline-block text-emerald-700 underline underline-offset-4"
+                  >
+                    Open reset link
+                  </a>
+                )}
+              </div>
             )}
 
             <Button
@@ -132,7 +227,7 @@ export default function Reset() {
               size="lg"
               className="w-full"
             >
-              {isSubmitting ? 'Submitting...' : 'Request reset'}
+              {isSubmitting ? 'Submitting...' : resetToken ? 'Save new password' : 'Request reset'}
             </Button>
 
             <div className="flex items-center justify-between gap-3 pt-2 text-sm">

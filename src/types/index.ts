@@ -177,6 +177,7 @@ export interface User {
   id: string;
   name: string;
   email?: string | null;
+  hasPassword?: boolean;
   role: string;
   xp: number;
   level: number;

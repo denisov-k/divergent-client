@@ -44,7 +44,9 @@ export interface AuthSlice {
   ) => Promise<void>;
   signOut: () => Promise<void>;
   updateUser: (patch: Partial<User>) => Promise<void>;
-  passwordReset: (email: string) => Promise<void>;
+  setCredentials: (password: string, email?: string, currentPassword?: string) => Promise<void>;
+  passwordReset: (email: string) => Promise<{ resetUrl?: string }>;
+  confirmPasswordReset: (token: string, password: string) => Promise<void>;
   logout: () => void;
   refreshUser: () => Promise<void>;
 }
