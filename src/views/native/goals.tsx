@@ -3,6 +3,7 @@
 import { ActionChip } from "@/components/native/ActionChip";
 import { CreateReportSheet } from "@/components/native/CreateReportSheet";
 import { EmptyStateCard } from "@/components/native/EmptyStateCard";
+import { GoalFormSheet } from "@/components/native/GoalFormSheet";
 import { ScreenHeader } from "@/components/native/ScreenHeader";
 import { SurfaceCard } from "@/components/native/SurfaceCard";
 import { useGoalsScreen } from "@/shared/screens/goals/useGoalsScreen";
@@ -11,12 +12,18 @@ export default function NativeGoalsScreen() {
   const {
     goals,
     rewards,
+    categories,
+    goalDialogOpen,
+    editingGoal,
     openCreateGoal,
     openEditGoal,
     openReminderForGoal,
     addProgress,
+    saveGoal,
+    removeGoal,
     createReportDialogOpen,
     saveReport,
+    setGoalDialogOpen,
     setCreateReportDialogOpen,
     toggleGoalTask,
   } = useGoalsScreen();
@@ -116,6 +123,16 @@ export default function NativeGoalsScreen() {
         open={createReportDialogOpen}
         onOpenChange={setCreateReportDialogOpen}
         onSubmit={saveReport}
+      />
+
+      <GoalFormSheet
+        open={goalDialogOpen}
+        goal={editingGoal}
+        categories={categories}
+        rewards={rewards}
+        onOpenChange={setGoalDialogOpen}
+        onSave={saveGoal}
+        onDelete={removeGoal}
       />
     </View>
   );

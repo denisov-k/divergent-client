@@ -1,21 +1,39 @@
 ﻿import { Alert, Linking, Pressable, ScrollView, Share, Text, View } from "react-native";
 
 import { ActionChip } from "@/components/native/ActionChip";
+import { ChallengeDetailsSheet } from "@/components/native/ChallengeDetailsSheet";
+import { ChallengeFormSheet } from "@/components/native/ChallengeFormSheet";
 import { EmptyStateCard } from "@/components/native/EmptyStateCard";
 import { ScreenHeader } from "@/components/native/ScreenHeader";
+import { SelectPaymentMethodSheet } from "@/components/native/SelectPaymentMethodSheet";
 import { SurfaceCard } from "@/components/native/SurfaceCard";
 import { useChallengesScreen } from "@/shared/screens/challenges/useChallengesScreen";
 
 export default function NativeChallengesScreen() {
   const {
     challenges,
+    goals,
+    reports,
+    participants,
+    challengeDialogOpen,
+    editingChallenge,
+    paymentDialogOpen,
+    reportsDialogOpen,
+    selectedChallenge,
+    closeChallengeDialog,
+    setPaymentDialogOpen,
     openCreateChallenge,
     openEditChallenge,
     shareChallenge,
     prepareLeaveChallenge,
     confirmLeaveChallenge,
     openParticipants,
+    downloadChallengeReport,
+    closeReportsDialog,
     acceptSelectedChallenge,
+    saveChallenge,
+    selectPaymentMethod,
+    kickChallengeParticipant,
     openChallengeLink,
   } = useChallengesScreen({
     onShareChallenge: async (id) => {
@@ -38,16 +56,12 @@ export default function NativeChallengesScreen() {
     }
 
     if (result.status === "payment_required") {
-      Alert.alert("Нужна оплата", "Для этого челленджа сначала нужно оплатить участие.");
+      Alert.alert("Нужна оплата", "Откроем выбор способа оплаты и продолжим через redirect flow.");
     }
   };
 
   const handleOpenParticipants = async (id: string) => {
-    const opened = await openParticipants(id);
-    if (opened) {
-      const challenge = challenges.find((item) => item.id === id);
-      Alert.alert(challenge?.title || "Челлендж", "Данные участников и отчётов загружены.");
-    }
+    await openParticipants(id);
   };
 
   const handleLeaveChallenge = async (id: string) => {
@@ -60,6 +74,19 @@ export default function NativeChallengesScreen() {
         style: "destructive",
         onPress: () => {
           void confirmLeaveChallenge();
+        },
+      },
+    ]);
+  };
+
+  const handleKickParticipant = async (challengeId: string, userId: string) => {
+    Alert.alert("Исключить участника?", "Он потеряет доступ к челленджу и его данным.", [
+      { text: "Отмена", style: "cancel" },
+      {
+        text: "Исключить",
+        style: "destructive",
+        onPress: () => {
+          void kickChallengeParticipant(challengeId, userId);
         },
       },
     ]);
@@ -133,6 +160,18 @@ export default function NativeChallengesScreen() {
                       {isPaid ? `${challenge.price} ₽` : "Бесплатно"}
                     </Text>
                   </View>
+                  {challenge.requiresReport && (
+                    <View
+                      style={{
+                        backgroundColor: "#dbeafe",
+                        paddingHorizontal: 10,
+                        paddingVertical: 6,
+                        borderRadius: 999,
+                      }}
+                    >
+                      <Text style={{ color: "#1d4ed8" }}>Нужен отчёт</Text>
+                    </View>
+                  )}
                 </View>
 
                 <View style={{ gap: 8 }}>
@@ -178,6 +217,36 @@ export default function NativeChallengesScreen() {
           })
         )}
       </ScrollView>
+
+      {selectedChallenge && (
+        <ChallengeDetailsSheet
+          open={reportsDialogOpen}
+          challenge={selectedChallenge}
+          participants={participants}
+          reports={reports}
+          onOpenChange={(open) => {
+            if (!open) {
+              closeReportsDialog();
+            }
+          }}
+          onDownload={downloadChallengeReport}
+          onKick={handleKickParticipant}
+        />
+      )}
+
+      <SelectPaymentMethodSheet
+        open={paymentDialogOpen}
+        onOpenChange={setPaymentDialogOpen}
+        onSelect={selectPaymentMethod}
+      />
+
+      <ChallengeFormSheet
+        open={challengeDialogOpen}
+        challenge={editingChallenge}
+        goals={goals}
+        onOpenChange={closeChallengeDialog}
+        onSave={saveChallenge}
+      />
     </View>
   );
 }
