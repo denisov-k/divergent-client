@@ -13,11 +13,11 @@ import ResetPasswordView from '@/views/auth/reset';
 
 import IndexView from '@/views/index';
 import FrensView from '@/views/frens';
-import GoalsView from '@/views/goals';
+import GoalsView from '@/views/goals-screen';
 import ChallengesView from '@/views/challenges';
 import SettingsView from '@/views/settings';
 import RewardsView from '@/views/rewards';
-import RemindersView from '@/views/reminders';
+import RemindersView from '@/views/reminders-screen';
 import ProgressView from '@/views/progress';
 
 import { useAppStore } from '@/stores/useAppStore';
