@@ -5,11 +5,12 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { FileText, Image as ImageIcon, Upload } from "lucide-react";
 import {useTranslation} from "react-i18next";
+import type { ReportUploadPayload } from "@/types";
 
 interface ReportUploadModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onSubmit: (data: { file: File; comment?: string }) => Promise<void>;
+  onSubmit: (data: ReportUploadPayload) => Promise<void>;
 }
 
 export default function CreateReportDialog({
@@ -34,7 +35,12 @@ export default function CreateReportDialog({
     setError(null);
 
     try {
-      await onSubmit({ file, comment: comment || undefined });
+      await onSubmit({
+        file,
+        fileName: file.name,
+        mimeType: file.type,
+        comment: comment || undefined,
+      });
       setFile(null);
       setComment("");
     } catch (e) {

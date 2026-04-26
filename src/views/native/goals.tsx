@@ -1,6 +1,7 @@
 ﻿import { Alert, Pressable, ScrollView, Text, View } from "react-native";
 
 import { ActionChip } from "@/components/native/ActionChip";
+import { CreateReportSheet } from "@/components/native/CreateReportSheet";
 import { EmptyStateCard } from "@/components/native/EmptyStateCard";
 import { ScreenHeader } from "@/components/native/ScreenHeader";
 import { SurfaceCard } from "@/components/native/SurfaceCard";
@@ -14,6 +15,9 @@ export default function NativeGoalsScreen() {
     openEditGoal,
     openReminderForGoal,
     addProgress,
+    createReportDialogOpen,
+    saveReport,
+    setCreateReportDialogOpen,
     toggleGoalTask,
   } = useGoalsScreen();
 
@@ -107,6 +111,12 @@ export default function NativeGoalsScreen() {
           })
         )}
       </ScrollView>
+
+      <CreateReportSheet
+        open={createReportDialogOpen}
+        onOpenChange={setCreateReportDialogOpen}
+        onSubmit={saveReport}
+      />
     </View>
   );
 }

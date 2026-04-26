@@ -1,4 +1,4 @@
-﻿import type { Challenge, ChallengeApi, Goal, Reminder, Reward, User } from "@/types";
+﻿import type { Challenge, ChallengeApi, Goal, Reminder, ReportUploadPayload, Reward, User } from "@/types";
 import Config from "@/services/Config";
 import { ChallengeInput } from "@/components/CreateChallengeDialog.tsx";
 import { clearSessionToken, readSessionToken, writeSessionToken } from "@/platform/session";
@@ -12,9 +12,7 @@ async function fetchJSON(url: string, options: RequestInit = {}) {
     ...options,
     credentials: "include",
     headers: {
-      ...(baseUrl.includes("ngrok-free.dev")
-        ? { "ngrok-skip-browser-warning": "true" }
-        : {}),
+      ...(baseUrl.includes("ngrok-free.dev") ? { "ngrok-skip-browser-warning": "true" } : {}),
       ...(!isFormData ? { "Content-Type": "application/json" } : {}),
       ...(sessionToken ? { Authorization: `Bearer ${sessionToken}` } : {}),
       ...(options.headers || {}),
@@ -140,10 +138,23 @@ export async function toggleTask(taskId: string) {
   });
 }
 
-export async function addReport(taskId: string, data: FormData) {
+export async function addReport(taskId: string, data: ReportUploadPayload) {
+  const formData = new FormData();
+  const filePart =
+    "name" in data.file && typeof (data.file as File).name === "string"
+      ? (data.file as File)
+      : new File([data.file], data.fileName, {
+          type: data.mimeType || data.file.type || "application/octet-stream",
+        });
+
+  formData.append("file", filePart);
+  if (data.comment) {
+    formData.append("comment", data.comment);
+  }
+
   const res = await fetchJSON(`/api/tasks/${taskId}/report`, {
     method: "POST",
-    body: data,
+    body: formData,
   });
 
   return res as Promise<{ goal: Goal; user: User }>;

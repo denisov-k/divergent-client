@@ -1,7 +1,7 @@
 {
   "name": "divergent-client",
   "private": true,
-  "version": "0.3.12",
+  "version": "0.3.13",
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
@@ -46,6 +46,7 @@
     "dayjs": "^1.11.19",
     "embla-carousel-react": "^8.6.0",
     "expo": "^55.0.7",
+    "expo-document-picker": "^55.0.13",
     "expo-secure-store": "^55.0.13",
     "i18next": "^25.5.2",
     "input-otp": "^1.4.2",

@@ -1,7 +1,7 @@
-import { useState } from "react";
+﻿import { useState } from "react";
 
 import { useAppStore } from "@/stores/useAppStore";
-import type { CategoryOption, Goal, GoalFormData, Reminder } from "@/types";
+import type { CategoryOption, Goal, GoalFormData, Reminder, ReportUploadPayload } from "@/types";
 import { findTaskRecursive, isTaskCompletedThisPeriod } from "./model";
 
 type SaveGoalResult =
@@ -18,11 +18,13 @@ type ToggleTaskResult =
   | { status: "toggled" }
   | { status: "ignored" };
 
-export function useGoalsScreen(options: {
-  focusId?: string | null;
-  onNavigateToProgress?: (goalId: string) => void;
-  onReminderCreated?: () => void;
-} = {}) {
+export function useGoalsScreen(
+  options: {
+    focusId?: string | null;
+    onNavigateToProgress?: (goalId: string) => void;
+    onReminderCreated?: () => void;
+  } = {}
+) {
   const {
     goals,
     addGoal,
@@ -111,18 +113,12 @@ export function useGoalsScreen(options: {
     setReminderDialogOpen(true);
   };
 
-  const saveReport = async ({ file, comment }: { file: File; comment?: string }) => {
+  const saveReport = async ({ file, fileName, mimeType, comment }: ReportUploadPayload) => {
     if (!reportTaskId) {
       return false;
     }
 
-    const formData = new FormData();
-    formData.append("file", file);
-    if (comment) {
-      formData.append("comment", comment);
-    }
-
-    await addReport(reportTaskId, formData);
+    await addReport(reportTaskId, { file, fileName, mimeType, comment });
     setCreateReportDialogOpen(false);
     setReportTaskId(null);
     return true;

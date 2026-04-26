@@ -1,4 +1,4 @@
-import type {
+﻿import type {
   CategoryType,
   RewardIconType as SharedRewardIconType,
 } from "@/shared/domain";
@@ -6,20 +6,20 @@ import type {
 export type { CategoryType } from "@/shared/domain";
 
 export enum UserRole {
-  User = 'user',
-  Agent = 'agent',
-  Admin = 'admin',
-  SuperAgent = 'superagent',
+  User = "user",
+  Agent = "agent",
+  Admin = "admin",
+  SuperAgent = "superagent",
 }
 
 export const DAYS_OF_WEEK = [
-  { key: 'mon', label: 'Пн' },
-  { key: 'tue', label: 'Вт' },
-  { key: 'wed', label: 'Ср' },
-  { key: 'thu', label: 'Чт' },
-  { key: 'fri', label: 'Пт' },
-  { key: 'sat', label: 'Сб' },
-  { key: 'sun', label: 'Вс' },
+  { key: "mon", label: "РџРЅ" },
+  { key: "tue", label: "Р’С‚" },
+  { key: "wed", label: "РЎСЂ" },
+  { key: "thu", label: "Р§С‚" },
+  { key: "fri", label: "РџС‚" },
+  { key: "sat", label: "РЎР±" },
+  { key: "sun", label: "Р’СЃ" },
 ] as const;
 
 export const DAYS_OF_MONTH = Array.from({ length: 31 }, (_, i) => i + 1);
@@ -41,16 +41,14 @@ export interface Goal {
   title: string;
   description?: string;
   category: CategoryType;
-  tasks: Task[]; // остаётся для обычных целей
+  tasks: Task[];
   dueDate?: string;
   lastCompletedAt?: string;
   xpReward?: number;
-
-  // новые поля для числовой цели
-  currentValue?: number; // текущее значение прогресса
-  targetValue?: number;  // целевое значение
-  goalType: GoalType;      // "tasks" | "numeric"
-  goalPeriod: GoalPeriod; // "daily" | "weekly" | "monthly"
+  currentValue?: number;
+  targetValue?: number;
+  goalType: GoalType;
+  goalPeriod: GoalPeriod;
   challengeId?: string;
   challenge?: Challenge;
 }
@@ -87,8 +85,7 @@ export interface Challenge {
   reports: Report[];
 }
 
-export interface ChallengeApi
-  extends Omit<Challenge, "goals"> {
+export interface ChallengeApi extends Omit<Challenge, "goals"> {
   goals: ChallengeGoal[];
 }
 
@@ -183,13 +180,19 @@ export interface User {
   level: number;
   xpInCurrentLevel: number;
   requiredXp: number;
-  photoUrl: string
-  language: string
-  timeZone: string
+  photoUrl: string;
+  language: string;
+  timeZone: string;
 }
 
 export type PaymentMethod = "YOUKASSA";
 
+export type ReportUploadPayload = {
+  file: Blob;
+  fileName: string;
+  mimeType?: string;
+  comment?: string;
+};
 
 export type GridItem = {
   periodStart: string;
@@ -204,43 +207,42 @@ export type GoalActivity = {
   longestStreak: number;
   period: GoalPeriod;
   data: GridItem[];
-}
+};
 
 export type Draft = {
   goal: {
-    title: string
-    description: string | null
-    goalPeriod: "NONE" | "DAILY" | "WEEKLY" | "MONTHLY"
-    category: string
-    dueDate: string | null
-  }
-  tasks: Task[]
+    title: string;
+    description: string | null;
+    goalPeriod: "NONE" | "DAILY" | "WEEKLY" | "MONTHLY";
+    category: string;
+    dueDate: string | null;
+  };
+  tasks: Task[];
   reminders: {
-    title: string
-    time: string
-    daysOfWeek: string[]
-    daysOfMonth: number[]
-  }[]
+    title: string;
+    time: string;
+    daysOfWeek: string[];
+    daysOfMonth: number[];
+  }[];
   reward: {
-    title: string
-    description?: string | null
-    icon?: string | null
-    xpRequires?: number | null
-  }
-}
+    title: string;
+    description?: string | null;
+    icon?: string | null;
+    xpRequires?: number | null;
+  };
+};
 
 export type ChatMessage = {
-  role: "user" | "assistant"
-  content: string
-  goalDraft?: Draft | null
+  role: "user" | "assistant";
+  content: string;
+  goalDraft?: Draft | null;
   id?: string;
   isDraftAdded: boolean;
-}
+};
 
 export type AIChatResponse = {
-  id: string
-  message: string
-  goalDraft: Draft | null
+  id: string;
+  message: string;
+  goalDraft: Draft | null;
   isDraftAdded: boolean;
-}
-
+};
