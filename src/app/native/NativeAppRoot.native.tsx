@@ -1,4 +1,5 @@
-﻿import { Text, View } from "react-native";
+﻿import { useFonts } from "expo-font";
+import { Text, View } from "react-native";
 
 import { useAppBootstrap } from "@/app/useAppBootstrap";
 import { ActionChip } from "@/components/native/ActionChip";
@@ -34,9 +35,12 @@ function NativeAuthScreen() {
 }
 
 export default function NativeAppRoot() {
+  const [fontsLoaded] = useFonts({
+    Montserrat: require("@/assets/fonts/Montserrat-VariableFont_wght.ttf"),
+  });
   const { initialized, user } = useAppBootstrap();
 
-  if (!initialized) {
+  if (!fontsLoaded || !initialized) {
     return <NativeLoadingScreen />;
   }
 

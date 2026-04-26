@@ -1,7 +1,11 @@
-﻿import { Linking, Pressable, SafeAreaView, Text, View } from "react-native";
-import { useEffect, useState } from "react";
+﻿import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
+import { Linking, Pressable, SafeAreaView, Text, View } from "react-native";
 
 import { parseNativeAppRoute, type NativeAppTab, type NativeMoreTab } from "@/app/router.native";
+import { NativeAppHeader } from "@/components/native/NativeAppHeader";
+import { BarChart2, Bell, Gift, Swords, Target } from "@/components/native/icons";
+import { useAppStore } from "@/stores/useAppStore";
 import NativeChallengesScreen from "@/views/native/challenges";
 import NativeGoalsScreen from "@/views/native/goals";
 import NativeMoreScreen from "@/views/native/more";
@@ -9,16 +13,9 @@ import NativeProgressScreen from "@/views/native/progress";
 import NativeRemindersScreen from "@/views/native/reminders";
 import NativeRewardsScreen from "@/views/native/rewards";
 
-const tabs: Array<{ key: NativeAppTab; label: string }> = [
-  { key: "goals", label: "Цели" },
-  { key: "reminders", label: "Ритм" },
-  { key: "challenges", label: "Челл." },
-  { key: "rewards", label: "Награды" },
-  { key: "progress", label: "Прогресс" },
-  { key: "more", label: "Еще" },
-];
-
 export default function NativeAppShell() {
+  const { t } = useTranslation();
+  const { user } = useAppStore();
   const [activeTab, setActiveTab] = useState<NativeAppTab>("goals");
   const [goalLinkState, setGoalLinkState] = useState<{ goalId?: string | null }>({});
   const [reminderLinkState, setReminderLinkState] = useState<{
@@ -32,6 +29,18 @@ export default function NativeAppShell() {
   const [rewardLinkState, setRewardLinkState] = useState<{ rewardId?: string | null }>({});
   const [progressLinkState, setProgressLinkState] = useState<{ goalId?: string | null }>({});
   const [moreLinkState, setMoreLinkState] = useState<{ screen?: NativeMoreTab }>({});
+
+  const tabs: Array<{
+    key: Exclude<NativeAppTab, "more">;
+    label: string;
+    icon: typeof Target;
+  }> = [
+    { key: "goals", label: t("navigation.goals"), icon: Target },
+    { key: "challenges", label: t("navigation.challenges"), icon: Swords },
+    { key: "rewards", label: t("navigation.rewards"), icon: Gift },
+    { key: "progress", label: t("navigation.progress"), icon: BarChart2 },
+    { key: "reminders", label: t("navigation.reminders"), icon: Bell },
+  ];
 
   useEffect(() => {
     const clearTransientState = () => {
@@ -106,7 +115,17 @@ export default function NativeAppShell() {
   }, []);
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: "#e2e8f0" }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: "#ffffff" }}>
+      {!!user && (
+        <NativeAppHeader
+          user={user}
+          onOpenSettings={() => {
+            setActiveTab("more");
+            setMoreLinkState({ screen: "settings" });
+          }}
+        />
+      )}
+
       <View style={{ flex: 1 }}>
         {activeTab === "goals" && (
           <NativeGoalsScreen
@@ -163,16 +182,14 @@ export default function NativeAppShell() {
       <View
         style={{
           flexDirection: "row",
-          borderTopWidth: 1,
-          borderTopColor: "#cbd5e1",
           backgroundColor: "#ffffff",
-          paddingHorizontal: 8,
-          paddingVertical: 10,
-          gap: 8,
+          paddingHorizontal: 4,
+          paddingVertical: 8,
         }}
       >
         {tabs.map((tab) => {
           const active = tab.key === activeTab;
+          const Icon = tab.icon;
 
           return (
             <Pressable
@@ -180,13 +197,32 @@ export default function NativeAppShell() {
               onPress={() => setActiveTab(tab.key)}
               style={{
                 flex: 1,
-                borderRadius: 12,
-                paddingVertical: 10,
-                backgroundColor: active ? "#dbeafe" : "#f8fafc",
+                minWidth: 0,
+                marginHorizontal: 4,
+                minHeight: 45,
+                borderRadius: 8,
+                borderWidth: 2,
+                borderColor: "#2563eb",
+                paddingHorizontal: 8,
+                paddingVertical: 4,
                 alignItems: "center",
+                justifyContent: "center",
+                backgroundColor: active ? "#2563eb" : "#ffffff",
               }}
             >
-              <Text style={{ color: active ? "#1d4ed8" : "#475569", fontWeight: "600", fontSize: 12 }}>
+              <Icon color={active ? "#ffffff" : "#2563eb"} size={17} strokeWidth={2.5} />
+              <Text
+                style={{
+                  color: active ? "#ffffff" : "#2563eb",
+                  fontSize: 8,
+                  fontWeight: "800",
+                  fontFamily: "Montserrat",
+                  textTransform: "uppercase",
+                  textAlign: "center",
+                  lineHeight: 8,
+                  marginTop: 2,
+                }}
+              >
                 {tab.label}
               </Text>
             </Pressable>

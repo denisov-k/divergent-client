@@ -1,19 +1,22 @@
 ﻿import { useEffect } from "react";
-import { Alert, Pressable, ScrollView, Text, View } from "react-native";
+import { Alert, ScrollView, Text, View } from "react-native";
 
 import { ActionChip } from "@/components/native/ActionChip";
 import { AiChatSheet } from "@/components/native/AiChatSheet";
 import { CreateReportSheet } from "@/components/native/CreateReportSheet";
 import { EmptyStateCard } from "@/components/native/EmptyStateCard";
 import { GoalFormSheet } from "@/components/native/GoalFormSheet";
+import { NativeGoalCard } from "@/components/native/NativeGoalCard";
 import { ScreenHeader } from "@/components/native/ScreenHeader";
 import { SurfaceCard } from "@/components/native/SurfaceCard";
+import { useAppStore } from "@/stores/useAppStore";
 import { useGoalsScreen } from "@/shared/screens/goals/useGoalsScreen";
 
 export default function NativeGoalsScreen(props: {
   goalId?: string | null;
   onConsumeLinkState?: () => void;
 }) {
+  const { user } = useAppStore();
   const {
     goals,
     rewards,
@@ -60,14 +63,27 @@ export default function NativeGoalsScreen(props: {
   };
 
   return (
-    <View style={{ flex: 1, backgroundColor: "#f8fafc" }}>
-      <ScreenHeader title="Цели" actionLabel="Новая цель" onAction={openCreateGoal} />
+    <View style={{ flex: 1, backgroundColor: "#ffffff" }}>
+      <ScreenHeader
+        title="Цели"
+        actionLabel="Новая цель"
+        onAction={openCreateGoal}
+        paddingHorizontal={8}
+        paddingVertical={8}
+      />
 
-      <ScrollView contentContainerStyle={{ padding: 16, gap: 12 }}>
+      <ScrollView
+        contentContainerStyle={{
+          paddingHorizontal: 8,
+          paddingTop: 8,
+          paddingBottom: 16,
+          gap: 8,
+        }}
+      >
         <SurfaceCard>
           <View style={{ gap: 8 }}>
-            <Text style={{ fontSize: 16, fontWeight: "600", color: "#0f172a" }}>AI-помощник</Text>
-            <Text style={{ color: "#64748b" }}>
+            <Text style={{ fontSize: 16, fontWeight: "600", color: "#0f172a", fontFamily: "Montserrat" }}>AI-помощник</Text>
+            <Text style={{ color: "#64748b", fontFamily: "Montserrat" }}>
               Тот же сценарий генерации целей через AI, что и в вебе, теперь доступен и в mobile-клиенте.
             </Text>
             <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8 }}>
@@ -87,65 +103,22 @@ export default function NativeGoalsScreen(props: {
           />
         ) : (
           goals.map((goal) => {
-            const reward = rewards.find((item) => item.goalId === goal.id);
+            const reward = rewards.find((item) => item.goalId === goal.id) || null;
+            const categoryLabel = categories.find((item) => item.value === goal.category)?.label ?? goal.category;
 
             return (
-              <SurfaceCard key={goal.id}>
-                <View style={{ flexDirection: "row", justifyContent: "space-between", gap: 12 }}>
-                  <View style={{ flex: 1 }}>
-                    <Text style={{ fontSize: 18, fontWeight: "700", color: "#0f172a" }}>
-                      {goal.title}
-                    </Text>
-                    {!!goal.description && (
-                      <Text style={{ marginTop: 4, color: "#64748b" }}>{goal.description}</Text>
-                    )}
-                    {reward && (
-                      <Text style={{ marginTop: 8, color: "#0f766e", fontWeight: "600" }}>
-                        Награда: {reward.title}
-                      </Text>
-                    )}
-                  </View>
-
-                  <Pressable onPress={() => openEditGoal(goal.id)}>
-                    <Text style={{ color: "#2563eb", fontWeight: "600" }}>Изменить</Text>
-                  </Pressable>
-                </View>
-
-                {goal.goalType === "PROGRESS" && (
-                  <View style={{ flexDirection: "row", gap: 8 }}>
-                    <ActionChip onPress={() => addProgress(goal.id, -1)}>-1</ActionChip>
-                    <ActionChip onPress={() => addProgress(goal.id, 1)} tone="primary">
-                      +1
-                    </ActionChip>
-                    <Text style={{ color: "#475569", alignSelf: "center" }}>
-                      {goal.currentValue ?? 0} / {goal.targetValue ?? "—"}
-                    </Text>
-                  </View>
-                )}
-
-                <View style={{ gap: 8 }}>
-                  {goal.tasks?.map((task) => (
-                    <Pressable
-                      key={task.id}
-                      onPress={() => void handleTaskToggle(goal.id, task.id)}
-                      style={{
-                        flexDirection: "row",
-                        justifyContent: "space-between",
-                        alignItems: "center",
-                        backgroundColor: "#f8fafc",
-                        paddingHorizontal: 12,
-                        paddingVertical: 10,
-                        borderRadius: 12,
-                      }}
-                    >
-                      <Text style={{ color: "#0f172a", flex: 1 }}>{task.title}</Text>
-                      <Text style={{ color: "#64748b" }}>{task.lastCompletedAt ? "Готово" : "Открыто"}</Text>
-                    </Pressable>
-                  ))}
-                </View>
-
-                <ActionChip onPress={() => openReminderForGoal(goal.id)}>Добавить напоминание</ActionChip>
-              </SurfaceCard>
+              <NativeGoalCard
+                key={goal.id}
+                goal={goal}
+                categoryLabel={categoryLabel}
+                reward={reward}
+                userTimeZone={user?.timeZone ?? "UTC"}
+                autoExpand={goal.id === props.goalId}
+                onEdit={openEditGoal}
+                onTaskToggle={handleTaskToggle}
+                onAddReminder={openReminderForGoal}
+                onAddProgress={addProgress}
+              />
             );
           })
         )}

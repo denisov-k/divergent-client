@@ -9,12 +9,16 @@ export function ScreenHeader({
   actionLabel,
   onAction,
   actionTone = "primary",
+  paddingHorizontal = 16,
+  paddingVertical = 12,
 }: {
   title: string;
   subtitle?: string;
   actionLabel?: ReactNode;
   onAction?: () => void;
   actionTone?: "primary" | "secondary" | "success" | "danger";
+  paddingHorizontal?: number;
+  paddingVertical?: number;
 }) {
   return (
     <View
@@ -23,16 +27,14 @@ export function ScreenHeader({
         justifyContent: "space-between",
         alignItems: "center",
         gap: 12,
-        paddingHorizontal: 16,
-        paddingVertical: 12,
+        paddingHorizontal,
+        paddingVertical,
         backgroundColor: "#ffffff",
-        borderBottomWidth: 1,
-        borderBottomColor: "#e2e8f0",
       }}
     >
       <View style={{ flex: 1, gap: subtitle ? 4 : 0 }}>
-        <Text style={{ fontSize: 22, fontWeight: "700", color: "#0f172a" }}>{title}</Text>
-        {!!subtitle && <Text style={{ color: "#64748b" }}>{subtitle}</Text>}
+        <Text style={{ fontSize: 19, fontWeight: "500", color: "#0f172a", fontFamily: "Montserrat", lineHeight: 29 }}>{title}</Text>
+        {!!subtitle && <Text style={{ color: "#64748b", fontSize: 12, fontWeight: "400", fontFamily: "Montserrat", lineHeight: 18 }}>{subtitle}</Text>}
       </View>
 
       {!!actionLabel && onAction && (

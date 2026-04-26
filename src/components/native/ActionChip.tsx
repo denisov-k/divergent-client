@@ -33,7 +33,7 @@ export function ActionChip({
         borderColor: palette.borderColor ?? palette.backgroundColor,
       }}
     >
-      <Text style={{ color: palette.textColor, fontWeight: "600" }}>{children}</Text>
+      <Text style={{ color: palette.textColor, fontWeight: "500", fontSize: 12, lineHeight: 18, fontFamily: "Montserrat" }}>{children}</Text>
     </Pressable>
   );
 }

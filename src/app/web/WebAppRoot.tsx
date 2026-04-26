@@ -28,6 +28,10 @@ function renderProtected(component: React.ReactNode) {
   );
 }
 
+function renderProtectedNativePreview(component: React.ReactNode) {
+  return <ProtectedRoute>{component}</ProtectedRoute>;
+}
+
 export default function WebAppRoot() {
   useAppBootstrap();
 
@@ -46,7 +50,7 @@ export default function WebAppRoot() {
         <Route path="/rewards" element={renderProtected(<RewardsView />)} />
         <Route path="/reminders" element={renderProtected(<RemindersView />)} />
         <Route path="/progress" element={renderProtected(<ProgressView />)} />
-        <Route path="/native" element={renderProtected(<NativePreviewPage />)} />
+        <Route path="/native" element={renderProtectedNativePreview(<NativePreviewPage />)} />
       </Routes>
     </Router>
   );
