@@ -1,11 +1,20 @@
-First native entrypoints live here.
+﻿First native entrypoints live here.
 
 Current scope:
 - `goals.tsx`
 - `reminders.tsx`
+- `challenges.tsx`
+- `rewards.tsx`
+- `progress.tsx`
+- `frens.tsx`
+- `settings.tsx`
+- `more.tsx`
+- `AppShell.tsx`
 
 Rules for the migration:
 - keep business logic in `src/shared/screens/<screen>`
 - keep native UI here
 - keep web UI in `src/views/web/<screen>.tsx`
 - expand this folder screen by screen instead of rewriting the whole client at once
+- grow `AppShell.tsx` into the future mobile root instead of duplicating navigation logic per screen
+- route secondary sections through `more.tsx`, so the main mobile tab bar stays compact

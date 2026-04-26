@@ -1,5 +1,9 @@
-import { Alert, Pressable, ScrollView, Text, View } from "react-native";
+﻿import { Alert, Pressable, ScrollView, Text, View } from "react-native";
 
+import { ActionChip } from "@/components/native/ActionChip";
+import { EmptyStateCard } from "@/components/native/EmptyStateCard";
+import { ScreenHeader } from "@/components/native/ScreenHeader";
+import { SurfaceCard } from "@/components/native/SurfaceCard";
 import { useGoalsScreen } from "@/shared/screens/goals/useGoalsScreen";
 
 export default function NativeGoalsScreen() {
@@ -28,78 +32,22 @@ export default function NativeGoalsScreen() {
 
   return (
     <View style={{ flex: 1, backgroundColor: "#f8fafc" }}>
-      <View
-        style={{
-          flexDirection: "row",
-          justifyContent: "space-between",
-          alignItems: "center",
-          paddingHorizontal: 16,
-          paddingVertical: 12,
-          backgroundColor: "#ffffff",
-          borderBottomWidth: 1,
-          borderBottomColor: "#e2e8f0",
-        }}
-      >
-        <Text style={{ fontSize: 22, fontWeight: "700", color: "#0f172a" }}>Цели</Text>
-        <Pressable
-          onPress={openCreateGoal}
-          style={{
-            backgroundColor: "#2563eb",
-            paddingHorizontal: 14,
-            paddingVertical: 10,
-            borderRadius: 12,
-          }}
-        >
-          <Text style={{ color: "#ffffff", fontWeight: "600" }}>Новая цель</Text>
-        </Pressable>
-      </View>
+      <ScreenHeader title="Цели" actionLabel="Новая цель" onAction={openCreateGoal} />
 
       <ScrollView contentContainerStyle={{ padding: 16, gap: 12 }}>
         {goals.length === 0 ? (
-          <View
-            style={{
-              backgroundColor: "#ffffff",
-              borderRadius: 16,
-              padding: 20,
-              borderWidth: 1,
-              borderColor: "#e2e8f0",
-            }}
-          >
-            <Text style={{ fontSize: 16, fontWeight: "600", color: "#0f172a", marginBottom: 8 }}>
-              Пока нет целей
-            </Text>
-            <Text style={{ color: "#64748b", marginBottom: 16 }}>
-              Создайте первую цель, чтобы начать перенос mobile flow на общий screen-layer.
-            </Text>
-            <Pressable
-              onPress={openCreateGoal}
-              style={{
-                alignSelf: "flex-start",
-                backgroundColor: "#eff6ff",
-                paddingHorizontal: 12,
-                paddingVertical: 10,
-                borderRadius: 10,
-              }}
-            >
-              <Text style={{ color: "#1d4ed8", fontWeight: "600" }}>Создать цель</Text>
-            </Pressable>
-          </View>
+          <EmptyStateCard
+            title="Пока нет целей"
+            description="Создайте первую цель, чтобы начать перенос mobile flow на общий screen-layer."
+            actionLabel="Создать цель"
+            onAction={openCreateGoal}
+          />
         ) : (
           goals.map((goal) => {
             const reward = rewards.find((item) => item.goalId === goal.id);
 
             return (
-              <View
-                key={goal.id}
-                style={{
-                  backgroundColor: "#ffffff",
-                  borderRadius: 16,
-                  padding: 16,
-                  borderWidth: 1,
-                  borderColor: "#e2e8f0",
-                  gap: 12,
-                }}
-              >
+              <SurfaceCard key={goal.id}>
                 <View style={{ flexDirection: "row", justifyContent: "space-between", gap: 12 }}>
                   <View style={{ flex: 1 }}>
                     <Text style={{ fontSize: 18, fontWeight: "700", color: "#0f172a" }}>
@@ -122,28 +70,10 @@ export default function NativeGoalsScreen() {
 
                 {goal.goalType === "PROGRESS" && (
                   <View style={{ flexDirection: "row", gap: 8 }}>
-                    <Pressable
-                      onPress={() => addProgress(goal.id, -1)}
-                      style={{
-                        backgroundColor: "#f1f5f9",
-                        paddingHorizontal: 12,
-                        paddingVertical: 8,
-                        borderRadius: 10,
-                      }}
-                    >
-                      <Text style={{ color: "#334155", fontWeight: "600" }}>-1</Text>
-                    </Pressable>
-                    <Pressable
-                      onPress={() => addProgress(goal.id, 1)}
-                      style={{
-                        backgroundColor: "#dbeafe",
-                        paddingHorizontal: 12,
-                        paddingVertical: 8,
-                        borderRadius: 10,
-                      }}
-                    >
-                      <Text style={{ color: "#1d4ed8", fontWeight: "600" }}>+1</Text>
-                    </Pressable>
+                    <ActionChip onPress={() => addProgress(goal.id, -1)}>-1</ActionChip>
+                    <ActionChip onPress={() => addProgress(goal.id, 1)} tone="primary">
+                      +1
+                    </ActionChip>
                     <Text style={{ color: "#475569", alignSelf: "center" }}>
                       {goal.currentValue ?? 0} / {goal.targetValue ?? "—"}
                     </Text>
@@ -171,19 +101,8 @@ export default function NativeGoalsScreen() {
                   ))}
                 </View>
 
-                <Pressable
-                  onPress={() => openReminderForGoal(goal.id)}
-                  style={{
-                    alignSelf: "flex-start",
-                    backgroundColor: "#f8fafc",
-                    paddingHorizontal: 12,
-                    paddingVertical: 10,
-                    borderRadius: 10,
-                  }}
-                >
-                  <Text style={{ color: "#334155", fontWeight: "600" }}>Добавить напоминание</Text>
-                </Pressable>
-              </View>
+                <ActionChip onPress={() => openReminderForGoal(goal.id)}>Добавить напоминание</ActionChip>
+              </SurfaceCard>
             );
           })
         )}
