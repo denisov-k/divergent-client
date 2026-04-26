@@ -1,6 +1,9 @@
 import {create} from "zustand";
 import * as api from "@/shared/api/client";
 import { loadAppData } from "@/shared/app/loadAppData";
+import { downloadReportFile } from "@/platform/files";
+import { clearSessionToken, readSessionToken, writeSessionToken } from "@/platform/session";
+import { openTelegramInvoice } from "@/platform/telegram";
 
 import {
   CategoryOption,
@@ -16,9 +19,6 @@ import {
   User, AIChatResponse, ChatMessage
 } from "@/types/";
 import {ChallengeInput} from "@/components/CreateChallengeDialog.tsx";
-
-import WebApp from '@twa-dev/sdk';
-import Config from "@/services/Config.ts";
 
 interface AppStore {
   initialized: boolean;
@@ -104,6 +104,7 @@ export const useAppStore = create<AppStore>((set, get) => ({
       const token = '';
       const user = await api.login(tgData);
       set({ user, token });
+      writeSessionToken(token);
       localStorage.setItem("token", token); // сохраняем для перезагрузки
     } catch (err) {
       console.error(err);
@@ -133,11 +134,11 @@ export const useAppStore = create<AppStore>((set, get) => ({
 
   logout: () => {
     set({ user: null, token: null, goals: [], rewards: [], reminders: [] });
-    localStorage.removeItem("token");
+    clearSessionToken();
   },
 
   refreshUser: async () => {
-    const token = get().token || localStorage.getItem("token");
+    const token = get().token || readSessionToken();
     if (!token) return;
 
     set({ loading: true });
@@ -265,10 +266,8 @@ export const useAppStore = create<AppStore>((set, get) => ({
   },
 
   redirectToTelegram(link) {
-    WebApp.openInvoice(link, async (status) => {
-      if (status === "paid") {
-        set(await loadAppData());
-      }
+    openTelegramInvoice(link, async () => {
+      set(await loadAppData());
     });
   },
 
@@ -461,21 +460,7 @@ export const useAppStore = create<AppStore>((set, get) => ({
 
   downloadReport: async (report: Report) => {
     try {
-      const fileUrl = report.fileUrl.startsWith("http")
-        ? report.fileUrl
-        : `${Config.data.api.http.baseURL}${report.fileUrl}`;
-
-      const res = await fetch(fileUrl, { credentials: "include" });
-      const blob = await res.blob();
-
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = `${report.user.name} - ${report.taskCompletion.task.title}`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
+      await downloadReportFile(report);
     } catch (err) {
       console.error("Download failed", err);
     }
