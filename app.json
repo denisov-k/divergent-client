@@ -1,17 +1,21 @@
 {
-  "android": {
-    "package": "com.anonymous.divergentclient"
-  },
-  "extra": {
-    "eas": {
-      "projectId": "63f44398-912c-4439-8efe-0d474e65d1ae"
-    }
-  },
   "expo": {
+    "name": "Divergent",
+    "slug": "divergent-client",
+    "scheme": "divergent",
+    "entryPoint": "./src/index.native.tsx",
+    "android": {
+      "package": "com.anonymous.divergentclient"
+    },
     "ios": {
       "bundleIdentifier": "com.anonymous.divergentclient",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
+      }
+    },
+    "extra": {
+      "eas": {
+        "projectId": "63f44398-912c-4439-8efe-0d474e65d1ae"
       }
     }
   }

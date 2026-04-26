@@ -1,5 +1,5 @@
-﻿import { useState } from "react";
-import { ScrollView, Text, View } from "react-native";
+﻿import { useEffect, useState } from "react";
+import { Linking, ScrollView, Text, View } from "react-native";
 import { z, ZodError } from "zod";
 
 import { ActionChip } from "@/components/native/ActionChip";
@@ -7,9 +7,8 @@ import { FieldInput } from "@/components/native/FieldInput";
 import { ScreenHeader } from "@/components/native/ScreenHeader";
 import { SectionTabs } from "@/components/native/SectionTabs";
 import { SurfaceCard } from "@/components/native/SurfaceCard";
+import { parseNativeAuthLink, type NativeAuthTab, type NativeResetMode } from "@/platform/nativeAuthLinking";
 import { useAppStore } from "@/stores/useAppStore";
-
-type AuthTab = "signin" | "signup" | "reset";
 
 const signInSchema = z.object({
   email: z.string().email("Invalid email address"),
@@ -69,7 +68,7 @@ function SuccessBanner({ message }: { message?: string }) {
 
 export default function NativeAuthRoot() {
   const { loading, loginWithCredentials, signup, passwordReset, confirmPasswordReset } = useAppStore();
-  const [activeTab, setActiveTab] = useState<AuthTab>("signin");
+  const [activeTab, setActiveTab] = useState<NativeAuthTab>("signin");
 
   const [signInData, setSignInData] = useState({ email: "", password: "" });
   const [signInError, setSignInError] = useState<string>();
@@ -77,7 +76,7 @@ export default function NativeAuthRoot() {
   const [signUpData, setSignUpData] = useState({ name: "", email: "", password: "" });
   const [signUpError, setSignUpError] = useState<string>();
 
-  const [resetMode, setResetMode] = useState<"request" | "confirm">("request");
+  const [resetMode, setResetMode] = useState<NativeResetMode>("request");
   const [resetData, setResetData] = useState({
     email: "",
     token: "",
@@ -87,6 +86,46 @@ export default function NativeAuthRoot() {
   const [resetError, setResetError] = useState<string>();
   const [resetSuccess, setResetSuccess] = useState<string>();
   const [resetUrl, setResetUrl] = useState<string>();
+
+  useEffect(() => {
+    const applyLink = (url: string) => {
+      const state = parseNativeAuthLink(url);
+      if (!state) {
+        return;
+      }
+
+      if (state.tab) {
+        setActiveTab(state.tab);
+      }
+
+      if (state.email) {
+        setSignInData((prev) => ({ ...prev, email: state.email || prev.email }));
+        setSignUpData((prev) => ({ ...prev, email: state.email || prev.email }));
+        setResetData((prev) => ({ ...prev, email: state.email || prev.email }));
+      }
+
+      if (state.tab === "reset") {
+        setResetMode(state.resetMode || "request");
+        if (state.token) {
+          setResetData((prev) => ({ ...prev, token: state.token || prev.token }));
+        }
+      }
+    };
+
+    void Linking.getInitialURL().then((url) => {
+      if (url) {
+        applyLink(url);
+      }
+    });
+
+    const subscription = Linking.addEventListener("url", ({ url }) => {
+      applyLink(url);
+    });
+
+    return () => {
+      subscription.remove();
+    };
+  }, []);
 
   const handleValidationError = (error: unknown) => {
     if (error instanceof ZodError) {
@@ -126,7 +165,7 @@ export default function NativeAuthRoot() {
       setResetUrl(response.resetUrl);
       setResetSuccess(
         response.resetUrl
-          ? "Reset link created. You can open it in the browser or paste the token below."
+          ? "Reset link created. You can open it directly or paste the token below."
           : "If an account exists, a reset link has been prepared."
       );
       setResetMode("confirm");
@@ -275,9 +314,12 @@ export default function NativeAuthRoot() {
             <SuccessBanner message={resetSuccess} />
 
             {!!resetUrl && (
-              <Text style={{ color: "#0f766e" }} selectable>
-                {resetUrl}
-              </Text>
+              <View style={{ gap: 8 }}>
+                <Text style={{ color: "#0f766e" }} selectable>
+                  {resetUrl}
+                </Text>
+                <ActionChip onPress={() => void Linking.openURL(resetUrl)}>Open reset link</ActionChip>
+              </View>
             )}
 
             <View style={{ flexDirection: "row", gap: 8, flexWrap: "wrap" }}>

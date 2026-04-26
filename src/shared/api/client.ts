@@ -1,10 +1,12 @@
-import type { Challenge, ChallengeApi, Goal, Reminder, Reward, User } from "@/types";
+﻿import type { Challenge, ChallengeApi, Goal, Reminder, Reward, User } from "@/types";
 import Config from "@/services/Config";
 import { ChallengeInput } from "@/components/CreateChallengeDialog.tsx";
+import { clearSessionToken, readSessionToken, writeSessionToken } from "@/platform/session";
 
 async function fetchJSON(url: string, options: RequestInit = {}) {
   const isFormData = options.body instanceof FormData;
   const baseUrl = Config.data.api.http.baseURL;
+  const sessionToken = await readSessionToken();
 
   const res = await fetch(baseUrl + url, {
     ...options,
@@ -14,12 +16,22 @@ async function fetchJSON(url: string, options: RequestInit = {}) {
         ? { "ngrok-skip-browser-warning": "true" }
         : {}),
       ...(!isFormData ? { "Content-Type": "application/json" } : {}),
+      ...(sessionToken ? { Authorization: `Bearer ${sessionToken}` } : {}),
       ...(options.headers || {}),
     },
   });
 
+  const nextSessionToken = res.headers.get("x-session-token");
+  if (nextSessionToken) {
+    await writeSessionToken(nextSessionToken);
+  }
+
   const contentType = res.headers.get("content-type") || "";
   if (!res.ok) {
+    if (res.status === 401) {
+      await clearSessionToken();
+    }
+
     if (contentType.includes("application/json")) {
       const data = (await res.json()) as { error?: string };
       throw new Error(data.error || `API error: ${res.status}`);
@@ -52,9 +64,11 @@ export async function register(email: string, password: string, name?: string) {
 }
 
 export async function logout() {
-  return fetchJSON("/api/auth/logout", {
+  const result = await fetchJSON("/api/auth/logout", {
     method: "POST",
   });
+  await clearSessionToken();
+  return result;
 }
 
 export async function requestPasswordReset(email: string): Promise<{ ok: true; resetUrl?: string }> {
@@ -187,18 +201,15 @@ export async function addDraft(messageId: string) {
 
 export async function downloadReport(reportId: string): Promise<Blob> {
   const baseUrl = Config.data.api.http.baseURL;
-  const res = await fetch(
-    baseUrl + `/api/reports/${reportId}/download`,
-    {
-      method: "GET",
-      credentials: "include",
-      headers: {
-        ...(baseUrl.includes("ngrok-free.dev")
-          ? { "ngrok-skip-browser-warning": "true" }
-          : {}),
-      },
-    }
-  );
+  const sessionToken = await readSessionToken();
+  const res = await fetch(baseUrl + `/api/reports/${reportId}/download`, {
+    method: "GET",
+    credentials: "include",
+    headers: {
+      ...(baseUrl.includes("ngrok-free.dev") ? { "ngrok-skip-browser-warning": "true" } : {}),
+      ...(sessionToken ? { Authorization: `Bearer ${sessionToken}` } : {}),
+    },
+  });
 
   if (!res.ok) {
     throw new Error(`Download error: ${res.status}`);
@@ -313,8 +324,6 @@ export async function fetchFriends(): Promise<any[]> {
   return fetchJSON("/api/friends");
 }
 
-export async function fetchCategories(): Promise<
-  { value: string; label: string }[]
-> {
+export async function fetchCategories(): Promise<{ value: string; label: string }[]> {
   return fetchJSON("/api/categories");
 }

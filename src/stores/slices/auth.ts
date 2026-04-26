@@ -1,11 +1,9 @@
-import * as api from "@/shared/api/client";
+﻿import * as api from "@/shared/api/client";
 import { loadAppData } from "@/shared/app/loadAppData";
 import { clearSessionToken } from "@/platform/session";
 import type { AuthSlice, StoreSlice } from "@/stores/types";
 
-async function finalizeAuthenticatedState(
-  set: Parameters<StoreSlice<AuthSlice>>[0]
-) {
+async function finalizeAuthenticatedState(set: Parameters<StoreSlice<AuthSlice>>[0]) {
   const user = await api.fetchUser();
 
   set({
@@ -14,7 +12,6 @@ async function finalizeAuthenticatedState(
     ...(await loadAppData()),
     initialized: true,
   });
-  clearSessionToken();
 }
 
 export const createAuthSlice: StoreSlice<AuthSlice> = (set, get) => ({
@@ -87,7 +84,7 @@ export const createAuthSlice: StoreSlice<AuthSlice> = (set, get) => ({
 
   logout: () => {
     set({ user: null, token: null, goals: [], rewards: [], reminders: [] });
-    clearSessionToken();
+    void clearSessionToken();
   },
 
   refreshUser: async () => {
@@ -115,6 +112,7 @@ export const createAuthSlice: StoreSlice<AuthSlice> = (set, get) => ({
     } catch (err) {
       console.error(err);
       set({ user: null });
+      void clearSessionToken();
     } finally {
       set({ initialized: true, loading: false });
     }

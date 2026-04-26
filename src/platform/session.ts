@@ -1,13 +1,13 @@
-const TOKEN_KEY = "token";
+﻿const TOKEN_KEY = "token";
 
-export function readSessionToken() {
+export async function readSessionToken() {
   return localStorage.getItem(TOKEN_KEY);
 }
 
-export function writeSessionToken(token: string) {
+export async function writeSessionToken(token: string) {
   localStorage.setItem(TOKEN_KEY, token);
 }
 
-export function clearSessionToken() {
+export async function clearSessionToken() {
   localStorage.removeItem(TOKEN_KEY);
 }
