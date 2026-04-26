@@ -27,6 +27,7 @@ export function ReminderFormSheet({
   onOpenChange,
   onSave,
   onDelete,
+  initialGoalId,
 }: {
   open: boolean;
   reminder?: Reminder;
@@ -34,6 +35,7 @@ export function ReminderFormSheet({
   onOpenChange: (open: boolean) => void;
   onSave: (reminder: Reminder) => Promise<unknown>;
   onDelete: (id: string) => Promise<boolean>;
+  initialGoalId?: string;
 }) {
   const [title, setTitle] = useState("");
   const [time, setTime] = useState("09:00");
@@ -67,10 +69,10 @@ export function ReminderFormSheet({
     setMode("week");
     setSelectedDays([]);
     setSelectedDaysOfMonth([]);
-    setGoalId(undefined);
+    setGoalId(initialGoalId);
     setTaskId(undefined);
     setIsActive(true);
-  }, [open, reminder]);
+  }, [open, reminder, initialGoalId]);
 
   const selectedGoal = useMemo(() => goals.find((goal) => goal.id === goalId), [goals, goalId]);
   const availableTasks = selectedGoal?.tasks ?? [];
@@ -226,7 +228,7 @@ export function ReminderFormSheet({
             <View style={{ gap: 8 }}>
               <Text style={{ fontSize: 14, fontWeight: "600", color: "#334155" }}>Привязка к цели</Text>
               <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8 }}>
-                <ActionChip onPress={() => { setGoalId(undefined); setTaskId(undefined); }} tone={!goalId ? "primary" : "secondary"}>
+                <ActionChip onPress={() => { setGoalId(initialGoalId); setTaskId(undefined); }} tone={!goalId ? "primary" : "secondary"}>
                   Без привязки
                 </ActionChip>
                 {goals.map((goal) => (
@@ -290,3 +292,4 @@ export function ReminderFormSheet({
     </Modal>
   );
 }
+

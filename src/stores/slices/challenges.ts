@@ -1,4 +1,5 @@
 ﻿import * as api from "@/shared/api/client";
+import { buildChallengesPath } from "@/app/routes";
 import { loadAppData } from "@/shared/app/loadAppData";
 import { buildPaymentReturnUrl } from "@/platform/appUrl";
 import { redirectToUrl } from "@/platform/browser";
@@ -93,7 +94,7 @@ export const createChallengesSlice: StoreSlice<ChallengesSlice> = (set, get) => 
   payChallenge: async (challenge, method) => {
     set({ loading: true });
     try {
-      const res = await api.payChallenge(challenge.id, method, buildPaymentReturnUrl("/challenges"));
+      const res = await api.payChallenge(challenge.id, method, buildPaymentReturnUrl(buildChallengesPath()));
       if (res.confirmationUrl) {
         redirectToUrl(res.confirmationUrl);
       }
@@ -162,3 +163,4 @@ export const createChallengesSlice: StoreSlice<ChallengesSlice> = (set, get) => 
     }
   },
 });
+

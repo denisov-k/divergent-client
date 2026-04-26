@@ -1,4 +1,5 @@
-﻿import { Alert, Pressable, ScrollView, Text, View } from "react-native";
+﻿import { useEffect } from "react";
+import { Alert, Pressable, ScrollView, Text, View } from "react-native";
 
 import { ActionChip } from "@/components/native/ActionChip";
 import { EmptyStateCard } from "@/components/native/EmptyStateCard";
@@ -6,8 +7,20 @@ import { ScreenHeader } from "@/components/native/ScreenHeader";
 import { SurfaceCard } from "@/components/native/SurfaceCard";
 import { useRewardsScreen } from "@/shared/screens/rewards/useRewardsScreen";
 
-export default function NativeRewardsScreen() {
+export default function NativeRewardsScreen(props: {
+  rewardId?: string | null;
+  onConsumeLinkState?: () => void;
+}) {
   const { rewards, goals, openCreateReward, openEditReward, removeReward } = useRewardsScreen();
+
+  useEffect(() => {
+    if (!props.rewardId) {
+      return;
+    }
+
+    openEditReward(props.rewardId);
+    props.onConsumeLinkState?.();
+  }, [props.rewardId, props.onConsumeLinkState, openEditReward]);
 
   const handleDeleteReward = async (id: string) => {
     await removeReward(id);

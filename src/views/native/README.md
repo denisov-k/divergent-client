@@ -18,3 +18,9 @@ Rules for the migration:
 - expand this folder screen by screen instead of rewriting the whole client at once
 - grow `AppShell.tsx` into the future mobile root instead of duplicating navigation logic per screen
 - route secondary sections through `more.tsx`, so the main mobile tab bar stays compact
+
+Navigation contract:
+- native deep links are parsed in `src/app/router.native.ts`
+- `AppShell.tsx` consumes app routes from that shared router layer
+- `NativeAuthRoot.tsx` consumes auth routes from the same contract
+- platform helper files in `src/platform/*Linking.ts` now stay as compatibility wrappers only

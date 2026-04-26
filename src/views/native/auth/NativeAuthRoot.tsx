@@ -8,7 +8,7 @@ import { platformCapabilities } from "@/platform/capabilities";
 import { ScreenHeader } from "@/components/native/ScreenHeader";
 import { SectionTabs } from "@/components/native/SectionTabs";
 import { SurfaceCard } from "@/components/native/SurfaceCard";
-import { parseNativeAuthLink, type NativeAuthTab, type NativeResetMode } from "@/platform/nativeAuthLinking";
+import { parseNativeAuthRoute, type NativeAuthTab, type NativeResetMode } from "@/app/router.native";
 import { useAppStore } from "@/stores/useAppStore";
 
 const signInSchema = z.object({
@@ -90,7 +90,7 @@ export default function NativeAuthRoot() {
 
   useEffect(() => {
     const applyLink = (url: string) => {
-      const state = parseNativeAuthLink(url);
+      const state = parseNativeAuthRoute(url);
       if (!state) {
         return;
       }
@@ -350,3 +350,4 @@ export default function NativeAuthRoot() {
     </View>
   );
 }
+

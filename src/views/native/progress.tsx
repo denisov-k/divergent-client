@@ -1,13 +1,16 @@
-﻿import { Pressable, ScrollView, Text, View } from "react-native";
-import { useState } from "react";
+﻿import { useEffect, useState } from "react";
+import { Pressable, ScrollView, Text, View } from "react-native";
 
 import { ScreenHeader } from "@/components/native/ScreenHeader";
 import { StatTile } from "@/components/native/StatTile";
 import { SurfaceCard } from "@/components/native/SurfaceCard";
 import { useProgressScreen } from "@/shared/screens/progress/useProgressScreen";
 
-export default function NativeProgressScreen() {
-  const [goalId, setGoalId] = useState<string | null>(null);
+export default function NativeProgressScreen(props: {
+  goalId?: string | null;
+  onConsumeLinkState?: () => void;
+}) {
+  const [goalId, setGoalId] = useState<string | null>(props.goalId || null);
   const {
     user,
     goals,
@@ -22,6 +25,15 @@ export default function NativeProgressScreen() {
     weeklyXpData,
     streakDays,
   } = useProgressScreen(goalId);
+
+  useEffect(() => {
+    if (props.goalId === undefined) {
+      return;
+    }
+
+    setGoalId(props.goalId || null);
+    props.onConsumeLinkState?.();
+  }, [props.goalId, props.onConsumeLinkState]);
 
   const totalTasks = filteredGoals.reduce((sum, goal) => sum + (goal.tasks?.length ?? 0), 0);
   const completedTasks = filteredGoals.reduce(

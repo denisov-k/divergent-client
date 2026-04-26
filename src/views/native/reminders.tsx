@@ -1,4 +1,5 @@
-﻿import { Alert, Pressable, ScrollView, Text, View } from "react-native";
+﻿import { useEffect } from "react";
+import { Alert, Pressable, ScrollView, Text, View } from "react-native";
 
 import { ActionChip } from "@/components/native/ActionChip";
 import { EmptyStateCard } from "@/components/native/EmptyStateCard";
@@ -17,7 +18,11 @@ const WEEK_DAY_LABELS: Record<string, string> = {
   sun: "Вс",
 };
 
-export default function NativeRemindersScreen() {
+export default function NativeRemindersScreen(props: {
+  reminderId?: string | null;
+  goalId?: string | null;
+  onConsumeLinkState?: () => void;
+}) {
   const {
     reminders,
     goals,
@@ -29,7 +34,21 @@ export default function NativeRemindersScreen() {
     saveReminder,
     toggleReminderState,
     removeReminder,
+    setReminderDialogOpen,
   } = useRemindersScreen();
+
+  useEffect(() => {
+    if (props.reminderId) {
+      openEditReminder(props.reminderId);
+      props.onConsumeLinkState?.();
+      return;
+    }
+
+    if (props.goalId) {
+      setReminderDialogOpen(true);
+      props.onConsumeLinkState?.();
+    }
+  }, [props.reminderId, props.goalId, props.onConsumeLinkState, openEditReminder, setReminderDialogOpen]);
 
   const handleDeleteReminder = async (id: string) => {
     await removeReminder(id);
@@ -60,9 +79,7 @@ export default function NativeRemindersScreen() {
                       {reminder.title}
                     </Text>
                     <Text style={{ color: "#64748b", marginTop: 4 }}>{reminder.time}</Text>
-                    {!!goal && (
-                      <Text style={{ color: "#0f766e", marginTop: 6 }}>Цель: {goal.title}</Text>
-                    )}
+                    {!!goal && <Text style={{ color: "#0f766e", marginTop: 6 }}>Цель: {goal.title}</Text>}
                   </View>
 
                   <Pressable onPress={() => openEditReminder(reminder.id)}>
@@ -121,6 +138,7 @@ export default function NativeRemindersScreen() {
         open={reminderDialogOpen}
         reminder={editingReminder}
         goals={goals}
+        initialGoalId={props.goalId || undefined}
         onOpenChange={closeReminderDialog}
         onSave={saveReminder}
         onDelete={removeReminder}

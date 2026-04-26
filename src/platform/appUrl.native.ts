@@ -1,4 +1,5 @@
-﻿import Config from "@/services/Config";
+﻿import { buildChallengesPath } from "@/app/routes";
+import Config from "@/services/Config";
 
 function trimTrailingSlash(value: string) {
   return value.endsWith("/") ? value.slice(0, -1) : value;
@@ -19,13 +20,17 @@ export function buildAppUrl(path: string) {
   return `${base}${normalizedPath}`;
 }
 
-export function buildPaymentReturnUrl(path: string) {
+export function buildNativeRouteUrl(path: string) {
   const normalizedPath = normalizePath(path).replace(/^\//, "");
   const scheme = (Config.data.app.scheme || "divergent").replace(/:$/, "");
 
   return `${scheme}://${normalizedPath}`;
 }
 
+export function buildPaymentReturnUrl(path: string) {
+  return buildNativeRouteUrl(path);
+}
+
 export function buildChallengeShareUrl(id: string) {
-  return buildAppUrl(`/challenges?id=${encodeURIComponent(id)}`);
+  return buildAppUrl(buildChallengesPath({ id }));
 }

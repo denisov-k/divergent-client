@@ -1,4 +1,5 @@
 ﻿import Config from "@/services/Config";
+import { buildChallengesPath } from "@/app/routes";
 
 function trimTrailingSlash(value: string) {
   return value.endsWith("/") ? value.slice(0, -1) : value;
@@ -24,5 +25,5 @@ export function buildPaymentReturnUrl(path: string) {
 }
 
 export function buildChallengeShareUrl(id: string) {
-  return buildAppUrl(`/challenges?id=${encodeURIComponent(id)}`);
+  return buildAppUrl(buildChallengesPath({ id }));
 }

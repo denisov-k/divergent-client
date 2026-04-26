@@ -1,4 +1,5 @@
-﻿import { Alert, Pressable, ScrollView, Text, View } from "react-native";
+﻿import { useEffect } from "react";
+import { Alert, Pressable, ScrollView, Text, View } from "react-native";
 
 import { ActionChip } from "@/components/native/ActionChip";
 import { CreateReportSheet } from "@/components/native/CreateReportSheet";
@@ -8,7 +9,10 @@ import { ScreenHeader } from "@/components/native/ScreenHeader";
 import { SurfaceCard } from "@/components/native/SurfaceCard";
 import { useGoalsScreen } from "@/shared/screens/goals/useGoalsScreen";
 
-export default function NativeGoalsScreen() {
+export default function NativeGoalsScreen(props: {
+  goalId?: string | null;
+  onConsumeLinkState?: () => void;
+}) {
   const {
     goals,
     rewards,
@@ -26,7 +30,18 @@ export default function NativeGoalsScreen() {
     setGoalDialogOpen,
     setCreateReportDialogOpen,
     toggleGoalTask,
-  } = useGoalsScreen();
+  } = useGoalsScreen({
+    focusId: props.goalId,
+  });
+
+  useEffect(() => {
+    if (!props.goalId) {
+      return;
+    }
+
+    openEditGoal(props.goalId);
+    props.onConsumeLinkState?.();
+  }, [props.goalId, props.onConsumeLinkState, openEditGoal]);
 
   const handleTaskToggle = async (goalId: string, taskId: string) => {
     const result = await toggleGoalTask(goalId, taskId);

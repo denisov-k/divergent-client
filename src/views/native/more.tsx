@@ -1,17 +1,28 @@
-﻿import { useState } from "react";
+﻿import { useEffect, useState } from "react";
 import { ScrollView, Text, View } from "react-native";
 
 import { ActionChip } from "@/components/native/ActionChip";
 import { ScreenHeader } from "@/components/native/ScreenHeader";
 import { SectionTabs } from "@/components/native/SectionTabs";
 import { SurfaceCard } from "@/components/native/SurfaceCard";
+import type { NativeMoreTab } from "@/app/router.native";
 import NativeFrensScreen from "@/views/native/frens";
 import NativeSettingsScreen from "@/views/native/settings";
 
-type MoreTab = "menu" | "frens" | "settings";
+export default function NativeMoreScreen(props: {
+  activeScreen?: NativeMoreTab;
+  onConsumeLinkState?: () => void;
+}) {
+  const [activeTab, setActiveTab] = useState<NativeMoreTab>(props.activeScreen || "menu");
 
-export default function NativeMoreScreen() {
-  const [activeTab, setActiveTab] = useState<MoreTab>("menu");
+  useEffect(() => {
+    if (!props.activeScreen) {
+      return;
+    }
+
+    setActiveTab(props.activeScreen);
+    props.onConsumeLinkState?.();
+  }, [props.activeScreen, props.onConsumeLinkState]);
 
   if (activeTab === "frens") {
     return (
@@ -59,12 +70,11 @@ export default function NativeMoreScreen() {
             <ActionChip onPress={() => setActiveTab("frens")} tone="primary">
               Открыть друзей
             </ActionChip>
-            <ActionChip onPress={() => setActiveTab("settings")}>
-              Открыть настройки
-            </ActionChip>
+            <ActionChip onPress={() => setActiveTab("settings")}>Открыть настройки</ActionChip>
           </View>
         </SurfaceCard>
       </ScrollView>
     </View>
   );
 }
+

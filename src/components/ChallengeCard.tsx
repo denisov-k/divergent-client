@@ -1,4 +1,4 @@
-import {Card, CardContent, CardDescription, CardHeader, CardTitle} from "@/components/ui/card"
+﻿import {Card, CardContent, CardDescription, CardHeader, CardTitle} from "@/components/ui/card"
 import {Badge} from "@/components/ui/badge"
 import {Calendar, Users, Edit, Share, ChevronUp, ChevronDown, DoorOpen, Swords} from "lucide-react"
 import {Challenge, Leader} from "@/types"
@@ -10,6 +10,7 @@ import {Collapsible, CollapsibleContent, CollapsibleTrigger} from "@/components/
 import {useEffect, useRef, useState} from "react";
 import {useTranslation} from "react-i18next";
 import {useNavigate} from "react-router-dom";
+import { buildGoalsPath } from "@/app/routes";
 import {useAppStore} from "@/stores/useAppStore.ts";
 import { MouseEvent as ReactMouseEvent } from "react";
 
@@ -81,7 +82,7 @@ export function ChallengeCard({challenge, focused, onShare, onEdit, onAccept, on
     return goal.lastCompletedAt ? "COMPLETED" : "NOT_COMPLETED";
   };
 
-  const isParticipant = challenge.participants.some(p => p.userId === user!.id); // предполагаем, что есть флаг
+  const isParticipant = challenge.participants.some(p => p.userId === user!.id); // РїСЂРµРґРїРѕР»Р°РіР°РµРј, С‡С‚Рѕ РµСЃС‚СЊ С„Р»Р°Рі
 
   const allGoalsCompleted = goals.every(goal => getGoalStatus(goal) === "COMPLETED");
 
@@ -91,7 +92,7 @@ export function ChallengeCard({challenge, focused, onShare, onEdit, onAccept, on
   const challengeStart = challenge.startsAt ? new Date(challenge.startsAt) : null;
   const challengeEnd = challenge.endsAt ? new Date(challenge.endsAt) : null;
 
-// Прибавляем один день к дате старта
+// РџСЂРёР±Р°РІР»СЏРµРј РѕРґРёРЅ РґРµРЅСЊ Рє РґР°С‚Рµ СЃС‚Р°СЂС‚Р°
   const hasStarted = challengeStart
     ? new Date(challengeStart.getTime() + 24 * 60 * 60 * 1000) <= now
     : false;
@@ -99,7 +100,7 @@ export function ChallengeCard({challenge, focused, onShare, onEdit, onAccept, on
     ? new Date(challengeEnd.getTime() + 24 * 60 * 60 * 1000) <= now
     : false;
   if (!isParticipant) {
-    // Пользователь не участвует — челлендж просто активен
+    // РџРѕР»СЊР·РѕРІР°С‚РµР»СЊ РЅРµ СѓС‡Р°СЃС‚РІСѓРµС‚ вЂ” С‡РµР»Р»РµРЅРґР¶ РїСЂРѕСЃС‚Рѕ Р°РєС‚РёРІРµРЅ
     challengeStatus = "ACTIVE";
   } else if (allGoalsCompleted) {
     challengeStatus = "COMPLETED";
@@ -114,7 +115,7 @@ export function ChallengeCard({challenge, focused, onShare, onEdit, onAccept, on
       return;
 
     e.stopPropagation();
-    navigate(`/goals?id=${id}`);
+    navigate(buildGoalsPath({ id }));
   }
 
   const onLeaderboardClick = async (id: string) => {
@@ -154,12 +155,12 @@ export function ChallengeCard({challenge, focused, onShare, onEdit, onAccept, on
               {
                 (isCreator &&
                   <Badge variant="outline">
-                    Организатор
+                    РћСЂРіР°РЅРёР·Р°С‚РѕСЂ
                   </Badge>)
                 ||
                 (isParticipant &&
                   (<Badge variant="outline">
-                      Участвуете
+                      РЈС‡Р°СЃС‚РІСѓРµС‚Рµ
                     </Badge>
                   ))
               }
@@ -174,10 +175,10 @@ export function ChallengeCard({challenge, focused, onShare, onEdit, onAccept, on
                   }
                 >
                   {challengeStatus === "COMPLETED"
-                    ? "Выполнен"
+                    ? "Р’С‹РїРѕР»РЅРµРЅ"
                     : challengeStatus === "FAILED"
-                      ? "Не выполнен"
-                      : "В процессе"}
+                      ? "РќРµ РІС‹РїРѕР»РЅРµРЅ"
+                      : "Р’ РїСЂРѕС†РµСЃСЃРµ"}
                 </Badge>
               )}
             </div>
@@ -222,7 +223,7 @@ export function ChallengeCard({challenge, focused, onShare, onEdit, onAccept, on
       </CardHeader>
 
       <CardContent className="space-y-2">
-        {/* Прогресс */
+        {/* РџСЂРѕРіСЂРµСЃСЃ */
           isParticipant &&
           <div className="pb-2">
             <div className="flex items-center justify-between mb-2">
@@ -237,7 +238,7 @@ export function ChallengeCard({challenge, focused, onShare, onEdit, onAccept, on
           </div>
         }
 
-        {/* Цели */}
+        {/* Р¦РµР»Рё */}
         <Collapsible open={isGoalsOpen} onOpenChange={setIsGoalsOpen}>
           <CollapsibleTrigger asChild>
             <Button variant="transparent" className="w-full justify-between"
@@ -259,7 +260,7 @@ export function ChallengeCard({challenge, focused, onShare, onEdit, onAccept, on
               >
                 <span className="truncate">{goal.title}</span>
                 {goal.lastCompletedAt && (
-                  <Badge variant="secondary">✓</Badge>
+                  <Badge variant="secondary">вњ“</Badge>
                 )}
               </div>
             ))}
@@ -274,7 +275,7 @@ export function ChallengeCard({challenge, focused, onShare, onEdit, onAccept, on
                 className="w-full justify-between"
                 onClick={(e) => e.stopPropagation()}
               >
-                <span>Правила</span>
+                <span>РџСЂР°РІРёР»Р°</span>
                 {isRulesOpen ? (
                   <ChevronUp className="size-4"/>
                 ) : (
@@ -289,7 +290,7 @@ export function ChallengeCard({challenge, focused, onShare, onEdit, onAccept, on
           </Collapsible>
         )}
 
-        {/* Топ участников */}
+        {/* РўРѕРї СѓС‡Р°СЃС‚РЅРёРєРѕРІ */}
         <Collapsible open={isLeaderboardOpen} onOpenChange={setIsLeaderboardOpen}>
           <CollapsibleTrigger asChild>
             <Button
@@ -297,7 +298,7 @@ export function ChallengeCard({challenge, focused, onShare, onEdit, onAccept, on
               className="w-full justify-between"
               onClick={(e) => (e.stopPropagation(), onLeaderboardClick(challenge.id))}
             >
-              <span>Топ участников</span>
+              <span>РўРѕРї СѓС‡Р°СЃС‚РЅРёРєРѕРІ</span>
               {isLeaderboardOpen ? (
                 <ChevronUp className="size-4"/>
               ) : (
@@ -326,8 +327,8 @@ export function ChallengeCard({challenge, focused, onShare, onEdit, onAccept, on
 
 
         <div className="flex justify-between border p-2 text-sm font-medium rounded-md">
-          <span>Стоимость участия</span>
-          <span>{challenge.price ? challenge.price + ' руб.' : 'Бесплатно'}</span>
+          <span>РЎС‚РѕРёРјРѕСЃС‚СЊ СѓС‡Р°СЃС‚РёСЏ</span>
+          <span>{challenge.price ? challenge.price + ' СЂСѓР±.' : 'Р‘РµСЃРїР»Р°С‚РЅРѕ'}</span>
         </div>
 
         <div className="flex justify-center gap-2">
@@ -335,7 +336,7 @@ export function ChallengeCard({challenge, focused, onShare, onEdit, onAccept, on
             onOpenLink && challenge.link && isParticipant &&
             <div className="flex justify-center py-2">
               <Button onClick={(e) => (e.stopPropagation(), onOpenLink(challenge.id))}>
-                Сообщество
+                РЎРѕРѕР±С‰РµСЃС‚РІРѕ
               </Button>
             </div>
           }
@@ -343,7 +344,7 @@ export function ChallengeCard({challenge, focused, onShare, onEdit, onAccept, on
             onOpenParticipants && isCreator &&
             <div className="flex justify-center py-2">
               <Button onClick={(e) => (e.stopPropagation(), onOpenParticipants(challenge.id))}>
-                Участники
+                РЈС‡Р°СЃС‚РЅРёРєРё
               </Button>
             </div>
           }
@@ -358,18 +359,18 @@ export function ChallengeCard({challenge, focused, onShare, onEdit, onAccept, on
           )}
         </div>
 
-        {/* Нижняя инфа */}
+        {/* РќРёР¶РЅСЏСЏ РёРЅС„Р° */}
         <div className="flex flex-wrap items-center justify-between gap-4 pt-3 border-t">
           <div className="flex items-center gap-1 text-muted-foreground">
             <Calendar className="size-4"/>
             <span>
               {challenge.startsAt
                 ? format(new Date(challenge.startsAt), "dd.MM.yyyy")
-                : "—"}
-              {" → "}
+                : "вЂ”"}
+              {" в†’ "}
               {challenge.endsAt
                 ? format(new Date(challenge.endsAt), "dd.MM.yyyy")
-                : "—"}
+                : "вЂ”"}
             </span>
           </div>
 
@@ -382,3 +383,4 @@ export function ChallengeCard({challenge, focused, onShare, onEdit, onAccept, on
     </Card>
   );
 }
+

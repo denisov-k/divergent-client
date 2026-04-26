@@ -1,1 +1,9 @@
-export { default } from "@/views/settings";
+﻿import Settings from "@/components/Settings";
+
+export default function SettingsView() {
+  return (
+    <div id="settings-view" className="flex flex-1 flex-col px-2">
+      <Settings />
+    </div>
+  );
+}

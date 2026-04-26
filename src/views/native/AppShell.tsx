@@ -1,7 +1,7 @@
 ﻿import { Linking, Pressable, SafeAreaView, Text, View } from "react-native";
 import { useEffect, useState } from "react";
 
-import { parseNativeAppLink, type NativeAppTab } from "@/platform/nativeAppLinking";
+import { parseNativeAppRoute, type NativeAppTab, type NativeMoreTab } from "@/app/router.native";
 import NativeChallengesScreen from "@/views/native/challenges";
 import NativeGoalsScreen from "@/views/native/goals";
 import NativeMoreScreen from "@/views/native/more";
@@ -20,28 +20,74 @@ const tabs: Array<{ key: NativeAppTab; label: string }> = [
 
 export default function NativeAppShell() {
   const [activeTab, setActiveTab] = useState<NativeAppTab>("goals");
+  const [goalLinkState, setGoalLinkState] = useState<{ goalId?: string | null }>({});
+  const [reminderLinkState, setReminderLinkState] = useState<{
+    reminderId?: string | null;
+    goalId?: string | null;
+  }>({});
   const [challengeLinkState, setChallengeLinkState] = useState<{
     focusId?: string | null;
     paymentId?: string | null;
   }>({});
+  const [rewardLinkState, setRewardLinkState] = useState<{ rewardId?: string | null }>({});
+  const [progressLinkState, setProgressLinkState] = useState<{ goalId?: string | null }>({});
+  const [moreLinkState, setMoreLinkState] = useState<{ screen?: NativeMoreTab }>({});
 
   useEffect(() => {
+    const clearTransientState = () => {
+      setGoalLinkState({});
+      setReminderLinkState({});
+      setChallengeLinkState({});
+      setRewardLinkState({});
+      setProgressLinkState({});
+      setMoreLinkState({});
+    };
+
     const applyLink = (url: string) => {
-      const state = parseNativeAppLink(url);
+      const state = parseNativeAppRoute(url);
       if (!state?.tab) {
         return;
       }
 
       setActiveTab(state.tab);
-      if (state.tab === "challenges") {
-        setChallengeLinkState({
-          focusId: state.challenge?.focusId ?? null,
-          paymentId: state.challenge?.paymentId ?? null,
+      clearTransientState();
+
+      if (state.tab === "goals") {
+        setGoalLinkState({ goalId: state.goalId ?? null });
+        return;
+      }
+
+      if (state.tab === "reminders") {
+        setReminderLinkState({
+          reminderId: state.reminderId ?? null,
+          goalId: state.goalId ?? null,
         });
         return;
       }
 
-      setChallengeLinkState({});
+      if (state.tab === "challenges") {
+        setChallengeLinkState({
+          focusId: state.focusId ?? null,
+          paymentId: state.paymentId ?? null,
+        });
+        return;
+      }
+
+      if (state.tab === "rewards") {
+        setRewardLinkState({ rewardId: state.rewardId ?? null });
+        return;
+      }
+
+      if (state.tab === "progress") {
+        setProgressLinkState({ goalId: state.goalId ?? null });
+        return;
+      }
+
+      if (state.tab === "more") {
+        setMoreLinkState({
+          screen: state.screen || "menu",
+        });
+      }
     };
 
     void Linking.getInitialURL().then((url) => {
@@ -62,8 +108,23 @@ export default function NativeAppShell() {
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#e2e8f0" }}>
       <View style={{ flex: 1 }}>
-        {activeTab === "goals" && <NativeGoalsScreen />}
-        {activeTab === "reminders" && <NativeRemindersScreen />}
+        {activeTab === "goals" && (
+          <NativeGoalsScreen
+            goalId={goalLinkState.goalId}
+            onConsumeLinkState={() => {
+              setGoalLinkState({});
+            }}
+          />
+        )}
+        {activeTab === "reminders" && (
+          <NativeRemindersScreen
+            reminderId={reminderLinkState.reminderId}
+            goalId={reminderLinkState.goalId}
+            onConsumeLinkState={() => {
+              setReminderLinkState({});
+            }}
+          />
+        )}
         {activeTab === "challenges" && (
           <NativeChallengesScreen
             focusId={challengeLinkState.focusId}
@@ -73,9 +134,30 @@ export default function NativeAppShell() {
             }}
           />
         )}
-        {activeTab === "rewards" && <NativeRewardsScreen />}
-        {activeTab === "progress" && <NativeProgressScreen />}
-        {activeTab === "more" && <NativeMoreScreen />}
+        {activeTab === "rewards" && (
+          <NativeRewardsScreen
+            rewardId={rewardLinkState.rewardId}
+            onConsumeLinkState={() => {
+              setRewardLinkState({});
+            }}
+          />
+        )}
+        {activeTab === "progress" && (
+          <NativeProgressScreen
+            goalId={progressLinkState.goalId}
+            onConsumeLinkState={() => {
+              setProgressLinkState({});
+            }}
+          />
+        )}
+        {activeTab === "more" && (
+          <NativeMoreScreen
+            activeScreen={moreLinkState.screen}
+            onConsumeLinkState={() => {
+              setMoreLinkState({});
+            }}
+          />
+        )}
       </View>
 
       <View
