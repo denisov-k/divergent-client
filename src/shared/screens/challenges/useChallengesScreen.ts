@@ -2,7 +2,7 @@
 
 import { useAppStore } from "@/stores/useAppStore";
 import type { Challenge, ChallengeParticipant, PaymentMethod, Report } from "@/types";
-import type { ChallengeInput } from "@/components/CreateChallengeDialog";
+import type { ChallengeInput } from "@/types";
 
 export function useChallengesScreen(options: {
   focusId?: string | null;
@@ -237,3 +237,4 @@ export function useChallengesScreen(options: {
     clearPaymentSyncStatus: () => setPaymentSyncStatus(null),
   };
 }
+

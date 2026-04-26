@@ -6,6 +6,7 @@ import type {
   Challenge,
   ChallengeParticipant,
   ChatMessage,
+  FriendInput,
   FriendSummary,
   Goal,
   GoalActivity,
@@ -17,7 +18,7 @@ import type {
   Reward,
   User,
 } from "@/types";
-import type { ChallengeInput } from "@/components/CreateChallengeDialog";
+import type { ChallengeInput } from "@/types";
 
 export interface AppStoreState {
   initialized: boolean;
@@ -85,8 +86,10 @@ export interface AppStoreActions {
   deleteReminder: (reminder: Reminder) => Promise<void>;
   updateReminder: (reminder: Reminder) => Promise<void>;
   toggleReminder: (id: string) => Promise<void>;
+  addFriend: (friend: FriendInput) => Promise<void>;
 }
 
 export type AppStore = AppStoreState & AuthSlice & AppStoreActions;
 
 export type StoreSlice<T> = StateCreator<AppStore, [], [], T>;
+

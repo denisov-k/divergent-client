@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useState } from "react";
 import {
@@ -13,7 +13,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useTranslation } from "react-i18next";
-import { Challenge, Goal } from "@/types";
+import { Challenge, ChallengeInput, Goal } from "@/types";
 
 import Select from "react-select";
 import {Label} from "@/components/ui/label.tsx";
@@ -26,11 +26,6 @@ interface CreateChallengeDialogProps {
   goals: Goal[];
   onSave: (data: ChallengeInput) => Promise<void> | void;
 }
-
-export type ChallengeInput = Omit<
-  Challenge,
-  "goals" | "leaderboard" | "creatorId" | "participants"
->;
 
 export function CreateChallengeDialog({
                                         open,
@@ -156,7 +151,7 @@ export function CreateChallengeDialog({
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="link">Ссылка на сообщество</Label>
+            <Label htmlFor="link">РЎСЃС‹Р»РєР° РЅР° СЃРѕРѕР±С‰РµСЃС‚РІРѕ</Label>
             <Input
               id="link"
               placeholder={t("challenges.fields.link")}
@@ -255,3 +250,6 @@ export function CreateChallengeDialog({
     </Dialog>
   );
 }
+
+
+

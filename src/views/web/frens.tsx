@@ -1,19 +1,22 @@
-﻿import { Plus } from "lucide-react";
+﻿import { useState } from "react";
+import { Plus } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 import { FriendCard } from "@/components/FriendCard";
+import { FriendDialog } from "@/components/FriendDialog";
 import { Button } from "@/components/ui/button";
 import { useFrensScreen } from "@/shared/screens/frens/useFrensScreen";
 
 export default function FrensScreen() {
   const { t } = useTranslation();
-  const { friends } = useFrensScreen();
+  const { friends, addFriend, loading } = useFrensScreen();
+  const [isCreateOpen, setIsCreateOpen] = useState(false);
 
   return (
     <div className="flex flex-1 flex-col px-2">
       <div className="flex items-center justify-between py-2">
         <h2>{t("frens.title")}</h2>
-        <Button disabled>
+        <Button onClick={() => setIsCreateOpen(true)} disabled={loading}>
           <Plus className="mr-2 size-4" />
           {t("frens.add")}
         </Button>
@@ -34,6 +37,8 @@ export default function FrensScreen() {
           </div>
         ))}
       </div>
+
+      <FriendDialog open={isCreateOpen} onOpenChange={setIsCreateOpen} onSave={addFriend} />
     </div>
   );
 }

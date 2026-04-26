@@ -1,23 +1,43 @@
-﻿import { ScrollView, Text, View } from "react-native";
+﻿import { useState } from "react";
+import { ScrollView, Text, View } from "react-native";
 
+import { FriendFormSheet } from "@/components/native/FriendFormSheet";
 import { ScreenHeader } from "@/components/native/ScreenHeader";
 import { StatTile } from "@/components/native/StatTile";
 import { SurfaceCard } from "@/components/native/SurfaceCard";
+import { ActionChip } from "@/components/native/ActionChip";
 import { useFrensScreen } from "@/shared/screens/frens/useFrensScreen";
 
 export default function NativeFrensScreen() {
-  const { friends } = useFrensScreen();
+  const { friends, addFriend, loading } = useFrensScreen();
+  const [isCreateOpen, setIsCreateOpen] = useState(false);
 
   return (
     <View style={{ flex: 1, backgroundColor: "#f8fafc" }}>
-      <ScreenHeader title="Друзья" subtitle="Социальный слой поверх общего shared screen-controller." />
+      <ScreenHeader title="Друзья" subtitle="Social flow теперь тоже живёт в standalone mobile runtime." />
 
       <ScrollView contentContainerStyle={{ padding: 16, gap: 12 }}>
+        <SurfaceCard>
+          <View style={{ gap: 12 }}>
+            <View style={{ gap: 4 }}>
+              <Text style={{ fontSize: 18, fontWeight: "700", color: "#0f172a" }}>Команда и рейтинг</Text>
+              <Text style={{ color: "#64748b" }}>
+                Добавляй друзей вручную и сравнивай прогресс прямо в mobile-ветке.
+              </Text>
+            </View>
+            <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8 }}>
+              <ActionChip onPress={() => setIsCreateOpen(true)} tone="primary">
+                {loading ? "Сохраняем..." : "Добавить друга"}
+              </ActionChip>
+            </View>
+          </View>
+        </SurfaceCard>
+
         {friends.length === 0 ? (
           <SurfaceCard>
             <Text style={{ fontSize: 16, fontWeight: "600", color: "#0f172a" }}>Пока нет друзей</Text>
             <Text style={{ color: "#64748b" }}>
-              Когда referral и social flow будут перенесены в mobile, список появится здесь автоматически.
+              Добавь первого друга, и social-слой сразу появится в мобильном клиенте.
             </Text>
           </SurfaceCard>
         ) : (
@@ -86,6 +106,8 @@ export default function NativeFrensScreen() {
           })
         )}
       </ScrollView>
+
+      <FriendFormSheet open={isCreateOpen} onOpenChange={setIsCreateOpen} onSave={addFriend} />
     </View>
   );
 }

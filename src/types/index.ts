@@ -85,6 +85,11 @@ export interface Challenge {
   reports: Report[];
 }
 
+export type ChallengeInput = Omit<
+  Challenge,
+  "goals" | "leaderboard" | "creatorId" | "participants"
+>;
+
 export interface ChallengeApi extends Omit<Challenge, "goals"> {
   goals: ChallengeGoal[];
 }
@@ -142,6 +147,12 @@ export interface FriendSummary {
   completedGoals: number;
   streak: number;
   rank?: number;
+}
+
+export interface FriendInput {
+  name: string;
+  level: number;
+  currentXp: number;
 }
 
 export interface Reminder {

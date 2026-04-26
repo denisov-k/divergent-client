@@ -1,7 +1,33 @@
-﻿import type { Challenge, ChallengeApi, Goal, Reminder, ReportUploadPayload, Reward, User } from "@/types";
-import Config from "@/services/Config";
-import { ChallengeInput } from "@/components/CreateChallengeDialog.tsx";
+﻿import Config from "@/services/Config";
+import { readDownloadResponse } from "@/platform/download";
 import { clearSessionToken, readSessionToken, writeSessionToken } from "@/platform/session";
+import { createReportUploadBody } from "@/platform/upload";
+import type {
+  Challenge,
+  ChallengeApi,
+  ChallengeInput,
+  FriendInput,
+  FriendSummary,
+  Goal,
+  Reminder,
+  ReportUploadPayload,
+  Reward,
+  User,
+} from "@/types";
+
+function normalizeFriend(friend: Partial<FriendSummary> & { id: string; name: string; level: number; currentXp: number }): FriendSummary {
+  return {
+    id: friend.id,
+    name: friend.name,
+    level: friend.level,
+    avatarUrl: friend.avatarUrl,
+    currentXp: friend.currentXp ?? 0,
+    totalGoals: friend.totalGoals ?? 0,
+    completedGoals: friend.completedGoals ?? 0,
+    streak: friend.streak ?? 0,
+    rank: friend.rank ?? undefined,
+  };
+}
 
 async function fetchJSON(url: string, options: RequestInit = {}) {
   const isFormData = options.body instanceof FormData;
@@ -139,22 +165,9 @@ export async function toggleTask(taskId: string) {
 }
 
 export async function addReport(taskId: string, data: ReportUploadPayload) {
-  const formData = new FormData();
-  const filePart =
-    "name" in data.file && typeof (data.file as File).name === "string"
-      ? (data.file as File)
-      : new File([data.file], data.fileName, {
-          type: data.mimeType || data.file.type || "application/octet-stream",
-        });
-
-  formData.append("file", filePart);
-  if (data.comment) {
-    formData.append("comment", data.comment);
-  }
-
   const res = await fetchJSON(`/api/tasks/${taskId}/report`, {
     method: "POST",
-    body: formData,
+    body: createReportUploadBody(data),
   });
 
   return res as Promise<{ goal: Goal; user: User }>;
@@ -226,7 +239,7 @@ export async function downloadReport(reportId: string): Promise<Blob> {
     throw new Error(`Download error: ${res.status}`);
   }
 
-  return await res.blob();
+  return await readDownloadResponse(res);
 }
 
 export async function updateGoalProgress(goalId: string, delta: number) {
@@ -331,11 +344,20 @@ export async function toggleReminder(id: string) {
   return fetchJSON(`/api/reminders/${id}/toggle`, { method: "PATCH" });
 }
 
-export async function fetchFriends(): Promise<any[]> {
-  return fetchJSON("/api/friends");
+export async function fetchFriends(): Promise<FriendSummary[]> {
+  const friends = (await fetchJSON("/api/friends")) as FriendSummary[];
+  return friends.map((friend) => normalizeFriend(friend));
+}
+
+export async function createFriend(friend: FriendInput): Promise<FriendSummary> {
+  const createdFriend = (await fetchJSON("/api/friends", {
+    method: "POST",
+    body: JSON.stringify(friend),
+  })) as FriendSummary;
+
+  return normalizeFriend(createdFriend);
 }
 
 export async function fetchCategories(): Promise<{ value: string; label: string }[]> {
   return fetchJSON("/api/categories");
 }
-

@@ -1,7 +1,7 @@
 ﻿import { useEffect, useState } from "react";
 import { Modal, ScrollView, Text, View } from "react-native";
 
-import type { ChallengeInput } from "@/components/CreateChallengeDialog";
+import type { ChallengeInput } from "@/types";
 import { ActionChip } from "@/components/native/ActionChip";
 import { FieldInput } from "@/components/native/FieldInput";
 import { SectionTabs } from "@/components/native/SectionTabs";
@@ -189,3 +189,4 @@ export function ChallengeFormSheet({
     </Modal>
   );
 }
+
