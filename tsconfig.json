@@ -15,8 +15,7 @@
     ],
     "baseUrl": ".",
     "types": [
-      "node",
-      "./node_modules/telegram-webapps"
+      "node"
     ],
     "paths": {
       "@/*": [
@@ -26,3 +25,4 @@
   },
   "extends": "expo/tsconfig.base"
 }
+

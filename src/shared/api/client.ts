@@ -18,13 +18,6 @@ async function fetchJSON(url: string, options: RequestInit = {}) {
   return res.json();
 }
 
-export async function login(tgData: string) {
-  return fetchJSON("/api/auth/telegram", {
-    method: "POST",
-    body: JSON.stringify({ tgData }),
-  });
-}
-
 export async function loginWithCredentials(email: string, password: string) {
   return fetchJSON("/api/auth/login", {
     method: "POST",
@@ -132,13 +125,6 @@ export async function kickParticipant(challengeId: string, userId: string) {
   });
 }
 
-export async function sendMessageToParticipants(challengeId: string, text: string) {
-  return await fetchJSON(`/api/challenges/${challengeId}/message`, {
-    method: "POST",
-    body: JSON.stringify({ text }),
-  });
-}
-
 export async function chatAI(message: string) {
   return await fetchJSON(`/api/ai/chat`, {
     method: "POST",
@@ -217,6 +203,12 @@ export async function payChallenge(id: string, method: string) {
   return fetchJSON(`/api/payments/create`, {
     method: "POST",
     body: JSON.stringify({ challengeId: id, method }),
+  });
+}
+
+export async function fetchPaymentStatus(paymentId: string) {
+  return fetchJSON(`/api/payments/${paymentId}/status`, {
+    method: "GET",
   });
 }
 

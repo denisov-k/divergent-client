@@ -67,25 +67,7 @@
             border-radius: 6px;
             padding: 6px 10px;
             font-size: 13px;
-        }
-		
-		.telegram-entry-button {
-			display: inline-flex;
-			justify-content: center;
-			align-items: center;
-			background: #0088cb;
-			color: #ffffff;
-			border-radius: 8px;
-			width: 140px;
-			height: 26px;
-			padding: 0 8px !important;
-			margin: 5px;
-			cursor: pointer;
-			font-size: 10px;
-			font-weight: 700;
-			text-transform: uppercase;
-		}
-
+}
         .form-footer {
           display: flex;
             align-items: center;
@@ -101,3 +83,4 @@
         }
     }
 }
+

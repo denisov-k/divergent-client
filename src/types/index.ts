@@ -187,7 +187,7 @@ export interface User {
   timeZone: string
 }
 
-export type PaymentMethod = "YOUKASSA" | "STARS";
+export type PaymentMethod = "YOUKASSA";
 
 
 export type GridItem = {
@@ -242,3 +242,4 @@ export type AIChatResponse = {
   goalDraft: Draft | null
   isDraftAdded: boolean;
 }
+

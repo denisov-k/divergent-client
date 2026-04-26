@@ -34,7 +34,6 @@ export interface AppStoreState {
 
 export interface AuthSlice {
   initialize: () => Promise<void>;
-  loginWithTelegram: (tgData: string) => Promise<void>;
   loginWithCredentials: (email: string, password: string) => Promise<void>;
   signup: (
     email: string,
@@ -57,7 +56,7 @@ export interface AppStoreActions {
   acceptChallenge: (challenge: Challenge) => Promise<void>;
   leaveChallenge: (id: string) => Promise<void>;
   payChallenge: (challenge: Challenge, method: PaymentMethod) => Promise<void>;
-  redirectToTelegram: (link: string) => void;
+  syncPaymentStatus: (paymentId: string) => Promise<"PENDING" | "SUCCESS" | "FAILED" | "CANCELLED">;
   addCategory: (category: CategoryOption) => void;
   addGoal: (goal: Goal) => Promise<void>;
   deleteGoal: (goal: Goal) => Promise<void>;
@@ -70,7 +69,6 @@ export interface AppStoreActions {
   getReports: (challengeId: string) => Promise<Report[]>;
   getParticipants: (challengeId: string) => Promise<ChallengeParticipant[]>;
   kickParticipant: (challengeId: string, userId: string) => Promise<void>;
-  sendMessageToParticipants: (challengeId: string, message: string) => Promise<void>;
   downloadReport: (report: Report) => Promise<void>;
   chatAI: (prompt: string) => Promise<AIChatResponse>;
   getChatHistory: () => Promise<ChatMessage[]>;

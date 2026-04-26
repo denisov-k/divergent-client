@@ -18,19 +18,6 @@ async function finalizeAuthenticatedState(
 }
 
 export const createAuthSlice: StoreSlice<AuthSlice> = (set, get) => ({
-  loginWithTelegram: async (tgData: string) => {
-    set({ loading: true });
-    try {
-      await api.login(tgData);
-      await finalizeAuthenticatedState(set);
-    } catch (err) {
-      console.error(err);
-      throw err;
-    } finally {
-      set({ loading: false });
-    }
-  },
-
   signup: async (email, password, name, referrerId, referrerLinkId) => {
     void referrerId;
     void referrerLinkId;

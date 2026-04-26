@@ -2,8 +2,6 @@ import { useLocation, useNavigate, To } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { BarChart2, Bell, Gift, Swords, Target } from "lucide-react";
 
-import { triggerTelegramHapticImpact } from "@/platform/telegram";
-
 const Navigation = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
@@ -18,7 +16,6 @@ const Navigation = () => {
   ];
 
   const onClick = (path: To) => {
-    triggerTelegramHapticImpact("medium");
     navigate(path);
   };
 

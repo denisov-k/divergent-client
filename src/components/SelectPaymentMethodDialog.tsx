@@ -7,7 +7,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { CreditCard, Star } from "lucide-react";
+import { CreditCard } from "lucide-react";
 import { PaymentMethod } from "@/types";
 import { useTranslation } from "react-i18next";
 
@@ -32,16 +32,6 @@ export function SelectPaymentMethodDialog({
         </DialogHeader>
 
         <div className="grid gap-3 mt-4">
-          <Card
-            className="p-3 cursor-pointer hover:bg-muted transition"
-            onClick={() => onSelect("STARS")}
-          >
-            <div className="flex items-center gap-3">
-              <Star/>
-              <span>{t("payments.stars")}</span>
-            </div>
-          </Card>
-
           <Card
             className="p-3 cursor-pointer hover:bg-muted transition"
             onClick={() => onSelect("YOUKASSA")}

@@ -1,15 +1,10 @@
 import { type ChangeEvent, useEffect, useState } from "react";
-import { Loader2 } from "lucide-react";
 import { ReactSVG } from "react-svg";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { z, ZodError } from "zod";
 
 import LogoIcon from "@/assets/images/logo-icon.svg";
 import Logo from "@/assets/images/logo.svg";
-import {
-  getTelegramInitData,
-  isTelegramWebAppAvailable,
-} from "@/platform/telegram";
 import { useAppStore } from "@/stores/useAppStore";
 import "./index.css";
 
@@ -21,7 +16,7 @@ const signInSchema = z.object({
 export default function SignIn() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const { user, loading, loginWithCredentials, loginWithTelegram } = useAppStore();
+  const { user, loading, loginWithCredentials } = useAppStore();
 
   const [formData, setFormData] = useState({
     email: "",
@@ -33,10 +28,8 @@ export default function SignIn() {
     submit?: string;
   }>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isTelegramSubmitting, setIsTelegramSubmitting] = useState(false);
 
   const redirect = searchParams.get("redirect");
-  const isTelegramClient = isTelegramWebAppAvailable();
 
   useEffect(() => {
     if (loading) return;
@@ -45,28 +38,6 @@ export default function SignIn() {
       else navigate("/");
     }
   }, [user, loading, navigate, redirect]);
-
-  useEffect(() => {
-    if (!isTelegramClient || user) {
-      return;
-    }
-
-    const autoLogin = async () => {
-      try {
-        setIsTelegramSubmitting(true);
-        const data = getTelegramInitData();
-        if (!data) return;
-
-        await loginWithTelegram(data);
-      } catch (err) {
-        console.error("Telegram auto-auth failed", err);
-      } finally {
-        setIsTelegramSubmitting(false);
-      }
-    };
-
-    autoLogin();
-  }, [isTelegramClient, user, loginWithTelegram]);
 
   const handleSubmit = async (data: typeof formData) => {
     try {
@@ -101,7 +72,7 @@ export default function SignIn() {
     }
   };
 
-  const isBusy = isSubmitting || isTelegramSubmitting || loading;
+  const isBusy = isSubmitting || loading;
 
   return (
     <div id="sign-in">
@@ -153,19 +124,6 @@ export default function SignIn() {
         <button type="submit" disabled={isBusy}>
           {isSubmitting ? "Signing in..." : "Login"}
         </button>
-
-        {isTelegramClient && (
-          <p className="text-xs text-center text-zinc-400 mt-2">
-            {isTelegramSubmitting ? (
-              <span className="inline-flex items-center gap-2">
-                <Loader2 className="h-3 w-3 animate-spin" />
-                Connecting through Telegram...
-              </span>
-            ) : (
-              "Telegram sign-in is still available during the transition."
-            )}
-          </p>
-        )}
 
         <div className="form-footer">
           <a href="/signup" className="link">

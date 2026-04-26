@@ -1,7 +1,7 @@
 import * as api from "@/shared/api/client";
 import { loadAppData } from "@/shared/app/loadAppData";
 import { downloadReportFile } from "@/platform/files";
-import { openTelegramInvoice } from "@/platform/telegram";
+import { redirectToUrl } from "@/platform/browser";
 import type { AppStoreActions, StoreSlice } from "@/stores/types";
 
 type ChallengesSlice = Pick<
@@ -12,11 +12,10 @@ type ChallengesSlice = Pick<
   | "acceptChallenge"
   | "leaveChallenge"
   | "payChallenge"
-  | "redirectToTelegram"
+  | "syncPaymentStatus"
   | "getReports"
   | "getParticipants"
   | "kickParticipant"
-  | "sendMessageToParticipants"
   | "downloadReport"
 >;
 
@@ -94,18 +93,29 @@ export const createChallengesSlice: StoreSlice<ChallengesSlice> = (set, get) => 
     set({ loading: true });
     try {
       const res = await api.payChallenge(challenge.id, method);
-      get().redirectToTelegram(res.invoiceLink);
+      if (res.confirmationUrl) {
+        redirectToUrl(res.confirmationUrl);
+      }
     } catch (err) {
       console.error(err);
+      throw err;
     } finally {
       set({ loading: false });
     }
   },
 
-  redirectToTelegram: (link) => {
-    void openTelegramInvoice(link, async () => {
-      set(await loadAppData());
-    });
+  syncPaymentStatus: async (paymentId) => {
+    try {
+      const result = await api.fetchPaymentStatus(paymentId);
+      if (result.status === "SUCCESS") {
+        set(await loadAppData());
+      }
+
+      return result.status;
+    } catch (err) {
+      console.error(err);
+      return "FAILED";
+    }
   },
 
   getReports: async (challengeId) => {
@@ -136,17 +146,6 @@ export const createChallengesSlice: StoreSlice<ChallengesSlice> = (set, get) => 
     set({ loading: true });
     try {
       await api.kickParticipant(challengeId, userId);
-    } catch (err) {
-      console.error(err);
-    } finally {
-      set({ loading: false });
-    }
-  },
-
-  sendMessageToParticipants: async (challengeId, text) => {
-    set({ loading: true });
-    try {
-      await api.sendMessageToParticipants(challengeId, text);
     } catch (err) {
       console.error(err);
     } finally {

@@ -1,47 +1,48 @@
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import {Challenge, ChallengeParticipant, PaymentMethod, Report} from "@/types";
-
+import { useEffect, useState } from "react";
+import { useSearchParams } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { Plus } from "lucide-react";
 
-import { useAppStore } from "@/stores/useAppStore";
-import {useEffect, useState} from "react";
-import { useTranslation } from "react-i18next";
-
-import {ChallengeInput, CreateChallengeDialog} from "@/components/CreateChallengeDialog";
 import { AcceptChallengeDialog } from "@/components/AcceptChallengeDialog";
-
 import { ChallengeCard } from "@/components/ChallengeCard";
-import Config from "@/services/Config.ts";
-import {useSearchParams} from "react-router-dom";
-import {SelectPaymentMethodDialog} from "@/components/SelectPaymentMethodDialog.tsx";
-import {ChallengeParticipantDialog} from "@/components/ChallengeParticipantDialog.tsx";
-import {MessageDialog} from "@/components/MessageDialog.tsx";
-import {LeaveChallengeDialog} from "@/components/LeaveChallengeDialog.tsx";
-import { openTelegramLink } from "@/platform/telegram";
+import { ChallengeParticipantDialog } from "@/components/ChallengeParticipantDialog.tsx";
+import { ChallengeInput, CreateChallengeDialog } from "@/components/CreateChallengeDialog";
+import { LeaveChallengeDialog } from "@/components/LeaveChallengeDialog.tsx";
+import { SelectPaymentMethodDialog } from "@/components/SelectPaymentMethodDialog.tsx";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { openExternalLink, shareLink } from "@/platform/browser";
+import { useAppStore } from "@/stores/useAppStore";
+import { Challenge, ChallengeParticipant, PaymentMethod, Report } from "@/types";
 
 export default function ChallengesView() {
-  const { challenges, goals } = useAppStore();
-
   const { t } = useTranslation();
   const [searchParams] = useSearchParams();
   const focusId = searchParams.get("id");
+  const paymentId = searchParams.get("paymentId");
 
-  const { addChallenge, updateChallenge, acceptChallenge, sendMessageToParticipants,
-    leaveChallenge, payChallenge, getReports, getParticipants, kickParticipant, downloadReport } = useAppStore();
+  const { challenges, goals } = useAppStore();
+  const {
+    addChallenge,
+    updateChallenge,
+    acceptChallenge,
+    leaveChallenge,
+    payChallenge,
+    getReports,
+    getParticipants,
+    kickParticipant,
+    downloadReport,
+    syncPaymentStatus,
+  } = useAppStore();
 
   const [challengeDialogOpen, setChallengeDialogOpen] = useState(false);
   const [editingChallenge, setEditingChallenge] = useState<Challenge | undefined>();
-
   const [paymentDialogOpen, setPaymentDialogOpen] = useState(false);
   const [paymentChallenge, setPaymentChallenge] = useState<Challenge | null>(null);
-
   const [leaveDialogOpen, setLeaveDialogOpen] = useState(false);
   const [reportsDialogOpen, setReportsDialogOpen] = useState(false);
   const [acceptDialogOpen, setAcceptDialogOpen] = useState(false);
   const [selectedChallenge, setSelectedChallenge] = useState<Challenge | undefined>();
-  const [isMessageOpen, setIsMessageOpen] = useState(false);
-
   const [reports, setReports] = useState<Report[]>([]);
   const [participants, setParticipants] = useState<ChallengeParticipant[]>([]);
 
@@ -54,7 +55,7 @@ export default function ChallengesView() {
   };
 
   const handleEditChallenge = (id: string) => {
-    const challenge = challenges.find((c) => c.id === id);
+    const challenge = challenges.find((item) => item.id === id);
     setEditingChallenge(challenge);
     setChallengeDialogOpen(true);
   };
@@ -67,15 +68,12 @@ export default function ChallengesView() {
   };
 
   const handleShareChallenge = (id: string) => {
-    const baseUrl = Config.data?.api.telegram.twaURL;
-    const text = "";
-    const url = `${baseUrl}?startapp=challenge-${id}`;
-
-    openTelegramLink('https://t.me/share/url?url=' + url + '&text=' + text);
+    const url = `${window.location.origin}/challenges?id=${id}`;
+    void shareLink(url);
   };
 
   const handleLeaveChallenge = (id: string) => {
-    const challenge = challenges.find((c) => c.id === id);
+    const challenge = challenges.find((item) => item.id === id);
     if (!challenge) return;
 
     setSelectedChallenge(challenge);
@@ -86,12 +84,10 @@ export default function ChallengesView() {
     if (!selectedChallenge) return;
 
     await leaveChallenge(selectedChallenge.id);
-
     setLeaveDialogOpen(false);
     setSelectedChallenge(undefined);
   };
 
-  // --- Новый обработчик для открытия AcceptChallengeDialog
   const handleSelectChallenge = (challenge: Challenge) => {
     setSelectedChallenge(challenge);
     setAcceptDialogOpen(true);
@@ -103,27 +99,24 @@ export default function ChallengesView() {
   };
 
   const handleOpenParticipants = async (id: string) => {
-    const challenge = challenges.find((c) => c.id === id);
+    const challenge = challenges.find((item) => item.id === id);
     if (!challenge) return;
 
-    const reports = await getReports(challenge.id);
-    setReports(reports);
+    const nextReports = await getReports(challenge.id);
+    const nextParticipants = await getParticipants(challenge.id);
 
-    const participants = await getParticipants(challenge.id);
-    setParticipants(participants);
-
+    setReports(nextReports);
+    setParticipants(nextParticipants);
     setSelectedChallenge(challenge);
     setReportsDialogOpen(true);
   };
 
   const handleDownloadReport = async (reportId: string) => {
-    // 1️⃣ Найдём отчёт в объекте reports по выбранному challenge
     if (!selectedChallenge) return;
 
-    const report = reports.find(r => r.id === reportId);
+    const report = reports.find((item) => item.id === reportId);
     if (!report) return;
 
-    // 2️⃣ Скачиваем через store
     await downloadReport(report);
   };
 
@@ -133,7 +126,7 @@ export default function ChallengesView() {
   };
 
   const handleAcceptChallenge = async (id: string) => {
-    const challenge = challenges.find((c) => c.id === id);
+    const challenge = challenges.find((item) => item.id === id);
     if (!challenge) return;
 
     if (challenge.price && challenge.price > 0) {
@@ -148,54 +141,51 @@ export default function ChallengesView() {
     if (!paymentChallenge) return;
 
     await payChallenge(paymentChallenge, method);
-
     setPaymentDialogOpen(false);
     setPaymentChallenge(null);
   };
 
-  const handleSendMessage = async (challengeId: string, text: string) => {
-    await sendMessageToParticipants(challengeId, text);
-  }
-
   const handleKick = async (challengeId: string, userId: string) => {
     await kickParticipant(challengeId, userId);
-
-    const participants = await getParticipants(challengeId);
-    setParticipants(participants);
+    const nextParticipants = await getParticipants(challengeId);
+    setParticipants(nextParticipants);
   };
 
   const handleOpenLink = async (id: string) => {
-    const challenge = challenges.find((c) => c.id === id);
-
-    if (challenge && challenge.link)
-      openTelegramLink(challenge.link);
+    const challenge = challenges.find((item) => item.id === id);
+    if (challenge?.link) {
+      openExternalLink(challenge.link);
+    }
   };
 
-
   useEffect(() => {
-    if (focusId) {
-      const challenge = challenges.find((c) => c.id === focusId);
-      if (challenge) {
-        handleSelectChallenge(challenge);
-      }
+    if (!focusId) return;
+
+    const challenge = challenges.find((item) => item.id === focusId);
+    if (challenge) {
+      handleSelectChallenge(challenge);
     }
   }, [focusId, challenges]);
 
+  useEffect(() => {
+    if (!paymentId) return;
+    void syncPaymentStatus(paymentId);
+  }, [paymentId, syncPaymentStatus]);
+
   return (
     <div className="flex flex-col px-2 flex-1">
-      {/* Header */}
       <div className="flex items-center justify-between py-2">
-        <h2>
-          {t("challenges.title")}
-        </h2>
+        <h2>{t("challenges.title")}</h2>
 
-        <Button onClick={() => { setEditingChallenge(undefined); setChallengeDialogOpen(true); }}>
+        <Button onClick={() => {
+          setEditingChallenge(undefined);
+          setChallengeDialogOpen(true);
+        }}>
           <Plus className="size-4 mr-2" />
           {t("challenges.create")}
         </Button>
       </div>
 
-      {/* Empty state */}
       {challenges.length === 0 ? (
         <Card>
           <CardContent className="flex flex-col items-center justify-center py-12">
@@ -207,12 +197,7 @@ export default function ChallengesView() {
           </CardContent>
         </Card>
       ) : (
-        /* List */
-        <div className="columns-1
-          sm:columns-2
-          lg:columns-3
-          xl:columns-4
-          gap-2">
+        <div className="columns-1 sm:columns-2 lg:columns-3 xl:columns-4 gap-2">
           {challenges.map((challenge) => (
             <ChallengeCard
               key={challenge.id}
@@ -262,20 +247,7 @@ export default function ChallengesView() {
           onOpenChange={handleReportsDialogClose}
           onDownload={handleDownloadReport}
           onKick={handleKick}
-          onOpenMessageDialog={() => {
-            setReportsDialogOpen(false); // если нужно закрыть первый
-            setIsMessageOpen(true);
-          }}
           participants={participants}
-        />
-      )}
-
-      {selectedChallenge && (
-        <MessageDialog
-          challenge={selectedChallenge}
-          isOpen={isMessageOpen}
-          onOpenChange={setIsMessageOpen}
-          onSend={handleSendMessage}
         />
       )}
 
@@ -287,7 +259,3 @@ export default function ChallengesView() {
     </div>
   );
 }
-
-
-
-

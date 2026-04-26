@@ -28,7 +28,6 @@
     }
   },
   "include": [
-    "src",
-    "node_modules/telegram-webapps/src/index.d.ts"
+    "src"
   ]
 }

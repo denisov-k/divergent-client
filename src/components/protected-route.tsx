@@ -1,10 +1,11 @@
-import { Navigate } from 'react-router-dom'
+import { Navigate, useLocation } from 'react-router-dom'
 import {useAppStore} from "@/stores/useAppStore.ts";
 import {Loader2} from "lucide-react";
 import React from "react";
 
 export function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { user, initialized } = useAppStore();
+  const location = useLocation();
 
   if (!initialized) {
     return (
@@ -13,7 +14,8 @@ export function ProtectedRoute({ children }: { children: React.ReactNode }) {
       </div>
     )
   } else if (!user) {
-    return <Navigate to="/signin" replace />
+    const redirect = encodeURIComponent(`${location.pathname}${location.search}`);
+    return <Navigate to={`/signin?redirect=${redirect}`} replace />
   }
 
   return <>{children}</>

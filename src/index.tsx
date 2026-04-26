@@ -5,9 +5,6 @@ import AppRoot from "./App.tsx";
 import "./index.css";
 import Config from "./services/Config";
 import "./i18n";
-import { initializeTelegramWebApp } from "./platform/telegram";
-
-initializeTelegramWebApp();
 
 Config.init().then(() => {
   const root = document.getElementById("root");
