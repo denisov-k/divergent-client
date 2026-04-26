@@ -1,7 +1,8 @@
-import * as api from "@/shared/api/client";
+﻿import * as api from "@/shared/api/client";
 import { loadAppData } from "@/shared/app/loadAppData";
-import { downloadReportFile } from "@/platform/files";
+import { buildPaymentReturnUrl } from "@/platform/appUrl";
 import { redirectToUrl } from "@/platform/browser";
+import { downloadReportFile } from "@/platform/files";
 import type { AppStoreActions, StoreSlice } from "@/stores/types";
 
 type ChallengesSlice = Pick<
@@ -92,7 +93,7 @@ export const createChallengesSlice: StoreSlice<ChallengesSlice> = (set, get) => 
   payChallenge: async (challenge, method) => {
     set({ loading: true });
     try {
-      const res = await api.payChallenge(challenge.id, method);
+      const res = await api.payChallenge(challenge.id, method, buildPaymentReturnUrl("/challenges"));
       if (res.confirmationUrl) {
         redirectToUrl(res.confirmationUrl);
       }

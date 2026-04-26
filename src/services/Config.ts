@@ -28,6 +28,7 @@ interface ConfigInterface {
   data: {
     app: {
       publicURL: string;
+      scheme: string;
     };
     api: {
       http: {
@@ -46,6 +47,7 @@ const Config: ConfigInterface = {
   data: {
     app: {
       publicURL: "",
+      scheme: "",
     },
     api: {
       http: {
@@ -63,7 +65,22 @@ const Config: ConfigInterface = {
           if (typeof envResponse.data !== "object") {
             return reject("Bad config file");
           }
-          this.data = { ...envResponse.data };
+
+          const nextData = envResponse.data as Partial<ConfigInterface["data"]>;
+          this.data = {
+            app: {
+              publicURL: nextData.app?.publicURL || "",
+              scheme: nextData.app?.scheme || "",
+            },
+            api: {
+              http: {
+                baseURL: nextData.api?.http?.baseURL || "",
+              },
+              telegram: {
+                twaURL: nextData.api?.telegram?.twaURL || "",
+              },
+            },
+          };
           resolve(this.data);
         });
       });

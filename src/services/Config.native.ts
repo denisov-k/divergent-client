@@ -1,6 +1,7 @@
 ﻿type NativeConfigData = {
   app: {
     publicURL: string;
+    scheme: string;
   };
   api: {
     http: {
@@ -18,6 +19,7 @@ const Config = {
   data: {
     app: {
       publicURL: "",
+      scheme: "divergent",
     },
     api: {
       http: {
@@ -33,6 +35,7 @@ const Config = {
       p = new Promise((resolve, reject) => {
         const baseURL = process.env.EXPO_PUBLIC_API_BASE_URL || "";
         const publicURL = process.env.EXPO_PUBLIC_APP_PUBLIC_URL || baseURL;
+        const scheme = process.env.EXPO_PUBLIC_APP_SCHEME || "divergent";
 
         if (!baseURL) {
           reject(
@@ -46,6 +49,7 @@ const Config = {
         this.data = {
           app: {
             publicURL,
+            scheme,
           },
           api: {
             http: {

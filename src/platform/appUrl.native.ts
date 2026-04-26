@@ -20,7 +20,10 @@ export function buildAppUrl(path: string) {
 }
 
 export function buildPaymentReturnUrl(path: string) {
-  return buildAppUrl(path);
+  const normalizedPath = normalizePath(path).replace(/^\//, "");
+  const scheme = (Config.data.app.scheme || "divergent").replace(/:$/, "");
+
+  return `${scheme}://${normalizedPath}`;
 }
 
 export function buildChallengeShareUrl(id: string) {

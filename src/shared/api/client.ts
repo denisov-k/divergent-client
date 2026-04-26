@@ -267,10 +267,10 @@ export async function leaveChallenge(id: string) {
   });
 }
 
-export async function payChallenge(id: string, method: string) {
+export async function payChallenge(id: string, method: string, returnUrl?: string) {
   return fetchJSON(`/api/payments/create`, {
     method: "POST",
-    body: JSON.stringify({ challengeId: id, method }),
+    body: JSON.stringify({ challengeId: id, method, returnUrl }),
   });
 }
 
@@ -338,3 +338,4 @@ export async function fetchFriends(): Promise<any[]> {
 export async function fetchCategories(): Promise<{ value: string; label: string }[]> {
   return fetchJSON("/api/categories");
 }
+
