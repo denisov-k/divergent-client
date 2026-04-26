@@ -1,14 +1,20 @@
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "./ui/dialog";
+﻿import { useState } from "react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "./ui/dialog";
 import { Button } from "./ui/button";
 import { Badge } from "./ui/badge";
-import {Calendar, Users, Share2, ChevronUp, ChevronDown} from "lucide-react";
+import { Calendar, Users, Share2, ChevronUp, ChevronDown } from "lucide-react";
 import { ProgressRing } from "./ProgressRing";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "./ui/collapsible";
-import { useState } from "react";
 import { format } from "date-fns";
-import {Challenge, Leader} from "@/types";
+import type { Challenge, Leader } from "@/types";
 import { useTranslation } from "react-i18next";
-import {useAppStore} from "@/stores/useAppStore.ts";
+import { useAppStore } from "@/stores/useAppStore.ts";
 
 interface ChallengeDialogProps {
   challenge: Challenge;
@@ -22,42 +28,32 @@ export function AcceptChallengeDialog({ challenge, isOpen, onOpenChange, onAccep
   const [showGoals, setShowGoals] = useState(false);
   const [isRulesOpen, setIsRulesOpen] = useState(false);
   const [isLeaderboardOpen, setIsLeaderboardOpen] = useState(false);
-
-  const { t } = useTranslation();
-  const {user, getLeaderboard} = useAppStore();
-
-  const totalGoals = challenge.goals.length;
-  const completedGoals = challenge.goals.filter(g => g.lastCompletedAt).length;
-  const progress = totalGoals === 0 ? 0 : completedGoals / totalGoals;
-
   const [leaderboard, setLeaderboard] = useState<Leader[]>([]);
 
+  const { t } = useTranslation();
+  const { user, getLeaderboard } = useAppStore();
+
+  const totalGoals = challenge.goals.length;
+  const completedGoals = challenge.goals.filter((goal) => goal.lastCompletedAt).length;
+  const progress = totalGoals === 0 ? 0 : completedGoals / totalGoals;
   const goals = challenge.goals;
+  const isParticipant = challenge.participants.some((participant) => participant.userId === user!.id);
 
-  // Если пользователь уже участник, кнопку "Принять" скрываем
-  const isParticipant = challenge.participants.some(p => p.userId === user!.id); // предполагаем, что есть флаг
-
-  const getGoalStatus = (goal: typeof goals[0]) => {
+  const getGoalStatus = (goal: (typeof goals)[0]) => {
     return goal.lastCompletedAt ? "COMPLETED" : "NOT_COMPLETED";
   };
 
-  const allGoalsCompleted = goals.every(goal => getGoalStatus(goal) === "COMPLETED");
-
+  const allGoalsCompleted = goals.every((goal) => getGoalStatus(goal) === "COMPLETED");
   let challengeStatus: "COMPLETED" | "FAILED" | "ACTIVE";
 
   const now = new Date();
   const challengeStart = challenge.startsAt ? new Date(challenge.startsAt) : null;
   const challengeEnd = challenge.endsAt ? new Date(challenge.endsAt) : null;
 
-  // Прибавляем один день к дате старта
-  const hasStarted = challengeStart
-    ? new Date(challengeStart.getTime() + 24 * 60 * 60 * 1000) <= now
-    : false;
-  const hasEnded = challengeEnd
-    ? new Date(challengeEnd.getTime() + 24 * 60 * 60 * 1000) <= now
-    : false;
+  const hasStarted = challengeStart ? new Date(challengeStart.getTime() + 24 * 60 * 60 * 1000) <= now : false;
+  const hasEnded = challengeEnd ? new Date(challengeEnd.getTime() + 24 * 60 * 60 * 1000) <= now : false;
+
   if (!isParticipant) {
-    // Пользователь не участвует — челлендж просто активен
     challengeStatus = "ACTIVE";
   } else if (allGoalsCompleted) {
     challengeStatus = "COMPLETED";
@@ -68,38 +64,49 @@ export function AcceptChallengeDialog({ challenge, isOpen, onOpenChange, onAccep
   }
 
   const onLeaderboardClick = async (id: string) => {
-    if (isLeaderboardOpen)
+    if (isLeaderboardOpen) {
       return;
-    const leaderboard = await getLeaderboard(id);
-    setLeaderboard(leaderboard);
-  }
+    }
+
+    const nextLeaderboard = await getLeaderboard(id);
+    setLeaderboard(nextLeaderboard);
+  };
+
+  const statusLabel =
+    challengeStatus === "COMPLETED"
+      ? t("challenges.status_completed")
+      : challengeStatus === "FAILED"
+        ? t("challenges.status_failed")
+        : t("challenges.status_active");
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-h-[90vh] max-w-2xl overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="text-lg font-semibold">{challenge.title}</DialogTitle>
         </DialogHeader>
 
         {challenge.description && (
-          <p className="text-sm text-muted-foreground mt-2 whitespace-break-spaces">{challenge.description}</p>
+          <p className="mt-2 whitespace-break-spaces text-sm text-muted-foreground">{challenge.description}</p>
         )}
 
-        <div className="flex items-center gap-6 mt-4">
-          <ProgressRing progress={progress * 100} size={70} strokeWidth={7}/>
+        <div className="mt-4 flex items-center gap-6">
+          <ProgressRing progress={progress * 100} size={70} strokeWidth={7} />
 
           <div className="flex flex-col gap-2">
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <Calendar size={16}/>
+              <Calendar size={16} />
               <span>
-          {challenge.startsAt ? format(new Date(challenge.startsAt), "dd.MM.yyyy") : "—"} →{" "}
+                {challenge.startsAt ? format(new Date(challenge.startsAt), "dd.MM.yyyy") : "—"} → {" "}
                 {challenge.endsAt ? format(new Date(challenge.endsAt), "dd.MM.yyyy") : "—"}
-        </span>
+              </span>
             </div>
 
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <Users size={16}/>
-              <span>{t("challenges.participants_count")} {challenge.participants.length}</span>
+              <Users size={16} />
+              <span>
+                {t("challenges.participants_count")} {challenge.participants.length}
+              </span>
             </div>
 
             <Badge variant={challenge.isPublic ? "secondary" : "outline"} className="mt-1">
@@ -115,11 +122,7 @@ export function AcceptChallengeDialog({ challenge, isOpen, onOpenChange, onAccep
                       : "bg-accent text-foreground"
                 }
               >
-                {challengeStatus === "COMPLETED"
-                  ? "Выполнен"
-                  : challengeStatus === "FAILED"
-                    ? "Не выполнен"
-                    : "В процессе"}
+                {statusLabel}
               </Badge>
             )}
           </div>
@@ -131,23 +134,17 @@ export function AcceptChallengeDialog({ challenge, isOpen, onOpenChange, onAccep
               <CollapsibleTrigger asChild>
                 <Button variant="outline" className="w-full justify-between">
                   <span>{t("challenges.goals")}</span>
-                  {showGoals ? (
-                    <ChevronUp className="size-4"/>
-                  ) : (
-                    <ChevronDown className="size-4"/>
-                  )}
+                  {showGoals ? <ChevronUp className="size-4" /> : <ChevronDown className="size-4" />}
                 </Button>
               </CollapsibleTrigger>
-              <CollapsibleContent className="space-y-2 dark:border-gray-700 pt-2">
-                {challenge.goals.map(goal => (
-                  <div key={goal.id}
-                       className="flex items-center justify-between p-2 rounded border hover:bg-gray-100 dark:hover:bg-gray-700 transition">
+              <CollapsibleContent className="space-y-2 pt-2">
+                {challenge.goals.map((goal) => (
+                  <div
+                    key={goal.id}
+                    className="flex items-center justify-between rounded border p-2 transition hover:bg-gray-100 dark:hover:bg-gray-700"
+                  >
                     <span className="text-sm">{goal.title}</span>
-                    {goal.lastCompletedAt &&
-                      <Badge variant={goal.lastCompletedAt ? "secondary" : "outline"}>
-                        {t("challenges.completed")}
-                      </Badge>
-                    }
+                    {goal.lastCompletedAt && <Badge variant="secondary">{t("challenges.completed")}</Badge>}
                   </div>
                 ))}
               </CollapsibleContent>
@@ -157,26 +154,17 @@ export function AcceptChallengeDialog({ challenge, isOpen, onOpenChange, onAccep
           {challenge.rules && (
             <Collapsible open={isRulesOpen} onOpenChange={setIsRulesOpen}>
               <CollapsibleTrigger asChild>
-                <Button
-                  variant="outline"
-                  className="w-full justify-between"
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  <span>Правила</span>
-                  {isRulesOpen ? (
-                    <ChevronUp className="size-4"/>
-                  ) : (
-                    <ChevronDown className="size-4"/>
-                  )}
+                <Button variant="outline" className="w-full justify-between" onClick={(e) => e.stopPropagation()}>
+                  <span>{t("challenges.rules")}</span>
+                  {isRulesOpen ? <ChevronUp className="size-4" /> : <ChevronDown className="size-4" />}
                 </Button>
               </CollapsibleTrigger>
 
-              <CollapsibleContent className="mt-2 text-sm text-muted-foreground whitespace-pre-line">
+              <CollapsibleContent className="mt-2 whitespace-pre-line text-sm text-muted-foreground">
                 {challenge.rules}
               </CollapsibleContent>
             </Collapsible>
           )}
-
 
           <Collapsible open={isLeaderboardOpen} onOpenChange={setIsLeaderboardOpen}>
             <CollapsibleTrigger asChild>
@@ -185,37 +173,30 @@ export function AcceptChallengeDialog({ challenge, isOpen, onOpenChange, onAccep
                 className="w-full justify-between"
                 onClick={(e) => (e.stopPropagation(), onLeaderboardClick(challenge.id))}
               >
-                <span>Топ участников</span>
-                {isLeaderboardOpen ? (
-                  <ChevronUp className="size-4"/>
-                ) : (
-                  <ChevronDown className="size-4"/>
-                )}
+                <span>{t("challenges.top_participants")}</span>
+                {isLeaderboardOpen ? <ChevronUp className="size-4" /> : <ChevronDown className="size-4" />}
               </Button>
             </CollapsibleTrigger>
 
             <CollapsibleContent className="my-2 space-y-2">
-              {leaderboard.map((p, index) => (
+              {leaderboard.map((participant, index) => (
                 <div
-                  key={p.userId}
+                  key={participant.userId}
                   className="flex items-center justify-between rounded border px-3 py-2 text-sm"
                 >
                   <div className="flex items-center gap-2">
                     <Badge variant="secondary">#{index + 1}</Badge>
-                    <span>{p.name}</span>
+                    <span>{participant.name}</span>
                   </div>
-                  <span className="text-muted-foreground">
-                  {p.xp} XP
-                </span>
+                  <span className="text-muted-foreground">{participant.xp} XP</span>
                 </div>
               ))}
             </CollapsibleContent>
           </Collapsible>
 
-
-          <div className="flex justify-between border p-2 text-sm font-medium rounded-md">
-            <span>Стоимость участия</span>
-            <span>{challenge.price ? challenge.price + ' руб.' : 'Бесплатно'}</span>
+          <div className="flex justify-between rounded-md border p-2 text-sm font-medium">
+            <span>{t("challenges.participation_cost")}</span>
+            <span>{challenge.price ? `${challenge.price} руб.` : t("challenges.free")}</span>
           </div>
         </div>
 
@@ -225,14 +206,17 @@ export function AcceptChallengeDialog({ challenge, isOpen, onOpenChange, onAccep
           </Button>
 
           <Button variant="outline" onClick={() => onShare(challenge.id)}>
-            <Share2 size={16} className="mr-1"/> {t("common.share")}
+            <Share2 size={16} className="mr-1" /> {t("common.share")}
           </Button>
 
           {!isParticipant && !hasStarted && !hasEnded && (
-            <Button className="bg-blue-600 text-white hover:bg-blue-700" onClick={() => {
-              onAccept(challenge.id);
-              onOpenChange(false);
-            }}>
+            <Button
+              className="bg-blue-600 text-white hover:bg-blue-700"
+              onClick={() => {
+                onAccept(challenge.id);
+                onOpenChange(false);
+              }}
+            >
               {t("challenges.accept")}
             </Button>
           )}

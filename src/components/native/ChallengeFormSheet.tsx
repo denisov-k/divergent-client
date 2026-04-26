@@ -1,5 +1,6 @@
 ﻿import { useEffect, useState } from "react";
 import { Modal, ScrollView, Text, View } from "react-native";
+import { useTranslation } from "react-i18next";
 
 import type { ChallengeInput } from "@/types";
 import { ActionChip } from "@/components/native/ActionChip";
@@ -20,6 +21,7 @@ export function ChallengeFormSheet({
   onOpenChange: (open: boolean) => void;
   onSave: (data: ChallengeInput) => Promise<unknown>;
 }) {
+  const { t } = useTranslation();
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [rules, setRules] = useState("");
@@ -117,33 +119,61 @@ export function ChallengeFormSheet({
         >
           <View style={{ gap: 6 }}>
             <Text style={{ fontSize: 20, fontWeight: "700", color: "#0f172a" }}>
-              {challenge ? "Редактировать челлендж" : "Новый челлендж"}
+              {challenge ? t("challenges.edit_title") : t("challenges.create_title")}
             </Text>
-            <Text style={{ color: "#64748b" }}>
-              Mobile-форма для базового challenge CRUD без web-specific зависимостей.
-            </Text>
+            <Text style={{ color: "#64748b" }}>{t("challenges.create_sheet_description")}</Text>
           </View>
 
           <ScrollView contentContainerStyle={{ gap: 14 }}>
-            <FieldInput label="Название" value={title} onChangeText={setTitle} placeholder="Например, майский спринт" />
             <FieldInput
-              label="Описание"
+              label={t("challenges.fields.title")}
+              value={title}
+              onChangeText={setTitle}
+              placeholder={t("challenges.placeholders.title")}
+            />
+            <FieldInput
+              label={t("challenges.fields.description")}
               value={description}
               onChangeText={setDescription}
-              placeholder="О чём этот челлендж"
+              placeholder={t("challenges.placeholders.description")}
             />
-            <FieldInput label="Правила" value={rules} onChangeText={setRules} placeholder="Короткие правила участия" />
-            <FieldInput label="Ссылка" value={link} onChangeText={setLink} placeholder="https://..." />
-            <FieldInput label="Цена" value={price} onChangeText={setPrice} placeholder="0" />
-            <FieldInput label="Старт (YYYY-MM-DD)" value={startsAt} onChangeText={setStartsAt} placeholder="2026-05-01" />
-            <FieldInput label="Финиш (YYYY-MM-DD)" value={endsAt} onChangeText={setEndsAt} placeholder="2026-05-31" />
+            <FieldInput
+              label={t("challenges.fields.rules")}
+              value={rules}
+              onChangeText={setRules}
+              placeholder={t("challenges.placeholders.rules")}
+            />
+            <FieldInput
+              label={t("challenges.fields.link")}
+              value={link}
+              onChangeText={setLink}
+              placeholder={t("challenges.placeholders.link")}
+            />
+            <FieldInput
+              label={t("challenges.fields.price")}
+              value={price}
+              onChangeText={setPrice}
+              placeholder={t("challenges.placeholders.price")}
+            />
+            <FieldInput
+              label={`${t("challenges.fields.start_date")} (YYYY-MM-DD)`}
+              value={startsAt}
+              onChangeText={setStartsAt}
+              placeholder={t("challenges.placeholders.start_date")}
+            />
+            <FieldInput
+              label={`${t("challenges.fields.end_date")} (YYYY-MM-DD)`}
+              value={endsAt}
+              onChangeText={setEndsAt}
+              placeholder={t("challenges.placeholders.end_date")}
+            />
 
             <View style={{ gap: 8 }}>
-              <Text style={{ fontSize: 14, fontWeight: "600", color: "#334155" }}>Доступ</Text>
+              <Text style={{ fontSize: 14, fontWeight: "600", color: "#334155" }}>{t("challenges.fields.visibility")}</Text>
               <SectionTabs
                 tabs={[
-                  { key: "public", label: "Публичный" },
-                  { key: "private", label: "Приватный" },
+                  { key: "public", label: t("challenges.visibility.public") },
+                  { key: "private", label: t("challenges.visibility.private") },
                 ]}
                 activeTab={isPublic ? "public" : "private"}
                 onChange={(tab) => setIsPublic(tab === "public")}
@@ -151,11 +181,11 @@ export function ChallengeFormSheet({
             </View>
 
             <View style={{ gap: 8 }}>
-              <Text style={{ fontSize: 14, fontWeight: "600", color: "#334155" }}>Требовать отчёт</Text>
+              <Text style={{ fontSize: 14, fontWeight: "600", color: "#334155" }}>{t("challenges.fields.requiresReport")}</Text>
               <SectionTabs
                 tabs={[
-                  { key: "yes", label: "Да" },
-                  { key: "no", label: "Нет" },
+                  { key: "yes", label: t("common.yes") },
+                  { key: "no", label: t("common.no") },
                 ]}
                 activeTab={requiresReport ? "yes" : "no"}
                 onChange={(tab) => setRequiresReport(tab === "yes")}
@@ -163,7 +193,7 @@ export function ChallengeFormSheet({
             </View>
 
             <View style={{ gap: 8 }}>
-              <Text style={{ fontSize: 14, fontWeight: "600", color: "#334155" }}>Цели в челлендже</Text>
+              <Text style={{ fontSize: 14, fontWeight: "600", color: "#334155" }}>{t("challenges.selection.goals")}</Text>
               <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8 }}>
                 {goals.map((goal) => (
                   <ActionChip
@@ -179,9 +209,9 @@ export function ChallengeFormSheet({
           </ScrollView>
 
           <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8 }}>
-            <ActionChip onPress={() => onOpenChange(false)}>Отмена</ActionChip>
+            <ActionChip onPress={() => onOpenChange(false)}>{t("common.cancel")}</ActionChip>
             <ActionChip onPress={() => void handleSave()} tone="primary">
-              {isSubmitting ? "Сохраняем..." : challenge ? "Сохранить" : "Создать"}
+              {isSubmitting ? t("common.sending") : challenge ? t("common.save") : t("common.create")}
             </ActionChip>
           </View>
         </View>
@@ -189,4 +219,3 @@ export function ChallengeFormSheet({
     </Modal>
   );
 }
-

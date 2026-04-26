@@ -1,5 +1,6 @@
 ﻿import { useMemo, useState } from "react";
 import { Modal, Pressable, ScrollView, Text, View } from "react-native";
+import { useTranslation } from "react-i18next";
 
 import { ActionChip } from "@/components/native/ActionChip";
 import { SurfaceCard } from "@/components/native/SurfaceCard";
@@ -36,6 +37,7 @@ export function ChallengeDetailsSheet({
   onDownload: (reportId: string) => Promise<boolean>;
   onKick: (challengeId: string, userId: string) => Promise<void>;
 }) {
+  const { t } = useTranslation();
   const [expandedUsers, setExpandedUsers] = useState<Record<string, boolean>>({});
 
   const reportsByUser = useMemo(() => {
@@ -77,17 +79,15 @@ export function ChallengeDetailsSheet({
           <View style={{ gap: 6 }}>
             <Text style={{ fontSize: 20, fontWeight: "700", color: "#0f172a" }}>{challenge.title}</Text>
             <Text style={{ color: "#64748b" }}>
-              Участники: {participants.length} • Отчёты: {reports.length}
+              {t("challenges.participants_count")} {participants.length} • {t("challenges.reports_count", { count: reports.length })}
             </Text>
           </View>
 
           <ScrollView contentContainerStyle={{ gap: 12 }}>
             {participants.length === 0 ? (
               <SurfaceCard>
-                <Text style={{ fontSize: 16, fontWeight: "600", color: "#0f172a" }}>Пока никто не участвует</Text>
-                <Text style={{ color: "#64748b" }}>
-                  Когда участники присоединятся, здесь появятся их отчёты и быстрые действия.
-                </Text>
+                <Text style={{ fontSize: 16, fontWeight: "600", color: "#0f172a" }}>{t("challenges.noParticipants")}</Text>
+                <Text style={{ color: "#64748b" }}>{t("challenges.noParticipantsDescription")}</Text>
               </SurfaceCard>
             ) : (
               participants.map((participant) => {
@@ -104,11 +104,11 @@ export function ChallengeDetailsSheet({
                             {participant.user.name}
                           </Text>
                           <Text style={{ color: "#64748b" }}>
-                            {participant.user.email || "Email не указан"}
+                            {participant.user.email || t("common.not_specified")}
                           </Text>
                         </View>
                         <Text style={{ color: "#2563eb", fontWeight: "600" }}>
-                          {isExpanded ? "Скрыть" : "Открыть"}
+                          {isExpanded ? t("common.hide") : t("common.open")}
                         </Text>
                       </View>
 
@@ -121,7 +121,7 @@ export function ChallengeDetailsSheet({
                             borderRadius: 999,
                           }}
                         >
-                          <Text style={{ color: "#334155" }}>{userReports.length} отчётов</Text>
+                          <Text style={{ color: "#334155" }}>{t("challenges.reports_count", { count: userReports.length })}</Text>
                         </View>
                         {participant.userId === challenge.creatorId && (
                           <View
@@ -132,7 +132,7 @@ export function ChallengeDetailsSheet({
                               borderRadius: 999,
                             }}
                           >
-                            <Text style={{ color: "#6d28d9" }}>Создатель</Text>
+                            <Text style={{ color: "#6d28d9" }}>{t("common.created_by")}</Text>
                           </View>
                         )}
                       </View>
@@ -141,7 +141,7 @@ export function ChallengeDetailsSheet({
                     {isExpanded && (
                       <View style={{ gap: 10 }}>
                         {userReports.length === 0 ? (
-                          <Text style={{ color: "#64748b" }}>У этого участника пока нет отчётов.</Text>
+                          <Text style={{ color: "#64748b" }}>{t("challenges.participant_no_reports")}</Text>
                         ) : (
                           userReports.map((report) => (
                             <View
@@ -167,7 +167,7 @@ export function ChallengeDetailsSheet({
 
                               <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8 }}>
                                 <ActionChip onPress={() => void onDownload(report.id)} tone="primary">
-                                  Скачать отчёт
+                                  {t("common.download_report")}
                                 </ActionChip>
                               </View>
                             </View>
@@ -177,7 +177,7 @@ export function ChallengeDetailsSheet({
                         {canKick && (
                           <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8 }}>
                             <ActionChip onPress={() => void onKick(challenge.id, participant.userId)} tone="danger">
-                              Исключить участника
+                              {t("challenges.kick_participant")}
                             </ActionChip>
                           </View>
                         )}
@@ -190,7 +190,7 @@ export function ChallengeDetailsSheet({
           </ScrollView>
 
           <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8 }}>
-            <ActionChip onPress={() => onOpenChange(false)}>Закрыть</ActionChip>
+            <ActionChip onPress={() => onOpenChange(false)}>{t("common.close")}</ActionChip>
           </View>
         </View>
       </View>

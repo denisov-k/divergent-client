@@ -1,5 +1,6 @@
 ﻿import { useEffect } from "react";
 import { Alert, Linking, Pressable, ScrollView, Share, Text, View } from "react-native";
+import { useTranslation } from "react-i18next";
 
 import { ActionChip } from "@/components/native/ActionChip";
 import { ChallengeDetailsSheet } from "@/components/native/ChallengeDetailsSheet";
@@ -16,6 +17,7 @@ export default function NativeChallengesScreen(props: {
   paymentId?: string | null;
   onConsumeLinkState?: () => void;
 }) {
+  const { t } = useTranslation();
   const {
     challenges,
     goals,
@@ -50,7 +52,7 @@ export default function NativeChallengesScreen(props: {
       const url = buildChallengeShareUrl(id);
       await Share.share({
         url,
-        message: `Посмотри этот челлендж: ${url}`,
+        message: t("challenges.share_message", { url }),
       });
     },
     onOpenLink: (url) => {
@@ -72,28 +74,28 @@ export default function NativeChallengesScreen(props: {
     }
 
     if (paymentSyncStatus.status === "SUCCESS") {
-      Alert.alert("Оплата подтверждена", "Вы успешно присоединились к челленджу.");
+      Alert.alert(t("challenges.payment_confirmed_title"), t("challenges.payment_confirmed_description"));
     } else if (paymentSyncStatus.status === "PENDING") {
-      Alert.alert("Платеж обрабатывается", "Провайдер еще не подтвердил оплату. Проверим статус чуть позже.");
+      Alert.alert(t("challenges.payment_pending_title"), t("challenges.payment_pending_description"));
     } else if (paymentSyncStatus.status === "CANCELLED") {
-      Alert.alert("Оплата отменена", "Вы можете попробовать снова, когда будете готовы.");
+      Alert.alert(t("challenges.payment_cancelled_title"), t("challenges.payment_cancelled_description"));
     } else {
-      Alert.alert("Статус оплаты не получен", "Не удалось подтвердить оплату. Попробуйте открыть челлендж еще раз.");
+      Alert.alert(t("challenges.payment_unknown_title"), t("challenges.payment_unknown_description"));
     }
 
     clearPaymentSyncStatus();
-  }, [paymentSyncStatus, clearPaymentSyncStatus]);
+  }, [paymentSyncStatus, clearPaymentSyncStatus, t]);
 
   const handleAcceptChallenge = async (id: string) => {
     const result = await acceptSelectedChallenge(id);
 
     if (result.status === "accepted") {
-      Alert.alert("Готово", "Вы присоединились к челленджу.");
+      Alert.alert(t("challenges.accepted_title"), t("challenges.accepted_description"));
       return;
     }
 
     if (result.status === "payment_required") {
-      Alert.alert("Нужна оплата", "Откроем выбор способа оплаты и продолжим через redirect flow.");
+      Alert.alert(t("challenges.payment_required_title"), t("challenges.payment_required_description"));
     }
   };
 
@@ -104,10 +106,10 @@ export default function NativeChallengesScreen(props: {
   const handleLeaveChallenge = async (id: string) => {
     prepareLeaveChallenge(id);
 
-    Alert.alert("Покинуть челлендж?", "Вы потеряете доступ к его данным.", [
-      { text: "Отмена", style: "cancel" },
+    Alert.alert(t("challenges.leave_native_title"), t("challenges.leave_native_description"), [
+      { text: t("common.cancel"), style: "cancel" },
       {
-        text: "Покинуть",
+        text: t("challenges.leave"),
         style: "destructive",
         onPress: () => {
           void confirmLeaveChallenge();
@@ -117,10 +119,10 @@ export default function NativeChallengesScreen(props: {
   };
 
   const handleKickParticipant = async (challengeId: string, userId: string) => {
-    Alert.alert("Исключить участника?", "Он потеряет доступ к челленджу и его данным.", [
-      { text: "Отмена", style: "cancel" },
+    Alert.alert(t("challenges.kick_native_title"), t("challenges.kick_native_description"), [
+      { text: t("common.cancel"), style: "cancel" },
       {
-        text: "Исключить",
+        text: t("challenges.kick"),
         style: "destructive",
         onPress: () => {
           void kickChallengeParticipant(challengeId, userId);
@@ -131,14 +133,14 @@ export default function NativeChallengesScreen(props: {
 
   return (
     <View style={{ flex: 1, backgroundColor: "#f8fafc" }}>
-      <ScreenHeader title="Челленджи" actionLabel="Новый" onAction={openCreateChallenge} />
+      <ScreenHeader title={t("challenges.title")} actionLabel={t("common.create")} onAction={openCreateChallenge} />
 
       <ScrollView contentContainerStyle={{ padding: 16, gap: 12 }}>
         {challenges.length === 0 ? (
           <EmptyStateCard
-            title="Пока нет челленджей"
-            description="Это первый сложный native screen поверх общего controller-layer."
-            actionLabel="Создать челлендж"
+            title={t("challenges.empty_native_title")}
+            description={t("challenges.empty_native_description")}
+            actionLabel={t("challenges.create")}
             onAction={openCreateChallenge}
           />
         ) : (
@@ -160,7 +162,7 @@ export default function NativeChallengesScreen(props: {
                   </View>
 
                   <Pressable onPress={() => openEditChallenge(challenge.id)}>
-                    <Text style={{ color: "#2563eb", fontWeight: "600" }}>Изменить</Text>
+                    <Text style={{ color: "#2563eb", fontWeight: "600" }}>{t("common.edit")}</Text>
                   </Pressable>
                 </View>
 
@@ -173,7 +175,7 @@ export default function NativeChallengesScreen(props: {
                       borderRadius: 999,
                     }}
                   >
-                    <Text style={{ color: "#334155" }}>{goalsCount} целей</Text>
+                    <Text style={{ color: "#334155" }}>{goalsCount} {t("challenges.goals_count")}</Text>
                   </View>
                   <View
                     style={{
@@ -183,7 +185,7 @@ export default function NativeChallengesScreen(props: {
                       borderRadius: 999,
                     }}
                   >
-                    <Text style={{ color: "#334155" }}>{participantsCount} участников</Text>
+                    <Text style={{ color: "#334155" }}>{participantsCount} {t("challenges.participants").toLowerCase()}</Text>
                   </View>
                   <View
                     style={{
@@ -194,7 +196,7 @@ export default function NativeChallengesScreen(props: {
                     }}
                   >
                     <Text style={{ color: isPaid ? "#92400e" : "#166534" }}>
-                      {isPaid ? `${challenge.price} ₽` : "Бесплатно"}
+                      {isPaid ? `${challenge.price} ₽` : t("challenges.free")}
                     </Text>
                   </View>
                   {challenge.requiresReport && (
@@ -206,7 +208,7 @@ export default function NativeChallengesScreen(props: {
                         borderRadius: 999,
                       }}
                     >
-                      <Text style={{ color: "#1d4ed8" }}>Нужен отчет</Text>
+                      <Text style={{ color: "#1d4ed8" }}>{t("challenges.requires_report")}</Text>
                     </View>
                   )}
                 </View>
@@ -226,27 +228,27 @@ export default function NativeChallengesScreen(props: {
                     </View>
                   ))}
                   {challenge.goals.length > 3 && (
-                    <Text style={{ color: "#64748b" }}>И еще {challenge.goals.length - 3} целей</Text>
+                    <Text style={{ color: "#64748b" }}>{t("challenges.goals_more", { count: challenge.goals.length - 3 })}</Text>
                   )}
                 </View>
 
                 <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8 }}>
                   <ActionChip onPress={() => void handleAcceptChallenge(challenge.id)} tone="primary">
-                    Принять участие
+                    {t("challenges.accept")}
                   </ActionChip>
 
-                  <ActionChip onPress={() => void shareChallenge(challenge.id)}>Поделиться</ActionChip>
+                  <ActionChip onPress={() => void shareChallenge(challenge.id)}>{t("common.share")}</ActionChip>
 
                   <ActionChip onPress={() => void handleOpenParticipants(challenge.id)}>
-                    Участники
+                    {t("challenges.participants")}
                   </ActionChip>
 
                   {!!challenge.link && (
-                    <ActionChip onPress={() => openChallengeLink(challenge.id)}>Ссылка</ActionChip>
+                    <ActionChip onPress={() => openChallengeLink(challenge.id)}>{t("challenges.link")}</ActionChip>
                   )}
 
                   <ActionChip onPress={() => void handleLeaveChallenge(challenge.id)} tone="danger">
-                    Покинуть
+                    {t("challenges.leave")}
                   </ActionChip>
                 </View>
               </SurfaceCard>
@@ -287,3 +289,4 @@ export default function NativeChallengesScreen(props: {
     </View>
   );
 }
+

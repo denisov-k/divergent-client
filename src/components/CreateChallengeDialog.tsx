@@ -151,7 +151,7 @@ export function CreateChallengeDialog({
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="link">РЎСЃС‹Р»РєР° РЅР° СЃРѕРѕР±С‰РµСЃС‚РІРѕ</Label>
+            <Label htmlFor="link">{t("challenges.fields.link")}</Label>
             <Input
               id="link"
               placeholder={t("challenges.fields.link")}
@@ -250,6 +250,7 @@ export function CreateChallengeDialog({
     </Dialog>
   );
 }
+
 
 
 

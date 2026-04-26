@@ -2,6 +2,7 @@
 import { Alert, Pressable, ScrollView, Text, View } from "react-native";
 
 import { ActionChip } from "@/components/native/ActionChip";
+import { AiChatSheet } from "@/components/native/AiChatSheet";
 import { CreateReportSheet } from "@/components/native/CreateReportSheet";
 import { EmptyStateCard } from "@/components/native/EmptyStateCard";
 import { GoalFormSheet } from "@/components/native/GoalFormSheet";
@@ -18,6 +19,7 @@ export default function NativeGoalsScreen(props: {
     rewards,
     categories,
     goalDialogOpen,
+    aiOpen,
     editingGoal,
     openCreateGoal,
     openEditGoal,
@@ -29,6 +31,7 @@ export default function NativeGoalsScreen(props: {
     saveReport,
     setGoalDialogOpen,
     setCreateReportDialogOpen,
+    setAiOpen,
     toggleGoalTask,
   } = useGoalsScreen({
     focusId: props.goalId,
@@ -61,6 +64,20 @@ export default function NativeGoalsScreen(props: {
       <ScreenHeader title="Цели" actionLabel="Новая цель" onAction={openCreateGoal} />
 
       <ScrollView contentContainerStyle={{ padding: 16, gap: 12 }}>
+        <SurfaceCard>
+          <View style={{ gap: 8 }}>
+            <Text style={{ fontSize: 16, fontWeight: "600", color: "#0f172a" }}>AI-помощник</Text>
+            <Text style={{ color: "#64748b" }}>
+              Тот же сценарий генерации целей через AI, что и в вебе, теперь доступен и в mobile-клиенте.
+            </Text>
+            <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8 }}>
+              <ActionChip onPress={() => setAiOpen(true)} tone="secondary">
+                Открыть AI
+              </ActionChip>
+            </View>
+          </View>
+        </SurfaceCard>
+
         {goals.length === 0 ? (
           <EmptyStateCard
             title="Пока нет целей"
@@ -148,6 +165,14 @@ export default function NativeGoalsScreen(props: {
         onOpenChange={setGoalDialogOpen}
         onSave={saveGoal}
         onDelete={removeGoal}
+      />
+
+      <AiChatSheet
+        open={aiOpen}
+        onOpenChange={setAiOpen}
+        onDraftAdded={(goal) => {
+          Alert.alert("Черновик добавлен", `Цель \"${goal.title}\" появилась в списке.`);
+        }}
       />
     </View>
   );

@@ -1,4 +1,5 @@
 ﻿import { Modal, Text, View } from "react-native";
+import { useTranslation } from "react-i18next";
 
 import { ActionChip } from "@/components/native/ActionChip";
 import type { PaymentMethod } from "@/types";
@@ -12,6 +13,8 @@ export function SelectPaymentMethodSheet({
   onOpenChange: (open: boolean) => void;
   onSelect: (method: PaymentMethod) => Promise<boolean>;
 }) {
+  const { t } = useTranslation();
+
   const handleSelect = async (method: PaymentMethod) => {
     await onSelect(method);
     onOpenChange(false);
@@ -35,16 +38,14 @@ export function SelectPaymentMethodSheet({
             gap: 14,
           }}
         >
-          <Text style={{ fontSize: 20, fontWeight: "700", color: "#0f172a" }}>Выбери способ оплаты</Text>
-          <Text style={{ color: "#64748b" }}>
-            Сейчас в мобильной ветке уже подключён базовый redirect flow через YooKassa.
-          </Text>
+          <Text style={{ fontSize: 20, fontWeight: "700", color: "#0f172a" }}>{t("challenges.payment_sheet_title")}</Text>
+          <Text style={{ color: "#64748b" }}>{t("challenges.payment_sheet_description")}</Text>
 
           <View style={{ gap: 10 }}>
             <ActionChip onPress={() => void handleSelect("YOUKASSA")} tone="primary">
-              Оплатить картой
+              {t("challenges.payment_sheet_submit")}
             </ActionChip>
-            <ActionChip onPress={() => onOpenChange(false)}>Отмена</ActionChip>
+            <ActionChip onPress={() => onOpenChange(false)}>{t("common.cancel")}</ActionChip>
           </View>
         </View>
       </View>

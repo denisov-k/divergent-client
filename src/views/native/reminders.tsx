@@ -1,5 +1,6 @@
 ﻿import { useEffect } from "react";
 import { Alert, Pressable, ScrollView, Text, View } from "react-native";
+import { useTranslation } from "react-i18next";
 
 import { ActionChip } from "@/components/native/ActionChip";
 import { EmptyStateCard } from "@/components/native/EmptyStateCard";
@@ -23,6 +24,7 @@ export default function NativeRemindersScreen(props: {
   goalId?: string | null;
   onConsumeLinkState?: () => void;
 }) {
+  const { t } = useTranslation();
   const {
     reminders,
     goals,
@@ -52,19 +54,19 @@ export default function NativeRemindersScreen(props: {
 
   const handleDeleteReminder = async (id: string) => {
     await removeReminder(id);
-    Alert.alert("Готово", "Напоминание удалено");
+    Alert.alert(t("reminders.deleted_title"), t("reminders.deleted_description"));
   };
 
   return (
     <View style={{ flex: 1, backgroundColor: "#f8fafc" }}>
-      <ScreenHeader title="Напоминания" actionLabel="Новое" onAction={openCreateReminder} />
+      <ScreenHeader title={t("reminders.title")} actionLabel={t("common.create")} onAction={openCreateReminder} />
 
       <ScrollView contentContainerStyle={{ padding: 16, gap: 12 }}>
         {reminders.length === 0 ? (
           <EmptyStateCard
-            title="Пока нет напоминаний"
-            description="Это базовый native entrypoint на общей screen-логике reminders."
-            actionLabel="Создать напоминание"
+            title={t("reminders.empty_native_title")}
+            description={t("reminders.empty_native_description")}
+            actionLabel={t("reminders.create")}
             onAction={openCreateReminder}
           />
         ) : (
@@ -79,11 +81,11 @@ export default function NativeRemindersScreen(props: {
                       {reminder.title}
                     </Text>
                     <Text style={{ color: "#64748b", marginTop: 4 }}>{reminder.time}</Text>
-                    {!!goal && <Text style={{ color: "#0f766e", marginTop: 6 }}>Цель: {goal.title}</Text>}
+                    {!!goal && <Text style={{ color: "#0f766e", marginTop: 6 }}>{t("reminders.goal_prefix", { title: goal.title })}</Text>}
                   </View>
 
                   <Pressable onPress={() => openEditReminder(reminder.id)}>
-                    <Text style={{ color: "#2563eb", fontWeight: "600" }}>Изменить</Text>
+                    <Text style={{ color: "#2563eb", fontWeight: "600" }}>{t("common.edit")}</Text>
                   </Pressable>
                 </View>
 
@@ -121,11 +123,11 @@ export default function NativeRemindersScreen(props: {
                     onPress={() => void toggleReminderState(reminder.id)}
                     tone={reminder.isActive ? "success" : "secondary"}
                   >
-                    {reminder.isActive ? "Активно" : "Выключено"}
+                    {reminder.isActive ? t("reminders.status_active") : t("reminders.status_disabled")}
                   </ActionChip>
 
                   <ActionChip onPress={() => void handleDeleteReminder(reminder.id)} tone="danger">
-                    Удалить
+                    {t("common.delete")}
                   </ActionChip>
                 </View>
               </SurfaceCard>

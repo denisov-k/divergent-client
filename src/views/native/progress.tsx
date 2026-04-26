@@ -1,5 +1,6 @@
 ﻿import { useEffect, useState } from "react";
 import { Pressable, ScrollView, Text, View } from "react-native";
+import { useTranslation } from "react-i18next";
 
 import { ScreenHeader } from "@/components/native/ScreenHeader";
 import { StatTile } from "@/components/native/StatTile";
@@ -10,6 +11,7 @@ export default function NativeProgressScreen(props: {
   goalId?: string | null;
   onConsumeLinkState?: () => void;
 }) {
+  const { t } = useTranslation();
   const [goalId, setGoalId] = useState<string | null>(props.goalId || null);
   const {
     user,
@@ -49,17 +51,17 @@ export default function NativeProgressScreen(props: {
   return (
     <View style={{ flex: 1, backgroundColor: "#f8fafc" }}>
       <ScreenHeader
-        title="Прогресс"
+        title={t("navigation.progress")}
         subtitle={
           selectedGoal
-            ? `Статистика по цели: ${selectedGoal.title}`
-            : "Сводка по задачам, активности и заработанному XP"
+            ? t("progress.subtitle_selected", { title: selectedGoal.title })
+            : t("progress.subtitle_all")
         }
       />
 
       <ScrollView contentContainerStyle={{ padding: 16, gap: 16 }}>
         <View style={{ gap: 10 }}>
-          <Text style={{ fontSize: 16, fontWeight: "600", color: "#0f172a" }}>Фильтр по цели</Text>
+          <Text style={{ fontSize: 16, fontWeight: "600", color: "#0f172a" }}>{t("progress.filter_label")}</Text>
           <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8 }}>
             <Pressable
               onPress={() => setGoalId(null)}
@@ -73,7 +75,7 @@ export default function NativeProgressScreen(props: {
               }}
             >
               <Text style={{ color: goalId === null ? "#1d4ed8" : "#334155", fontWeight: "600" }}>
-                Все цели
+                {t("progress.all_goals")}
               </Text>
             </Pressable>
 
@@ -103,23 +105,21 @@ export default function NativeProgressScreen(props: {
         </View>
 
         <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 12 }}>
-          <StatTile label="Текущий XP" value={String(xp)} tone="blue" />
-          <StatTile label="Закрыто целей" value={String(completedGoals)} tone="emerald" />
-          <StatTile label="Выполнено задач" value={`${completedTasks}/${totalTasks || 0}`} />
-          <StatTile label="Получено наград" value={String(unlockedRewards)} />
+          <StatTile label={t("progress.current_xp")} value={String(xp)} tone="blue" />
+          <StatTile label={t("progress.completed_goals")} value={String(completedGoals)} tone="emerald" />
+          <StatTile label={t("progress.completed_tasks")} value={`${completedTasks}/${totalTasks || 0}`} />
+          <StatTile label={t("progress.unlocked_rewards")} value={String(unlockedRewards)} />
         </View>
 
         <SurfaceCard>
-          <Text style={{ fontSize: 16, fontWeight: "600", color: "#0f172a" }}>Активность за 7 дней</Text>
+          <Text style={{ fontSize: 16, fontWeight: "600", color: "#0f172a" }}>{t("progress.activity_title")}</Text>
 
           {selectedGoal?.goalType !== "TASK" ? (
-            <Text style={{ color: "#64748b" }}>
-              Детальная дневная активность сейчас доступна для целей с типом TASK.
-            </Text>
+            <Text style={{ color: "#64748b" }}>{t("progress.activity_task_only")}</Text>
           ) : loadingActivity ? (
-            <Text style={{ color: "#64748b" }}>Загружаем активность…</Text>
+            <Text style={{ color: "#64748b" }}>{t("progress.activity_loading")}</Text>
           ) : weeklyXpData.length === 0 ? (
-            <Text style={{ color: "#64748b" }}>Пока нет данных по активности за эту неделю.</Text>
+            <Text style={{ color: "#64748b" }}>{t("progress.activity_empty")}</Text>
           ) : (
             <View style={{ gap: 10 }}>
               {weeklyXpData.map((item) => (
@@ -148,18 +148,16 @@ export default function NativeProgressScreen(props: {
                 </View>
               ))}
 
-              <Text style={{ color: "#64748b" }}>
-                Лучший день: {bestDay.name}, {bestDay.value} XP
-              </Text>
+              <Text style={{ color: "#64748b" }}>{t("progress.best_day", { day: bestDay.name, xp: bestDay.value })}</Text>
             </View>
           )}
         </SurfaceCard>
 
         <SurfaceCard>
-          <Text style={{ fontSize: 16, fontWeight: "600", color: "#0f172a" }}>Серии выполнения</Text>
+          <Text style={{ fontSize: 16, fontWeight: "600", color: "#0f172a" }}>{t("progress.streaks_title")}</Text>
 
           {!streakDays || streakDays.length === 0 ? (
-            <Text style={{ color: "#64748b" }}>Выберите task-цель, чтобы увидеть серию по дням.</Text>
+            <Text style={{ color: "#64748b" }}>{t("progress.streaks_empty")}</Text>
           ) : (
             <View style={{ flexDirection: "row", gap: 8 }}>
               {streakDays.map((day, index) => (
@@ -174,7 +172,7 @@ export default function NativeProgressScreen(props: {
                   }}
                 >
                   <Text style={{ color: day ? "#ffffff" : "#475569", fontWeight: "700" }}>
-                    {day ? "Да" : "Нет"}
+                    {day ? t("common.yes") : t("common.no")}
                   </Text>
                 </View>
               ))}
@@ -183,10 +181,10 @@ export default function NativeProgressScreen(props: {
         </SurfaceCard>
 
         <SurfaceCard>
-          <Text style={{ fontSize: 16, fontWeight: "600", color: "#0f172a" }}>Категории</Text>
+          <Text style={{ fontSize: 16, fontWeight: "600", color: "#0f172a" }}>{t("progress.categories_title")}</Text>
 
           {categoryData.length === 0 ? (
-            <Text style={{ color: "#64748b" }}>Пока нет завершённых задач для разбивки по категориям.</Text>
+            <Text style={{ color: "#64748b" }}>{t("progress.categories_empty")}</Text>
           ) : (
             categoryData.map((item) => (
               <View
@@ -209,10 +207,10 @@ export default function NativeProgressScreen(props: {
         </SurfaceCard>
 
         <SurfaceCard gap={8}>
-          <Text style={{ fontSize: 16, fontWeight: "600", color: "#0f172a" }}>Общий срез</Text>
-          <Text style={{ color: "#475569" }}>Пользователь: {user?.name || user?.email || "Без имени"}</Text>
-          <Text style={{ color: "#475569" }}>Целей в выборке: {filteredGoals.length}</Text>
-          <Text style={{ color: "#475569" }}>Записей активности: {activity?.data.length ?? 0}</Text>
+          <Text style={{ fontSize: 16, fontWeight: "600", color: "#0f172a" }}>{t("progress.overview_title")}</Text>
+          <Text style={{ color: "#475569" }}>{t("progress.overview_user", { name: user?.name || user?.email || "—" })}</Text>
+          <Text style={{ color: "#475569" }}>{t("progress.overview_goals", { count: filteredGoals.length })}</Text>
+          <Text style={{ color: "#475569" }}>{t("progress.overview_activity", { count: activity?.data.length ?? 0 })}</Text>
         </SurfaceCard>
       </ScrollView>
     </View>

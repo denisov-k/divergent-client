@@ -1,11 +1,11 @@
-import {Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter} from "./ui/dialog";
-import {Button} from "./ui/button";
-import {ChevronUp, ChevronDown, Download} from "lucide-react";
-import {Collapsible, CollapsibleContent, CollapsibleTrigger} from "./ui/collapsible";
-import {useState} from "react";
-import {format} from "date-fns";
-import {Challenge, ChallengeParticipant, Report} from "@/types";
-import {useTranslation} from "react-i18next";
+﻿import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "./ui/dialog";
+import { Button } from "./ui/button";
+import { ChevronUp, ChevronDown, Download } from "lucide-react";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "./ui/collapsible";
+import { useState } from "react";
+import { format } from "date-fns";
+import type { Challenge, ChallengeParticipant, Report } from "@/types";
+import { useTranslation } from "react-i18next";
 
 interface ChallengeParticipantDialogProps {
   challenge: Challenge;
@@ -18,23 +18,24 @@ interface ChallengeParticipantDialogProps {
 }
 
 export function ChallengeParticipantDialog({
-                                             challenge,
-                                             participants,
-                                             reports,
-                                             isOpen,
-                                             onOpenChange,
-                                             onDownload,
-                                             onKick
-                                           }: ChallengeParticipantDialogProps) {
+  challenge,
+  participants,
+  reports,
+  isOpen,
+  onOpenChange,
+  onDownload,
+  onKick,
+}: ChallengeParticipantDialogProps) {
   const [openUsers, setOpenUsers] = useState<Record<string, boolean>>({});
-  const {t} = useTranslation();
+  const { t } = useTranslation();
 
   const isCreator = (userId: string) => challenge.creatorId === userId;
 
-  // Группировка отчётов по пользователям
   const reportsByUser = reports.reduce(
     (acc: Record<string, Report[]>, report) => {
-      if (!acc[report.userId]) acc[report.userId] = [];
+      if (!acc[report.userId]) {
+        acc[report.userId] = [];
+      }
       acc[report.userId].push(report);
       return acc;
     },
@@ -42,87 +43,63 @@ export function ChallengeParticipantDialog({
   );
 
   const toggleUser = (userId: string) => {
-    setOpenUsers(prev => ({...prev, [userId]: !prev[userId]}));
+    setOpenUsers((prev) => ({ ...prev, [userId]: !prev[userId] }));
   };
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-h-[90vh] max-w-2xl overflow-y-auto">
         <DialogHeader>
-          <DialogTitle
-            className="text-lg font-semibold">{challenge.title} — {t("challenges.participants")}</DialogTitle>
+          <DialogTitle className="text-lg font-semibold">
+            {challenge.title} — {t("challenges.participants")}
+          </DialogTitle>
         </DialogHeader>
 
-        <div className="flex flex-col gap-2 mt-4">
-          {participants.length === 0 && (
-            <p className="text-sm text-muted-foreground">
-              {t("challenges.noParticipants")}
-            </p>
-          )}
+        <div className="mt-4 flex flex-col gap-2">
+          {participants.length === 0 && <p className="text-sm text-muted-foreground">{t("challenges.noParticipants")}</p>}
 
           {participants.map((participant) => {
             const userReports = reportsByUser[participant.userId] || [];
-            const isOpen = openUsers[participant.userId];
+            const isOpenUser = openUsers[participant.userId];
 
             return (
               <Collapsible
                 key={participant.userId}
-                open={isOpen}
+                open={isOpenUser}
                 onOpenChange={() => toggleUser(participant.userId)}
               >
                 <CollapsibleTrigger asChild>
                   <Button variant="outline" className="w-full justify-between">
-            <span>
-              {participant.user.name}
-            </span>
-                    {isOpen ? (
-                      <ChevronUp className="size-4"/>
-                    ) : (
-                      <ChevronDown className="size-4"/>
-                    )}
+                    <span>{participant.user.name}</span>
+                    {isOpenUser ? <ChevronUp className="size-4" /> : <ChevronDown className="size-4" />}
                   </Button>
                 </CollapsibleTrigger>
 
-                <CollapsibleContent className="space-y-2 mt-2">
-
+                <CollapsibleContent className="mt-2 space-y-2">
                   {userReports.length === 0 && (
-                    <span className="text-xs ml-2 text-muted-foreground">
-                      {t("challenges.noReports")}
-                    </span>
+                    <span className="ml-2 text-xs text-muted-foreground">{t("challenges.noReports")}</span>
                   )}
 
-                  {/* Репорты */}
                   {userReports.map((report) => (
                     <div
                       key={report.id}
-                      className="flex items-center justify-between border rounded p-2 hover:bg-gray-100 dark:hover:bg-gray-700 transition"
+                      className="flex items-center justify-between rounded border p-2 transition hover:bg-gray-100 dark:hover:bg-gray-700"
                     >
                       <div className="flex flex-col">
-                <span className="font-medium">
-                  {report.taskCompletion.task.title}
-                </span>
+                        <span className="font-medium">{report.taskCompletion.task.title}</span>
                         <span className="text-xs text-muted-foreground">
-                  {report.fileType} • {report.comment || "-"} •{" "}
-                          {format(new Date(report.createdAt), "dd.MM.yyyy HH:mm")}
-                </span>
+                          {report.fileType} • {report.comment || "-"} • {format(new Date(report.createdAt), "dd.MM.yyyy HH:mm")}
+                        </span>
                       </div>
 
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => onDownload(report.id)}
-                      >
-                        <Download/>
+                      <Button variant="outline" size="sm" onClick={() => onDownload(report.id)}>
+                        <Download />
                       </Button>
                     </div>
                   ))}
 
-                  { !isCreator(participant.userId) && (
-                    <Button
-                      variant="destructive"
-                      size="sm"
-                      onClick={() => onKick(challenge.id, participant.userId)}
-                    >
+                  {!isCreator(participant.userId) && (
+                    <Button variant="destructive" size="sm" onClick={() => onKick(challenge.id, participant.userId)}>
                       {t("challenges.kick")}
                     </Button>
                   )}

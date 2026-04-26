@@ -1,5 +1,6 @@
 ﻿import { useSearchParams, useNavigate } from "react-router-dom";
 import { Target, Trophy, Zap } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 import { PeriodCalendar } from "@/components/PeriodCalendar";
 import { ProgressChart } from "@/components/ProgressChart";
@@ -9,6 +10,7 @@ import { buildProgressPath } from "@/app/routes";
 import { useProgressScreen } from "@/shared/screens/progress/useProgressScreen";
 
 export default function ProgressScreen() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const goalId = searchParams.get("goalId");
@@ -39,14 +41,14 @@ export default function ProgressScreen() {
   return (
     <div className="flex w-full flex-1 flex-col px-2">
       <div className="mb-2 flex items-center justify-between">
-        <h2 className="py-3">РњРѕР№ РїСЂРѕРіСЂРµСЃСЃ</h2>
+        <h2 className="py-3">{t("progress.title")}</h2>
 
         <select
           value={goalId || ""}
           onChange={(event) => handleGoalChange(event.target.value)}
           className="rounded-md border bg-background px-3 py-2 text-sm"
         >
-          <option value="">Р’СЃРµ С†РµР»Рё</option>
+          <option value="">{t("progress.all_goals")}</option>
           {goals.map((goal) => (
             <option key={goal.id} value={goal.id}>
               {goal.title}
@@ -63,28 +65,28 @@ export default function ProgressScreen() {
         <div className="columns-1 gap-2 sm:columns-2 lg:columns-3 xl:columns-4">
           {selectedGoal && (
             <StatCard
-              title="XP Р·Р° С†РµР»СЊ"
+              title={t("progress.goal_xp")}
               value={xp}
               icon={Zap}
-              description="РќР°РєРѕРїР»РµРЅРѕ РѕРїС‹С‚Р°"
+              description={t("progress.goal_xp_description")}
             />
           )}
 
           {!selectedGoal && (
             <StatCard
-              title="Р—Р°РІРµСЂС€РµРЅРѕ С†РµР»РµР№"
+              title={t("progress.completed_goals")}
               value={completedGoals}
               icon={Target}
-              description={`РР· ${filteredGoals.length} С†РµР»РµР№`}
+              description={t("progress.completed_goals_description", { count: filteredGoals.length })}
             />
           )}
 
           {!selectedGoal && (
             <StatCard
-              title="РџРѕР»СѓС‡РµРЅРѕ РЅР°РіСЂР°Рґ"
+              title={t("progress.rewards_received")}
               value={rewards.filter((reward) => reward.isUnlocked).length}
               icon={Trophy}
-              description={`РР· ${rewards.length} РЅР°РіСЂР°Рґ`}
+              description={t("progress.rewards_received_description", { count: rewards.length })}
             />
           )}
 
@@ -99,8 +101,8 @@ export default function ProgressScreen() {
           {selectedGoal && selectedGoal.goalType === "TASK" && (
             <ProgressChart
               type="line"
-              title="РћРїС‹С‚ Р·Р° РЅРµРґРµР»СЋ"
-              description="Р’Р°С€ Р·Р°СЂР°Р±РѕС‚Р°РЅРЅС‹Р№ РѕРїС‹С‚ РїРѕ РґРЅСЏРј"
+              title={t("progress.xp_week")}
+              description={t("progress.xp_week_description")}
               data={weeklyXpData}
               dataKey="value"
             />
@@ -109,8 +111,8 @@ export default function ProgressScreen() {
           {!selectedGoal && (
             <ProgressChart
               type="bar"
-              title="Р—Р°РґР°С‡Рё РїРѕ РєР°С‚РµРіРѕСЂРёСЏРј"
-              description="Р Р°СЃРїСЂРµРґРµР»РµРЅРёРµ РІС‹РїРѕР»РЅРµРЅРЅС‹С… Р·Р°РґР°С‡"
+              title={t("progress.tasks_by_category")}
+              description={t("progress.tasks_by_category_description")}
               data={categoryData}
               dataKey="value"
             />
@@ -120,4 +122,3 @@ export default function ProgressScreen() {
     </div>
   );
 }
-

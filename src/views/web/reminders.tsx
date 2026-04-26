@@ -1,5 +1,6 @@
 ﻿import { Plus } from "lucide-react";
 import { toast } from "sonner";
+import { useTranslation } from "react-i18next";
 
 import { ReminderCard } from "@/components/ReminderCard";
 import { ReminderDialog } from "@/components/ReminderDialog";
@@ -8,6 +9,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { useRemindersScreen } from "@/shared/screens/reminders/useRemindersScreen";
 
 export default function RemindersScreen() {
+  const { t } = useTranslation();
   const {
     reminders,
     goals,
@@ -23,11 +25,7 @@ export default function RemindersScreen() {
 
   const handleSaveReminder = async (...args: Parameters<typeof saveReminder>) => {
     const result = await saveReminder(...args);
-    toast.success(
-      result.status === "updated"
-        ? "РќР°РїРѕРјРёРЅР°РЅРёРµ РѕР±РЅРѕРІР»РµРЅРѕ"
-        : "РќР°РїРѕРјРёРЅР°РЅРёРµ СЃРѕР·РґР°РЅРѕ"
-    );
+    toast.success(result.status === "updated" ? t("reminders.updated") : t("reminders.created"));
   };
 
   const handleDeleteReminder = async (id: string) => {
@@ -37,20 +35,20 @@ export default function RemindersScreen() {
   return (
     <div className="flex flex-1 flex-col px-2">
       <div className="flex items-center justify-between py-2">
-        <h2>РќР°РїРѕРјРёРЅР°РЅРёСЏ</h2>
+        <h2>{t("reminders.title")}</h2>
         <Button onClick={openCreateReminder}>
           <Plus className="mr-2 size-4" />
-          Р”РѕР±Р°РІРёС‚СЊ РЅР°РїРѕРјРёРЅР°РЅРёРµ
+          {t("reminders.create")}
         </Button>
       </div>
 
       {reminders.length === 0 ? (
         <Card>
           <CardContent className="flex flex-col items-center justify-center py-12">
-            <p className="mb-4 text-muted-foreground">РЈ РІР°СЃ РїРѕРєР° РЅРµС‚ РЅР°РїРѕРјРёРЅР°РЅРёР№</p>
+            <p className="mb-4 text-muted-foreground">{t("reminders.empty")}</p>
             <Button onClick={openCreateReminder}>
               <Plus className="mr-2 size-4" />
-              РЎРѕР·РґР°С‚СЊ РїРµСЂРІРѕРµ РЅР°РїРѕРјРёРЅР°РЅРёРµ
+              {t("reminders.create_first")}
             </Button>
           </CardContent>
         </Card>
