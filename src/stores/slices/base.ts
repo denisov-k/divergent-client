@@ -1,0 +1,15 @@
+import type { AppStoreState, StoreSlice } from "@/stores/types";
+
+export const createBaseSlice: StoreSlice<AppStoreState> = () => ({
+  initialized: false,
+  loading: false,
+  user: null,
+  token: null,
+  goals: [],
+  challenges: [],
+  rewards: [],
+  reminders: [],
+  friends: [],
+  categories: [],
+  reports: {},
+});
