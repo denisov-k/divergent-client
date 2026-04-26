@@ -45,6 +45,7 @@ type NativeButtonBaseProps = Omit<TouchableOpacityProps, "onPress" | "children">
   onPress?: (event: GestureResponderEvent) => void;
   onClick?: (event: GestureResponderEvent) => void;
   type?: "button" | "submit" | "reset";
+  title?: string;
 };
 
 export interface ButtonProps
@@ -59,6 +60,8 @@ function Button({
   onPress,
   onClick,
   disabled,
+  type = "button",
+  title,
   ...props
 }: ButtonProps) {
   const handlePress = onPress ?? onClick;
@@ -66,7 +69,8 @@ function Button({
   if (Platform.OS === "web") {
     return (
       <button
-        type="button"
+        type={type}
+        title={title}
         className={cn(buttonVariants({ variant, size, className }))}
         onClick={handlePress as unknown as React.MouseEventHandler<HTMLButtonElement>}
         disabled={disabled}

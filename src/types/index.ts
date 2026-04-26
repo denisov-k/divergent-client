@@ -1,4 +1,9 @@
-import type {CategoryType} from "@/components/GoalCard.tsx";
+import type {
+  CategoryType,
+  RewardIconType as SharedRewardIconType,
+} from "@/shared/domain";
+
+export type { CategoryType } from "@/shared/domain";
 
 export enum UserRole {
   User = 'user',
@@ -130,6 +135,18 @@ export interface CategoryOption {
   label: string;
 }
 
+export interface FriendSummary {
+  id: string;
+  name: string;
+  level: number;
+  avatarUrl?: string;
+  currentXp: number;
+  totalGoals: number;
+  completedGoals: number;
+  streak: number;
+  rank?: number;
+}
+
 export interface Reminder {
   id: string;
   title: string;
@@ -143,7 +160,7 @@ export interface Reminder {
   task?: Task;
 }
 
-export type RewardIcon = "trophy" | "star" | "gift" | "crown" | "award" | "zap";
+export type RewardIcon = SharedRewardIconType;
 
 export interface Reward {
   id: string;

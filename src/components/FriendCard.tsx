@@ -4,18 +4,9 @@ import { Progress } from "./ui/progress";
 import { Badge } from "./ui/badge";
 
 import { Trophy, Target, Flame } from "lucide-react";
+import type { FriendSummary } from "@/types";
 
-export interface FriendCardProps {
-  id: string;
-  name: string;
-  level: number;
-  avatarUrl?: string;
-  currentXp: number;
-  totalGoals: number;
-  completedGoals: number;
-  streak: number;
-  rank?: number;
-}
+export type FriendCardProps = FriendSummary;
 
 export function FriendCard({
   name,

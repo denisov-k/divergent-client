@@ -15,8 +15,6 @@ import {Challenge, GoalPeriod, GoalType, Reward, Task} from "@/types";
 import {useNavigate} from "react-router-dom";
 import {useAppStore} from "@/stores/useAppStore.ts";
 
-export type CategoryType = string;
-
 
 interface GoalCardProps {
   id: string;

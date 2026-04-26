@@ -1,6 +1,7 @@
 import { Trophy, Star, Gift, Crown, Award, Zap } from "lucide-react";
+import type { RewardIconType } from "@/shared/domain";
 
-export type RewardIconType = "trophy" | "star" | "gift" | "crown" | "award" | "zap";
+export type { RewardIconType } from "@/shared/domain";
 
 interface RewardIconProps {
   icon?: RewardIconType;

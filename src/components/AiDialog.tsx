@@ -11,10 +11,10 @@ import { Textarea } from "@/components/ui/textarea"
 import { Badge } from "@/components/ui/badge"
 import {Calendar, Clock, Target} from "lucide-react"
 
-import {AIChatResponse, Task, ChatMessage, Draft, Goal, DAYS_OF_WEEK} from "@/types"
+import {AIChatResponse, Task, ChatMessage, Draft, Goal, DAYS_OF_WEEK, RewardIcon as RewardIconType} from "@/types"
 import { useAppStore } from "@/stores/useAppStore"
 import { useTranslation } from "react-i18next"
-import { RewardIcon, RewardIconType } from "@/components/RewardIcon"
+import { RewardIcon } from "@/components/RewardIcon"
 import {CategoryBadge} from "@/components/CategoryBadge.tsx";
 
 interface Props {

@@ -17,7 +17,7 @@ import { TaskItem } from "./TaskItem";
 import { Plus } from "lucide-react";
 import { Separator } from "./ui/separator";
 
-import { type CategoryType } from "@/components/GoalCard";
+import type { CategoryType } from "@/shared/domain";
 import {useTranslation} from "react-i18next";
 import {GoalFormData, Goal, CategoryOption, Task, Reward, GoalPeriod, GoalType} from "@/types";
 

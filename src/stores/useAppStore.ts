@@ -1,11 +1,12 @@
 import {create} from "zustand";
-import * as api from "@/utils/api";
-import {FriendCardProps} from "@/components/FriendCard.tsx";
+import * as api from "@/shared/api/client";
+import { loadAppData } from "@/shared/app/loadAppData";
 
 import {
   CategoryOption,
   Challenge,
   ChallengeApi, ChallengeParticipant,
+  FriendSummary,
   Goal, GoalActivity,
   Leader,
   PaymentMethod,
@@ -28,7 +29,7 @@ interface AppStore {
   challenges: Challenge[];
   rewards: Reward[];
   reminders: Reminder[];
-  friends: FriendCardProps[];
+  friends: FriendSummary[];
   categories: CategoryOption[];
   reports: Record<string, Report[]>;
 
@@ -90,7 +91,7 @@ export const useAppStore = create<AppStore>((set, get) => ({
   challenges: [] as Challenge[],
   rewards: [] as Reward[],
   reminders: [] as Reminder[],
-  friends: [] as FriendCardProps[],
+  friends: [] as FriendSummary[],
   categories: [] as CategoryOption[],
   reports: {},
 
@@ -158,16 +159,7 @@ export const useAppStore = create<AppStore>((set, get) => ({
       set({ user });
 
       if (user) {
-        const [goals, challenges, rewards, reminders, friends, categories] = await Promise.all([
-          api.fetchGoals(),
-          api.fetchChallenges(),
-          api.fetchRewards(),
-          api.fetchReminders(),
-          api.fetchFriends(),
-          api.fetchCategories()
-        ]);
-
-        set({ goals, challenges, rewards, reminders, friends, categories });
+        set(await loadAppData());
       }
     } catch (err) {
       console.error(err);
@@ -275,16 +267,7 @@ export const useAppStore = create<AppStore>((set, get) => ({
   redirectToTelegram(link) {
     WebApp.openInvoice(link, async (status) => {
       if (status === "paid") {
-        const [goals, challenges, rewards, reminders, friends, categories] = await Promise.all([
-          api.fetchGoals(),
-          api.fetchChallenges(),
-          api.fetchRewards(),
-          api.fetchReminders(),
-          api.fetchFriends(),
-          api.fetchCategories()
-        ]);
-
-        set({ goals, challenges, rewards, reminders, friends, categories });
+        set(await loadAppData());
       }
     });
   },

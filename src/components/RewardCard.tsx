@@ -1,9 +1,9 @@
 import { Card, CardContent, CardDescription, CardTitle } from "./ui/card";
 import { Badge } from "./ui/badge";
 import { Button } from "./ui/button";
-import {RewardIcon, RewardIconType} from "@/components/RewardIcon.tsx";
+import {RewardIcon} from "@/components/RewardIcon.tsx";
 import {Edit, Target, Swords} from "lucide-react";
-import {Goal} from "@/types";
+import {Goal, RewardIcon as RewardIconType} from "@/types";
 import {useNavigate} from "react-router-dom";
 import {useAppStore} from "@/stores/useAppStore.ts";
 import {useEffect, useRef, useState} from "react";

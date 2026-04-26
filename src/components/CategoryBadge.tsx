@@ -10,7 +10,7 @@ import {
   type LucideIcon
 } from "lucide-react";
 
-import { type CategoryType } from "@/components/GoalCard.tsx";
+import type { CategoryType } from "@/shared/domain";
 
 interface CategoryBadgeProps {
   category: CategoryType;
