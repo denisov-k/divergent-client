@@ -1,21 +1,28 @@
 import * as api from "@/shared/api/client";
 import { loadAppData } from "@/shared/app/loadAppData";
-import {
-  clearSessionToken,
-  readSessionToken,
-  writeSessionToken,
-} from "@/platform/session";
+import { clearSessionToken } from "@/platform/session";
 import type { AuthSlice, StoreSlice } from "@/stores/types";
 
+async function finalizeAuthenticatedState(
+  set: Parameters<StoreSlice<AuthSlice>>[0]
+) {
+  const user = await api.fetchUser();
+
+  set({
+    user,
+    token: null,
+    ...(await loadAppData()),
+    initialized: true,
+  });
+  clearSessionToken();
+}
+
 export const createAuthSlice: StoreSlice<AuthSlice> = (set, get) => ({
-  login: async (tgData: string) => {
+  loginWithTelegram: async (tgData: string) => {
     set({ loading: true });
     try {
-      const token = "";
-      const user = await api.login(tgData);
-
-      set({ user, token });
-      writeSessionToken(token);
+      await api.login(tgData);
+      await finalizeAuthenticatedState(set);
     } catch (err) {
       console.error(err);
       throw err;
@@ -25,10 +32,45 @@ export const createAuthSlice: StoreSlice<AuthSlice> = (set, get) => ({
   },
 
   signup: async (email, password, name, referrerId, referrerLinkId) => {
-    console.log(email, password, name, referrerId, referrerLinkId);
+    void referrerId;
+    void referrerLinkId;
+
+    set({ loading: true });
+    try {
+      await api.register(email, password, name);
+      await finalizeAuthenticatedState(set);
+    } catch (err) {
+      console.error(err);
+      throw err;
+    } finally {
+      set({ loading: false });
+    }
   },
 
-  signOut: async () => {},
+  loginWithCredentials: async (email: string, password: string) => {
+    set({ loading: true });
+    try {
+      await api.loginWithCredentials(email, password);
+      await finalizeAuthenticatedState(set);
+    } catch (err) {
+      console.error(err);
+      throw err;
+    } finally {
+      set({ loading: false });
+    }
+  },
+
+  signOut: async () => {
+    set({ loading: true });
+    try {
+      await api.logout();
+    } catch (err) {
+      console.error(err);
+    } finally {
+      get().logout();
+      set({ initialized: true, loading: false });
+    }
+  },
 
   updateUser: async (patch) => {
     const updated = await api.updateUser(patch);
@@ -37,6 +79,7 @@ export const createAuthSlice: StoreSlice<AuthSlice> = (set, get) => ({
 
   passwordReset: async (email) => {
     console.log(email);
+    throw new Error("Password reset is not implemented yet");
   },
 
   logout: () => {
@@ -45,9 +88,6 @@ export const createAuthSlice: StoreSlice<AuthSlice> = (set, get) => ({
   },
 
   refreshUser: async () => {
-    const token = get().token || readSessionToken();
-    if (!token) return;
-
     set({ loading: true });
     try {
       const user = await api.fetchUser();

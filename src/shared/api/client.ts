@@ -25,6 +25,26 @@ export async function login(tgData: string) {
   });
 }
 
+export async function loginWithCredentials(email: string, password: string) {
+  return fetchJSON("/api/auth/login", {
+    method: "POST",
+    body: JSON.stringify({ email, password }),
+  });
+}
+
+export async function register(email: string, password: string, name?: string) {
+  return fetchJSON("/api/auth/register", {
+    method: "POST",
+    body: JSON.stringify({ email, password, name }),
+  });
+}
+
+export async function logout() {
+  return fetchJSON("/api/auth/logout", {
+    method: "POST",
+  });
+}
+
 export async function fetchUser() {
   return fetchJSON("/api/user");
 }

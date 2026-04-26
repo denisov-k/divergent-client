@@ -34,6 +34,8 @@ export interface AppStoreState {
 
 export interface AuthSlice {
   initialize: () => Promise<void>;
+  loginWithTelegram: (tgData: string) => Promise<void>;
+  loginWithCredentials: (email: string, password: string) => Promise<void>;
   signup: (
     email: string,
     password: string,
@@ -44,7 +46,6 @@ export interface AuthSlice {
   signOut: () => Promise<void>;
   updateUser: (patch: Partial<User>) => Promise<void>;
   passwordReset: (email: string) => Promise<void>;
-  login: (tgData: string) => Promise<void>;
   logout: () => void;
   refreshUser: () => Promise<void>;
 }

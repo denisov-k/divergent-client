@@ -1,13 +1,8 @@
-import { useNavigate, useLocation, To } from "react-router-dom";
+import { useLocation, useNavigate, To } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import { BarChart2, Bell, Gift, Swords, Target } from "lucide-react";
 
-import {
-  Target,
-  Gift,
-  BarChart2,
-  Swords,
-  Bell,
-} from "lucide-react";
+import { triggerTelegramHapticImpact } from "@/platform/telegram";
 
 const Navigation = () => {
   const { t } = useTranslation();
@@ -20,11 +15,10 @@ const Navigation = () => {
     { path: "/rewards", title: t("navigation.rewards"), icon: Gift },
     { path: "/progress", title: t("navigation.progress"), icon: BarChart2 },
     { path: "/reminders", title: t("navigation.reminders"), icon: Bell },
-   // { path: "/frens", title: t("navigation.frens"), icon: Users },
   ];
 
   const onClick = (path: To) => {
-    Telegram.WebApp.HapticFeedback.impactOccurred("medium");
+    triggerTelegramHapticImpact("medium");
     navigate(path);
   };
 
@@ -49,10 +43,10 @@ const Navigation = () => {
               flex-1 min-w-0 mx-1 rounded-lg border-2 px-2
               transition
               ${
-              isActive
-                ? "bg-primary text-background border-primary"
-                : "border-primary text-primary"
-            }
+                isActive
+                  ? "bg-primary text-background border-primary"
+                  : "border-primary text-primary"
+              }
             `}
           >
             <Icon

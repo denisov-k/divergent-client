@@ -18,6 +18,7 @@ import {SelectPaymentMethodDialog} from "@/components/SelectPaymentMethodDialog.
 import {ChallengeParticipantDialog} from "@/components/ChallengeParticipantDialog.tsx";
 import {MessageDialog} from "@/components/MessageDialog.tsx";
 import {LeaveChallengeDialog} from "@/components/LeaveChallengeDialog.tsx";
+import { openTelegramLink } from "@/platform/telegram";
 
 export default function ChallengesView() {
   const { challenges, goals } = useAppStore();
@@ -70,7 +71,7 @@ export default function ChallengesView() {
     const text = "";
     const url = `${baseUrl}?startapp=challenge-${id}`;
 
-    Telegram.WebApp.openTelegramLink('https://t.me/share/url?url=' + url + '&text=' + text);
+    openTelegramLink('https://t.me/share/url?url=' + url + '&text=' + text);
   };
 
   const handleLeaveChallenge = (id: string) => {
@@ -167,7 +168,7 @@ export default function ChallengesView() {
     const challenge = challenges.find((c) => c.id === id);
 
     if (challenge && challenge.link)
-      Telegram.WebApp.openTelegramLink(challenge.link);
+      openTelegramLink(challenge.link);
   };
 
 
@@ -286,3 +287,7 @@ export default function ChallengesView() {
     </div>
   );
 }
+
+
+
+

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { type ChangeEvent, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {ReactSVG} from "react-svg";
 
@@ -54,14 +54,14 @@ export default function Reset() {
         })
         setErrors(formattedErrors)
       } else {
-        setErrors({ submit: 'Failed to sign in. Please try again.' })
+        setErrors({ submit: 'Password reset is not available yet in the new auth flow.' })
       }
     } finally {
       setIsSubmitting(false)
     }
   }
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target
     setFormData(prev => ({ ...prev, [name]: value }))
     // Clear error when user starts typing

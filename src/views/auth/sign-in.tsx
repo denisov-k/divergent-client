@@ -1,16 +1,42 @@
-import { useEffect } from "react";
+import { type ChangeEvent, useEffect, useState } from "react";
+import { Loader2 } from "lucide-react";
+import { ReactSVG } from "react-svg";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import WebApp from "@twa-dev/sdk";
+import { z, ZodError } from "zod";
+
+import LogoIcon from "@/assets/images/logo-icon.svg";
+import Logo from "@/assets/images/logo.svg";
+import {
+  getTelegramInitData,
+  isTelegramWebAppAvailable,
+} from "@/platform/telegram";
 import { useAppStore } from "@/stores/useAppStore";
-import {Loader2} from "lucide-react";
+import "./index.css";
+
+const signInSchema = z.object({
+  email: z.string().email("Invalid email address"),
+  password: z.string().min(1, "Password is required"),
+});
 
 export default function SignIn() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const { user, loading, login, initialize } = useAppStore();
+  const { user, loading, loginWithCredentials, loginWithTelegram } = useAppStore();
+
+  const [formData, setFormData] = useState({
+    email: "",
+    password: "",
+  });
+  const [errors, setErrors] = useState<{
+    email?: string;
+    password?: string;
+    submit?: string;
+  }>({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isTelegramSubmitting, setIsTelegramSubmitting] = useState(false);
 
   const redirect = searchParams.get("redirect");
-  const isTelegramClient = !!WebApp;
+  const isTelegramClient = isTelegramWebAppAvailable();
 
   useEffect(() => {
     if (loading) return;
@@ -21,23 +47,135 @@ export default function SignIn() {
   }, [user, loading, navigate, redirect]);
 
   useEffect(() => {
-    if (isTelegramClient && !user) {
-      const autoLogin = async () => {
-        try {
-          const data = WebApp.initData;
-          await login(data);
-          await initialize();
-        } catch (err) {
-          console.error("Telegram auto-auth failed", err);
-        }
-      };
-      autoLogin();
+    if (!isTelegramClient || user) {
+      return;
     }
-  }, [isTelegramClient, user, login, initialize]);
+
+    const autoLogin = async () => {
+      try {
+        setIsTelegramSubmitting(true);
+        const data = getTelegramInitData();
+        if (!data) return;
+
+        await loginWithTelegram(data);
+      } catch (err) {
+        console.error("Telegram auto-auth failed", err);
+      } finally {
+        setIsTelegramSubmitting(false);
+      }
+    };
+
+    autoLogin();
+  }, [isTelegramClient, user, loginWithTelegram]);
+
+  const handleSubmit = async (data: typeof formData) => {
+    try {
+      setIsSubmitting(true);
+      setErrors({});
+
+      const validatedData = signInSchema.parse(data);
+      await loginWithCredentials(validatedData.email, validatedData.password);
+    } catch (error) {
+      if (error instanceof ZodError) {
+        const formattedErrors: Record<string, string> = {};
+        error.errors.forEach((err) => {
+          if (err.path) {
+            formattedErrors[String(err.path[0])] = err.message;
+          }
+        });
+        setErrors(formattedErrors);
+      } else {
+        setErrors({ submit: "Failed to sign in. Please check your credentials." });
+      }
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+
+    if (errors[name as keyof typeof errors]) {
+      setErrors((prev) => ({ ...prev, [name]: undefined }));
+    }
+  };
+
+  const isBusy = isSubmitting || isTelegramSubmitting || loading;
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
-      {loading ? <Loader2 className="h-12 w-12 animate-spin text-primary" /> : "Error" }
+    <div id="sign-in">
+      <div className="logo">
+        <ReactSVG src={Logo} className="title" />
+        <ReactSVG src={LogoIcon} />
+      </div>
+
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+          handleSubmit(formData);
+        }}
+      >
+        <span>Login</span>
+
+        <div>
+          <input
+            id="email"
+            name="email"
+            type="email"
+            value={formData.email}
+            onChange={handleChange}
+            required
+            placeholder="Enter your email"
+            className={errors.email ? "border-red-500" : ""}
+          />
+          {errors.email && <p className="text-sm text-red-500">{errors.email}</p>}
+        </div>
+
+        <div>
+          <input
+            id="password"
+            name="password"
+            type="password"
+            value={formData.password}
+            onChange={handleChange}
+            required
+            placeholder="Enter your password"
+            className={errors.password ? "border-red-500" : ""}
+          />
+          {errors.password && <p className="text-sm text-red-500">{errors.password}</p>}
+        </div>
+
+        {errors.submit && (
+          <p className="text-sm text-red-500 text-center">{errors.submit}</p>
+        )}
+
+        <button type="submit" disabled={isBusy}>
+          {isSubmitting ? "Signing in..." : "Login"}
+        </button>
+
+        {isTelegramClient && (
+          <p className="text-xs text-center text-zinc-400 mt-2">
+            {isTelegramSubmitting ? (
+              <span className="inline-flex items-center gap-2">
+                <Loader2 className="h-3 w-3 animate-spin" />
+                Connecting through Telegram...
+              </span>
+            ) : (
+              "Telegram sign-in is still available during the transition."
+            )}
+          </p>
+        )}
+
+        <div className="form-footer">
+          <a href="/signup" className="link">
+            Registration
+          </a>
+          <a href="/reset" className="link">
+            Reset password
+          </a>
+        </div>
+      </form>
     </div>
   );
 }

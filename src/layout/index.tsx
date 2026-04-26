@@ -1,9 +1,8 @@
+import Main from "./Main";
+import { ReactElement, ReactNode } from "react";
 
-import Main from './Main';
-import {ReactNode, ReactElement} from 'react';
-import './index.css';
-import WebApp from "@twa-dev/sdk";
-
+import "./index.css";
+import { isTelegramFullscreen } from "@/platform/telegram";
 
 interface LayoutProps {
   header?: ReactNode;
@@ -11,10 +10,9 @@ interface LayoutProps {
   footer?: ReactNode;
 }
 
-
 export default function Layout({ children, header, footer }: LayoutProps): ReactElement {
   return (
-    <div className={"layout" + (WebApp.isFullscreen ? " fullscreen" : "") }>
+    <div className={"layout" + (isTelegramFullscreen() ? " fullscreen" : "")}>
       {header}
       <Main>
         {children}

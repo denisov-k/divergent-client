@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { type ChangeEvent, useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 
 import { useAppStore } from '@/stores/useAppStore';
@@ -72,7 +72,7 @@ export default function SignUp() {
     }
   }
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target
     setFormData(prev => ({ ...prev, [name]: value }))
     // Clear error when user starts typing
