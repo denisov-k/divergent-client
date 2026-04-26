@@ -11,14 +11,14 @@ import SignInView from '@/views/auth/sign-in';
 import SignUpView from '@/views/auth/sign-up';
 import ResetPasswordView from '@/views/auth/reset';
 
-import IndexView from '@/views/index';
-import FrensView from '@/views/frens';
-import GoalsView from '@/views/goals-screen';
-import ChallengesView from '@/views/challenges';
-import SettingsView from '@/views/settings';
-import RewardsView from '@/views/rewards';
-import RemindersView from '@/views/reminders-screen';
-import ProgressView from '@/views/progress';
+import IndexView from '@/views/web/index';
+import FrensView from '@/views/web/frens';
+import GoalsView from '@/views/web/goals';
+import ChallengesView from '@/views/web/challenges';
+import SettingsView from '@/views/web/settings';
+import RewardsView from '@/views/web/rewards';
+import RemindersView from '@/views/web/reminders';
+import ProgressView from '@/views/web/progress';
 
 import { useAppStore } from '@/stores/useAppStore';
 import i18n from './i18n';
