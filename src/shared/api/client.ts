@@ -4,17 +4,28 @@ import { ChallengeInput } from "@/components/CreateChallengeDialog.tsx";
 
 async function fetchJSON(url: string, options: RequestInit = {}) {
   const isFormData = options.body instanceof FormData;
+  const baseUrl = Config.data.api.http.baseURL;
 
-  const res = await fetch(Config.data.api.http.baseURL + url, {
+  const res = await fetch(baseUrl + url, {
     ...options,
     credentials: "include",
     headers: {
+      ...(baseUrl.includes("ngrok-free.dev")
+        ? { "ngrok-skip-browser-warning": "true" }
+        : {}),
       ...(!isFormData ? { "Content-Type": "application/json" } : {}),
       ...(options.headers || {}),
     },
   });
 
   if (!res.ok) throw new Error(`API error: ${res.status}`);
+
+  const contentType = res.headers.get("content-type") || "";
+  if (!contentType.includes("application/json")) {
+    const text = await res.text();
+    throw new Error(`Expected JSON but received ${contentType || "unknown content type"}: ${text.slice(0, 120)}`);
+  }
+
   return res.json();
 }
 
@@ -146,11 +157,17 @@ export async function addDraft(messageId: string) {
 }
 
 export async function downloadReport(reportId: string): Promise<Blob> {
+  const baseUrl = Config.data.api.http.baseURL;
   const res = await fetch(
-    Config.data.api.http.baseURL + `/api/reports/${reportId}/download`,
+    baseUrl + `/api/reports/${reportId}/download`,
     {
       method: "GET",
       credentials: "include",
+      headers: {
+        ...(baseUrl.includes("ngrok-free.dev")
+          ? { "ngrok-skip-browser-warning": "true" }
+          : {}),
+      },
     }
   );
 

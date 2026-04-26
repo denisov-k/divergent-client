@@ -2,15 +2,36 @@ import axios, { AxiosResponse } from "axios";
 
 let p: Promise<unknown> | null = null;
 
-const ENV_CURRENT = process.env.NODE_ENV;
 const BASE_URL = "/config/{env}.json";
 const http = axios.create();
+
+function resolveRuntimeEnv() {
+  if (typeof window === "undefined") {
+    return process.env.NODE_ENV || "production";
+  }
+
+  const { hostname } = window.location;
+
+  if (
+    hostname === "localhost" ||
+    hostname === "127.0.0.1" ||
+    hostname.endsWith(".ngrok-free.dev") ||
+    hostname.endsWith(".ngrok.io")
+  ) {
+    return "development";
+  }
+
+  return "production";
+}
 
 interface ConfigInterface {
   data: {
     api: {
       http: {
         baseURL: string;
+      };
+      telegram: {
+        twaURL: string;
       };
       ton: {
         manifestURL: string;
@@ -28,6 +49,9 @@ const Config: ConfigInterface = {
       http: {
         baseURL: "",
       },
+      telegram: {
+        twaURL: "",
+      },
       ton: {
         manifestURL: "",
         wallet: "",
@@ -37,7 +61,7 @@ const Config: ConfigInterface = {
   init() {
     if (!p) {
       p = new Promise((resolve, reject) => {
-        return Promise.all([this._loadEnv(ENV_CURRENT)]).then(([envResponse]) => {
+        return Promise.all([this._loadEnv(resolveRuntimeEnv())]).then(([envResponse]) => {
           if (typeof envResponse.data !== "object") {
             return reject("Bad config file");
           }

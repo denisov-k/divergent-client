@@ -1,14 +1,17 @@
 import { type ChangeEvent, useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
-
-import { useAppStore } from '@/stores/useAppStore';
-
 import { z, ZodError } from 'zod'
-import './index.css';
-import {ReactSVG} from "react-svg";
 
-import LogoIcon from '@/assets/images/logo-icon.svg';
-import Logo from '@/assets/images/logo.svg';
+import { Button } from '@/components/ui/button';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { useAppStore } from '@/stores/useAppStore';
 
 const signUpSchema = z.object({
   email: z.string().email('Invalid email address'),
@@ -81,79 +84,119 @@ export default function SignUp() {
     }
   }
 
+  const isBusy = isSubmitting;
+
   return (
-    <div id="sign-in">
-      <div className="logo">
-        <ReactSVG src={Logo} className="title"></ReactSVG>
-        <ReactSVG src={LogoIcon}></ReactSVG>
+    <div className="relative flex min-h-svh items-center justify-center overflow-hidden bg-[radial-gradient(circle_at_top,#eef6ff_0%,#ffffff_42%,#f3f4f6_100%)] px-4 py-10">
+      <div className="pointer-events-none absolute inset-0">
+        <div className="absolute left-[-6rem] top-[-5rem] h-56 w-56 rounded-full bg-sky-100 blur-3xl" />
+        <div className="absolute right-[-5rem] top-20 h-48 w-48 rounded-full bg-blue-100/80 blur-3xl" />
+        <div className="absolute bottom-[-6rem] left-1/2 h-64 w-64 -translate-x-1/2 rounded-full bg-zinc-200/70 blur-3xl" />
       </div>
-      <form onSubmit={(e) => {
-        e.preventDefault()
-        handleSubmit(formData)
-      }}>
-        <span>Registration</span>
-        <div>
-          <input
-            id="email"
-            name="email"
-            type="email"
-            value={formData.email}
-            onChange={handleChange}
-            required
-            placeholder="Enter your email"
-            className={errors.email ? 'border-red-500' : ''}
-          />
-          {errors.email && (
-            <p className="text-sm text-red-500">{errors.email}</p>
-          )}
-        </div>
-        <div>
-          <input
-            id="password"
-            name="password"
-            type="password"
-            value={formData.password}
-            onChange={handleChange}
-            required
-            placeholder="Create a password"
-            className={errors.password ? 'border-red-500' : ''}
-          />
-          {errors.password && (
-            <p className="text-sm text-red-500">{errors.password}</p>
-          )}
-        </div>
-        <div>
-          <input
-            id="name"
-            name="name"
-            type="text"
-            value={formData.name}
-            onChange={handleChange}
-            placeholder="Enter your name"
-            className={errors.name ? 'border-red-500' : ''}
-          />
-          {errors.name && (
-            <p className="text-sm text-red-500">{errors.name}</p>
-          )}
-        </div>
-        {errors.submit && (
-          <p className="text-sm text-red-500 text-center">{errors.submit}</p>
-        )}
-        <button
-          type="submit"
-          disabled={isSubmitting}
-        >
-          {isSubmitting ? 'Creating...' : 'Create'}
-        </button>
-        <div className="form-footer">
-          <a
-            href="/signin"
-            className="link"
+
+      <Card className="relative z-10 w-full max-w-md border-border/80 bg-card/95 shadow-[0_24px_80px_rgba(15,23,42,0.10)] backdrop-blur">
+        <CardHeader className="space-y-2 pb-0 text-center">
+          <div className="space-y-2">
+            <CardTitle className="text-2xl text-foreground">Create account</CardTitle>
+            <CardDescription className="text-sm text-muted-foreground">
+              Start with email and password, then continue in the app.
+            </CardDescription>
+          </div>
+        </CardHeader>
+
+        <CardContent className="pt-6">
+          <form
+            className="space-y-4"
+            onSubmit={(e) => {
+              e.preventDefault()
+              handleSubmit(formData)
+            }}
           >
-            Login
-          </a>
-        </div>
-      </form>
+            <div className="space-y-2">
+              <label htmlFor="name" className="text-sm font-medium text-foreground">
+                Name
+              </label>
+              <Input
+                id="name"
+                name="name"
+                type="text"
+                value={formData.name}
+                onChange={handleChange}
+                placeholder="Your name"
+                aria-invalid={Boolean(errors.name)}
+                className="h-11 border-border bg-input-background text-foreground placeholder:text-muted-foreground"
+              />
+              {errors.name && (
+                <p className="text-sm text-red-400">{errors.name}</p>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <label htmlFor="email" className="text-sm font-medium text-foreground">
+                Email
+              </label>
+              <Input
+                id="email"
+                name="email"
+                type="email"
+                value={formData.email}
+                onChange={handleChange}
+                required
+                placeholder="you@example.com"
+                aria-invalid={Boolean(errors.email)}
+                className="h-11 border-border bg-input-background text-foreground placeholder:text-muted-foreground"
+              />
+              {errors.email && (
+                <p className="text-sm text-red-400">{errors.email}</p>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <div className="flex items-center justify-between gap-3">
+                <label htmlFor="password" className="text-sm font-medium text-foreground">
+                  Password
+                </label>
+                <span className="text-xs text-muted-foreground">
+                  8+ chars, upper/lowercase and number
+                </span>
+              </div>
+              <Input
+                id="password"
+                name="password"
+                type="password"
+                value={formData.password}
+                onChange={handleChange}
+                required
+                placeholder="Create a password"
+                aria-invalid={Boolean(errors.password)}
+                className="h-11 border-border bg-input-background text-foreground placeholder:text-muted-foreground"
+              />
+              {errors.password && (
+                <p className="text-sm text-red-400">{errors.password}</p>
+              )}
+            </div>
+
+            {errors.submit && (
+              <p className="rounded-md border border-red-500/20 bg-red-500/10 px-3 py-2 text-sm text-red-300">
+                {errors.submit}
+              </p>
+            )}
+
+            <Button type="submit" disabled={isBusy} size="lg" className="w-full">
+              {isSubmitting ? 'Creating account...' : 'Create account'}
+            </Button>
+
+            <div className="pt-2 text-center text-sm">
+              <a
+                href="/signin"
+                className="text-primary underline-offset-4 hover:underline"
+              >
+                Already have an account? Sign in
+              </a>
+            </div>
+          </form>
+        </CardContent>
+      </Card>
     </div>
   )
 }
