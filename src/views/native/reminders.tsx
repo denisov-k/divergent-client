@@ -5,7 +5,7 @@ import { useTranslation } from "react-i18next";
 const ReminderFormSheet = lazy(() => import("@/components/native/ReminderFormSheet").then((m) => ({ default: m.ReminderFormSheet })));
 
 import { EmptyStateCard } from "@/components/native/EmptyStateCard";
-import { NativeReminderCard } from "@/components/native/NativeReminderCard";
+import { NativeReminderCardView } from "@/components/native/NativeReminderCardView";
 import { ScreenHeader } from "@/components/native/ScreenHeader";
 import { useRemindersScreen } from "@/shared/screens/reminders/useRemindersScreen";
 import { appPalette } from "@/theme/palette";
@@ -79,7 +79,7 @@ export default function NativeRemindersScreen(props: {
             const task = goal?.tasks.find((item) => item.id === reminder.taskId);
 
             return (
-              <NativeReminderCard
+              <NativeReminderCardView
                 key={reminder.id}
                 reminder={reminder}
                 goal={goal}

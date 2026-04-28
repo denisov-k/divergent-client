@@ -7,7 +7,7 @@ const ChallengeFormSheet = lazy(() => import("@/components/native/ChallengeFormS
 const SelectPaymentMethodSheet = lazy(() => import("@/components/native/SelectPaymentMethodSheet").then((m) => ({ default: m.SelectPaymentMethodSheet })));
 
 import { EmptyStateCard } from "@/components/native/EmptyStateCard";
-import { NativeChallengeCard } from "@/components/native/NativeChallengeCard";
+import { NativeChallengeCardView } from "@/components/native/NativeChallengeCardView";
 import { Plus } from "@/components/native/icons";
 import { buildChallengeShareUrl } from "@/platform/appUrl";
 import { useChallengesScreen } from "@/shared/screens/challenges/useChallengesScreen";
@@ -169,7 +169,7 @@ export default function NativeChallengesScreen(props: {
           <EmptyStateCard title={t("challenges.empty")} description={t("challenges.empty_native_description")} actionLabel={t("challenges.create_first")} onAction={openCreateChallenge} />
         ) : (
           challenges.map((challenge) => (
-            <NativeChallengeCard
+            <NativeChallengeCardView
               key={challenge.id}
               challenge={challenge}
               focused={challenge.id === props.focusId}

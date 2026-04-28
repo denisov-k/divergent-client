@@ -1,5 +1,4 @@
-﻿export type NativeAppTab = "goals" | "reminders" | "challenges" | "rewards" | "progress" | "more";
-export type NativeMoreTab = "menu" | "frens" | "settings";
+export type NativeAppTab = "goals" | "reminders" | "challenges" | "rewards" | "progress" | "settings";
 export type NativeAuthTab = "signin" | "signup" | "reset";
 export type NativeResetMode = "request" | "confirm";
 
@@ -9,7 +8,7 @@ export type NativeAppRoute =
   | { kind: "app"; tab: "challenges"; focusId?: string | null; paymentId?: string | null }
   | { kind: "app"; tab: "rewards"; rewardId?: string | null }
   | { kind: "app"; tab: "progress"; goalId?: string | null }
-  | { kind: "app"; tab: "more"; screen?: NativeMoreTab };
+  | { kind: "app"; tab: "settings" };
 
 export type NativeAuthRoute = {
   kind: "auth";
@@ -28,16 +27,8 @@ function normalizeAppTab(value: string | null): NativeAppTab | undefined {
     value === "challenges" ||
     value === "rewards" ||
     value === "progress" ||
-    value === "more"
+    value === "settings"
   ) {
-    return value;
-  }
-
-  return undefined;
-}
-
-function normalizeMoreTab(value: string | null): NativeMoreTab | undefined {
-  if (value === "menu" || value === "frens" || value === "settings") {
     return value;
   }
 
@@ -119,8 +110,12 @@ function parseAuthRoute(parsed: URL): NativeAuthRoute | null {
 function parseAppRoute(parsed: URL): NativeAppRoute | null {
   const pathSegments = parsed.pathname.split("/").filter(Boolean);
   const routeFromPath = normalizeRoute(pathSegments[0] ?? null);
-  const routeFromHost = parsed.protocol === "http:" || parsed.protocol === "https:" ? undefined : normalizeRoute(parsed.hostname);
-  const tab = normalizeAppTab(parsed.searchParams.get("tab")) || normalizeAppTab(routeFromPath || null) || normalizeAppTab(routeFromHost || null);
+  const routeFromHost =
+    parsed.protocol === "http:" || parsed.protocol === "https:" ? undefined : normalizeRoute(parsed.hostname);
+  const tab =
+    normalizeAppTab(parsed.searchParams.get("tab")) ||
+    normalizeAppTab(routeFromPath || null) ||
+    normalizeAppTab(routeFromHost || null);
 
   if (tab === "goals") {
     return {
@@ -164,27 +159,10 @@ function parseAppRoute(parsed: URL): NativeAppRoute | null {
     };
   }
 
-  if (tab === "more") {
-    return {
-      kind: "app",
-      tab,
-      screen: normalizeMoreTab(parsed.searchParams.get("screen")) || "menu",
-    };
-  }
-
   if (tab) {
     return {
       kind: "app",
       tab,
-    };
-  }
-
-  const standaloneMoreTab = normalizeMoreTab(pathSegments[0] ?? parsed.hostname);
-  if (standaloneMoreTab) {
-    return {
-      kind: "app",
-      tab: "more",
-      screen: standaloneMoreTab,
     };
   }
 
@@ -209,4 +187,3 @@ export function parseNativeAuthRoute(url: string): NativeAuthRoute | null {
   const route = parseNativeRoute(url);
   return route?.kind === "auth" ? route : null;
 }
-

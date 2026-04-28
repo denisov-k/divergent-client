@@ -1,15 +1,12 @@
-Ôªøimport { useEffect, useState } from "react";
-import { Modal, ScrollView, Text, View } from "react-native";
+import { useEffect, useState } from "react";
+import { View } from "react-native";
 import { useTranslation } from "react-i18next";
 
 import { ActionChip } from "@/components/native/ActionChip";
 import { FieldInput } from "@/components/native/FieldInput";
-import { NativeRewardIcon } from "@/components/native/NativeRewardIcon";
-import { SectionTabs } from "@/components/native/SectionTabs";
-import { appPalette } from "@/theme/palette";
+import { FormSheetLayout } from "@/components/native/form-sheet/Layout";
+import { RewardGoalSection, RewardIconSection } from "@/components/native/reward-form-sheet/Sections";
 import type { Goal, Reward, RewardIcon } from "@/types";
-
-const iconOptions: RewardIcon[] = ["trophy", "star", "gift", "crown", "award", "zap"];
 
 export function RewardFormSheet({
   open,
@@ -77,53 +74,31 @@ export function RewardFormSheet({
     }
   };
 
-  const sectionLabelStyle = { fontSize: 14, fontWeight: "600" as const, color: appPalette.semantic.text, fontFamily: "Montserrat" };
-
   return (
-    <Modal visible={open} transparent animationType="slide" onRequestClose={() => onOpenChange(false)}>
-      <View style={{ flex: 1, backgroundColor: appPalette.surface.overlay, justifyContent: "flex-end" }}>
-        <View style={{ maxHeight: "90%", backgroundColor: appPalette.surface.background, borderTopLeftRadius: 24, borderTopRightRadius: 24, padding: 20, gap: 14 }}>
-          <View style={{ gap: 6 }}>
-            <Text style={{ fontSize: 20, fontWeight: "700", color: appPalette.semantic.textStrong, fontFamily: "Montserrat" }}>
-              {reward ? "–†–µ–¥–∞–∫—Ç–∏—Ä–æ–≤–∞—Ç—å –Ω–∞–≥—Ä–∞–¥—É" : "–°–æ–∑–¥–∞—Ç—å –Ω–æ–≤—É—é –Ω–∞–≥—Ä–∞–¥—É"}
-            </Text>
-            <Text style={{ color: appPalette.semantic.textMuted, fontFamily: "Montserrat", fontSize: 12, lineHeight: 18 }}>
-              –°–æ–∑–¥–∞–π—Ç–µ –Ω–∞–≥—Ä–∞–¥—É, –∫–æ—Ç–æ—Ä—É—é –º–æ–∂–Ω–æ –ø–æ–ª—É—á–∏—Ç—å –∑–∞ –¥–æ—Å—Ç–∏–∂–µ–Ω–∏–µ –æ–ø—Ä–µ–¥–µ–ª–µ–Ω–Ω–æ–≥–æ –æ–ø—ã—Ç–∞
-            </Text>
-          </View>
-
-          <ScrollView contentContainerStyle={{ gap: 14 }}>
-            <FieldInput label="–ù–∞–∑–≤–∞–Ω–∏–µ –Ω–∞–≥—Ä–∞–¥—ã *" value={title} onChangeText={setTitle} placeholder="–ù–∞–ø—Ä–∏–º–µ—Ä: –ú–∞—Å—Ç–µ—Ä –ø—Ä–∏–≤—ã—á–µ–∫" />
-            <FieldInput label="–û–ø–∏—Å–∞–Ω–∏–µ *" value={description} onChangeText={setDescription} placeholder="–ó–∞ —á—Ç–æ –¥–∞—ë—Ç—Å—è –Ω–∞–≥—Ä–∞–¥–∞..." />
-            <FieldInput label="–¢—Ä–µ–±—É–µ—Ç—Å—è XP *" value={xpRequires} onChangeText={setXpRequires} placeholder="100" />
-
-            <View style={{ gap: 8 }}>
-              <Text style={sectionLabelStyle}>–ò–∫–æ–Ω–∫–∞</Text>
-              <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8 }}>
-                {iconOptions.map((option) => (
-                  <ActionChip key={option} onPress={() => setIcon(option)} tone={icon === option ? "primary" : "secondary"}>
-                    <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
-                      <NativeRewardIcon icon={option} />
-                      <Text style={{ color: icon === option ? appPalette.semantic.textInverse : appPalette.semantic.text, fontSize: 12, fontWeight: "500", lineHeight: 18, fontFamily: "Montserrat" }}>{option}</Text>
-                    </View>
-                  </ActionChip>
-                ))}
-              </View>
-            </View>
-
-            <View style={{ gap: 8 }}>
-              <Text style={sectionLabelStyle}>–¶–µ–ª—å</Text>
-              <SectionTabs tabs={[{ key: "none", label: "–ë–µ–∑ —Ü–µ–ª–∏" }, ...goals.map((goal) => ({ key: goal.id, label: goal.title }))]} activeTab={goalId || "none"} onChange={(tab) => setGoalId(tab === "none" ? "" : tab)} />
-            </View>
-          </ScrollView>
-
-          <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8 }}>
-            {reward && <ActionChip onPress={() => void onDelete(reward.id)} tone="danger">{t("common.delete")}</ActionChip>}
-            <ActionChip onPress={() => onOpenChange(false)}>{t("common.cancel")}</ActionChip>
-            <ActionChip onPress={() => void handleSave()} tone="primary">{isSubmitting ? t("common.sending") : reward ? t("common.save") : "–°–æ–∑–¥–∞—Ç—å –Ω–∞–≥—Ä–∞–¥—É"}</ActionChip>
-          </View>
+    <FormSheetLayout
+      open={open}
+      onOpenChange={onOpenChange}
+      title={reward ? "–Â‰‡ÍÚËÓ‚‡Ú¸ Ì‡„‡‰Û" : "—ÓÁ‰‡Ú¸ ÌÓ‚Û˛ Ì‡„‡‰Û"}
+      subtitle="—ÓÁ‰‡ÈÚÂ Ì‡„‡‰Û, ÍÓÚÓÛ˛ ÏÓÊÌÓ ÔÓÎÛ˜ËÚ¸ Á‡ ‰ÓÒÚËÊÂÌËÂ ÓÔÂ‰ÂÎÂÌÌÓ„Ó ÓÔ˚Ú‡"
+      footer={
+        <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8 }}>
+          {reward && (
+            <ActionChip onPress={() => void onDelete(reward.id)} tone="danger">
+              {t("common.delete")}
+            </ActionChip>
+          )}
+          <ActionChip onPress={() => onOpenChange(false)}>{t("common.cancel")}</ActionChip>
+          <ActionChip onPress={() => void handleSave()} tone="primary">
+            {isSubmitting ? t("common.sending") : reward ? t("common.save") : "—ÓÁ‰‡Ú¸ Ì‡„‡‰Û"}
+          </ActionChip>
         </View>
-      </View>
-    </Modal>
+      }
+    >
+      <FieldInput label="Õ‡Á‚‡ÌËÂ Ì‡„‡‰˚ *" value={title} onChangeText={setTitle} placeholder="Õ‡ÔËÏÂ: Ã‡ÒÚÂ ÔË‚˚˜ÂÍ" />
+      <FieldInput label="ŒÔËÒ‡ÌËÂ *" value={description} onChangeText={setDescription} placeholder="«‡ ˜ÚÓ ‰‡∏ÚÒˇ Ì‡„‡‰‡..." />
+      <FieldInput label="“Â·ÛÂÚÒˇ XP *" value={xpRequires} onChangeText={setXpRequires} placeholder="100" />
+      <RewardIconSection icon={icon} onChange={setIcon} />
+      <RewardGoalSection goals={goals} goalId={goalId} onChange={setGoalId} />
+    </FormSheetLayout>
   );
 }

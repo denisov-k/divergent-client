@@ -1,4 +1,4 @@
-﻿export type GoalsRouteParams = {
+export type GoalsRouteParams = {
   id?: string | null;
 };
 
@@ -18,10 +18,6 @@ export type RewardsRouteParams = {
 
 export type ProgressRouteParams = {
   goalId?: string | null;
-};
-
-export type MoreRouteParams = {
-  screen?: "menu" | "frens" | "settings" | null;
 };
 
 function buildPath(path: string, params?: Record<string, string | null | undefined>) {
@@ -63,6 +59,6 @@ export function buildProgressPath(params: ProgressRouteParams = {}) {
   return buildPath("/progress", { goalId: params.goalId });
 }
 
-export function buildMorePath(params: MoreRouteParams = {}) {
-  return buildPath("/more", { screen: params.screen });
+export function buildSettingsPath() {
+  return "/settings";
 }

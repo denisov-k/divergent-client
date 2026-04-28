@@ -1,21 +1,19 @@
-п»їimport { useEffect, useMemo, useState } from "react";
-import { Alert, Modal, ScrollView, Text, View } from "react-native";
+import { useEffect, useMemo, useState } from "react";
+import { Alert, View } from "react-native";
 
 import { ActionChip } from "@/components/native/ActionChip";
 import { FieldInput } from "@/components/native/FieldInput";
-import { SectionTabs } from "@/components/native/SectionTabs";
-import { appPalette } from "@/theme/palette";
+import { FormSheetLayout } from "@/components/native/form-sheet/Layout";
+import {
+  CategorySection,
+  GoalPeriodSection,
+  GoalTypeSection,
+  ProgressFieldsSection,
+  RewardSection,
+  TasksSection,
+} from "@/components/native/goal-form-sheet/Sections";
+import { createTask } from "@/components/native/goal-form-sheet/helpers";
 import type { CategoryOption, Goal, GoalFormData, GoalPeriod, GoalType, Reward, Task } from "@/types";
-
-function createTask(title: string): Task {
-  return {
-    id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
-    title,
-    lastCompletedAt: "",
-    parentId: null,
-    subtasks: [],
-  };
-}
 
 export function GoalFormSheet({
   open,
@@ -103,12 +101,12 @@ export function GoalFormSheet({
 
   const handleSave = async () => {
     if (!title.trim()) {
-      Alert.alert("РќСѓР¶РЅРѕ РЅР°Р·РІР°РЅРёРµ", "РЈРєР°Р¶Рё РЅР°Р·РІР°РЅРёРµ С†РµР»Рё.");
+      Alert.alert("Нужно название", "Укажи название цели.");
       return;
     }
 
     if (goalType === "TASK" && tasks.length === 0) {
-      Alert.alert("Р”РѕР±Р°РІСЊ Р·Р°РґР°С‡Сѓ", "Р”Р»СЏ task-С†РµР»Рё РЅСѓР¶РЅР° С…РѕС‚СЏ Р±С‹ РѕРґРЅР° Р·Р°РґР°С‡Р°.");
+      Alert.alert("Добавь задачу", "Для task-цели нужна хотя бы одна задача.");
       return;
     }
 
@@ -142,10 +140,10 @@ export function GoalFormSheet({
       return;
     }
 
-    Alert.alert("РЈРґР°Р»РёС‚СЊ С†РµР»СЊ?", "Р­С‚Рѕ РґРµР№СЃС‚РІРёРµ РЅРµР»СЊР·СЏ Р±С‹СЃС‚СЂРѕ РѕС‚РјРµРЅРёС‚СЊ.", [
-      { text: "РћС‚РјРµРЅР°", style: "cancel" },
+    Alert.alert("Удалить цель?", "Это действие нельзя быстро отменить.", [
+      { text: "Отмена", style: "cancel" },
       {
-        text: "РЈРґР°Р»РёС‚СЊ",
+        text: "Удалить",
         style: "destructive",
         onPress: () => {
           void onDelete(goal.id).then((ok) => {
@@ -158,92 +156,49 @@ export function GoalFormSheet({
     ]);
   };
 
-  const sectionLabelStyle = { fontSize: 14, fontWeight: "600" as const, color: appPalette.semantic.text, fontFamily: "Montserrat" };
-  const helperStyle = { color: appPalette.semantic.textMuted, fontFamily: "Montserrat", fontSize: 12, lineHeight: 18 };
-
   return (
-    <Modal visible={open} transparent animationType="slide" onRequestClose={() => onOpenChange(false)}>
-      <View style={{ flex: 1, backgroundColor: appPalette.surface.overlay, justifyContent: "flex-end" }}>
-        <View style={{ maxHeight: "90%", backgroundColor: appPalette.surface.background, borderTopLeftRadius: 24, borderTopRightRadius: 24, padding: 20, gap: 14 }}>
-          <View style={{ gap: 6 }}>
-            <Text style={{ fontSize: 20, fontWeight: "700", color: appPalette.semantic.textStrong, fontFamily: "Montserrat" }}>
-              {goal ? "Р РµРґР°РєС‚РёСЂРѕРІР°С‚СЊ С†РµР»СЊ" : "РќРѕРІР°СЏ С†РµР»СЊ"}
-            </Text>
-            <Text style={helperStyle}>Р‘Р°Р·РѕРІР°СЏ mobile-С„РѕСЂРјР° РїРѕРІРµСЂС… РѕР±С‰РµРіРѕ goal screen layer.</Text>
-          </View>
-
-          <ScrollView contentContainerStyle={{ gap: 14 }}>
-            <FieldInput label="РќР°Р·РІР°РЅРёРµ" value={title} onChangeText={setTitle} placeholder="РќР°РїСЂРёРјРµСЂ, 12 РєРЅРёРі Р·Р° РіРѕРґ" />
-            <FieldInput label="РћРїРёСЃР°РЅРёРµ" value={description} onChangeText={setDescription} placeholder="РљРѕСЂРѕС‚РєРѕ РѕРїРёС€Рё С†РµР»СЊ" />
-
-            <View style={{ gap: 8 }}>
-              <Text style={sectionLabelStyle}>РўРёРї С†РµР»Рё</Text>
-              <SectionTabs tabs={[{ key: "TASK", label: "Р—Р°РґР°С‡Рё" }, { key: "PROGRESS", label: "Р§РёСЃР»Рѕ" }]} activeTab={goalType} onChange={setGoalType} />
-            </View>
-
-            <View style={{ gap: 8 }}>
-              <Text style={sectionLabelStyle}>РџРµСЂРёРѕРґ</Text>
-              <SectionTabs tabs={[{ key: "NONE", label: "Р‘РµР· РїРѕРІС‚РѕСЂР°" }, { key: "DAILY", label: "Р”РµРЅСЊ" }, { key: "WEEKLY", label: "РќРµРґРµР»СЏ" }, { key: "MONTHLY", label: "РњРµСЃСЏС†" }]} activeTab={goalPeriod} onChange={setGoalPeriod} />
-            </View>
-
-            <FieldInput label="РЎСЂРѕРє (YYYY-MM-DD)" value={dueDate} onChangeText={setDueDate} placeholder="2026-05-01" />
-
-            <View style={{ gap: 8 }}>
-              <Text style={sectionLabelStyle}>РљР°С‚РµРіРѕСЂРёСЏ</Text>
-              <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8 }}>
-                {categories.map((item) => (
-                  <ActionChip key={item.value} onPress={() => setCategory(item.value)} tone={category === item.value ? "primary" : "secondary"}>
-                    {item.label}
-                  </ActionChip>
-                ))}
-              </View>
-            </View>
-
-            <View style={{ gap: 8 }}>
-              <Text style={sectionLabelStyle}>РќР°РіСЂР°РґР°</Text>
-              <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8 }}>
-                <ActionChip onPress={() => setSelectedRewardId(null)} tone={activeRewardId ? "secondary" : "primary"}>Р‘РµР· РЅР°РіСЂР°РґС‹</ActionChip>
-                {rewards.map((reward) => (
-                  <ActionChip key={reward.id} onPress={() => setSelectedRewardId(reward.id)} tone={activeRewardId === reward.id ? "primary" : "secondary"}>
-                    {reward.title}
-                  </ActionChip>
-                ))}
-              </View>
-            </View>
-
-            {goalType === "PROGRESS" ? (
-              <View style={{ gap: 12 }}>
-                <FieldInput label="РўРµРєСѓС‰РёР№ РїСЂРѕРіСЂРµСЃСЃ" value={currentValue} onChangeText={setCurrentValue} placeholder="0" />
-                <FieldInput label="Р¦РµР»РµРІРѕРµ Р·РЅР°С‡РµРЅРёРµ" value={targetValue} onChangeText={setTargetValue} placeholder="100" />
-              </View>
-            ) : (
-              <View style={{ gap: 12 }}>
-                <Text style={sectionLabelStyle}>Р—Р°РґР°С‡Рё</Text>
-
-                {tasks.length === 0 ? (
-                  <Text style={helperStyle}>РџРѕРєР° РЅРµС‚ Р·Р°РґР°С‡. Р”РѕР±Р°РІСЊ РїРµСЂРІСѓСЋ РЅРёР¶Рµ.</Text>
-                ) : (
-                  tasks.map((task) => (
-                    <View key={task.id} style={{ borderWidth: 1, borderColor: appPalette.semantic.borderSubtle, borderRadius: 14, padding: 12, gap: 8, backgroundColor: appPalette.semantic.neutralSurfaceStrong }}>
-                      <Text style={{ color: appPalette.semantic.textStrong, fontWeight: "600", fontFamily: "Montserrat" }}>{task.title}</Text>
-                      <ActionChip onPress={() => removeTask(task.id)} tone="danger">РЈРґР°Р»РёС‚СЊ Р·Р°РґР°С‡Сѓ</ActionChip>
-                    </View>
-                  ))
-                )}
-
-                <FieldInput label="РќРѕРІР°СЏ Р·Р°РґР°С‡Р°" value={newTaskTitle} onChangeText={setNewTaskTitle} placeholder="РќР°РїСЂРёРјРµСЂ, С‡РёС‚Р°С‚СЊ 20 РјРёРЅСѓС‚" />
-                <ActionChip onPress={addTask} tone="primary">Р”РѕР±Р°РІРёС‚СЊ Р·Р°РґР°С‡Сѓ</ActionChip>
-              </View>
-            )}
-          </ScrollView>
-
-          <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8 }}>
-            {!!goal && <ActionChip onPress={handleDelete} tone="danger">РЈРґР°Р»РёС‚СЊ</ActionChip>}
-            <ActionChip onPress={() => onOpenChange(false)}>РћС‚РјРµРЅР°</ActionChip>
-            <ActionChip onPress={() => void handleSave()} tone="primary">{isSubmitting ? "РЎРѕС…СЂР°РЅСЏРµРј..." : goal ? "РЎРѕС…СЂР°РЅРёС‚СЊ" : "РЎРѕР·РґР°С‚СЊ"}</ActionChip>
-          </View>
+    <FormSheetLayout
+      open={open}
+      onOpenChange={onOpenChange}
+      title={goal ? "Редактировать цель" : "Новая цель"}
+      subtitle="Базовая mobile-форма поверх общего goal screen layer."
+      footer={
+        <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8 }}>
+          {!!goal && (
+            <ActionChip onPress={handleDelete} tone="danger">
+              Удалить
+            </ActionChip>
+          )}
+          <ActionChip onPress={() => onOpenChange(false)}>Отмена</ActionChip>
+          <ActionChip onPress={() => void handleSave()} tone="primary">
+            {isSubmitting ? "Сохраняем..." : goal ? "Сохранить" : "Создать"}
+          </ActionChip>
         </View>
-      </View>
-    </Modal>
+      }
+    >
+      <FieldInput label="Название" value={title} onChangeText={setTitle} placeholder="Например, 12 книг за год" />
+      <FieldInput label="Описание" value={description} onChangeText={setDescription} placeholder="Коротко опиши цель" />
+      <GoalTypeSection goalType={goalType} onChange={setGoalType} />
+      <GoalPeriodSection goalPeriod={goalPeriod} onChange={setGoalPeriod} />
+      <FieldInput label="Срок (YYYY-MM-DD)" value={dueDate} onChangeText={setDueDate} placeholder="2026-05-01" />
+      <CategorySection categories={categories} category={category} onChange={setCategory} />
+      <RewardSection rewards={rewards} activeRewardId={activeRewardId} onChange={setSelectedRewardId} />
+      {goalType === "PROGRESS" ? (
+        <ProgressFieldsSection
+          currentValue={currentValue}
+          targetValue={targetValue}
+          onChangeCurrentValue={setCurrentValue}
+          onChangeTargetValue={setTargetValue}
+        />
+      ) : (
+        <TasksSection
+          tasks={tasks}
+          newTaskTitle={newTaskTitle}
+          onChangeNewTaskTitle={setNewTaskTitle}
+          onAddTask={addTask}
+          onRemoveTask={removeTask}
+        />
+      )}
+    </FormSheetLayout>
   );
 }

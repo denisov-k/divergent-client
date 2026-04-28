@@ -6,7 +6,7 @@ const RewardFormSheet = lazy(() => import("@/components/native/RewardFormSheet")
 
 import { EmptyStateCard } from "@/components/native/EmptyStateCard";
 import { Plus } from "@/components/native/icons";
-import { NativeRewardCard } from "@/components/native/NativeRewardCard";
+import { NativeRewardCardView } from "@/components/native/NativeRewardCardView";
 import { useAppStore } from "@/stores/useAppStore";
 import { useRewardsScreen } from "@/shared/screens/rewards/useRewardsScreen";
 import { appPalette } from "@/theme/palette";
@@ -73,7 +73,7 @@ export default function NativeRewardsScreen(props: {
             const goal = goals.find((item) => item.id === reward.goalId);
             const challenge = goal?.challengeId ? challenges.find((item) => item.id === goal.challengeId) : undefined;
 
-            return <NativeRewardCard key={reward.id} reward={reward} goal={goal} challenge={challenge} onEdit={openEditReward} />;
+            return <NativeRewardCardView key={reward.id} reward={reward} goal={goal} challenge={challenge} onEdit={openEditReward} />;
           })
         )}
       </ScrollView>

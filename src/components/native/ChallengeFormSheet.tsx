@@ -1,12 +1,16 @@
-﻿import { useEffect, useState } from "react";
-import { Modal, ScrollView, Text, View } from "react-native";
+import { useEffect, useState } from "react";
+import { View } from "react-native";
 import { useTranslation } from "react-i18next";
 
 import type { ChallengeInput } from "@/types";
 import { ActionChip } from "@/components/native/ActionChip";
-import { FieldInput } from "@/components/native/FieldInput";
-import { SectionTabs } from "@/components/native/SectionTabs";
-import { appPalette } from "@/theme/palette";
+import { FormSheetLayout } from "@/components/native/form-sheet/Layout";
+import {
+  ChallengeFieldsSection,
+  ChallengeGoalsSection,
+  ChallengeReportsSection,
+  ChallengeVisibilitySection,
+} from "@/components/native/challenge-form-sheet/Sections";
 import type { Challenge, Goal } from "@/types";
 
 export function ChallengeFormSheet({
@@ -68,7 +72,7 @@ export function ChallengeFormSheet({
 
   const toggleGoalSelection = (goalId: string) => {
     setSelectedGoalIds((current) =>
-      current.includes(goalId) ? current.filter((item) => item !== goalId) : [...current, goalId]
+      current.includes(goalId) ? current.filter((item) => item !== goalId) : [...current, goalId],
     );
   };
 
@@ -99,58 +103,40 @@ export function ChallengeFormSheet({
     }
   };
 
-  const sectionLabelStyle = { fontSize: 14, fontWeight: "600" as const, color: appPalette.semantic.text, fontFamily: "Montserrat" };
-
   return (
-    <Modal visible={open} transparent animationType="slide" onRequestClose={() => onOpenChange(false)}>
-      <View style={{ flex: 1, backgroundColor: appPalette.surface.overlay, justifyContent: "flex-end" }}>
-        <View style={{ maxHeight: "90%", backgroundColor: appPalette.surface.background, borderTopLeftRadius: 24, borderTopRightRadius: 24, padding: 20, gap: 14 }}>
-          <View style={{ gap: 6 }}>
-            <Text style={{ fontSize: 20, fontWeight: "700", color: appPalette.semantic.textStrong, fontFamily: "Montserrat" }}>
-              {challenge ? t("challenges.edit_title") : t("challenges.create_title")}
-            </Text>
-            <Text style={{ color: appPalette.semantic.textMuted, fontFamily: "Montserrat", fontSize: 12, lineHeight: 18 }}>{t("challenges.create_sheet_description")}</Text>
-          </View>
-
-          <ScrollView contentContainerStyle={{ gap: 14 }}>
-            <FieldInput label={t("challenges.fields.title")} value={title} onChangeText={setTitle} placeholder={t("challenges.placeholders.title")} />
-            <FieldInput label={t("challenges.fields.description")} value={description} onChangeText={setDescription} placeholder={t("challenges.placeholders.description")} />
-            <FieldInput label={t("challenges.fields.rules")} value={rules} onChangeText={setRules} placeholder={t("challenges.placeholders.rules")} />
-            <FieldInput label={t("challenges.fields.link")} value={link} onChangeText={setLink} placeholder={t("challenges.placeholders.link")} />
-            <FieldInput label={t("challenges.fields.price")} value={price} onChangeText={setPrice} placeholder={t("challenges.placeholders.price")} />
-            <FieldInput label={`${t("challenges.fields.start_date")} (YYYY-MM-DD)`} value={startsAt} onChangeText={setStartsAt} placeholder={t("challenges.placeholders.start_date")} />
-            <FieldInput label={`${t("challenges.fields.end_date")} (YYYY-MM-DD)`} value={endsAt} onChangeText={setEndsAt} placeholder={t("challenges.placeholders.end_date")} />
-
-            <View style={{ gap: 8 }}>
-              <Text style={sectionLabelStyle}>{t("challenges.fields.visibility")}</Text>
-              <SectionTabs tabs={[{ key: "public", label: t("challenges.visibility.public") }, { key: "private", label: t("challenges.visibility.private") }]} activeTab={isPublic ? "public" : "private"} onChange={(tab) => setIsPublic(tab === "public")} />
-            </View>
-
-            <View style={{ gap: 8 }}>
-              <Text style={sectionLabelStyle}>{t("challenges.fields.requiresReport")}</Text>
-              <SectionTabs tabs={[{ key: "yes", label: t("common.yes") }, { key: "no", label: t("common.no") }]} activeTab={requiresReport ? "yes" : "no"} onChange={(tab) => setRequiresReport(tab === "yes")} />
-            </View>
-
-            <View style={{ gap: 8 }}>
-              <Text style={sectionLabelStyle}>{t("challenges.selection.goals")}</Text>
-              <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8 }}>
-                {goals.map((goal) => (
-                  <ActionChip key={goal.id} onPress={() => toggleGoalSelection(goal.id)} tone={selectedGoalIds.includes(goal.id) ? "primary" : "secondary"}>
-                    {goal.title}
-                  </ActionChip>
-                ))}
-              </View>
-            </View>
-          </ScrollView>
-
-          <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8 }}>
-            <ActionChip onPress={() => onOpenChange(false)}>{t("common.cancel")}</ActionChip>
-            <ActionChip onPress={() => void handleSave()} tone="primary">
-              {isSubmitting ? t("common.sending") : challenge ? t("common.save") : t("common.create")}
-            </ActionChip>
-          </View>
+    <FormSheetLayout
+      open={open}
+      onOpenChange={onOpenChange}
+      title={challenge ? t("challenges.edit_title") : t("challenges.create_title")}
+      subtitle={t("challenges.create_sheet_description")}
+      footer={
+        <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8 }}>
+          <ActionChip onPress={() => onOpenChange(false)}>{t("common.cancel")}</ActionChip>
+          <ActionChip onPress={() => void handleSave()} tone="primary">
+            {isSubmitting ? t("common.sending") : challenge ? t("common.save") : t("common.create")}
+          </ActionChip>
         </View>
-      </View>
-    </Modal>
+      }
+    >
+      <ChallengeFieldsSection
+        title={title}
+        description={description}
+        rules={rules}
+        link={link}
+        price={price}
+        startsAt={startsAt}
+        endsAt={endsAt}
+        onChangeTitle={setTitle}
+        onChangeDescription={setDescription}
+        onChangeRules={setRules}
+        onChangeLink={setLink}
+        onChangePrice={setPrice}
+        onChangeStartsAt={setStartsAt}
+        onChangeEndsAt={setEndsAt}
+      />
+      <ChallengeVisibilitySection isPublic={isPublic} onChange={setIsPublic} />
+      <ChallengeReportsSection requiresReport={requiresReport} onChange={setRequiresReport} />
+      <ChallengeGoalsSection goals={goals} selectedGoalIds={selectedGoalIds} onToggleGoal={toggleGoalSelection} />
+    </FormSheetLayout>
   );
 }

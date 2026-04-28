@@ -1,8 +1,8 @@
-﻿import { Suspense, lazy, useEffect, useState } from "react";
+import { Suspense, lazy, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Linking, Pressable, SafeAreaView, Text, View } from "react-native";
 
-import { parseNativeAppRoute, type NativeAppTab, type NativeMoreTab } from "@/app/router.native";
+import { parseNativeAppRoute, type NativeAppTab } from "@/app/router.native";
 import { NativeAppHeader } from "@/components/native/NativeAppHeader";
 import { BarChart2, Bell, Gift, Swords, Target } from "@/components/native/icons";
 import { useAppStore } from "@/stores/useAppStore";
@@ -10,10 +10,10 @@ import { appPalette } from "@/theme/palette";
 
 const NativeChallengesScreen = lazy(() => import("@/views/native/challenges"));
 const NativeGoalsScreen = lazy(() => import("@/views/native/goals"));
-const NativeMoreScreen = lazy(() => import("@/views/native/more"));
-const NativeProgressScreen = lazy(() => import("@/views/native/progress"));
+const NativeProgressScreen = lazy(() => import("@/views/native/progress-view"));
 const NativeRemindersScreen = lazy(() => import("@/views/native/reminders"));
 const NativeRewardsScreen = lazy(() => import("@/views/native/rewards"));
+const NativeSettingsScreen = lazy(() => import("@/views/native/settings"));
 
 function NativeScreenFallback() {
   return (
@@ -40,10 +40,9 @@ export default function NativeAppShell() {
   }>({});
   const [rewardLinkState, setRewardLinkState] = useState<{ rewardId?: string | null }>({});
   const [progressLinkState, setProgressLinkState] = useState<{ goalId?: string | null }>({});
-  const [moreLinkState, setMoreLinkState] = useState<{ screen?: NativeMoreTab }>({});
 
   const tabs: Array<{
-    key: Exclude<NativeAppTab, "more">;
+    key: Exclude<NativeAppTab, "settings">;
     label: string;
     icon: typeof Target;
   }> = [
@@ -61,7 +60,6 @@ export default function NativeAppShell() {
       setChallengeLinkState({});
       setRewardLinkState({});
       setProgressLinkState({});
-      setMoreLinkState({});
     };
 
     const applyLink = (url: string) => {
@@ -101,13 +99,6 @@ export default function NativeAppShell() {
 
       if (state.tab === "progress") {
         setProgressLinkState({ goalId: state.goalId ?? null });
-        return;
-      }
-
-      if (state.tab === "more") {
-        setMoreLinkState({
-          screen: state.screen || "menu",
-        });
       }
     };
 
@@ -128,15 +119,7 @@ export default function NativeAppShell() {
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: appPalette.surface.background }}>
-      {!!user && (
-        <NativeAppHeader
-          user={user}
-          onOpenSettings={() => {
-            setActiveTab("more");
-            setMoreLinkState({ screen: "settings" });
-          }}
-        />
-      )}
+      {!!user && <NativeAppHeader user={user} onOpenSettings={() => setActiveTab("settings")} />}
 
       <View style={{ flex: 1 }}>
         <Suspense fallback={<NativeScreenFallback />}>
@@ -182,67 +165,62 @@ export default function NativeAppShell() {
               }}
             />
           )}
-          {activeTab === "more" && (
-            <NativeMoreScreen
-              activeScreen={moreLinkState.screen}
-              onConsumeLinkState={() => {
-                setMoreLinkState({});
-              }}
-            />
-          )}
+          {activeTab === "settings" && <NativeSettingsScreen />}
         </Suspense>
       </View>
 
-      <View
-        style={{
-          flexDirection: "row",
-          backgroundColor: appPalette.surface.background,
-          paddingHorizontal: 4,
-          paddingVertical: 8,
-        }}
-      >
-        {tabs.map((tab) => {
-          const active = tab.key === activeTab;
-          const Icon = tab.icon;
+      {activeTab !== "settings" && (
+        <View
+          style={{
+            flexDirection: "row",
+            backgroundColor: appPalette.surface.background,
+            paddingHorizontal: 4,
+            paddingVertical: 8,
+          }}
+        >
+          {tabs.map((tab) => {
+            const active = tab.key === activeTab;
+            const Icon = tab.icon;
 
-          return (
-            <Pressable
-              key={tab.key}
-              onPress={() => setActiveTab(tab.key)}
-              style={{
-                flex: 1,
-                minWidth: 0,
-                marginHorizontal: 4,
-                minHeight: 45,
-                borderRadius: 8,
-                borderWidth: 2,
-                borderColor: appPalette.brand.primary,
-                paddingHorizontal: 8,
-                paddingVertical: 4,
-                alignItems: "center",
-                justifyContent: "center",
-                backgroundColor: active ? appPalette.brand.primary : appPalette.surface.background,
-              }}
-            >
-              <Icon color={active ? appPalette.brand.primaryForeground : appPalette.brand.primary} size={17} strokeWidth={2.5} />
-              <Text
+            return (
+              <Pressable
+                key={tab.key}
+                onPress={() => setActiveTab(tab.key)}
                 style={{
-                  color: active ? appPalette.brand.primaryForeground : appPalette.brand.primary,
-                  fontSize: 8,
-                  fontWeight: "800",
-                  fontFamily: "Montserrat",
-                  textTransform: "uppercase",
-                  textAlign: "center",
-                  lineHeight: 8,
-                  marginTop: 2,
+                  flex: 1,
+                  minWidth: 0,
+                  marginHorizontal: 4,
+                  minHeight: 45,
+                  borderRadius: 8,
+                  borderWidth: 2,
+                  borderColor: appPalette.brand.primary,
+                  paddingHorizontal: 8,
+                  paddingVertical: 4,
+                  alignItems: "center",
+                  justifyContent: "center",
+                  backgroundColor: active ? appPalette.brand.primary : appPalette.surface.background,
                 }}
               >
-                {tab.label}
-              </Text>
-            </Pressable>
-          );
-        })}
-      </View>
+                <Icon color={active ? appPalette.brand.primaryForeground : appPalette.brand.primary} size={17} strokeWidth={2.5} />
+                <Text
+                  style={{
+                    color: active ? appPalette.brand.primaryForeground : appPalette.brand.primary,
+                    fontSize: 8,
+                    fontWeight: "800",
+                    fontFamily: "Montserrat",
+                    textTransform: "uppercase",
+                    textAlign: "center",
+                    lineHeight: 8,
+                    marginTop: 2,
+                  }}
+                >
+                  {tab.label}
+                </Text>
+              </Pressable>
+            );
+          })}
+        </View>
+      )}
     </SafeAreaView>
   );
 }

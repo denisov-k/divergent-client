@@ -7,7 +7,7 @@ const CreateReportSheet = lazy(() => import("@/components/native/CreateReportShe
 const GoalFormSheet = lazy(() => import("@/components/native/GoalFormSheet").then((m) => ({ default: m.GoalFormSheet })));
 
 import { EmptyStateCard } from "@/components/native/EmptyStateCard";
-import { NativeGoalCard } from "@/components/native/NativeGoalCard";
+import { NativeGoalCardView } from "@/components/native/NativeGoalCardView";
 import { Plus, Sparkles } from "@/components/native/icons";
 import { useAppStore } from "@/stores/useAppStore";
 import { useGoalsScreen } from "@/shared/screens/goals/useGoalsScreen";
@@ -149,7 +149,7 @@ export default function NativeGoalsScreen(props: {
             const categoryLabel = categories.find((item) => item.value === goal.category)?.label ?? goal.category;
 
             return (
-              <NativeGoalCard
+              <NativeGoalCardView
                 key={goal.id}
                 goal={goal}
                 categoryLabel={categoryLabel}
