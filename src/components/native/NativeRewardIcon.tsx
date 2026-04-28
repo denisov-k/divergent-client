@@ -1,6 +1,6 @@
 ﻿import { View } from "react-native";
 
-import { Award, Crown, Gift, Star, Trophy, Zap } from "@/components/native/icons";
+import { Award, Crown, Gift, Star, Trophy, Zap } from "@/components/native/Icons";
 import { appPalette } from "@/theme/palette";
 import type { RewardIcon } from "@/types";
 

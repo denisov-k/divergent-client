@@ -1,7 +1,7 @@
 import { Plus, Sparkles } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
-import { GoalCard } from "@/components/GoalCard";
+import { GoalCard } from "@/components/web/goals/GoalCard";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import type { Goal, Reward } from "@/types";

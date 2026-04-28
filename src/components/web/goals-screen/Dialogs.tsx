@@ -2,13 +2,13 @@ import { Suspense, lazy } from "react";
 
 import type { CategoryOption, Goal, GoalFormData, Reminder, ReportUploadPayload, Reward } from "@/types";
 
-const AiGenerateGoalDialog = lazy(() => import("@/components/AiDialog"));
-const CreateReportDialog = lazy(() => import("@/components/CreateReportDialog"));
+const AiGenerateGoalDialog = lazy(() => import("@/components/web/goals/AiDialog"));
+const CreateReportDialog = lazy(() => import("@/components/web/goals/CreateReportDialog"));
 const GoalDialog = lazy(() =>
-  import("@/components/GoalDialog").then((m) => ({ default: m.GoalDialog })),
+  import("@/components/web/goals/GoalDialog").then((m) => ({ default: m.GoalDialog })),
 );
 const ReminderDialog = lazy(() =>
-  import("@/components/ReminderDialog").then((m) => ({ default: m.ReminderDialog })),
+  import("@/components/web/reminders/ReminderDialog").then((m) => ({ default: m.ReminderDialog })),
 );
 
 function DialogFallback() {

@@ -2,8 +2,8 @@
 import { Plus } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
-import { FriendCard } from "@/components/FriendCard";
-import { FriendDialog } from "@/components/FriendDialog";
+import { FriendCard } from "@/components/web/frens/FriendCard";
+import { FriendDialog } from "@/components/web/frens/FriendDialog";
 import { Button } from "@/components/ui/button";
 import { useFrensScreen } from "@/shared/screens/frens/useFrensScreen";
 
@@ -42,3 +42,4 @@ export default function FrensScreen() {
     </div>
   );
 }
+

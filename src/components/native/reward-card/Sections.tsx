@@ -2,7 +2,7 @@ import { Linking, Text, View } from "react-native";
 import { useTranslation } from "react-i18next";
 
 import { buildChallengesPath, buildGoalsPath } from "@/app/routes";
-import { Edit, Swords, Target } from "@/components/native/icons";
+import { Edit, Swords, Target } from "@/components/native/Icons";
 import { NativeRewardIcon } from "@/components/native/NativeRewardIcon";
 import { buildNativeRouteUrl } from "@/platform/appUrl.native";
 import { appPalette } from "@/theme/palette";

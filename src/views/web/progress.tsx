@@ -2,10 +2,10 @@
 import { Target, Trophy, Zap } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
-import { PeriodCalendar } from "@/components/PeriodCalendar";
-import { ProgressChart } from "@/components/ProgressChart";
-import { StatCard } from "@/components/StatCard";
-import { StreakCard } from "@/components/StreakCard";
+import { PeriodCalendar } from "@/components/web/progress/PeriodCalendar";
+import { ProgressChart } from "@/components/web/progress/ProgressChart";
+import { StatCard } from "@/components/web/progress/StatCard";
+import { StreakCard } from "@/components/web/progress/StreakCard";
 import { buildProgressPath } from "@/app/routes";
 import { useProgressScreen } from "@/shared/screens/progress/useProgressScreen";
 
@@ -122,3 +122,4 @@ export default function ProgressScreen() {
     </div>
   );
 }
+

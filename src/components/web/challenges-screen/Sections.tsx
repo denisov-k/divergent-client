@@ -1,7 +1,7 @@
 import { Plus } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
-import { ChallengeCard } from "@/components/ChallengeCard";
+import { ChallengeCard } from "@/components/web/challenges/ChallengeCard";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import type { Challenge } from "@/types";

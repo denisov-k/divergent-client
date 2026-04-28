@@ -2,7 +2,7 @@ import { Pressable, ScrollView, Text, View } from "react-native";
 import { useTranslation } from "react-i18next";
 
 import { EmptyStateCard } from "@/components/native/EmptyStateCard";
-import { Plus } from "@/components/native/icons";
+import { Plus } from "@/components/native/Icons";
 import { NativeChallengeCardView } from "@/components/native/NativeChallengeCardView";
 import { appPalette } from "@/theme/palette";
 import type { Challenge } from "@/types";

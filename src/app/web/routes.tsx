@@ -1,7 +1,7 @@
 ﻿import { Suspense, lazy, type ReactNode } from "react";
 import { Route } from "react-router-dom";
 
-import { ProtectedRoute } from "@/components/protected-route";
+import { ProtectedRoute } from "@/components/shared/ProtectedRoute";
 import Footer from "@/layout/Footer";
 import Header from "@/layout/Header";
 import Layout from "@/layout";
@@ -60,3 +60,4 @@ export function renderProductWebRoutes() {
     </>
   );
 }
+

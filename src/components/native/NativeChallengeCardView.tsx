@@ -1,9 +1,9 @@
-import { useState } from "react";
+﻿import { useState } from "react";
 import { View } from "react-native";
 import { useTranslation } from "react-i18next";
 
-import { ProgressRing } from "@/components/ProgressRing";
-import { DoorOpen, Edit, Share } from "@/components/native/icons";
+import { ProgressRing } from "@/components/shared/ProgressRing";
+import { DoorOpen, Edit, Share } from "@/components/native/Icons";
 import { SurfaceCard } from "@/components/native/SurfaceCard";
 import { useAppStore } from "@/stores/useAppStore";
 import { appPalette } from "@/theme/palette";
@@ -136,3 +136,4 @@ export function NativeChallengeCardView({
     </View>
   );
 }
+

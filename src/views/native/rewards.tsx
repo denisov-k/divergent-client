@@ -5,7 +5,7 @@ import { useTranslation } from "react-i18next";
 const RewardFormSheet = lazy(() => import("@/components/native/RewardFormSheet").then((m) => ({ default: m.RewardFormSheet })));
 
 import { EmptyStateCard } from "@/components/native/EmptyStateCard";
-import { Plus } from "@/components/native/icons";
+import { Plus } from "@/components/native/Icons";
 import { NativeRewardCardView } from "@/components/native/NativeRewardCardView";
 import { useAppStore } from "@/stores/useAppStore";
 import { useRewardsScreen } from "@/shared/screens/rewards/useRewardsScreen";

@@ -10,19 +10,19 @@ import type {
 } from "@/types";
 
 const AcceptChallengeDialog = lazy(() =>
-  import("@/components/AcceptChallengeDialog").then((m) => ({ default: m.AcceptChallengeDialog })),
+  import("@/components/web/challenges/AcceptChallengeDialog").then((m) => ({ default: m.AcceptChallengeDialog })),
 );
 const ChallengeParticipantDialog = lazy(() =>
-  import("@/components/ChallengeParticipantDialog").then((m) => ({ default: m.ChallengeParticipantDialog })),
+  import("@/components/web/challenges/ChallengeParticipantDialog").then((m) => ({ default: m.ChallengeParticipantDialog })),
 );
 const CreateChallengeDialog = lazy(() =>
-  import("@/components/CreateChallengeDialog").then((m) => ({ default: m.CreateChallengeDialog })),
+  import("@/components/web/challenges/CreateChallengeDialog").then((m) => ({ default: m.CreateChallengeDialog })),
 );
 const LeaveChallengeDialog = lazy(() =>
-  import("@/components/LeaveChallengeDialog").then((m) => ({ default: m.LeaveChallengeDialog })),
+  import("@/components/web/challenges/LeaveChallengeDialog").then((m) => ({ default: m.LeaveChallengeDialog })),
 );
 const SelectPaymentMethodDialog = lazy(() =>
-  import("@/components/SelectPaymentMethodDialog").then((m) => ({ default: m.SelectPaymentMethodDialog })),
+  import("@/components/web/challenges/SelectPaymentMethodDialog").then((m) => ({ default: m.SelectPaymentMethodDialog })),
 );
 
 function DialogFallback() {

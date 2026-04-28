@@ -1,6 +1,6 @@
 ﻿import { Image, Pressable, Text, View } from "react-native";
 
-import { Settings } from "@/components/native/icons";
+import { Settings } from "@/components/native/Icons";
 import { appPalette } from "@/theme/palette";
 import type { User } from "@/types";
 

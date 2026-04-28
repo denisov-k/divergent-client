@@ -4,13 +4,13 @@ import { Linking, Pressable, SafeAreaView, Text, View } from "react-native";
 
 import { parseNativeAppRoute, type NativeAppTab } from "@/app/router.native";
 import { NativeAppHeader } from "@/components/native/NativeAppHeader";
-import { BarChart2, Bell, Gift, Swords, Target } from "@/components/native/icons";
+import { BarChart2, Bell, Gift, Swords, Target } from "@/components/native/Icons";
 import { useAppStore } from "@/stores/useAppStore";
 import { appPalette } from "@/theme/palette";
 
 const NativeChallengesScreen = lazy(() => import("@/views/native/challenges"));
 const NativeGoalsScreen = lazy(() => import("@/views/native/goals"));
-const NativeProgressScreen = lazy(() => import("@/views/native/progress-view"));
+const NativeProgressScreen = lazy(() => import("@/views/native/ProgressView"));
 const NativeRemindersScreen = lazy(() => import("@/views/native/reminders"));
 const NativeRewardsScreen = lazy(() => import("@/views/native/rewards"));
 const NativeSettingsScreen = lazy(() => import("@/views/native/settings"));

@@ -3,9 +3,9 @@ import { Plus } from "lucide-react";
 import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
 
-const ReminderDialog = lazy(() => import("@/components/ReminderDialog").then((m) => ({ default: m.ReminderDialog })));
+const ReminderDialog = lazy(() => import("@/components/web/reminders/ReminderDialog").then((m) => ({ default: m.ReminderDialog })));
 
-import { ReminderCard } from "@/components/ReminderCard";
+import { ReminderCard } from "@/components/web/reminders/ReminderCard";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useRemindersScreen } from "@/shared/screens/reminders/useRemindersScreen";

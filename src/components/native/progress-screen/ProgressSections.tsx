@@ -1,7 +1,7 @@
 import { Modal, Pressable, ScrollView, Text, View } from "react-native";
 import { useTranslation } from "react-i18next";
 
-import { ChartSpline, ChevronDown, Flame } from "@/components/native/icons";
+import { ChartSpline, ChevronDown, Flame } from "@/components/native/Icons";
 import { SurfaceCard } from "@/components/native/SurfaceCard";
 import { appPalette } from "@/theme/palette";
 import type { Goal } from "@/types";

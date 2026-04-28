@@ -4,9 +4,9 @@ import { useTranslation } from "react-i18next";
 import { useSearchParams } from "react-router-dom";
 import { toast } from "sonner";
 
-const RewardDialog = lazy(() => import("@/components/RewardDialog").then((m) => ({ default: m.RewardDialog })));
+const RewardDialog = lazy(() => import("@/components/web/rewards/RewardDialog").then((m) => ({ default: m.RewardDialog })));
 
-import { RewardCard } from "@/components/RewardCard";
+import { RewardCard } from "@/components/web/rewards/RewardCard";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useRewardsScreen } from "@/shared/screens/rewards/useRewardsScreen";

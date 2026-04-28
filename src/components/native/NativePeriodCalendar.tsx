@@ -5,7 +5,7 @@ import { ScrollView, Text, View } from "react-native";
 import dayjs from "dayjs";
 import isoWeek from "dayjs/plugin/isoWeek";
 
-import { Activity } from "@/components/native/icons";
+import { Activity } from "@/components/native/Icons";
 import { SurfaceCard } from "@/components/native/SurfaceCard";
 import { appPalette } from "@/theme/palette";
 import type { Goal, GoalActivity } from "@/types";

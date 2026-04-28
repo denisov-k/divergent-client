@@ -1,8 +1,8 @@
-import { useMemo, useState } from "react";
+﻿import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { View } from "react-native";
 
-import { ProgressRing } from "@/components/ProgressRing";
+import { ProgressRing } from "@/components/shared/ProgressRing";
 import {
   GoalCardActions,
   GoalCardHeader,
@@ -10,7 +10,7 @@ import {
   GoalNumericProgressInput,
   GoalProgressSection,
   GoalTaskSection,
-} from "@/components/native/goal-card-parts";
+} from "@/components/native/GoalCardParts";
 import { SurfaceCard } from "@/components/native/SurfaceCard";
 import { isTaskCompletedThisPeriod } from "@/shared/screens/goals/model";
 import type { Goal, GoalPeriod, Reward, Task } from "@/types";
@@ -103,4 +103,5 @@ export function NativeGoalCardView({ goal, categoryLabel, reward, userTimeZone, 
     </SurfaceCard>
   );
 }
+
 

@@ -2,7 +2,7 @@ import { Linking, Pressable, Text, View } from "react-native";
 import { useTranslation } from "react-i18next";
 
 import { buildGoalsPath } from "@/app/routes";
-import { Calendar, ChevronDown, ChevronUp, Swords, Users } from "@/components/native/icons";
+import { Calendar, ChevronDown, ChevronUp, Swords, Users } from "@/components/native/Icons";
 import { buildNativeRouteUrl } from "@/platform/appUrl.native";
 import { appPalette } from "@/theme/palette";
 import type { Challenge, Goal, Leader } from "@/types";

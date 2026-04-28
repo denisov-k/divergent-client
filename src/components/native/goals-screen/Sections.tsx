@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 
 import { EmptyStateCard } from "@/components/native/EmptyStateCard";
 import { NativeGoalCardView } from "@/components/native/NativeGoalCardView";
-import { Plus, Sparkles } from "@/components/native/icons";
+import { Plus, Sparkles } from "@/components/native/Icons";
 import { appPalette } from "@/theme/palette";
 import type { CategoryOption, Goal, Reward } from "@/types";
 
