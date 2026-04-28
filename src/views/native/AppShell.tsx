@@ -169,58 +169,57 @@ export default function NativeAppShell() {
         </Suspense>
       </View>
 
-      {activeTab !== "settings" && (
-        <View
-          style={{
-            flexDirection: "row",
-            backgroundColor: appPalette.surface.background,
-            paddingHorizontal: 4,
-            paddingVertical: 8,
-          }}
-        >
-          {tabs.map((tab) => {
-            const active = tab.key === activeTab;
-            const Icon = tab.icon;
+      <View
+        style={{
+          flexDirection: "row",
+          backgroundColor: appPalette.surface.background,
+          paddingHorizontal: 4,
+          paddingVertical: 8,
+        }}
+      >
+        {tabs.map((tab) => {
+          const active = tab.key === activeTab;
+          const Icon = tab.icon;
 
-            return (
-              <Pressable
-                key={tab.key}
-                onPress={() => setActiveTab(tab.key)}
+          return (
+            <Pressable
+              key={tab.key}
+              onPress={() => setActiveTab(tab.key)}
+              style={{
+                flex: 1,
+                minWidth: 0,
+                marginHorizontal: 4,
+                minHeight: 45,
+                borderRadius: 8,
+                borderWidth: 2,
+                borderColor: appPalette.brand.primary,
+                paddingHorizontal: 8,
+                paddingVertical: 4,
+                alignItems: "center",
+                justifyContent: "center",
+                backgroundColor: active ? appPalette.brand.primary : appPalette.surface.background,
+              }}
+            >
+              <Icon color={active ? appPalette.brand.primaryForeground : appPalette.brand.primary} size={17} strokeWidth={2.5} />
+              <Text
                 style={{
-                  flex: 1,
-                  minWidth: 0,
-                  marginHorizontal: 4,
-                  minHeight: 45,
-                  borderRadius: 8,
-                  borderWidth: 2,
-                  borderColor: appPalette.brand.primary,
-                  paddingHorizontal: 8,
-                  paddingVertical: 4,
-                  alignItems: "center",
-                  justifyContent: "center",
-                  backgroundColor: active ? appPalette.brand.primary : appPalette.surface.background,
+                  color: active ? appPalette.brand.primaryForeground : appPalette.brand.primary,
+                  fontSize: 8,
+                  fontWeight: "800",
+                  fontFamily: "Montserrat",
+                  textTransform: "uppercase",
+                  textAlign: "center",
+                  lineHeight: 8,
+                  marginTop: 2,
                 }}
               >
-                <Icon color={active ? appPalette.brand.primaryForeground : appPalette.brand.primary} size={17} strokeWidth={2.5} />
-                <Text
-                  style={{
-                    color: active ? appPalette.brand.primaryForeground : appPalette.brand.primary,
-                    fontSize: 8,
-                    fontWeight: "800",
-                    fontFamily: "Montserrat",
-                    textTransform: "uppercase",
-                    textAlign: "center",
-                    lineHeight: 8,
-                    marginTop: 2,
-                  }}
-                >
-                  {tab.label}
-                </Text>
-              </Pressable>
-            );
-          })}
-        </View>
-      )}
+                {tab.label}
+              </Text>
+            </Pressable>
+          );
+        })}
+      </View>
     </SafeAreaView>
   );
 }
+

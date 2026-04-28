@@ -1,4 +1,4 @@
-﻿import { useState } from "react";
+import { useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -97,8 +97,8 @@ export function AcceptChallengeDialog({ challenge, isOpen, onOpenChange, onAccep
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
               <Calendar size={16} />
               <span>
-                {challenge.startsAt ? format(new Date(challenge.startsAt), "dd.MM.yyyy") : "—"} → {" "}
-                {challenge.endsAt ? format(new Date(challenge.endsAt), "dd.MM.yyyy") : "—"}
+                {challenge.startsAt ? format(new Date(challenge.startsAt), "dd.MM.yyyy") : "�"} {" > "}
+                {challenge.endsAt ? format(new Date(challenge.endsAt), "dd.MM.yyyy") : "�"}
               </span>
             </div>
 
@@ -196,7 +196,7 @@ export function AcceptChallengeDialog({ challenge, isOpen, onOpenChange, onAccep
 
           <div className="flex justify-between rounded-md border p-2 text-sm font-medium">
             <span>{t("challenges.participation_cost")}</span>
-            <span>{challenge.price ? `${challenge.price} руб.` : t("challenges.free")}</span>
+            <span>{challenge.price ? `${challenge.price} ${t("common.rubles_short")}` : t("challenges.free")}</span>
           </div>
         </div>
 
@@ -225,3 +225,5 @@ export function AcceptChallengeDialog({ challenge, isOpen, onOpenChange, onAccep
     </Dialog>
   );
 }
+
+

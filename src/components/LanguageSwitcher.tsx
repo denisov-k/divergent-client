@@ -1,5 +1,5 @@
-import { useAppStore } from '@/stores/useAppStore';
-import { useTranslation } from 'react-i18next';
+﻿import { useAppStore } from "@/stores/useAppStore";
+import { useTranslation } from "react-i18next";
 
 export default function LanguageSwitcher() {
   const { i18n, t } = useTranslation();
@@ -14,14 +14,14 @@ export default function LanguageSwitcher() {
 
   return (
     <div className="flex flex-col">
-      <label className="text-sm text-gray-500">{t('settings.language')}</label>
+      <label className="text-sm text-gray-500">{t("settings.language")}</label>
       <select
-        className="mt-1 p-2 border rounded"
+        className="mt-1 rounded border p-2"
         value={user!.language || i18n.language}
         onChange={handleChange}
       >
-        <option value="en">English</option>
-        <option value="ru">Русский</option>
+        <option value="en">{t("settings.language_english")}</option>
+        <option value="ru">{t("settings.language_russian")}</option>
       </select>
     </div>
   );

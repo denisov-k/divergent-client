@@ -1,4 +1,5 @@
 import { type ChangeEvent, useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { z, ZodError } from "zod";
 
@@ -23,6 +24,7 @@ const signInSchema = z.object({
 
 export default function SignIn() {
   const [searchParams] = useSearchParams();
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { user, loading, loginWithCredentials } = useAppStore();
 
@@ -140,7 +142,7 @@ export default function SignIn() {
                 value={formData.email}
                 onChange={handleChange}
                 required
-                placeholder="you@example.com"
+                placeholder={t("auth.email_placeholder")}
                 aria-invalid={Boolean(errors.email)}
                 className="h-11 border-border bg-input-background text-foreground placeholder:text-muted-foreground"
               />
@@ -158,7 +160,7 @@ export default function SignIn() {
                 value={formData.password}
                 onChange={handleChange}
                 required
-                placeholder="Enter your password"
+                placeholder={t("auth.password_placeholder")}
                 aria-invalid={Boolean(errors.password)}
                 className="h-11 border-border bg-input-background text-foreground placeholder:text-muted-foreground"
               />

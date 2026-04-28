@@ -1,4 +1,5 @@
-﻿import { useEffect, useRef } from "react";
+import { useTranslation } from "react-i18next";
+import { useEffect, useRef } from "react";
 import { ScrollView, Text, View } from "react-native";
 
 import dayjs from "dayjs";
@@ -11,8 +12,6 @@ import type { Goal, GoalActivity } from "@/types";
 
 dayjs.extend(isoWeek);
 
-const dayLabels = ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"];
-
 type Props = {
   goal: Goal;
   activity: GoalActivity;
@@ -20,6 +19,16 @@ type Props = {
 };
 
 export function NativePeriodCalendar({ goal, activity, loading }: Props) {
+  const { t } = useTranslation();
+  const dayLabels = [
+    t("weekdays.mon"),
+    t("weekdays.tue"),
+    t("weekdays.wed"),
+    t("weekdays.thu"),
+    t("weekdays.fri"),
+    t("weekdays.sat"),
+    t("weekdays.sun"),
+  ];
   const scrollRef = useRef<ScrollView>(null);
 
   useEffect(() => {
@@ -36,12 +45,9 @@ export function NativePeriodCalendar({ goal, activity, loading }: Props) {
 
   const daysToShow = 365;
   const today = dayjs();
-
   const dateMap = new Map(activity.data.map((d) => [dayjs(d.periodStart).format("YYYY-MM-DD"), d.status]));
-
   const firstDate = today.subtract(daysToShow - 1, "day").startOf("isoWeek");
   const lastDate = today;
-
   const dates: dayjs.Dayjs[] = [];
   let current = firstDate;
   while (current.isBefore(lastDate) || current.isSame(lastDate, "day")) {
@@ -99,14 +105,20 @@ export function NativePeriodCalendar({ goal, activity, loading }: Props) {
     <SurfaceCard gap={12} padding={16} radius={12}>
       <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
         <View>
-          <Text style={{ color: appPalette.semantic.textStrong, fontSize: 14, fontWeight: "500", lineHeight: 20, fontFamily: "Montserrat" }}>Активность</Text>
-          <Text style={{ color: appPalette.semantic.textMuted, fontSize: 12, fontWeight: "400", lineHeight: 18, fontFamily: "Montserrat" }}>Прогресс в календарном виде</Text>
+          <Text style={{ color: appPalette.semantic.textStrong, fontSize: 14, fontWeight: "500", lineHeight: 20, fontFamily: "Montserrat" }}>
+            {t("progress.activity_widget_title")}
+          </Text>
+          <Text style={{ color: appPalette.semantic.textMuted, fontSize: 12, fontWeight: "400", lineHeight: 18, fontFamily: "Montserrat" }}>
+            {t("progress.activity_widget_description")}
+          </Text>
         </View>
         <Activity size={20} color={appPalette.semantic.textMuted} />
       </View>
 
       {loading ? (
-        <Text style={{ color: appPalette.semantic.textMuted, fontSize: 12, fontWeight: "400", lineHeight: 18, fontFamily: "Montserrat" }}>Загрузка активности...</Text>
+        <Text style={{ color: appPalette.semantic.textMuted, fontSize: 12, fontWeight: "400", lineHeight: 18, fontFamily: "Montserrat" }}>
+          {t("progress.activity_loading")}
+        </Text>
       ) : (
         <ScrollView ref={scrollRef} horizontal showsHorizontalScrollIndicator={false}>
           <View style={{ gap: 6 }}>
@@ -155,6 +167,3 @@ export function NativePeriodCalendar({ goal, activity, loading }: Props) {
     </SurfaceCard>
   );
 }
-
-
-

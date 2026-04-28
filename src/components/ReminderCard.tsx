@@ -1,32 +1,12 @@
-﻿import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { Badge } from "./ui/badge";
 import { Button } from "./ui/button";
 import { Bell, Clock, Repeat, Edit, Target, CircleCheck } from "lucide-react";
 import { Switch } from "./ui/switch";
+import { useTranslation } from "react-i18next";
 
 import { Goal, Task } from "@/types";
 import { useNavigate } from "react-router-dom";
-
-const DAY_LABEL_MAP: Record<string, string> = {
-  mon: "Пн",
-  tue: "Вт",
-  wed: "Ср",
-  thu: "Чт",
-  fri: "Пт",
-  sat: "Сб",
-  sun: "Вс",
-  "1": "Пн",
-  "2": "Вт",
-  "3": "Ср",
-  "4": "Чт",
-  "5": "Пт",
-  "6": "Сб",
-  "7": "Вс",
-};
-
-function formatReminderDayLabel(day: string) {
-  return DAY_LABEL_MAP[String(day).toLowerCase()] ?? day;
-}
 
 interface ReminderCardProps {
   id: string;
@@ -41,22 +21,19 @@ interface ReminderCardProps {
   onEdit?: (id: string) => void;
 }
 
-export function ReminderCard({
-  id,
-  title,
-  time,
-  goal,
-  task,
-  daysOfWeek = [],
-  daysOfMonth = [],
-  isActive,
-  onToggle,
-  onEdit,
-}: ReminderCardProps) {
+export function ReminderCard({ id, title, time, goal, task, daysOfWeek = [], daysOfMonth = [], isActive, onToggle, onEdit }: ReminderCardProps) {
+  const { t } = useTranslation();
+  const navigate = useNavigate();
   const hasDays = daysOfWeek.length > 0;
   const hasDates = daysOfMonth.length > 0;
-
-  const navigate = useNavigate();
+  const formatReminderDayLabel = (day: string) => {
+    const normalized = String(day).toLowerCase();
+    const map: Record<string, string> = {
+      mon: t("weekdays.mon"), tue: t("weekdays.tue"), wed: t("weekdays.wed"), thu: t("weekdays.thu"), fri: t("weekdays.fri"), sat: t("weekdays.sat"), sun: t("weekdays.sun"),
+      "1": t("weekdays.mon"), "2": t("weekdays.tue"), "3": t("weekdays.wed"), "4": t("weekdays.thu"), "5": t("weekdays.fri"), "6": t("weekdays.sat"), "7": t("weekdays.sun"),
+    };
+    return map[normalized] ?? day;
+  };
 
   return (
     <Card className={`mb-2 break-inside-avoid transition-all ${isActive ? "border-primary" : "opacity-60"}`}>
@@ -68,75 +45,38 @@ export function ReminderCard({
           </div>
           <div className="flex items-center gap-2">
             <Switch checked={isActive} onCheckedChange={onToggle} />
-            {onEdit && (
-              <Button variant="ghost" size="icon" onClick={() => onEdit(id)}>
-                <Edit className="size-4" />
-              </Button>
-            )}
+            {onEdit && <Button variant="ghost" size="icon" onClick={() => onEdit(id)}><Edit className="size-4" /></Button>}
           </div>
         </div>
       </CardHeader>
 
       <CardContent className="space-y-3">
-        <div className="flex items-center gap-2">
-          <Clock className="size-4 text-muted-foreground" />
-          <span>{time}</span>
-        </div>
+        <div className="flex items-center gap-2"><Clock className="size-4 text-muted-foreground" /><span>{time}</span></div>
 
         {hasDays && (
           <div className="flex items-center gap-2">
             <Repeat className="size-4 text-muted-foreground" />
-            <div className="flex flex-wrap gap-1">
-              {daysOfWeek.map((day) => (
-                <Badge key={day} variant="outline" className="text-xs">
-                  {formatReminderDayLabel(day)}
-                </Badge>
-              ))}
-            </div>
+            <div className="flex flex-wrap gap-1">{daysOfWeek.map((day) => <Badge key={day} variant="outline" className="text-xs">{formatReminderDayLabel(day)}</Badge>)}</div>
           </div>
         )}
 
         {hasDates && (
           <div className="flex items-center gap-2">
             <Repeat className="size-4 text-muted-foreground" />
-            <div className="flex flex-wrap gap-1">
-              {daysOfMonth?.sort((dayX, dayY) => dayX - dayY).map((day) => (
-                <Badge key={day} variant="outline" className="text-xs">
-                  {day}
-                </Badge>
-              ))}
-            </div>
+            <div className="flex flex-wrap gap-1">{daysOfMonth.sort((a, b) => a - b).map((day) => <Badge key={day} variant="outline" className="text-xs">{day}</Badge>)}</div>
           </div>
         )}
 
         {(task || goal) && (
           <div className="pt-2 border-t gap-2 flex flex-wrap">
             {goal && (
-              <Badge
-                className="cursor-pointer bg-primary text-white hover:bg-primary/80"
-                onClick={() =>
-                  navigate({
-                    pathname: "/goals",
-                    search: `?id=${goal.id}`,
-                  })
-                }
-                title="Перейти к цели"
-              >
+              <Badge className="cursor-pointer bg-primary text-white hover:bg-primary/80" onClick={() => navigate({ pathname: "/goals", search: `?id=${goal.id}` })} title={t("reminders.go_to_goal")}>
                 <Target />
                 <span>{goal.title}</span>
               </Badge>
             )}
             {goal && task && (
-              <Badge
-                className="cursor-pointer bg-primary text-white hover:bg-primary/80"
-                onClick={() =>
-                  navigate({
-                    pathname: "/goals",
-                    search: `?id=${goal.id}`,
-                  })
-                }
-                title="Перейти к задаче"
-              >
+              <Badge className="cursor-pointer bg-primary text-white hover:bg-primary/80" onClick={() => navigate({ pathname: "/goals", search: `?id=${goal.id}` })} title={t("reminders.go_to_task")}>
                 <CircleCheck />
                 <span>{task.title}</span>
               </Badge>

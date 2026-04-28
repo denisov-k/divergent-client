@@ -23,7 +23,7 @@ export default function Settings() {
 
   const hasPassword = Boolean(user?.hasPassword);
   const credentialsTitle = useMemo(
-    () => (hasPassword ? 'Change password' : 'Add email and password'),
+    () => (hasPassword ? t('settings.credentials_change_title') : t('settings.credentials_add_title')),
     [hasPassword]
   );
 
@@ -125,7 +125,7 @@ export default function Settings() {
             {hasPassword && (
               <div className="space-y-2">
                 <label htmlFor="currentPassword" className="text-sm font-medium text-foreground">
-                  Current password
+                  {t('common.current_password')}
                 </label>
                 <Input
                   id="currentPassword"
@@ -133,7 +133,7 @@ export default function Settings() {
                   type="password"
                   value={formData.currentPassword}
                   onChange={handleChange}
-                  placeholder="Enter current password"
+                  placeholder={t('common.current_password')}
                   className="h-11"
                 />
               </div>
@@ -141,22 +141,22 @@ export default function Settings() {
 
             <div className="space-y-2">
               <label htmlFor="password" className="text-sm font-medium text-foreground">
-                {hasPassword ? 'New password' : 'Password'}
-              </label>
+                  {hasPassword ? t('common.new_password') : t('common.password')}
+                </label>
               <Input
                 id="password"
                 name="password"
                 type="password"
                 value={formData.password}
                 onChange={handleChange}
-                placeholder={hasPassword ? 'Create a new password' : 'Create a password'}
-                className="h-11"
-              />
+                  placeholder={hasPassword ? t('auth.new_password_placeholder') : t('auth.password_create_placeholder')}
+                  className="h-11"
+                />
             </div>
 
             <div className="space-y-2">
               <label htmlFor="confirmPassword" className="text-sm font-medium text-foreground">
-                Confirm password
+                {t('common.confirm_password')}
               </label>
               <Input
                 id="confirmPassword"
@@ -164,9 +164,9 @@ export default function Settings() {
                 type="password"
                 value={formData.confirmPassword}
                 onChange={handleChange}
-                placeholder="Repeat the password"
-                className="h-11"
-              />
+                  placeholder={t('auth.confirm_password_placeholder')}
+                  className="h-11"
+                />
             </div>
 
             {error && (

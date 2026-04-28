@@ -1,4 +1,5 @@
 import { Linking, Text, View } from "react-native";
+import { useTranslation } from "react-i18next";
 
 import { buildChallengesPath, buildGoalsPath } from "@/app/routes";
 import { Edit, Swords, Target } from "@/components/native/icons";
@@ -14,6 +15,8 @@ export function RewardCardHeader({
 }: {
   reward: Reward;
 }) {
+  const { t } = useTranslation();
+
   return (
     <View style={{ flexDirection: "row", alignItems: "center", gap: 16 }}>
       <NativeRewardIcon icon={reward.icon} unlocked={reward.isUnlocked} />
@@ -23,7 +26,7 @@ export function RewardCardHeader({
           <Text style={{ fontSize: 12, fontWeight: "500", color: appPalette.semantic.textStrong, fontFamily: "Montserrat", lineHeight: 12, flexShrink: 1 }}>
             {reward.title}
           </Text>
-          {reward.isUnlocked && <RewardBadge tone="success">Получено</RewardBadge>}
+          {reward.isUnlocked && <RewardBadge tone="success">{t("rewards.unlocked")}</RewardBadge>}
         </View>
 
         <Text style={{ color: appPalette.semantic.textMuted, fontSize: 12, fontWeight: "400", lineHeight: 18, fontFamily: "Montserrat" }}>
@@ -43,6 +46,8 @@ export function RewardCardLinks({
   goal?: Goal;
   challenge?: Challenge;
 }) {
+  const { t } = useTranslation();
+
   return (
     <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8 }}>
       {!!goal && (
@@ -65,7 +70,7 @@ export function RewardCardLinks({
         </RewardBadge>
       )}
 
-      {!!reward.xpRequires && !reward.isUnlocked && <RewardBadge>{`Требуется ${reward.xpRequires} XP`}</RewardBadge>}
+      {!!reward.xpRequires && !reward.isUnlocked && <RewardBadge>{t("ai.xp_required", { xp: reward.xpRequires })}</RewardBadge>}
     </View>
   );
 }

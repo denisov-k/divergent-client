@@ -1,4 +1,5 @@
-import { Text, View } from "react-native";
+п»їimport { Text, View } from "react-native";
+import { useTranslation } from "react-i18next";
 
 import { ActionChip } from "@/components/native/ActionChip";
 import { FieldInput } from "@/components/native/FieldInput";
@@ -8,11 +9,13 @@ import { appPalette } from "@/theme/palette";
 import type { CategoryOption, GoalPeriod, GoalType, Reward, Task } from "@/types";
 
 export function GoalTypeSection(props: { goalType: GoalType; onChange: (value: GoalType) => void }) {
+  const { t } = useTranslation();
+
   return (
     <View style={{ gap: 8 }}>
-      <Text style={formSectionLabelStyle}>Тип цели</Text>
+      <Text style={formSectionLabelStyle}>{t("goals.dialog.goal_type_label")}</Text>
       <SectionTabs
-        tabs={[{ key: "TASK", label: "Задачи" }, { key: "PROGRESS", label: "Число" }]}
+        tabs={[{ key: "TASK", label: t("goals.dialog.goal_type_tasks") }, { key: "PROGRESS", label: t("goals.dialog.goal_type_progress") }]}
         activeTab={props.goalType}
         onChange={(value) => props.onChange(value as GoalType)}
       />
@@ -21,15 +24,17 @@ export function GoalTypeSection(props: { goalType: GoalType; onChange: (value: G
 }
 
 export function GoalPeriodSection(props: { goalPeriod: GoalPeriod; onChange: (value: GoalPeriod) => void }) {
+  const { t } = useTranslation();
+
   return (
     <View style={{ gap: 8 }}>
-      <Text style={formSectionLabelStyle}>Период</Text>
+      <Text style={formSectionLabelStyle}>{t("goals.dialog.period_label")}</Text>
       <SectionTabs
         tabs={[
-          { key: "NONE", label: "Без повтора" },
-          { key: "DAILY", label: "День" },
-          { key: "WEEKLY", label: "Неделя" },
-          { key: "MONTHLY", label: "Месяц" },
+          { key: "NONE", label: t("goals.dialog.period_none") },
+          { key: "DAILY", label: t("goals.dialog.period_day") },
+          { key: "WEEKLY", label: t("goals.dialog.period_week") },
+          { key: "MONTHLY", label: t("goals.dialog.period_month") },
         ]}
         activeTab={props.goalPeriod}
         onChange={(value) => props.onChange(value as GoalPeriod)}
@@ -43,9 +48,11 @@ export function CategorySection(props: {
   category: string;
   onChange: (value: string) => void;
 }) {
+  const { t } = useTranslation();
+
   return (
     <View style={{ gap: 8 }}>
-      <Text style={formSectionLabelStyle}>Категория</Text>
+      <Text style={formSectionLabelStyle}>{t("goals.dialog.category_label")}</Text>
       <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8 }}>
         {props.categories.map((item) => (
           <ActionChip key={item.value} onPress={() => props.onChange(item.value)} tone={props.category === item.value ? "primary" : "secondary"}>
@@ -62,12 +69,14 @@ export function RewardSection(props: {
   activeRewardId: string | null;
   onChange: (value: string | null) => void;
 }) {
+  const { t } = useTranslation();
+
   return (
     <View style={{ gap: 8 }}>
-      <Text style={formSectionLabelStyle}>Награда</Text>
+      <Text style={formSectionLabelStyle}>{t("goals.dialog.reward_label")}</Text>
       <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8 }}>
         <ActionChip onPress={() => props.onChange(null)} tone={props.activeRewardId ? "secondary" : "primary"}>
-          Без награды
+          {t("common.no_reward")}
         </ActionChip>
         {props.rewards.map((reward) => (
           <ActionChip key={reward.id} onPress={() => props.onChange(reward.id)} tone={props.activeRewardId === reward.id ? "primary" : "secondary"}>
@@ -85,10 +94,12 @@ export function ProgressFieldsSection(props: {
   onChangeCurrentValue: (value: string) => void;
   onChangeTargetValue: (value: string) => void;
 }) {
+  const { t } = useTranslation();
+
   return (
     <View style={{ gap: 12 }}>
-      <FieldInput label="Текущий прогресс" value={props.currentValue} onChangeText={props.onChangeCurrentValue} placeholder="0" />
-      <FieldInput label="Целевое значение" value={props.targetValue} onChangeText={props.onChangeTargetValue} placeholder="100" />
+      <FieldInput label={t("goals.dialog.current_progress")} value={props.currentValue} onChangeText={props.onChangeCurrentValue} placeholder="0" />
+      <FieldInput label={t("goals.dialog.target_value")} value={props.targetValue} onChangeText={props.onChangeTargetValue} placeholder="100" />
     </View>
   );
 }
@@ -100,12 +111,14 @@ export function TasksSection(props: {
   onAddTask: () => void;
   onRemoveTask: (taskId: string) => void;
 }) {
+  const { t } = useTranslation();
+
   return (
     <View style={{ gap: 12 }}>
-      <Text style={formSectionLabelStyle}>Задачи</Text>
+      <Text style={formSectionLabelStyle}>{t("goals.dialog.tasks_label")}</Text>
 
       {props.tasks.length === 0 ? (
-        <Text style={formHelperStyle}>Пока нет задач. Добавь первую ниже.</Text>
+        <Text style={formHelperStyle}>{t("goals.dialog.empty_tasks")}</Text>
       ) : (
         props.tasks.map((task) => (
           <View
@@ -121,15 +134,15 @@ export function TasksSection(props: {
           >
             <Text style={{ color: appPalette.semantic.textStrong, fontWeight: "600", fontFamily: "Montserrat" }}>{task.title}</Text>
             <ActionChip onPress={() => props.onRemoveTask(task.id)} tone="danger">
-              Удалить задачу
+              {t("common.delete")}
             </ActionChip>
           </View>
         ))
       )}
 
-      <FieldInput label="Новая задача" value={props.newTaskTitle} onChangeText={props.onChangeNewTaskTitle} placeholder="Например, читать 20 минут" />
+      <FieldInput label={t("goals.dialog.task_placeholder")} value={props.newTaskTitle} onChangeText={props.onChangeNewTaskTitle} placeholder={t("goals.dialog.task_placeholder")} />
       <ActionChip onPress={props.onAddTask} tone="primary">
-        Добавить задачу
+        {t("common.add")}
       </ActionChip>
     </View>
   );

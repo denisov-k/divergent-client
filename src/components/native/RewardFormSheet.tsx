@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+п»їimport { useEffect, useState } from "react";
 import { View } from "react-native";
 import { useTranslation } from "react-i18next";
 
@@ -78,8 +78,8 @@ export function RewardFormSheet({
     <FormSheetLayout
       open={open}
       onOpenChange={onOpenChange}
-      title={reward ? "Редактировать награду" : "Создать новую награду"}
-      subtitle="Создайте награду, которую можно получить за достижение определенного опыта"
+      title={reward ? t("rewards.dialog.edit_title") : t("rewards.dialog.create_title")}
+      subtitle={t("rewards.dialog.description")}
       footer={
         <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8 }}>
           {reward && (
@@ -89,14 +89,14 @@ export function RewardFormSheet({
           )}
           <ActionChip onPress={() => onOpenChange(false)}>{t("common.cancel")}</ActionChip>
           <ActionChip onPress={() => void handleSave()} tone="primary">
-            {isSubmitting ? t("common.sending") : reward ? t("common.save") : "Создать награду"}
+            {isSubmitting ? t("common.sending") : reward ? t("common.save") : t("rewards.dialog.create_submit")}
           </ActionChip>
         </View>
       }
     >
-      <FieldInput label="Название награды *" value={title} onChangeText={setTitle} placeholder="Например: Мастер привычек" />
-      <FieldInput label="Описание *" value={description} onChangeText={setDescription} placeholder="За что даётся награда..." />
-      <FieldInput label="Требуется XP *" value={xpRequires} onChangeText={setXpRequires} placeholder="100" />
+      <FieldInput label={t("rewards.dialog.title_label")} value={title} onChangeText={setTitle} placeholder={t("rewards.dialog.title_placeholder")} />
+      <FieldInput label={t("rewards.dialog.description_label")} value={description} onChangeText={setDescription} placeholder={t("rewards.dialog.description_placeholder")} />
+      <FieldInput label={t("rewards.dialog.xp_label")} value={xpRequires} onChangeText={setXpRequires} placeholder="100" />
       <RewardIconSection icon={icon} onChange={setIcon} />
       <RewardGoalSection goals={goals} goalId={goalId} onChange={setGoalId} />
     </FormSheetLayout>

@@ -1,4 +1,5 @@
 import { ScrollView, View } from "react-native";
+import { useTranslation } from "react-i18next";
 
 import { ScreenHeader } from "@/components/native/ScreenHeader";
 import {
@@ -13,6 +14,7 @@ import { useSettingsScreen } from "@/shared/screens/settings/useSettingsScreen";
 import { appPalette } from "@/theme/palette";
 
 export default function NativeSettingsScreen() {
+  const { t } = useTranslation();
   const {
     user,
     formData,
@@ -36,7 +38,7 @@ export default function NativeSettingsScreen() {
 
   return (
     <View style={{ flex: 1, backgroundColor: appPalette.surface.background }}>
-      <ScreenHeader title="Настройки" subtitle="Профиль, язык, часовой пояс и вход." />
+      <ScreenHeader title={t("settings.title")} subtitle={t("settings.subtitle")} />
 
       <ScrollView contentContainerStyle={{ paddingHorizontal: 8, gap: 8 }}>
         <ProfileSection user={user} />
@@ -62,7 +64,7 @@ export default function NativeSettingsScreen() {
           success={success}
           isSubmitting={isSubmitting}
           onSetField={setField}
-          onSubmit={() => handleSettingsSubmit(submitCredentials, hasPassword)}
+          onSubmit={() => handleSettingsSubmit(submitCredentials, hasPassword, t)}
         />
         <SignOutSection
           onSignOut={async () => {

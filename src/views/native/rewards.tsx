@@ -1,4 +1,4 @@
-﻿import { Suspense, lazy, useEffect } from "react";
+import { Suspense, lazy, useEffect } from "react";
 import { Alert, Pressable, ScrollView, Text, View } from "react-native";
 import { useTranslation } from "react-i18next";
 
@@ -15,73 +15,46 @@ function SheetFallback() {
   return null;
 }
 
-export default function NativeRewardsScreen(props: {
-  rewardId?: string | null;
-  onConsumeLinkState?: () => void;
-}) {
+export default function NativeRewardsScreen(props: { rewardId?: string | null; onConsumeLinkState?: () => void }) {
   const { t } = useTranslation();
   const { challenges } = useAppStore();
   const { rewards, goals, rewardDialogOpen, editingReward, openCreateReward, openEditReward, saveReward, removeReward, closeRewardDialog } = useRewardsScreen();
 
   useEffect(() => {
-    if (!props.rewardId) {
-      return;
-    }
-
+    if (!props.rewardId) return;
     openEditReward(props.rewardId);
     props.onConsumeLinkState?.();
   }, [props.rewardId, props.onConsumeLinkState, openEditReward]);
 
   const handleDeleteReward = async (id: string) => {
     await removeReward(id);
-    Alert.alert("Готово", "Награда удалена");
+    Alert.alert(t("rewards.deleted_title"), t("rewards.deleted_description"));
   };
 
   return (
     <View style={{ flex: 1, backgroundColor: appPalette.surface.background }}>
       <View style={{ paddingHorizontal: 8, paddingVertical: 8, flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: 8, backgroundColor: appPalette.surface.background }}>
-        <Text style={{ fontSize: 19, fontWeight: "500", color: appPalette.semantic.textStrong, fontFamily: "Montserrat", lineHeight: 29 }}>
-          {t("rewards.title")}
-        </Text>
-
-        <Pressable
-          onPress={openCreateReward}
-          style={{
-            flexDirection: "row",
-            alignItems: "center",
-            gap: 8,
-            backgroundColor: appPalette.semantic.infoSurface,
-            borderWidth: 1,
-            borderColor: appPalette.semantic.infoBorder,
-            borderRadius: 10,
-            paddingHorizontal: 12,
-            paddingVertical: 10,
-          }}
-        >
+        <Text style={{ fontSize: 19, fontWeight: "500", color: appPalette.semantic.textStrong, fontFamily: "Montserrat", lineHeight: 29 }}>{t("rewards.title")}</Text>
+        <Pressable onPress={openCreateReward} style={{ flexDirection: "row", alignItems: "center", gap: 8, backgroundColor: appPalette.semantic.infoSurface, borderWidth: 1, borderColor: appPalette.semantic.infoBorder, borderRadius: 10, paddingHorizontal: 12, paddingVertical: 10 }}>
           <Plus size={16} color={appPalette.semantic.infoText} />
-          <Text style={{ color: appPalette.semantic.infoText, fontSize: 12, fontWeight: "500", lineHeight: 18, fontFamily: "Montserrat" }}>
-            {t("rewards.add")}
-          </Text>
+          <Text style={{ color: appPalette.semantic.infoText, fontSize: 12, fontWeight: "500", lineHeight: 18, fontFamily: "Montserrat" }}>{t("rewards.add")}</Text>
         </Pressable>
       </View>
 
       <ScrollView contentContainerStyle={{ paddingHorizontal: 8, gap: 8 }}>
         {rewards.length === 0 ? (
-          <EmptyStateCard title="Пока нет наград" description="Создайте первую награду" actionLabel="Создать первую награду" onAction={openCreateReward} />
+          <EmptyStateCard title={t("rewards.empty_title")} description={t("rewards.empty_description")} actionLabel={t("common.create_first_reward")} onAction={openCreateReward} />
         ) : (
           rewards.map((reward) => {
             const goal = goals.find((item) => item.id === reward.goalId);
             const challenge = goal?.challengeId ? challenges.find((item) => item.id === goal.challengeId) : undefined;
-
             return <NativeRewardCardView key={reward.id} reward={reward} goal={goal} challenge={challenge} onEdit={openEditReward} />;
           })
         )}
       </ScrollView>
 
       <Suspense fallback={<SheetFallback />}>
-        {rewardDialogOpen && (
-          <RewardFormSheet open={rewardDialogOpen} reward={editingReward} goals={goals} onOpenChange={closeRewardDialog} onSave={saveReward} onDelete={handleDeleteReward} />
-        )}
+        {rewardDialogOpen && <RewardFormSheet open={rewardDialogOpen} reward={editingReward} goals={goals} onOpenChange={closeRewardDialog} onSave={saveReward} onDelete={handleDeleteReward} />}
       </Suspense>
     </View>
   );

@@ -1,4 +1,4 @@
-﻿import { lazy, Suspense } from "react";
+import { lazy, Suspense } from "react";
 import { Plus } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useSearchParams } from "react-router-dom";
@@ -34,7 +34,7 @@ export default function RewardsScreen() {
 
   const handleSaveReward = async (...args: Parameters<typeof saveReward>) => {
     const result = await saveReward(...args);
-    toast.success(result.status === "updated" ? "РќР°РіСЂР°РґР° РѕР±РЅРѕРІР»РµРЅР°" : "РќР°РіСЂР°РґР° СЃРѕР·РґР°РЅР°");
+    toast.success(result.status === "updated" ? t("rewards.updated") : t("rewards.created"));
   };
 
   const handleDeleteReward = async (id: string) => {
@@ -54,10 +54,10 @@ export default function RewardsScreen() {
       {rewards.length === 0 ? (
         <Card>
           <CardContent className="flex flex-col items-center justify-center py-12">
-            <p className="mb-4 text-muted-foreground">РЈ РІР°СЃ РїРѕРєР° РЅРµС‚ РЅР°РіСЂР°Рґ</p>
+            <p className="mb-4 text-muted-foreground">{t("rewards.empty_title")}</p>
             <Button onClick={openCreateReward}>
               <Plus className="mr-2 size-4" />
-              РЎРѕР·РґР°С‚СЊ РїРµСЂРІСѓСЋ РЅР°РіСЂР°РґСѓ
+              {t("common.create_first_reward")}
             </Button>
           </CardContent>
         </Card>
@@ -90,5 +90,4 @@ export default function RewardsScreen() {
     </div>
   );
 }
-
 

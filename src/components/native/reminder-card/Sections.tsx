@@ -6,7 +6,7 @@ import { buildNativeRouteUrl } from "@/platform/appUrl.native";
 import { appPalette } from "@/theme/palette";
 import type { Goal, Reminder, Task } from "@/types";
 
-import { formatReminderDayLabel, ReminderAction, ReminderBadge, ReminderSwitch } from "./Primitives";
+import { ReminderAction, ReminderBadge, ReminderSwitch, useReminderDayFormatter } from "./Primitives";
 
 function openGoal(goalId?: string) {
   if (!goalId) {
@@ -56,6 +56,7 @@ export function ReminderRepeatSection({
 }: {
   reminder: Reminder;
 }) {
+  const formatReminderDayLabel = useReminderDayFormatter();
   const hasDays = reminder.daysOfWeek.length > 0;
   const hasDates = reminder.daysOfMonth.length > 0;
 
@@ -100,3 +101,4 @@ export function ReminderLinksSection({
     </View>
   );
 }
+

@@ -1,4 +1,4 @@
-﻿import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Calendar, Users, Edit, Share, ChevronUp, ChevronDown, DoorOpen, Swords } from "lucide-react";
 import type { Challenge, Leader } from "@/types";
@@ -226,7 +226,7 @@ export function ChallengeCard({
                 onClick={(e) => onGoalClick(e, goal.id)}
               >
                 <span className="truncate">{goal.title}</span>
-                {goal.lastCompletedAt && <Badge variant="secondary">✓</Badge>}
+                {goal.lastCompletedAt && <Badge variant="secondary">?</Badge>}
               </div>
             ))}
           </CollapsibleContent>
@@ -277,7 +277,7 @@ export function ChallengeCard({
 
         <div className="flex justify-between rounded-md border p-2 text-sm font-medium">
           <span>{t("challenges.participation_cost")}</span>
-          <span>{challenge.price ? `${challenge.price} руб.` : t("challenges.free")}</span>
+          <span>{challenge.price ? `${challenge.price} ${t("common.rubles_short")}` : t("challenges.free")}</span>
         </div>
 
         <div className="flex justify-center gap-2">
@@ -312,9 +312,9 @@ export function ChallengeCard({
           <div className="flex items-center gap-1 text-muted-foreground">
             <Calendar className="size-4" />
             <span>
-              {challenge.startsAt ? format(new Date(challenge.startsAt), "dd.MM.yyyy") : "—"}
-              {" → "}
-              {challenge.endsAt ? format(new Date(challenge.endsAt), "dd.MM.yyyy") : "—"}
+              {challenge.startsAt ? format(new Date(challenge.startsAt), "dd.MM.yyyy") : "�"}
+              {" > "}
+              {challenge.endsAt ? format(new Date(challenge.endsAt), "dd.MM.yyyy") : "�"}
             </span>
           </div>
 
@@ -327,3 +327,4 @@ export function ChallengeCard({
     </Card>
   );
 }
+

@@ -111,13 +111,10 @@ export function ChallengeGoalsSection({
                 backgroundColor: focused ? appPalette.semantic.infoSurfaceStrong : appPalette.surface.background,
               }}
             >
-              <Text
-                style={{ flex: 1, color: appPalette.semantic.textStrong, fontSize: 12, fontWeight: "400", lineHeight: 18, fontFamily: "Montserrat" }}
-                numberOfLines={2}
-              >
+              <Text style={{ flex: 1, color: appPalette.semantic.textStrong, fontSize: 12, fontWeight: "400", lineHeight: 18, fontFamily: "Montserrat" }} numberOfLines={2}>
                 {goal.title}
               </Text>
-              {goalCompleted(goal) && <ChallengeCardBadge>✓</ChallengeCardBadge>}
+              {goalCompleted(goal) && <ChallengeCardBadge>?</ChallengeCardBadge>}
             </Pressable>
           ))}
         </View>
@@ -225,7 +222,7 @@ export function ChallengePriceSection({
       }}
     >
       <Text style={{ color: appPalette.semantic.textStrong, fontSize: 12, fontWeight: "500", lineHeight: 18, fontFamily: "Montserrat" }}>{t("challenges.participation_cost")}</Text>
-      <Text style={{ color: appPalette.semantic.textStrong, fontSize: 12, fontWeight: "500", lineHeight: 18, fontFamily: "Montserrat" }}>{price ? `${price} руб.` : t("challenges.free")}</Text>
+      <Text style={{ color: appPalette.semantic.textStrong, fontSize: 12, fontWeight: "500", lineHeight: 18, fontFamily: "Montserrat" }}>{price ? `${price} ${t("common.rubles_short")}` : t("challenges.free")}</Text>
     </View>
   );
 }
@@ -270,7 +267,7 @@ export function ChallengeFooter({
       <View style={{ flexDirection: "row", alignItems: "center", gap: 6, flex: 1 }}>
         <Calendar size={14} color={appPalette.semantic.textSubtle} />
         <Text style={{ color: appPalette.semantic.textMuted, fontSize: 12, fontWeight: "400", lineHeight: 18, fontFamily: "Montserrat", flex: 1 }}>
-          {formatChallengeDate(challenge.startsAt)} {" → "} {formatChallengeDate(challenge.endsAt)}
+          {formatChallengeDate(challenge.startsAt)} {" > "} {formatChallengeDate(challenge.endsAt)}
         </Text>
       </View>
       <View style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>

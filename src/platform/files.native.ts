@@ -2,6 +2,7 @@
 import { File, Paths } from "expo-file-system";
 import { isAvailableAsync, shareAsync } from "expo-sharing";
 
+import i18n from "@/i18n";
 import Config from "@/services/Config";
 import type { Report } from "@/types";
 
@@ -38,18 +39,21 @@ export async function downloadReportFile(report: Report) {
     const canShare = await isAvailableAsync();
 
     if (!canShare) {
-      Alert.alert("Sharing unavailable", "This device cannot open the native share sheet right now.");
+      Alert.alert(
+        i18n.t("common.sharing_unavailable_title"),
+        i18n.t("common.sharing_unavailable_description"),
+      );
       return;
     }
 
     await shareAsync(file.uri, {
       mimeType: report.fileType || undefined,
-      dialogTitle: "Export report",
+      dialogTitle: i18n.t("common.export_report_title"),
     });
   } catch {
     Alert.alert(
-      "Cannot export report",
-      "The report could not be prepared for sharing on this device."
+      i18n.t("common.export_report_error_title"),
+      i18n.t("common.export_report_error_description"),
     );
   }
 }

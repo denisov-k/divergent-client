@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Alert, View } from "react-native";
+import { useTranslation } from "react-i18next";
 
 import { ActionChip } from "@/components/native/ActionChip";
 import { FieldInput } from "@/components/native/FieldInput";
@@ -32,6 +33,7 @@ export function ReminderFormSheet({
   onDelete: (id: string) => Promise<boolean>;
   initialGoalId?: string;
 }) {
+  const { t } = useTranslation();
   const [title, setTitle] = useState("");
   const [time, setTime] = useState("09:00");
   const [mode, setMode] = useState<ReminderMode>("week");
@@ -77,24 +79,22 @@ export function ReminderFormSheet({
   };
 
   const toggleMonthDay = (value: number) => {
-    setSelectedDaysOfMonth((current) =>
-      current.includes(value) ? current.filter((item) => item !== value) : [...current, value],
-    );
+    setSelectedDaysOfMonth((current) => (current.includes(value) ? current.filter((item) => item !== value) : [...current, value]));
   };
 
   const handleSave = async () => {
     if (!title.trim()) {
-      Alert.alert("Нужно название", "Укажи название напоминания.");
+      Alert.alert(t("reminders.dialog.title_label"), t("reminders.dialog.title_placeholder"));
       return;
     }
 
     if (mode === "week" && selectedDays.length === 0) {
-      Alert.alert("Выбери дни", "Добавь хотя бы один день недели.");
+      Alert.alert(t("reminders.dialog.mode_week"), t("common.every_day"));
       return;
     }
 
     if (mode === "month" && selectedDaysOfMonth.length === 0) {
-      Alert.alert("Выбери даты", "Добавь хотя бы одно число месяца.");
+      Alert.alert(t("reminders.dialog.mode_month"), t("common.every_month_day"));
       return;
     }
 
@@ -121,10 +121,10 @@ export function ReminderFormSheet({
       return;
     }
 
-    Alert.alert("Удалить напоминание?", "Оно исчезнет из текущего графика.", [
-      { text: "Отмена", style: "cancel" },
+    Alert.alert(t("common.delete"), t("reminders.deleted_description"), [
+      { text: t("common.cancel"), style: "cancel" },
       {
-        text: "Удалить",
+        text: t("common.delete"),
         style: "destructive",
         onPress: () => {
           void onDelete(reminder.id).then((ok) => {
@@ -141,24 +141,24 @@ export function ReminderFormSheet({
     <FormSheetLayout
       open={open}
       onOpenChange={onOpenChange}
-      title={reminder ? "Редактировать напоминание" : "Новое напоминание"}
-      subtitle="Полноценная mobile-форма для reminder flow."
+      title={reminder ? t("reminders.dialog.edit_title") : t("reminders.dialog.create_title")}
+      subtitle={t("reminders.dialog.description")}
       footer={
         <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8 }}>
           {!!reminder && (
             <ActionChip onPress={handleDelete} tone="danger">
-              Удалить
+              {t("common.delete")}
             </ActionChip>
           )}
-          <ActionChip onPress={() => onOpenChange(false)}>Отмена</ActionChip>
+          <ActionChip onPress={() => onOpenChange(false)}>{t("common.cancel")}</ActionChip>
           <ActionChip onPress={() => void handleSave()} tone="primary">
-            {isSubmitting ? "Сохраняем..." : reminder ? "Сохранить" : "Создать"}
+            {isSubmitting ? t("common.saving") : reminder ? t("common.save") : t("common.create")}
           </ActionChip>
         </View>
       }
     >
-      <FieldInput label="Название" value={title} onChangeText={setTitle} placeholder="Например, утренняя зарядка" />
-      <FieldInput label="Время" value={time} onChangeText={setTime} placeholder="09:00" />
+      <FieldInput label={t("common.title")} value={title} onChangeText={setTitle} placeholder={t("reminders.dialog.title_placeholder")} />
+      <FieldInput label={t("common.time")} value={time} onChangeText={setTime} placeholder="09:00" />
       <ReminderModeSection mode={mode} onChange={setMode} />
       <ReminderScheduleSection
         mode={mode}
@@ -169,13 +169,7 @@ export function ReminderFormSheet({
         onSelectAllWeek={() => setSelectedDays(WEEK_DAYS.map((day) => day.key))}
         onSelectAllMonth={() => setSelectedDaysOfMonth(MONTH_DAYS)}
       />
-      <ReminderGoalSection
-        goals={goals}
-        goalId={goalId}
-        initialGoalId={initialGoalId}
-        onChangeGoalId={setGoalId}
-        onResetTask={() => setTaskId(undefined)}
-      />
+      <ReminderGoalSection goals={goals} goalId={goalId} initialGoalId={initialGoalId} onChangeGoalId={setGoalId} onResetTask={() => setTaskId(undefined)} />
       {goalId && availableTasks.length === 0 && <EmptyTasksHint />}
       <ReminderTaskSection visible={!!goalId && availableTasks.length > 0} availableTasks={availableTasks} taskId={taskId} onChangeTaskId={setTaskId} />
       <ReminderStateSection isActive={isActive} onChange={setIsActive} />

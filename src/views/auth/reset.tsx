@@ -1,4 +1,5 @@
 import { type ChangeEvent, useEffect, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { z, ZodError } from 'zod'
 
@@ -31,6 +32,7 @@ const confirmResetSchema = z.object({
 })
 
 export default function Reset() {
+  const { t } = useTranslation()
   const [searchParams] = useSearchParams();
   const resetToken = searchParams.get('token');
   const [formData, setFormData] = useState({
@@ -143,7 +145,7 @@ export default function Reset() {
                 onChange={handleChange}
                 required={!resetToken}
                 disabled={Boolean(resetToken)}
-                placeholder="you@example.com"
+                placeholder={t("auth.email_placeholder")}
                 aria-invalid={Boolean(errors.email)}
                 className="h-11 border-border bg-input-background text-foreground placeholder:text-muted-foreground"
               />
@@ -160,7 +162,7 @@ export default function Reset() {
                       New password
                     </label>
                     <span className="text-xs text-muted-foreground">
-                      8+ chars, upper/lowercase and number
+                      {t("auth.password_create_placeholder")}
                     </span>
                   </div>
                   <Input
@@ -170,7 +172,7 @@ export default function Reset() {
                     value={formData.password}
                     onChange={handleChange}
                     required
-                    placeholder="Create a new password"
+                    placeholder={t("auth.new_password_placeholder")}
                     aria-invalid={Boolean(errors.password)}
                     className="h-11 border-border bg-input-background text-foreground placeholder:text-muted-foreground"
                   />
@@ -190,7 +192,7 @@ export default function Reset() {
                     value={formData.confirmPassword}
                     onChange={handleChange}
                     required
-                    placeholder="Repeat the new password"
+                    placeholder={t("auth.confirm_password_placeholder")}
                     aria-invalid={Boolean(errors.confirmPassword)}
                     className="h-11 border-border bg-input-background text-foreground placeholder:text-muted-foreground"
                   />

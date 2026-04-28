@@ -4,6 +4,7 @@ import { Calendar, ChevronDown, ChevronRight, Plus, X } from "lucide-react";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import React, { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Task } from "@/types";
 
 import { startOfWeek, endOfWeek, startOfMonth, endOfMonth } from "date-fns";
@@ -82,6 +83,7 @@ export function TaskItem({
                            parentId,
                            disabled,
                          }: TaskItemProps) {
+  const { t } = useTranslation();
   const hasSubtasks = subtasks.length > 0;
   const [expandedTasks, setExpandedTasks] = useState<Record<string, boolean>>({});
 
@@ -163,7 +165,7 @@ export function TaskItem({
       {expanded && editMode && (
         <div className="flex gap-2 mt-2">
           <Input
-            placeholder="Подзадача"
+            placeholder={t("goals.subtask_placeholder")}
             value={newSubTaskTitles[id] || ""}
             onChange={(e) =>
               setNewSubTaskTitles({ ...newSubTaskTitles, [id]: e.target.value })
@@ -178,7 +180,7 @@ export function TaskItem({
           <Input
             type="number"
             min={0}
-            placeholder="XP"
+            placeholder={t("common.xp")}
             className="w-24"
             value={newSubTaskXps[id] || ""}
             onChange={(e) =>

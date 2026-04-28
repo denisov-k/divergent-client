@@ -1,45 +1,34 @@
-﻿import { useEffect, useMemo, useState } from "react";
-
+import { useEffect, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import dayjs from "dayjs";
 
 import { useAppStore } from "@/stores/useAppStore";
 import type { GoalActivity } from "@/types";
 
 export function useProgressScreen(goalId?: string | null) {
+  const { t } = useTranslation();
   const { user, goals, rewards, categories, getActivity, getGoalXp } = useAppStore();
 
   const [xp, setXp] = useState<number>(0);
   const [activity, setActivity] = useState<GoalActivity>();
   const [loadingActivity, setLoadingActivity] = useState(false);
 
-  const selectedGoal = useMemo(
-    () => goals.find((goal) => goal.id === goalId),
-    [goals, goalId]
-  );
+  const selectedGoal = useMemo(() => goals.find((goal) => goal.id === goalId), [goals, goalId]);
+  const filteredGoals = useMemo(() => (selectedGoal ? [selectedGoal] : goals), [selectedGoal, goals]);
 
-  const filteredGoals = useMemo(
-    () => (selectedGoal ? [selectedGoal] : goals),
-    [selectedGoal, goals]
-  );
-
-  const completedGoals = filteredGoals.filter(
-    (goal) => goal.tasks?.length && goal.tasks.every((task) => !!task.lastCompletedAt)
-  ).length;
+  const completedGoals = filteredGoals.filter((goal) => goal.tasks?.length && goal.tasks.every((task) => !!task.lastCompletedAt)).length;
 
   const categoryData = useMemo(() => {
     const categoryMap: Record<string, number> = {};
 
     filteredGoals.forEach((goal) => {
-      const categoryLabel =
-        categories.find((category) => category.value === goal.category)?.label || "Без категории";
+      const categoryLabel = categories.find((category) => category.value === goal.category)?.label || t("progress.no_category");
 
-      categoryMap[categoryLabel] =
-        (categoryMap[categoryLabel] || 0) +
-        (goal.tasks?.filter((task) => !!task.lastCompletedAt).length || 0);
+      categoryMap[categoryLabel] = (categoryMap[categoryLabel] || 0) + (goal.tasks?.filter((task) => !!task.lastCompletedAt).length || 0);
     });
 
     return Object.entries(categoryMap).map(([name, value]) => ({ name, value }));
-  }, [filteredGoals, categories]);
+  }, [filteredGoals, categories, t]);
 
   const weeklyXpData = useMemo(() => {
     if (!activity) {

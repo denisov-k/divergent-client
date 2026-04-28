@@ -60,7 +60,7 @@ export function ProgressStreakSection({
   return (
     <SurfaceCard gap={16} padding={16} radius={12}>
       <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
-        <Text style={{ color: appPalette.semantic.textStrong, fontSize: 14, fontWeight: "500", lineHeight: 20, fontFamily: "Montserrat" }}>Серия выполнений</Text>
+        <Text style={{ color: appPalette.semantic.textStrong, fontSize: 14, fontWeight: "500", lineHeight: 20, fontFamily: "Montserrat" }}>{t("progress.streaks_title")}</Text>
         <Flame size={20} color={appPalette.semantic.warningStrong} />
       </View>
 
@@ -83,7 +83,7 @@ export function ProgressStreakSection({
       </View>
 
       <View style={{ gap: 8 }}>
-        <Text style={{ color: appPalette.semantic.textMuted, fontSize: 12, fontWeight: "400", lineHeight: 18, fontFamily: "Montserrat" }}>Последние 7 дней</Text>
+        <Text style={{ color: appPalette.semantic.textMuted, fontSize: 12, fontWeight: "400", lineHeight: 18, fontFamily: "Montserrat" }}>{t("progress.last_7_days")}</Text>
         <View style={{ flexDirection: "row", gap: 8 }}>
           {days.map((day, index) => (
             <View key={index} style={{ flex: 1, alignItems: "center", gap: 6 }}>
@@ -218,3 +218,4 @@ export function ProgressGoalPickerModal({
     </Modal>
   );
 }
+

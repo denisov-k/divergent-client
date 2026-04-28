@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Alert, View } from "react-native";
+import { useTranslation } from "react-i18next";
 
 import { ActionChip } from "@/components/native/ActionChip";
 import { FieldInput } from "@/components/native/FieldInput";
@@ -32,6 +33,7 @@ export function GoalFormSheet({
   onSave: (data: GoalFormData) => Promise<unknown>;
   onDelete: (id: string) => Promise<boolean>;
 }) {
+  const { t } = useTranslation();
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [category, setCategory] = useState(categories[0]?.value ?? "personal");
@@ -101,12 +103,12 @@ export function GoalFormSheet({
 
   const handleSave = async () => {
     if (!title.trim()) {
-      Alert.alert("Нужно название", "Укажи название цели.");
+      Alert.alert(t("goals.dialog.title_label"), t("goals.dialog.title_placeholder"));
       return;
     }
 
     if (goalType === "TASK" && tasks.length === 0) {
-      Alert.alert("Добавь задачу", "Для task-цели нужна хотя бы одна задача.");
+      Alert.alert(t("goals.dialog.tasks_label"), t("goals.dialog.empty_tasks"));
       return;
     }
 
@@ -140,10 +142,10 @@ export function GoalFormSheet({
       return;
     }
 
-    Alert.alert("Удалить цель?", "Это действие нельзя быстро отменить.", [
-      { text: "Отмена", style: "cancel" },
+    Alert.alert(t("common.delete"), t("goals.dialog.edit_title"), [
+      { text: t("common.cancel"), style: "cancel" },
       {
-        text: "Удалить",
+        text: t("common.delete"),
         style: "destructive",
         onPress: () => {
           void onDelete(goal.id).then((ok) => {
@@ -160,44 +162,33 @@ export function GoalFormSheet({
     <FormSheetLayout
       open={open}
       onOpenChange={onOpenChange}
-      title={goal ? "Редактировать цель" : "Новая цель"}
-      subtitle="Базовая mobile-форма поверх общего goal screen layer."
+      title={goal ? t("goals.dialog.edit_title") : t("goals.dialog.create_title")}
+      subtitle={t("goals.dialog.description")}
       footer={
         <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8 }}>
           {!!goal && (
             <ActionChip onPress={handleDelete} tone="danger">
-              Удалить
+              {t("common.delete")}
             </ActionChip>
           )}
-          <ActionChip onPress={() => onOpenChange(false)}>Отмена</ActionChip>
+          <ActionChip onPress={() => onOpenChange(false)}>{t("common.cancel")}</ActionChip>
           <ActionChip onPress={() => void handleSave()} tone="primary">
-            {isSubmitting ? "Сохраняем..." : goal ? "Сохранить" : "Создать"}
+            {isSubmitting ? t("common.saving") : goal ? t("common.save") : t("common.create")}
           </ActionChip>
         </View>
       }
     >
-      <FieldInput label="Название" value={title} onChangeText={setTitle} placeholder="Например, 12 книг за год" />
-      <FieldInput label="Описание" value={description} onChangeText={setDescription} placeholder="Коротко опиши цель" />
+      <FieldInput label={t("common.title")} value={title} onChangeText={setTitle} placeholder={t("goals.dialog.title_placeholder")} />
+      <FieldInput label={t("common.description")} value={description} onChangeText={setDescription} placeholder={t("goals.dialog.description_placeholder")} />
       <GoalTypeSection goalType={goalType} onChange={setGoalType} />
       <GoalPeriodSection goalPeriod={goalPeriod} onChange={setGoalPeriod} />
-      <FieldInput label="Срок (YYYY-MM-DD)" value={dueDate} onChangeText={setDueDate} placeholder="2026-05-01" />
+      <FieldInput label={t("goals.dialog.due_date_label")} value={dueDate} onChangeText={setDueDate} placeholder="2026-05-01" />
       <CategorySection categories={categories} category={category} onChange={setCategory} />
       <RewardSection rewards={rewards} activeRewardId={activeRewardId} onChange={setSelectedRewardId} />
       {goalType === "PROGRESS" ? (
-        <ProgressFieldsSection
-          currentValue={currentValue}
-          targetValue={targetValue}
-          onChangeCurrentValue={setCurrentValue}
-          onChangeTargetValue={setTargetValue}
-        />
+        <ProgressFieldsSection currentValue={currentValue} targetValue={targetValue} onChangeCurrentValue={setCurrentValue} onChangeTargetValue={setTargetValue} />
       ) : (
-        <TasksSection
-          tasks={tasks}
-          newTaskTitle={newTaskTitle}
-          onChangeNewTaskTitle={setNewTaskTitle}
-          onAddTask={addTask}
-          onRemoveTask={removeTask}
-        />
+        <TasksSection tasks={tasks} newTaskTitle={newTaskTitle} onChangeNewTaskTitle={setNewTaskTitle} onAddTask={addTask} onRemoveTask={removeTask} />
       )}
     </FormSheetLayout>
   );

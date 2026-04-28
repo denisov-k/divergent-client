@@ -1,4 +1,6 @@
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
+
 import {
   Dialog,
   DialogContent,
@@ -18,9 +20,7 @@ import { Plus } from "lucide-react";
 import { Separator } from "./ui/separator";
 
 import type { CategoryType } from "@/shared/domain";
-import {useTranslation} from "react-i18next";
-import {GoalFormData, Goal, CategoryOption, Task, Reward, GoalPeriod, GoalType} from "@/types";
-
+import type { GoalFormData, Goal, CategoryOption, Task, Reward, GoalPeriod, GoalType } from "@/types";
 
 interface GoalDialogProps {
   open: boolean;
@@ -34,38 +34,28 @@ interface GoalDialogProps {
 }
 
 export function GoalDialog({
-                             open,
-                             onOpenChange,
-                             onSave,
-                             onDelete,
-                             goal,
-                             categories,
-                             rewards,
-                             onAddCategory: onAddCategoryProp,
-                           }: GoalDialogProps) {
+  open,
+  onOpenChange,
+  onSave,
+  onDelete,
+  goal,
+  categories,
+  rewards,
+  onAddCategory: onAddCategoryProp,
+}: GoalDialogProps) {
+  const { t } = useTranslation();
   const [title, setTitle] = useState(goal?.title || "");
   const [description, setDescription] = useState(goal?.description || "");
   const [category, setCategory] = useState<CategoryType>(goal?.category || "personal");
-  const [dueDate, setDueDate] = useState<Date | undefined>(
-    goal?.dueDate ? new Date(goal.dueDate) : undefined
-  );
-  const [xpReward, setXpReward] = useState(goal?.xpReward?.toString() || "");
+  const [dueDate, setDueDate] = useState<Date | undefined>(goal?.dueDate ? new Date(goal.dueDate) : undefined);
   const [tasks, setTasks] = useState<Task[]>(goal?.tasks || []);
   const [newTaskTitle, setNewTaskTitle] = useState("");
-  const [newTaskXp, setNewTaskXp] = useState("");
-  const [rewardId, setRewardId] = useState(
-    rewards.find((r) => r.goalId === goal?.id)?.id || "none"
-  );
-
-  const { t } = useTranslation();
-
+  const [rewardId, setRewardId] = useState(rewards.find((r) => r.goalId === goal?.id)?.id || "none");
   const [isCreatingCategory, setIsCreatingCategory] = useState(false);
   const [newCategoryName, setNewCategoryName] = useState("");
   const [expandedTasks, setExpandedTasks] = useState<Record<string, boolean>>({});
-
   const [newSubTaskTitles, setNewSubTaskTitles] = useState<Record<string, string>>({});
   const [newSubTaskXps, setNewSubTaskXps] = useState<Record<string, string>>({});
-
   const [goalType, setGoalType] = useState<GoalType>(goal?.goalType || "TASK");
   const [goalPeriod, setGoalPeriod] = useState<GoalPeriod>(goal?.goalPeriod || "NONE");
   const [numericTarget, setNumericTarget] = useState(goal?.targetValue?.toString() || "");
@@ -77,27 +67,12 @@ export function GoalDialog({
       setDescription(goal.description || "");
       setCategory(goal.category || "personal");
       setDueDate(goal.dueDate ? new Date(goal.dueDate) : undefined);
-      setXpReward(goal.xpReward?.toString() || "");
-
       setGoalType(goal.goalType || "TASK");
       setGoalPeriod(goal.goalPeriod || "NONE");
-
-      setNumericTarget(
-        goal.targetValue !== undefined && goal.targetValue !== null
-          ? goal.targetValue.toString()
-          : ""
-      );
-
-      setNumericCurrent(
-        goal.currentValue !== undefined && goal.currentValue !== null
-          ? goal.currentValue.toString()
-          : ""
-      );
-
+      setNumericTarget(goal.targetValue !== undefined && goal.targetValue !== null ? goal.targetValue.toString() : "");
+      setNumericCurrent(goal.currentValue !== undefined && goal.currentValue !== null ? goal.currentValue.toString() : "");
       setTasks(goal.tasks || []);
-      setRewardId(
-        rewards.find((r) => r.goalId === goal.id)?.id || "none"
-      );
+      setRewardId(rewards.find((r) => r.goalId === goal.id)?.id || "none");
     } else {
       resetForm();
     }
@@ -108,17 +83,13 @@ export function GoalDialog({
     setDescription("");
     setCategory("personal");
     setDueDate(undefined);
-    setXpReward("");
     setTasks([]);
     setRewardId("none");
-
     setGoalType("TASK");
     setGoalPeriod("NONE");
     setNumericTarget("");
     setNumericCurrent("");
-
     setNewTaskTitle("");
-    setNewTaskXp("");
     setIsCreatingCategory(false);
     setNewCategoryName("");
     setExpandedTasks({});
@@ -136,8 +107,7 @@ export function GoalDialog({
     setIsCreatingCategory(false);
   };
 
-  const generateId = () => Date.now().toString() + Math.random().toString(36).substr(2, 5);
-
+  const generateId = () => Date.now().toString() + Math.random().toString(36).slice(2, 7);
 
   const handleAddTask = () => {
     if (!newTaskTitle.trim()) return;
@@ -146,18 +116,16 @@ export function GoalDialog({
       id: generateId(),
       title: newTaskTitle,
       lastCompletedAt: "",
-      xpReward: newTaskXp ? parseInt(newTaskXp) : undefined,
       parentId: null,
       subtasks: [],
     };
 
     setTasks([...tasks, newTask]);
     setNewTaskTitle("");
-    setNewTaskXp("");
   };
 
-  function addSubtaskRecursive(tasks: Task[], parentId: string, subtask: Task): Task[] {
-    return tasks.map(task => {
+  function addSubtaskRecursive(currentTasks: Task[], parentId: string, subtask: Task): Task[] {
+    return currentTasks.map((task) => {
       if (task.id === parentId) {
         return {
           ...task,
@@ -177,33 +145,25 @@ export function GoalDialog({
   }
 
   const handleAddSubTask = (parentId: string) => {
-    const title = newSubTaskTitles[parentId];
-    if (!title?.trim()) return;
-
-    const xp = newSubTaskXps[parentId]
-      ? parseInt(newSubTaskXps[parentId])
-      : undefined;
+    const subtaskTitle = newSubTaskTitles[parentId];
+    if (!subtaskTitle?.trim()) return;
 
     const newSubTask: Task = {
       id: generateId(),
-      title,
+      title: subtaskTitle,
       lastCompletedAt: "",
-      xpReward: xp,
       parentId,
       subtasks: [],
     };
 
-    setTasks(prev =>
-      addSubtaskRecursive(prev, parentId, newSubTask)
-    );
-
-    setExpandedTasks(prev => ({ ...prev, [parentId]: true }));
-    setNewSubTaskTitles(prev => ({ ...prev, [parentId]: "" }));
-    setNewSubTaskXps(prev => ({ ...prev, [parentId]: "" }));
+    setTasks((prev) => addSubtaskRecursive(prev, parentId, newSubTask));
+    setExpandedTasks((prev) => ({ ...prev, [parentId]: true }));
+    setNewSubTaskTitles((prev) => ({ ...prev, [parentId]: "" }));
+    setNewSubTaskXps((prev) => ({ ...prev, [parentId]: "" }));
   };
 
-  function removeTaskRecursive(tasks: Task[], idToRemove: string): Task[] {
-    return tasks
+  function removeTaskRecursive(currentTasks: Task[], idToRemove: string): Task[] {
+    return currentTasks
       .filter((task) => task.id !== idToRemove)
       .map((task) => ({
         ...task,
@@ -215,14 +175,12 @@ export function GoalDialog({
     setTasks((prev) => removeTaskRecursive(prev, id));
   };
 
-  function toggleTaskRecursive(tasks: Task[], taskId: string): Task[] {
-    return tasks.map(task => {
+  function toggleTaskRecursive(currentTasks: Task[], taskId: string): Task[] {
+    return currentTasks.map((task) => {
       if (task.id === taskId) {
         return {
           ...task,
-          lastCompletedAt: task.lastCompletedAt
-            ? "" // снять отметку
-            : new Date().toISOString(), // поставить отметку сейчас
+          lastCompletedAt: task.lastCompletedAt ? "" : new Date().toISOString(),
         };
       }
 
@@ -238,7 +196,7 @@ export function GoalDialog({
   }
 
   const handleToggleTask = (id: string) => {
-    setTasks(prev => toggleTaskRecursive(prev, id));
+    setTasks((prev) => toggleTaskRecursive(prev, id));
   };
 
   const toggleExpand = (id: string) => {
@@ -254,22 +212,11 @@ export function GoalDialog({
       goalType,
       goalPeriod,
       tasks: goalType === "TASK" ? tasks : [],
-
-      targetValue:
-        goalType === "PROGRESS" && numericTarget
-          ? parseInt(numericTarget)
-          : undefined,
-
-      currentValue:
-        goalType === "PROGRESS" && numericCurrent
-          ? parseInt(numericCurrent)
-          : undefined,
+      targetValue: goalType === "PROGRESS" && numericTarget ? parseInt(numericTarget, 10) : undefined,
+      currentValue: goalType === "PROGRESS" && numericCurrent ? parseInt(numericCurrent, 10) : undefined,
       dueDate: dueDate
-        ? dueDate.getFullYear() + "-" +
-        String(dueDate.getMonth() + 1).padStart(2, "0") + "-" +
-        String(dueDate.getDate()).padStart(2, "0")
+        ? dueDate.getFullYear() + "-" + String(dueDate.getMonth() + 1).padStart(2, "0") + "-" + String(dueDate.getDate()).padStart(2, "0")
         : undefined,
-      xpReward: xpReward ? parseInt(xpReward) : undefined,
       rewardId: rewardId === "none" ? null : rewardId,
     };
 
@@ -298,28 +245,26 @@ export function GoalDialog({
     >
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>{goal ? "Редактировать цель" : "Создать новую цель"}</DialogTitle>
-          <DialogDescription>
-            Заполните информацию о цели и добавьте задачи для её достижения
-          </DialogDescription>
+          <DialogTitle>{goal ? t("goals.dialog.edit_title") : t("goals.dialog.create_title")}</DialogTitle>
+          <DialogDescription>{t("goals.dialog.description")}</DialogDescription>
         </DialogHeader>
 
         <div className="space-y-4 py-4">
           <div className="space-y-2">
-            <Label htmlFor="title">Название цели *</Label>
+            <Label htmlFor="title">{t("goals.dialog.title_label")}</Label>
             <Input
               id="title"
-              placeholder="Например: Прочитать 12 книг за год"
+              placeholder={t("goals.dialog.title_placeholder")}
               value={title}
               onChange={(e) => setTitle(e.target.value)}
             />
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="description">Описание</Label>
+            <Label htmlFor="description">{t("goals.dialog.description_label")}</Label>
             <Textarea
               id="description"
-              placeholder="Опишите вашу цель подробнее..."
+              placeholder={t("goals.dialog.description_placeholder")}
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               rows={3}
@@ -328,46 +273,36 @@ export function GoalDialog({
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label>Период</Label>
+              <Label>{t("goals.dialog.period_label")}</Label>
               <Select value={goalPeriod} onValueChange={(v: GoalPeriod) => setGoalPeriod(v)}>
                 <SelectTrigger>
-                  <SelectValue/>
+                  <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="NONE">Нет</SelectItem>
-                  <SelectItem value="DAILY">День</SelectItem>
-                  <SelectItem value="WEEKLY">Неделя</SelectItem>
-                  <SelectItem value="MONTHLY">Месяц</SelectItem>
+                  <SelectItem value="NONE">{t("goals.dialog.period_none")}</SelectItem>
+                  <SelectItem value="DAILY">{t("goals.dialog.period_day")}</SelectItem>
+                  <SelectItem value="WEEKLY">{t("goals.dialog.period_week")}</SelectItem>
+                  <SelectItem value="MONTHLY">{t("goals.dialog.period_month")}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="dueDate">Срок выполнения</Label>
-              <DatePickerInput
-                value={dueDate}
-                onChange={setDueDate}
-              />
+              <Label htmlFor="dueDate">{t("goals.dialog.due_date_label")}</Label>
+              <DatePickerInput value={dueDate} onChange={setDueDate} />
             </div>
           </div>
+
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <Label htmlFor="category">Категория *</Label>
+              <Label htmlFor="category">{t("goals.dialog.category_label")}</Label>
               {!isCreatingCategory ? (
-                <Button
-                  variant="link"
-                  className="h-auto p-0 text-xs"
-                  onClick={() => setIsCreatingCategory(true)}
-                >
-                  + Создать
+                <Button variant="link" className="h-auto p-0 text-xs" onClick={() => setIsCreatingCategory(true)}>
+                  {t("goals.dialog.create_category")}
                 </Button>
               ) : (
-                <Button
-                  variant="link"
-                  className="h-auto p-0 text-xs"
-                  onClick={() => setIsCreatingCategory(false)}
-                >
-                  Отмена
+                <Button variant="link" className="h-auto p-0 text-xs" onClick={() => setIsCreatingCategory(false)}>
+                  {t("goals.dialog.cancel_category")}
                 </Button>
               )}
             </div>
@@ -375,22 +310,18 @@ export function GoalDialog({
             {isCreatingCategory ? (
               <div className="flex gap-2">
                 <Input
-                  placeholder="Название категории"
+                  placeholder={t("goals.dialog.category_placeholder")}
                   value={newCategoryName}
                   onChange={(e) => setNewCategoryName(e.target.value)}
                 />
-                <Button
-                  type="button"
-                  onClick={handleAddCategory}
-                  disabled={!newCategoryName.trim()}
-                >
+                <Button type="button" onClick={handleAddCategory} disabled={!newCategoryName.trim()}>
                   OK
                 </Button>
               </div>
             ) : (
               <Select value={category} onValueChange={(value) => setCategory(value)}>
                 <SelectTrigger id="category">
-                  <SelectValue/>
+                  <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
                   {categories.map((option) => (
@@ -402,26 +333,28 @@ export function GoalDialog({
               </Select>
             )}
           </div>
+
           <div className="space-y-2">
-            <Label>Тип цели</Label>
+            <Label>{t("goals.dialog.goal_type_label")}</Label>
             <Select value={goalType} onValueChange={(v: GoalType) => setGoalType(v)}>
               <SelectTrigger>
-                <SelectValue/>
+                <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="TASK">Задачи</SelectItem>
-                <SelectItem value="PROGRESS">Числовая цель</SelectItem>
+                <SelectItem value="TASK">{t("goals.dialog.goal_type_tasks")}</SelectItem>
+                <SelectItem value="PROGRESS">{t("goals.dialog.goal_type_progress")}</SelectItem>
               </SelectContent>
             </Select>
           </div>
+
           <div className="space-y-2">
-            <Label htmlFor="reward">Награда за цель</Label>
+            <Label htmlFor="reward">{t("goals.dialog.reward_label")}</Label>
             <Select value={rewardId} onValueChange={(value) => setRewardId(value)}>
               <SelectTrigger id="reward">
-                <SelectValue placeholder="Выберите награду"/>
+                <SelectValue placeholder={t("goals.dialog.reward_placeholder")} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="none">Без награды</SelectItem>
+                <SelectItem value="none">{t("common.no_reward")}</SelectItem>
                 {rewards.map((reward) => (
                   <SelectItem key={reward.id} value={reward.id}>
                     {reward.title}
@@ -431,111 +364,78 @@ export function GoalDialog({
             </Select>
           </div>
 
-          {/*<div className="space-y-2">
-            <Label htmlFor="xpReward">Награда за цель (XP)</Label>
-            <Input
-              id="xpReward"
-              type="number"
-              min={0}
-              placeholder="1000"
-              value={xpReward}
-              onChange={(e) => setXpReward(e.target.value)}
-            />
-          </div>*/}
-
-
-          <Separator/>
+          <Separator />
 
           {goalType === "PROGRESS" && (
             <div className="space-y-2">
-              <Label>Текущий прогресс</Label>
-              <Input
-                type="number"
-                min={0}
-                value={numericCurrent}
-                onChange={(e) => setNumericCurrent(e.target.value)}
-              />
+              <Label>{t("goals.dialog.current_progress")}</Label>
+              <Input type="number" min={0} value={numericCurrent} onChange={(e) => setNumericCurrent(e.target.value)} />
 
-              <Label>Целевое значение</Label>
-              <Input
-                type="number"
-                min={1}
-                value={numericTarget}
-                onChange={(e) => setNumericTarget(e.target.value)}
-              />
+              <Label>{t("goals.dialog.target_value")}</Label>
+              <Input type="number" min={1} value={numericTarget} onChange={(e) => setNumericTarget(e.target.value)} />
             </div>
           )}
 
-          {goalType === "TASK" && (<div className="space-y-3">
-            <Label>Задачи для достижения цели</Label>
+          {goalType === "TASK" && (
+            <div className="space-y-3">
+              <Label>{t("goals.dialog.tasks_label")}</Label>
 
-            {tasks.map((task) => (
-              <TaskItem
-                key={task.id}
-                id={task.id}
-                title={task.title}
-                lastCompletedAt={task.lastCompletedAt}
-                editMode={true}
-                xpReward={task.xpReward}
-                dueDate={task.dueDate}
-                subtasks={task.subtasks} // Task[], а не TaskItemProps[]
-                expanded={expandedTasks[task.id]}
-                onToggle={handleToggleTask}
-                onRemove={handleRemoveTask}
-                onToggleExpand={toggleExpand}
-                newSubTaskTitles={newSubTaskTitles}
-                newSubTaskXps={newSubTaskXps}
-                setNewSubTaskTitles={setNewSubTaskTitles}
-                setNewSubTaskXps={setNewSubTaskXps}
-                handleAddSubTask={handleAddSubTask}
-                goalPeriod={goalPeriod ?? "NONE"}
-              />
-            ))}
+              {tasks.map((task) => (
+                <TaskItem
+                  key={task.id}
+                  id={task.id}
+                  title={task.title}
+                  lastCompletedAt={task.lastCompletedAt}
+                  editMode
+                  xpReward={task.xpReward}
+                  dueDate={task.dueDate}
+                  subtasks={task.subtasks}
+                  expanded={expandedTasks[task.id]}
+                  onToggle={handleToggleTask}
+                  onRemove={handleRemoveTask}
+                  onToggleExpand={toggleExpand}
+                  newSubTaskTitles={newSubTaskTitles}
+                  newSubTaskXps={newSubTaskXps}
+                  setNewSubTaskTitles={setNewSubTaskTitles}
+                  setNewSubTaskXps={setNewSubTaskXps}
+                  handleAddSubTask={handleAddSubTask}
+                  goalPeriod={goalPeriod ?? "NONE"}
+                />
+              ))}
 
-            <div className="flex gap-2 mt-2">
-              <Input
-                placeholder="Название задачи"
-                value={newTaskTitle}
-                onChange={(e) => setNewTaskTitle(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") {
-                    e.preventDefault();
-                    handleAddTask();
-                  }
-                }}
-              />
-              <Input
-                type="number"
-                min={0}
-                placeholder="XP"
-                className="w-24"
-                value={newTaskXp}
-                onChange={(e) => setNewTaskXp(e.target.value)}
-              />
-              <Button type="button" onClick={() => handleAddTask()} size="icon">
-                <Plus className="size-4"/>
-              </Button>
+              <div className="mt-2 flex gap-2">
+                <Input
+                  placeholder={t("goals.dialog.task_placeholder")}
+                  value={newTaskTitle}
+                  onChange={(e) => setNewTaskTitle(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      e.preventDefault();
+                      handleAddTask();
+                    }
+                  }}
+                />
+                <Button type="button" onClick={() => handleAddTask()} size="icon">
+                  <Plus className="size-4" />
+                </Button>
+              </div>
+
+              {tasks.length === 0 && <p className="py-4 text-center text-muted-foreground">{t("goals.dialog.empty_tasks")}</p>}
             </div>
-
-            {tasks.length === 0 && (
-              <p className="text-muted-foreground text-center py-4">
-                Добавьте задачи для вашей цели
-              </p>
-            )}
-          </div>)}
+          )}
         </div>
 
         <DialogFooter>
-          {goal &&
-            <Button variant="destructive" onClick={() => handleDelete(goal!.id)}>
-              {t('common.delete')}
+          {goal && (
+            <Button variant="destructive" onClick={() => handleDelete(goal.id)}>
+              {t("common.delete")}
             </Button>
-          }
+          )}
           <Button variant="outline" onClick={handleClose}>
-            {t('common.cancel')}
+            {t("common.cancel")}
           </Button>
           <Button onClick={handleSave} disabled={!title}>
-            {goal ? t('common.save') : t('common.create')}
+            {goal ? t("common.save") : t("common.create")}
           </Button>
         </DialogFooter>
       </DialogContent>

@@ -1,4 +1,5 @@
 import { type ChangeEvent, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { z, ZodError } from 'zod'
 
@@ -26,6 +27,7 @@ const signUpSchema = z.object({
 
 
 export default function SignUp() {
+  const { t } = useTranslation()
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -120,7 +122,7 @@ export default function SignUp() {
                 type="text"
                 value={formData.name}
                 onChange={handleChange}
-                placeholder="Your name"
+                placeholder={t("auth.your_name")}
                 aria-invalid={Boolean(errors.name)}
                 className="h-11 border-border bg-input-background text-foreground placeholder:text-muted-foreground"
               />
@@ -140,7 +142,7 @@ export default function SignUp() {
                 value={formData.email}
                 onChange={handleChange}
                 required
-                placeholder="you@example.com"
+                placeholder={t("auth.email_placeholder")}
                 aria-invalid={Boolean(errors.email)}
                 className="h-11 border-border bg-input-background text-foreground placeholder:text-muted-foreground"
               />
@@ -155,7 +157,7 @@ export default function SignUp() {
                   Password
                 </label>
                 <span className="text-xs text-muted-foreground">
-                  8+ chars, upper/lowercase and number
+                  {t("auth.password_create_placeholder")}
                 </span>
               </div>
               <Input
@@ -165,7 +167,7 @@ export default function SignUp() {
                 value={formData.password}
                 onChange={handleChange}
                 required
-                placeholder="Create a password"
+                placeholder={t("auth.password_create_placeholder")}
                 aria-invalid={Boolean(errors.password)}
                 className="h-11 border-border bg-input-background text-foreground placeholder:text-muted-foreground"
               />

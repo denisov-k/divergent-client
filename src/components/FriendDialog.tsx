@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -14,6 +15,7 @@ export function FriendDialog({
   onOpenChange: (open: boolean) => void;
   onSave: (friend: FriendInput) => Promise<unknown>;
 }) {
+  const { t } = useTranslation();
   const [name, setName] = useState("");
   const [level, setLevel] = useState("1");
   const [currentXp, setCurrentXp] = useState("0");
@@ -53,47 +55,35 @@ export function FriendDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Добавить друга</DialogTitle>
-          <DialogDescription>Быстрая форма для social-layer без web-only заглушек.</DialogDescription>
+          <DialogTitle>{t("frens.dialog_title")}</DialogTitle>
+          <DialogDescription>{t("frens.dialog_description")}</DialogDescription>
         </DialogHeader>
 
         <div className="space-y-4">
           <div className="space-y-2">
-            <label className="text-sm font-medium">Имя</label>
-            <Input value={name} onChange={(event) => setName(event.target.value)} placeholder="Например, Алина" />
+            <label className="text-sm font-medium">{t("common.name")}</label>
+            <Input value={name} onChange={(event) => setName(event.target.value)} placeholder={t("frens.name_placeholder")} />
           </div>
 
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-2">
-              <label className="text-sm font-medium">Уровень</label>
-              <Input
-                type="number"
-                min={1}
-                value={level}
-                onChange={(event) => setLevel(event.target.value)}
-                placeholder="1"
-              />
+              <label className="text-sm font-medium">{t("profile.level")}</label>
+              <Input type="number" min={1} value={level} onChange={(event) => setLevel(event.target.value)} placeholder="1" />
             </div>
 
             <div className="space-y-2">
               <label className="text-sm font-medium">XP</label>
-              <Input
-                type="number"
-                min={0}
-                value={currentXp}
-                onChange={(event) => setCurrentXp(event.target.value)}
-                placeholder="0"
-              />
+              <Input type="number" min={0} value={currentXp} onChange={(event) => setCurrentXp(event.target.value)} placeholder="0" />
             </div>
           </div>
         </div>
 
         <DialogFooter>
           <Button variant="outline" onClick={() => onOpenChange(false)}>
-            Отмена
+            {t("common.cancel")}
           </Button>
           <Button onClick={() => void handleSave()} disabled={isSubmitting || !name.trim()}>
-            {isSubmitting ? "Создаём..." : "Добавить"}
+            {isSubmitting ? t("frens.creating") : t("frens.add_submit")}
           </Button>
         </DialogFooter>
       </DialogContent>

@@ -1,4 +1,5 @@
 import { Text, View } from "react-native";
+import { useTranslation } from "react-i18next";
 
 import { ActionChip } from "@/components/native/ActionChip";
 import { SectionTabs } from "@/components/native/SectionTabs";
@@ -8,11 +9,13 @@ import type { Goal, Task } from "@/types";
 import { MONTH_DAYS, type ReminderMode, WEEK_DAYS } from "./constants";
 
 export function ReminderModeSection(props: { mode: ReminderMode; onChange: (value: ReminderMode) => void }) {
+  const { t } = useTranslation();
+
   return (
     <View style={{ gap: 8 }}>
-      <Text style={formSectionLabelStyle}>Режим</Text>
+      <Text style={formSectionLabelStyle}>{t("common.mode")}</Text>
       <SectionTabs
-        tabs={[{ key: "week", label: "Дни недели" }, { key: "month", label: "Числа месяца" }]}
+        tabs={[{ key: "week", label: t("reminders.dialog.mode_week") }, { key: "month", label: t("reminders.dialog.mode_month") }]}
         activeTab={props.mode}
         onChange={(value) => props.onChange(value as ReminderMode)}
       />
@@ -29,10 +32,12 @@ export function ReminderScheduleSection(props: {
   onSelectAllWeek: () => void;
   onSelectAllMonth: () => void;
 }) {
+  const { t } = useTranslation();
+
   if (props.mode === "week") {
     return (
       <View style={{ gap: 8 }}>
-        <Text style={formSectionLabelStyle}>Дни недели</Text>
+        <Text style={formSectionLabelStyle}>{t("reminders.dialog.mode_week")}</Text>
         <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8 }}>
           {WEEK_DAYS.map((day) => (
             <ActionChip key={day.key} onPress={() => props.onToggleWeekDay(day.key)} tone={props.selectedDays.includes(day.key) ? "primary" : "secondary"}>
@@ -40,14 +45,14 @@ export function ReminderScheduleSection(props: {
             </ActionChip>
           ))}
         </View>
-        <ActionChip onPress={props.onSelectAllWeek}>Каждый день</ActionChip>
+        <ActionChip onPress={props.onSelectAllWeek}>{t("common.every_day")}</ActionChip>
       </View>
     );
   }
 
   return (
     <View style={{ gap: 8 }}>
-      <Text style={formSectionLabelStyle}>Числа месяца</Text>
+      <Text style={formSectionLabelStyle}>{t("reminders.dialog.mode_month")}</Text>
       <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8 }}>
         {MONTH_DAYS.map((day) => (
           <ActionChip key={day} onPress={() => props.onToggleMonthDay(day)} tone={props.selectedDaysOfMonth.includes(day) ? "primary" : "secondary"}>
@@ -55,7 +60,7 @@ export function ReminderScheduleSection(props: {
           </ActionChip>
         ))}
       </View>
-      <ActionChip onPress={props.onSelectAllMonth}>Каждый день месяца</ActionChip>
+      <ActionChip onPress={props.onSelectAllMonth}>{t("common.every_month_day")}</ActionChip>
     </View>
   );
 }
@@ -67,9 +72,11 @@ export function ReminderGoalSection(props: {
   onChangeGoalId: (goalId: string | undefined) => void;
   onResetTask: () => void;
 }) {
+  const { t } = useTranslation();
+
   return (
     <View style={{ gap: 8 }}>
-      <Text style={formSectionLabelStyle}>Привязка к цели</Text>
+      <Text style={formSectionLabelStyle}>{t("reminders.dialog.bind_goal")}</Text>
       <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8 }}>
         <ActionChip
           onPress={() => {
@@ -78,7 +85,7 @@ export function ReminderGoalSection(props: {
           }}
           tone={!props.goalId ? "primary" : "secondary"}
         >
-          Без привязки
+          {t("reminders.dialog.goal_none")}
         </ActionChip>
         {props.goals.map((goal) => (
           <ActionChip
@@ -103,16 +110,18 @@ export function ReminderTaskSection(props: {
   taskId?: string;
   onChangeTaskId: (taskId: string | undefined) => void;
 }) {
+  const { t } = useTranslation();
+
   if (!props.visible) {
     return null;
   }
 
   return (
     <View style={{ gap: 8 }}>
-      <Text style={formSectionLabelStyle}>Привязка к задаче</Text>
+      <Text style={formSectionLabelStyle}>{t("reminders.dialog.bind_task")}</Text>
       <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8 }}>
         <ActionChip onPress={() => props.onChangeTaskId(undefined)} tone={!props.taskId ? "primary" : "secondary"}>
-          Без задачи
+          {t("reminders.dialog.task_none")}
         </ActionChip>
         {props.availableTasks.map((task) => (
           <ActionChip key={task.id} onPress={() => props.onChangeTaskId(task.id)} tone={props.taskId === task.id ? "primary" : "secondary"}>
@@ -125,11 +134,13 @@ export function ReminderTaskSection(props: {
 }
 
 export function ReminderStateSection(props: { isActive: boolean; onChange: (value: boolean) => void }) {
+  const { t } = useTranslation();
+
   return (
     <View style={{ gap: 8 }}>
-      <Text style={formSectionLabelStyle}>Состояние</Text>
+      <Text style={formSectionLabelStyle}>{t("common.status")}</Text>
       <SectionTabs
-        tabs={[{ key: "active", label: "Активно" }, { key: "paused", label: "Выключено" }]}
+        tabs={[{ key: "active", label: t("reminders.status_active") }, { key: "paused", label: t("reminders.status_disabled") }]}
         activeTab={props.isActive ? "active" : "paused"}
         onChange={(tab) => props.onChange(tab === "active")}
       />
@@ -138,5 +149,7 @@ export function ReminderStateSection(props: { isActive: boolean; onChange: (valu
 }
 
 export function EmptyTasksHint() {
-  return <Text style={formHelperStyle}>У выбранной цели пока нет задач для привязки.</Text>;
+  const { t } = useTranslation();
+  return <Text style={formHelperStyle}>{t("reminders.no_tasks_hint")}</Text>;
 }
+

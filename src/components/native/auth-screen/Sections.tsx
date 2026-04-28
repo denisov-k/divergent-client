@@ -1,4 +1,5 @@
-import { Linking, Text, View } from "react-native";
+п»їimport { Linking, Text, View } from "react-native";
+import { useTranslation } from "react-i18next";
 
 import { ActionChip } from "@/components/native/ActionChip";
 import { FieldInput } from "@/components/native/FieldInput";
@@ -10,15 +11,17 @@ import { appPalette } from "@/theme/palette";
 import { CardTitle, ErrorBanner, SuccessBanner } from "./Primitives";
 
 export function RuntimeNoticeSection() {
+  const { t } = useTranslation();
+
   if (platformCapabilities.telegramLogin) {
     return null;
   }
 
   return (
     <SurfaceCard>
-      <CardTitle>Возможности mobile runtime</CardTitle>
+      <CardTitle>{t("auth.runtime_title")}</CardTitle>
       <Text style={{ color: appPalette.semantic.textMuted, fontFamily: "Montserrat", fontSize: 12, lineHeight: 18 }}>
-        Telegram login сейчас остаётся web-only сценарием и не включён в standalone mobile runtime.
+        {t("auth.runtime_description")}
       </Text>
     </SurfaceCard>
   );
@@ -34,23 +37,25 @@ export function SignInSection(props: {
   onSubmit: () => Promise<void>;
   onOpenReset: () => void;
 }) {
+  const { t } = useTranslation();
+
   return (
     <SurfaceCard>
-      <CardTitle>Войти в аккаунт</CardTitle>
-      <FieldInput label="Email" value={props.email} onChangeText={props.onChangeEmail} placeholder="you@example.com" />
+      <CardTitle>{t("auth.signin_title")}</CardTitle>
+      <FieldInput label="Email" value={props.email} onChangeText={props.onChangeEmail} placeholder={t("auth.email_placeholder")} />
       <FieldInput
-        label="Password"
+        label={t("common.password")}
         value={props.password}
         onChangeText={props.onChangePassword}
-        placeholder="Enter your password"
+        placeholder={t("auth.password_placeholder")}
         secureTextEntry
       />
       <ErrorBanner message={props.error} />
       <View style={{ flexDirection: "row", gap: 8, flexWrap: "wrap" }}>
         <ActionChip onPress={() => void props.onSubmit()} tone="primary">
-          {props.loading ? "Signing in..." : "Sign in"}
+          {props.loading ? t("auth.signin_submitting") : t("auth.signin_submit")}
         </ActionChip>
-        <ActionChip onPress={props.onOpenReset}>Reset password</ActionChip>
+        <ActionChip onPress={props.onOpenReset}>{t("auth.reset_password")}</ActionChip>
       </View>
     </SurfaceCard>
   );
@@ -68,24 +73,26 @@ export function SignUpSection(props: {
   onSubmit: () => Promise<void>;
   onOpenSignIn: () => void;
 }) {
+  const { t } = useTranslation();
+
   return (
     <SurfaceCard>
-      <CardTitle>Создать аккаунт</CardTitle>
-      <FieldInput label="Name" value={props.name} onChangeText={props.onChangeName} placeholder="Your name" />
-      <FieldInput label="Email" value={props.email} onChangeText={props.onChangeEmail} placeholder="you@example.com" />
+      <CardTitle>{t("auth.signup_title")}</CardTitle>
+      <FieldInput label={t("common.name")} value={props.name} onChangeText={props.onChangeName} placeholder={t("auth.your_name")} />
+      <FieldInput label="Email" value={props.email} onChangeText={props.onChangeEmail} placeholder={t("auth.email_placeholder")} />
       <FieldInput
-        label="Password"
+        label={t("common.password")}
         value={props.password}
         onChangeText={props.onChangePassword}
-        placeholder="8+ chars, upper/lowercase and number"
+        placeholder={t("auth.password_create_placeholder")}
         secureTextEntry
       />
       <ErrorBanner message={props.error} />
       <View style={{ flexDirection: "row", gap: 8, flexWrap: "wrap" }}>
         <ActionChip onPress={() => void props.onSubmit()} tone="primary">
-          {props.loading ? "Creating..." : "Create account"}
+          {props.loading ? t("auth.signup_submitting") : t("auth.signup_submit")}
         </ActionChip>
-        <ActionChip onPress={props.onOpenSignIn}>Already have account</ActionChip>
+        <ActionChip onPress={props.onOpenSignIn}>{t("auth.already_have_account")}</ActionChip>
       </View>
     </SurfaceCard>
   );
@@ -110,33 +117,35 @@ export function ResetSection(props: {
   onSubmitConfirm: () => Promise<void>;
   onBackToSignIn: () => void;
 }) {
+  const { t } = useTranslation();
+
   return (
     <SurfaceCard>
-      <CardTitle>Reset password</CardTitle>
+      <CardTitle>{t("auth.reset_title")}</CardTitle>
       <SectionTabs
         tabs={[
-          { key: "request", label: "Запрос" },
-          { key: "confirm", label: "Подтверждение" },
+          { key: "request", label: t("auth.reset_request_tab") },
+          { key: "confirm", label: t("auth.reset_confirm_tab") },
         ]}
         activeTab={props.resetMode}
         onChange={(value) => props.onChangeMode(value as "request" | "confirm")}
       />
-      <FieldInput label="Email" value={props.email} onChangeText={props.onChangeEmail} placeholder="you@example.com" />
+      <FieldInput label="Email" value={props.email} onChangeText={props.onChangeEmail} placeholder={t("auth.email_placeholder")} />
       {props.resetMode === "confirm" && (
         <>
-          <FieldInput label="Reset token" value={props.token} onChangeText={props.onChangeToken} placeholder="Paste token from the link" />
+          <FieldInput label={t("auth.reset_confirm_tab")} value={props.token} onChangeText={props.onChangeToken} placeholder={t("auth.reset_token_placeholder")} />
           <FieldInput
-            label="New password"
+            label={t("common.new_password")}
             value={props.password}
             onChangeText={props.onChangePassword}
-            placeholder="Create a new password"
+            placeholder={t("auth.new_password_placeholder")}
             secureTextEntry
           />
           <FieldInput
-            label="Confirm password"
+            label={t("common.confirm_password")}
             value={props.confirmPassword}
             onChangeText={props.onChangeConfirmPassword}
-            placeholder="Repeat the new password"
+            placeholder={t("auth.confirm_password_placeholder")}
             secureTextEntry
           />
         </>
@@ -148,20 +157,20 @@ export function ResetSection(props: {
           <Text style={{ color: appPalette.semantic.successText, fontFamily: "Montserrat", fontSize: 12, lineHeight: 18 }} selectable>
             {props.resetUrl}
           </Text>
-          <ActionChip onPress={() => void Linking.openURL(props.resetUrl!)}>Open reset link</ActionChip>
+          <ActionChip onPress={() => void Linking.openURL(props.resetUrl!)}>{t("common.open")}</ActionChip>
         </View>
       )}
       <View style={{ flexDirection: "row", gap: 8, flexWrap: "wrap" }}>
         {props.resetMode === "request" ? (
           <ActionChip onPress={() => void props.onSubmitRequest()} tone="primary">
-            {props.loading ? "Submitting..." : "Request reset"}
+            {props.loading ? t("auth.reset_request_submitting") : t("auth.reset_request_submit")}
           </ActionChip>
         ) : (
           <ActionChip onPress={() => void props.onSubmitConfirm()} tone="primary">
-            {props.loading ? "Saving..." : "Save new password"}
+            {props.loading ? t("auth.reset_confirm_submitting") : t("auth.reset_confirm_submit")}
           </ActionChip>
         )}
-        <ActionChip onPress={props.onBackToSignIn}>Back to sign in</ActionChip>
+        <ActionChip onPress={props.onBackToSignIn}>{t("auth.back_to_signin")}</ActionChip>
       </View>
     </SurfaceCard>
   );

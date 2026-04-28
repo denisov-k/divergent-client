@@ -1,4 +1,4 @@
-﻿import type {
+import type {
   CategoryType,
   RewardIconType as SharedRewardIconType,
 } from "@/shared/domain";
@@ -13,13 +13,13 @@ export enum UserRole {
 }
 
 export const DAYS_OF_WEEK = [
-  { key: "mon", label: "РџРЅ" },
-  { key: "tue", label: "Р’С‚" },
-  { key: "wed", label: "РЎСЂ" },
-  { key: "thu", label: "Р§С‚" },
-  { key: "fri", label: "РџС‚" },
-  { key: "sat", label: "РЎР±" },
-  { key: "sun", label: "Р’СЃ" },
+  { key: "mon", label: "��" },
+  { key: "tue", label: "��" },
+  { key: "wed", label: "��" },
+  { key: "thu", label: "��" },
+  { key: "fri", label: "��" },
+  { key: "sat", label: "��" },
+  { key: "sun", label: "��" },
 ] as const;
 
 export const DAYS_OF_MONTH = Array.from({ length: 31 }, (_, i) => i + 1);

@@ -1,14 +1,13 @@
-import {
+﻿import {
   AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
   AlertDialogContent,
-  AlertDialogHeader,
-  AlertDialogTitle,
   AlertDialogDescription,
   AlertDialogFooter,
-  AlertDialogCancel,
-  AlertDialogAction,
+  AlertDialogHeader,
+  AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-
 import { useTranslation } from "react-i18next";
 
 interface LeaveChallengeDialogProps {
@@ -18,10 +17,10 @@ interface LeaveChallengeDialogProps {
 }
 
 export function LeaveChallengeDialog({
-                                       open,
-                                       onOpenChange,
-                                       onConfirm,
-                                     }: LeaveChallengeDialogProps) {
+  open,
+  onOpenChange,
+  onConfirm,
+}: LeaveChallengeDialogProps) {
   const { t } = useTranslation();
 
   const handleConfirm = async () => {
@@ -33,26 +32,17 @@ export function LeaveChallengeDialog({
     <AlertDialog open={open} onOpenChange={onOpenChange}>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>
-            {t("challenges.leave_confirm_title")}
-          </AlertDialogTitle>
-
-          <AlertDialogDescription>
-            {t(
-              "challenges.leave_confirm_description")}
-          </AlertDialogDescription>
+          <AlertDialogTitle>{t("challenges.leave_confirm_title")}</AlertDialogTitle>
+          <AlertDialogDescription>{t("challenges.leave_confirm_description")}</AlertDialogDescription>
         </AlertDialogHeader>
 
         <AlertDialogFooter>
-          <AlertDialogCancel>
-            {t("common.cancel", "Отмена")}
-          </AlertDialogCancel>
-
+          <AlertDialogCancel>{t("common.cancel")}</AlertDialogCancel>
           <AlertDialogAction
             onClick={handleConfirm}
             className="bg-destructive text-white hover:bg-destructive/90"
           >
-            {t("challenges.leave", "Покинуть")}
+            {t("challenges.leave")}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
