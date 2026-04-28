@@ -11,6 +11,7 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "./ui/collap
 import { useTranslation } from "react-i18next";
 import { DateTime } from "luxon";
 
+import { formatGoalDate, getGoalPeriodTranslationKey } from "@/shared/display/goals";
 import { Challenge, GoalPeriod, GoalType, Reward, Task } from "@/types";
 import { useNavigate } from "react-router-dom";
 import { useAppStore } from "@/stores/useAppStore.ts";
@@ -98,11 +99,10 @@ export function GoalCard({ id, title, description, category, tasks, challenge, g
 
   const handleToggleExpand = (taskId: string) => setExpandedTasks({ ...expandedTasks, [taskId]: !expandedTasks[taskId] });
   const handleAddSubTask = (parentId: string) => {
-    console.log("Add subtask to", parentId, newSubTaskTitles[parentId], newSubTaskXps[parentId]);
     setNewSubTaskTitles({ ...newSubTaskTitles, [parentId]: "" });
     setNewSubTaskXps({ ...newSubTaskXps, [parentId]: "" });
   };
-  const handleRemoveTask = (taskId: string, parentId?: string) => console.log("Remove task", taskId, "parent:", parentId);
+  const handleRemoveTask = (_taskId: string, _parentId?: string) => undefined;
 
   function hasChallengeStartedForUser(challengeStart: Date, userTimeZone: string) {
     if (!challengeStart) return true;
@@ -148,7 +148,8 @@ export function GoalCard({ id, title, description, category, tasks, challenge, g
     }
   }, [autoExpand, goalType]);
 
-  const periodLabel = goalPeriod === "DAILY" ? t("goal_period.daily") : goalPeriod === "WEEKLY" ? t("goal_period.weekly") : goalPeriod === "MONTHLY" ? t("goal_period.monthly") : null;
+  const periodLabelKey = getGoalPeriodTranslationKey(goalPeriod);
+  const periodLabel = periodLabelKey ? t(periodLabelKey) : null;
 
   return (
     <Card className={`mb-2 break-inside-avoid hover:shadow-md transition-all border ${highlight ? "bg-blue-50" : "bg-white"}`} ref={cardRef}>
@@ -199,7 +200,7 @@ export function GoalCard({ id, title, description, category, tasks, challenge, g
           <div className="flex gap-2 flex-col break-inside-avoid">
             {periodLabel && <Badge variant="outline">{periodLabel}</Badge>}
             {isFromChallenge && challenge && <div className="flex items-center flex-wrap justify-start mb-auto"><Badge className="cursor-pointer bg-orange-500 text-white hover:bg-orange-400" onClick={() => navigate({ pathname: "/challenges", search: `?id=${challenge.id}` })} title={t("goals.go_to_challenge")}><Swords size={14} className="shrink-0" />{challenge.title}</Badge></div>}
-            {dueDate && <div className="flex items-center gap-1 text-muted-foreground"><Calendar className="size-4" /><span className="whitespace-nowrap">{new Date(dueDate).toISOString().split("T")[0]}</span></div>}
+            {dueDate && <div className="flex items-center gap-1 text-muted-foreground"><Calendar className="size-4" /><span className="whitespace-nowrap">{formatGoalDate(dueDate)}</span></div>}
           </div>
           {reward && <div className="flex items-center flex-wrap justify-end mb-auto break-inside-avoid"><div className="flex flex-wrap justify-center"><Badge className="bg-green-500 cursor-pointer hover:bg-green-400" onClick={() => navigate({ pathname: "/rewards", search: `?id=${reward.id}` })} title={t("goals.go_to_reward")}><Gift size={14} />{reward.title}</Badge></div></div>}
         </div>

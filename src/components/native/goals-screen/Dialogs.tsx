@@ -1,0 +1,77 @@
+import { Suspense, lazy } from "react";
+
+import type { CategoryOption, Goal, GoalFormData, ReportUploadPayload, Reward } from "@/types";
+
+const AiChatSheet = lazy(() =>
+  import("@/components/native/AiChatSheet").then((m) => ({ default: m.AiChatSheet })),
+);
+const CreateReportSheet = lazy(() =>
+  import("@/components/native/CreateReportSheet").then((m) => ({ default: m.CreateReportSheet })),
+);
+const GoalFormSheet = lazy(() =>
+  import("@/components/native/GoalFormSheet").then((m) => ({ default: m.GoalFormSheet })),
+);
+
+function SheetFallback() {
+  return null;
+}
+
+export function GoalsScreenDialogs({
+  createReportDialogOpen,
+  goalDialogOpen,
+  aiOpen,
+  editingGoal,
+  categories,
+  rewards,
+  onCreateReportDialogOpenChange,
+  onGoalDialogOpenChange,
+  onAiOpenChange,
+  onSaveReport,
+  onSaveGoal,
+  onDeleteGoal,
+  onDraftAdded,
+}: {
+  createReportDialogOpen: boolean;
+  goalDialogOpen: boolean;
+  aiOpen: boolean;
+  editingGoal?: Goal | null;
+  categories: CategoryOption[];
+  rewards: Reward[];
+  onCreateReportDialogOpenChange: (open: boolean) => void;
+  onGoalDialogOpenChange: (open: boolean) => void;
+  onAiOpenChange: (open: boolean) => void;
+  onSaveReport: (data: ReportUploadPayload) => Promise<boolean>;
+  onSaveGoal: (data: GoalFormData) => Promise<unknown>;
+  onDeleteGoal: (id: string) => Promise<boolean>;
+  onDraftAdded: (goal: Goal) => void;
+}) {
+  return (
+    <Suspense fallback={<SheetFallback />}>
+      {createReportDialogOpen && (
+        <CreateReportSheet
+          open={createReportDialogOpen}
+          onOpenChange={onCreateReportDialogOpenChange}
+          onSubmit={onSaveReport}
+        />
+      )}
+      {goalDialogOpen && (
+        <GoalFormSheet
+          open={goalDialogOpen}
+          goal={editingGoal ?? undefined}
+          categories={categories}
+          rewards={rewards}
+          onOpenChange={onGoalDialogOpenChange}
+          onSave={onSaveGoal}
+          onDelete={onDeleteGoal}
+        />
+      )}
+      {aiOpen && (
+        <AiChatSheet
+          open={aiOpen}
+          onOpenChange={onAiOpenChange}
+          onDraftAdded={onDraftAdded}
+        />
+      )}
+    </Suspense>
+  );
+}

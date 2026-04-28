@@ -18,9 +18,7 @@ export type CreateLinkResponse = Record<string, unknown>;
 const transport = new ServiceTransport();
 async function callApi<T>(label: string, fn: () => Promise<AxiosResponse<T> | T>): Promise<AxiosResponse<T> | T> {
   try {
-    const res = await fn();
-    console.log(`${label} response:`, res);
-    return res;
+    return await fn();
   } catch (err) {
     console.error(`${label} error:`, err);
     throw err;

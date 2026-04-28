@@ -23,6 +23,7 @@ import {
   Target,
 } from "@/components/native/icons";
 import { buildNativeRouteUrl } from "@/platform/appUrl.native";
+import { formatGoalDate } from "@/shared/display/goals";
 import { isTaskCompletedThisPeriod } from "@/shared/screens/goals/model";
 import type { CategoryType } from "@/shared/domain";
 import { appPalette } from "@/theme/palette";
@@ -214,7 +215,7 @@ export function GoalFooter({ goal, reward, cycleLabel }: { goal: Goal; reward?: 
         {!!goal.dueDate && (
           <View style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
             <Calendar size={14} color={appPalette.semantic.textSubtle} />
-            <Text style={{ color: appPalette.semantic.textMuted, fontSize: 12, fontWeight: "400", lineHeight: 18, fontFamily: "Montserrat" }}>{new Date(goal.dueDate).toISOString().split("T")[0]}</Text>
+            <Text style={{ color: appPalette.semantic.textMuted, fontSize: 12, fontWeight: "400", lineHeight: 18, fontFamily: "Montserrat" }}>{formatGoalDate(goal.dueDate)}</Text>
           </View>
         )}
       </View>

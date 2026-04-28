@@ -1,32 +1,13 @@
 import { useTranslation } from "react-i18next";
 import { Pressable, Text, View } from "react-native";
 
+import { formatReminderDayLabel } from "@/shared/display/reminders";
 import { appPalette } from "@/theme/palette";
 
 export function useReminderDayFormatter() {
   const { t } = useTranslation();
 
-  return (day: string) => {
-    const normalized = String(day).toLowerCase();
-    const mapping: Record<string, string> = {
-      mon: t("weekdays.mon"),
-      tue: t("weekdays.tue"),
-      wed: t("weekdays.wed"),
-      thu: t("weekdays.thu"),
-      fri: t("weekdays.fri"),
-      sat: t("weekdays.sat"),
-      sun: t("weekdays.sun"),
-      "1": t("weekdays.mon"),
-      "2": t("weekdays.tue"),
-      "3": t("weekdays.wed"),
-      "4": t("weekdays.thu"),
-      "5": t("weekdays.fri"),
-      "6": t("weekdays.sat"),
-      "7": t("weekdays.sun"),
-    };
-
-    return mapping[normalized] ?? day;
-  };
+  return (day: string) => formatReminderDayLabel(day, t);
 }
 
 export function ReminderBadge({

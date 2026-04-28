@@ -2,7 +2,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Calendar, Users, Edit, Share, ChevronUp, ChevronDown, DoorOpen, Swords } from "lucide-react";
 import type { Challenge, Leader } from "@/types";
-import { format } from "date-fns";
 import { ProgressRing } from "@/components/ProgressRing.tsx";
 import { Button } from "@/components/ui/button.tsx";
 import { Progress } from "@/components/ui/progress";
@@ -11,6 +10,12 @@ import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { buildGoalsPath } from "@/app/routes";
+import {
+  formatChallengeDate,
+  getChallengeDerivedState,
+  getChallengeStatusTranslationKey,
+  goalCompleted,
+} from "@/shared/display/challenges";
 import { useAppStore } from "@/stores/useAppStore.ts";
 import { MouseEvent as ReactMouseEvent } from "react";
 
@@ -45,63 +50,17 @@ export function ChallengeCard({
   const [leaderboard, setLeaderboard] = useState<Leader[]>([]);
 
   const { user, getLeaderboard } = useAppStore();
-  const isCreator = challenge.creatorId === user!.id;
   const navigate = useNavigate();
   const goals = challenge.goals;
-
-  const completedGoals = goals.filter((goal) => {
-    if (goal.goalType === "TASK") {
-      return !!goal.lastCompletedAt;
-    }
-
-    if (goal.goalType === "PROGRESS" && goal.targetValue && goal.targetValue > 0) {
-      return (goal.currentValue ?? 0) >= goal.targetValue;
-    }
-
-    return false;
-  }).length;
-
-  const progress =
-    goals.length === 0
-      ? 0
-      : goals.reduce((sum, goal) => {
-          if (goal.goalType === "TASK") {
-            return sum + (goal.lastCompletedAt ? 1 : 0);
-          }
-
-          if (goal.goalType === "PROGRESS" && goal.targetValue && goal.targetValue > 0) {
-            const value = Math.min(goal.currentValue ?? 0, goal.targetValue);
-            return sum + value / goal.targetValue;
-          }
-
-          return sum;
-        }, 0) / goals.length;
-
-  const getGoalStatus = (goal: (typeof goals)[0]) => {
-    return goal.lastCompletedAt ? "COMPLETED" : "NOT_COMPLETED";
-  };
-
-  const isParticipant = challenge.participants.some((participant) => participant.userId === user!.id);
-  const allGoalsCompleted = goals.every((goal) => getGoalStatus(goal) === "COMPLETED");
-
-  let challengeStatus: "COMPLETED" | "FAILED" | "ACTIVE";
-
-  const now = new Date();
-  const challengeStart = challenge.startsAt ? new Date(challenge.startsAt) : null;
-  const challengeEnd = challenge.endsAt ? new Date(challenge.endsAt) : null;
-
-  const hasStarted = challengeStart ? new Date(challengeStart.getTime() + 24 * 60 * 60 * 1000) <= now : false;
-  const hasEnded = challengeEnd ? new Date(challengeEnd.getTime() + 24 * 60 * 60 * 1000) <= now : false;
-
-  if (!isParticipant) {
-    challengeStatus = "ACTIVE";
-  } else if (allGoalsCompleted) {
-    challengeStatus = "COMPLETED";
-  } else if (challenge.endsAt && new Date(challenge.endsAt) < now) {
-    challengeStatus = "FAILED";
-  } else {
-    challengeStatus = "ACTIVE";
-  }
+  const {
+    challengeStatus,
+    completedGoals,
+    hasEnded,
+    hasStarted,
+    isCreator,
+    isParticipant,
+    progress,
+  } = getChallengeDerivedState(challenge, user!.id);
 
   const onGoalClick = (e: ReactMouseEvent, id: string) => {
     if (!isParticipant) {
@@ -129,12 +88,7 @@ export function ChallengeCard({
     cardRef.current.scrollIntoView({ behavior: "smooth", block: "center" });
   }, [focused]);
 
-  const statusLabel =
-    challengeStatus === "COMPLETED"
-      ? t("challenges.status_completed")
-      : challengeStatus === "FAILED"
-        ? t("challenges.status_failed")
-        : t("challenges.status_active");
+  const statusLabel = t(getChallengeStatusTranslationKey(challengeStatus));
 
   return (
     <Card
@@ -226,7 +180,7 @@ export function ChallengeCard({
                 onClick={(e) => onGoalClick(e, goal.id)}
               >
                 <span className="truncate">{goal.title}</span>
-                {goal.lastCompletedAt && <Badge variant="secondary">?</Badge>}
+                {goalCompleted(goal) && <Badge variant="secondary">?</Badge>}
               </div>
             ))}
           </CollapsibleContent>
@@ -312,9 +266,9 @@ export function ChallengeCard({
           <div className="flex items-center gap-1 text-muted-foreground">
             <Calendar className="size-4" />
             <span>
-              {challenge.startsAt ? format(new Date(challenge.startsAt), "dd.MM.yyyy") : "�"}
+              {formatChallengeDate(challenge.startsAt)}
               {" > "}
-              {challenge.endsAt ? format(new Date(challenge.endsAt), "dd.MM.yyyy") : "�"}
+              {formatChallengeDate(challenge.endsAt)}
             </span>
           </div>
 

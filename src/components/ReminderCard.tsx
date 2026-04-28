@@ -7,6 +7,7 @@ import { useTranslation } from "react-i18next";
 
 import { Goal, Task } from "@/types";
 import { useNavigate } from "react-router-dom";
+import { formatReminderDayLabel } from "@/shared/display/reminders";
 
 interface ReminderCardProps {
   id: string;
@@ -26,15 +27,6 @@ export function ReminderCard({ id, title, time, goal, task, daysOfWeek = [], day
   const navigate = useNavigate();
   const hasDays = daysOfWeek.length > 0;
   const hasDates = daysOfMonth.length > 0;
-  const formatReminderDayLabel = (day: string) => {
-    const normalized = String(day).toLowerCase();
-    const map: Record<string, string> = {
-      mon: t("weekdays.mon"), tue: t("weekdays.tue"), wed: t("weekdays.wed"), thu: t("weekdays.thu"), fri: t("weekdays.fri"), sat: t("weekdays.sat"), sun: t("weekdays.sun"),
-      "1": t("weekdays.mon"), "2": t("weekdays.tue"), "3": t("weekdays.wed"), "4": t("weekdays.thu"), "5": t("weekdays.fri"), "6": t("weekdays.sat"), "7": t("weekdays.sun"),
-    };
-    return map[normalized] ?? day;
-  };
-
   return (
     <Card className={`mb-2 break-inside-avoid transition-all ${isActive ? "border-primary" : "opacity-60"}`}>
       <CardHeader className="pb-3">
@@ -56,7 +48,7 @@ export function ReminderCard({ id, title, time, goal, task, daysOfWeek = [], day
         {hasDays && (
           <div className="flex items-center gap-2">
             <Repeat className="size-4 text-muted-foreground" />
-            <div className="flex flex-wrap gap-1">{daysOfWeek.map((day) => <Badge key={day} variant="outline" className="text-xs">{formatReminderDayLabel(day)}</Badge>)}</div>
+            <div className="flex flex-wrap gap-1">{daysOfWeek.map((day) => <Badge key={day} variant="outline" className="text-xs">{formatReminderDayLabel(day, t)}</Badge>)}</div>
           </div>
         )}
 

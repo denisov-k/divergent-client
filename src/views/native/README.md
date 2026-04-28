@@ -5,10 +5,8 @@ Current scope:
 - `reminders.tsx`
 - `challenges.tsx`
 - `rewards.tsx`
-- `progress.tsx`
-- `frens.tsx`
+- `progress-view.tsx`
 - `settings.tsx`
-- `more.tsx`
 - `AppShell.tsx`
 
 Rules for the migration:
@@ -17,10 +15,10 @@ Rules for the migration:
 - keep web UI in `src/views/web/<screen>.tsx`
 - expand this folder screen by screen instead of rewriting the whole client at once
 - grow `AppShell.tsx` into the future mobile root instead of duplicating navigation logic per screen
-- route secondary sections through `more.tsx`, so the main mobile tab bar stays compact
+- keep secondary flows out of the main tab bar unless they become first-class tabs
 
 Navigation contract:
 - native deep links are parsed in `src/app/router.native.ts`
 - `AppShell.tsx` consumes app routes from that shared router layer
 - `NativeAuthRoot.tsx` consumes auth routes from the same contract
-- platform helper files in `src/platform/*Linking.ts` now stay as compatibility wrappers only
+- preview and standalone native runtime now share `src/app/native/NativeRuntimeRoot.tsx`
