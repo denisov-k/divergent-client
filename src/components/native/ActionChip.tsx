@@ -1,13 +1,31 @@
 ﻿import type { ReactNode } from "react";
 import { Pressable, Text } from "react-native";
 
+import { appPalette } from "@/theme/palette";
+
 type ActionChipTone = "primary" | "secondary" | "success" | "danger";
 
 const toneStyles: Record<ActionChipTone, { backgroundColor: string; textColor: string; borderColor?: string }> = {
-  primary: { backgroundColor: "#dbeafe", textColor: "#1d4ed8", borderColor: "#93c5fd" },
-  secondary: { backgroundColor: "#f1f5f9", textColor: "#334155", borderColor: "#e2e8f0" },
-  success: { backgroundColor: "#dcfce7", textColor: "#166534", borderColor: "#bbf7d0" },
-  danger: { backgroundColor: "#fef2f2", textColor: "#b91c1c", borderColor: "#fecaca" },
+  primary: {
+    backgroundColor: appPalette.semantic.infoSurface,
+    textColor: appPalette.semantic.infoText,
+    borderColor: appPalette.semantic.infoBorder,
+  },
+  secondary: {
+    backgroundColor: appPalette.surface.background,
+    textColor: appPalette.semantic.text,
+    borderColor: appPalette.semantic.borderSubtle,
+  },
+  success: {
+    backgroundColor: appPalette.semantic.successSurface,
+    textColor: appPalette.semantic.successText,
+    borderColor: appPalette.semantic.successBorder,
+  },
+  danger: {
+    backgroundColor: appPalette.semantic.dangerSurface,
+    textColor: appPalette.semantic.dangerText,
+    borderColor: appPalette.semantic.dangerBorder,
+  },
 };
 
 export function ActionChip({

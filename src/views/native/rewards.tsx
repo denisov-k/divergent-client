@@ -8,6 +8,7 @@ import { NativeRewardCard } from "@/components/native/NativeRewardCard";
 import { RewardFormSheet } from "@/components/native/RewardFormSheet";
 import { useAppStore } from "@/stores/useAppStore";
 import { useRewardsScreen } from "@/shared/screens/rewards/useRewardsScreen";
+import { appPalette } from "@/theme/palette";
 
 export default function NativeRewardsScreen(props: {
   rewardId?: string | null;
@@ -15,17 +16,7 @@ export default function NativeRewardsScreen(props: {
 }) {
   const { t } = useTranslation();
   const { challenges } = useAppStore();
-  const {
-    rewards,
-    goals,
-    rewardDialogOpen,
-    editingReward,
-    openCreateReward,
-    openEditReward,
-    saveReward,
-    removeReward,
-    closeRewardDialog,
-  } = useRewardsScreen();
+  const { rewards, goals, rewardDialogOpen, editingReward, openCreateReward, openEditReward, saveReward, removeReward, closeRewardDialog } = useRewardsScreen();
 
   useEffect(() => {
     if (!props.rewardId) {
@@ -42,27 +33,9 @@ export default function NativeRewardsScreen(props: {
   };
 
   return (
-    <View style={{ flex: 1, backgroundColor: "#ffffff" }}>
-      <View
-        style={{
-          paddingHorizontal: 8,
-          paddingVertical: 8,
-          flexDirection: "row",
-          alignItems: "center",
-          justifyContent: "space-between",
-          gap: 8,
-          backgroundColor: "#ffffff",
-        }}
-      >
-        <Text
-          style={{
-            fontSize: 19,
-            fontWeight: "500",
-            color: "#0f172a",
-            fontFamily: "Montserrat",
-            lineHeight: 29,
-          }}
-        >
+    <View style={{ flex: 1, backgroundColor: appPalette.surface.background }}>
+      <View style={{ paddingHorizontal: 8, paddingVertical: 8, flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: 8, backgroundColor: appPalette.surface.background }}>
+        <Text style={{ fontSize: 19, fontWeight: "500", color: appPalette.semantic.textStrong, fontFamily: "Montserrat", lineHeight: 29 }}>
           {t("rewards.title")}
         </Text>
 
@@ -72,16 +45,16 @@ export default function NativeRewardsScreen(props: {
             flexDirection: "row",
             alignItems: "center",
             gap: 8,
-            backgroundColor: "#dbeafe",
+            backgroundColor: appPalette.semantic.infoSurface,
             borderWidth: 1,
-            borderColor: "#93c5fd",
+            borderColor: appPalette.semantic.infoBorder,
             borderRadius: 10,
             paddingHorizontal: 12,
             paddingVertical: 10,
           }}
         >
-          <Plus size={16} color="#1d4ed8" />
-          <Text style={{ color: "#1d4ed8", fontSize: 12, fontWeight: "500", lineHeight: 18, fontFamily: "Montserrat" }}>
+          <Plus size={16} color={appPalette.semantic.infoText} />
+          <Text style={{ color: appPalette.semantic.infoText, fontSize: 12, fontWeight: "500", lineHeight: 18, fontFamily: "Montserrat" }}>
             {t("rewards.add")}
           </Text>
         </Pressable>
@@ -89,38 +62,18 @@ export default function NativeRewardsScreen(props: {
 
       <ScrollView contentContainerStyle={{ paddingHorizontal: 8, paddingTop: 8, paddingBottom: 16, gap: 8 }}>
         {rewards.length === 0 ? (
-          <EmptyStateCard
-            title="Пока нет наград"
-            description="Создайте первую награду"
-            actionLabel="Создать первую награду"
-            onAction={openCreateReward}
-          />
+          <EmptyStateCard title="Пока нет наград" description="Создайте первую награду" actionLabel="Создать первую награду" onAction={openCreateReward} />
         ) : (
           rewards.map((reward) => {
             const goal = goals.find((item) => item.id === reward.goalId);
             const challenge = goal?.challengeId ? challenges.find((item) => item.id === goal.challengeId) : undefined;
 
-            return (
-              <NativeRewardCard
-                key={reward.id}
-                reward={reward}
-                goal={goal}
-                challenge={challenge}
-                onEdit={openEditReward}
-              />
-            );
+            return <NativeRewardCard key={reward.id} reward={reward} goal={goal} challenge={challenge} onEdit={openEditReward} />;
           })
         )}
       </ScrollView>
 
-      <RewardFormSheet
-        open={rewardDialogOpen}
-        reward={editingReward}
-        goals={goals}
-        onOpenChange={closeRewardDialog}
-        onSave={saveReward}
-        onDelete={handleDeleteReward}
-      />
+      <RewardFormSheet open={rewardDialogOpen} reward={editingReward} goals={goals} onOpenChange={closeRewardDialog} onSave={saveReward} onDelete={handleDeleteReward} />
     </View>
   );
 }

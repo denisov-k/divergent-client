@@ -10,6 +10,7 @@ import { SelectPaymentMethodSheet } from "@/components/native/SelectPaymentMetho
 import { Plus } from "@/components/native/icons";
 import { buildChallengeShareUrl } from "@/platform/appUrl";
 import { useChallengesScreen } from "@/shared/screens/challenges/useChallengesScreen";
+import { appPalette } from "@/theme/palette";
 
 export default function NativeChallengesScreen(props: {
   focusId?: string | null;
@@ -131,27 +132,9 @@ export default function NativeChallengesScreen(props: {
   };
 
   return (
-    <View style={{ flex: 1, backgroundColor: "#ffffff" }}>
-      <View
-        style={{
-          paddingHorizontal: 8,
-          paddingVertical: 8,
-          flexDirection: "row",
-          alignItems: "center",
-          justifyContent: "space-between",
-          gap: 8,
-          backgroundColor: "#ffffff",
-        }}
-      >
-        <Text
-          style={{
-            fontSize: 19,
-            fontWeight: "500",
-            color: "#0f172a",
-            fontFamily: "Montserrat",
-            lineHeight: 29,
-          }}
-        >
+    <View style={{ flex: 1, backgroundColor: appPalette.surface.background }}>
+      <View style={{ paddingHorizontal: 8, paddingVertical: 8, flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: 8, backgroundColor: appPalette.surface.background }}>
+        <Text style={{ fontSize: 19, fontWeight: "500", color: appPalette.semantic.textStrong, fontFamily: "Montserrat", lineHeight: 29 }}>
           {t("challenges.title")}
         </Text>
 
@@ -161,16 +144,16 @@ export default function NativeChallengesScreen(props: {
             flexDirection: "row",
             alignItems: "center",
             gap: 8,
-            backgroundColor: "#dbeafe",
+            backgroundColor: appPalette.semantic.infoSurface,
             borderWidth: 1,
-            borderColor: "#93c5fd",
+            borderColor: appPalette.semantic.infoBorder,
             borderRadius: 10,
             paddingHorizontal: 12,
             paddingVertical: 10,
           }}
         >
-          <Plus size={16} color="#1d4ed8" />
-          <Text style={{ color: "#1d4ed8", fontSize: 12, fontWeight: "500", lineHeight: 18, fontFamily: "Montserrat" }}>
+          <Plus size={16} color={appPalette.semantic.infoText} />
+          <Text style={{ color: appPalette.semantic.infoText, fontSize: 12, fontWeight: "500", lineHeight: 18, fontFamily: "Montserrat" }}>
             {t("challenges.create")}
           </Text>
         </Pressable>
@@ -178,12 +161,7 @@ export default function NativeChallengesScreen(props: {
 
       <ScrollView contentContainerStyle={{ paddingHorizontal: 8, paddingTop: 8, paddingBottom: 16, gap: 8 }}>
         {challenges.length === 0 ? (
-          <EmptyStateCard
-            title={t("challenges.empty")}
-            description={t("challenges.empty_native_description")}
-            actionLabel={t("challenges.create_first")}
-            onAction={openCreateChallenge}
-          />
+          <EmptyStateCard title={t("challenges.empty")} description={t("challenges.empty_native_description")} actionLabel={t("challenges.create_first")} onAction={openCreateChallenge} />
         ) : (
           challenges.map((challenge) => (
             <NativeChallengeCard
@@ -201,35 +179,9 @@ export default function NativeChallengesScreen(props: {
         )}
       </ScrollView>
 
-      {selectedChallenge && (
-        <ChallengeDetailsSheet
-          open={reportsDialogOpen}
-          challenge={selectedChallenge}
-          participants={participants}
-          reports={reports}
-          onOpenChange={(open) => {
-            if (!open) {
-              closeReportsDialog();
-            }
-          }}
-          onDownload={downloadChallengeReport}
-          onKick={handleKickParticipant}
-        />
-      )}
-
-      <SelectPaymentMethodSheet
-        open={paymentDialogOpen}
-        onOpenChange={setPaymentDialogOpen}
-        onSelect={selectPaymentMethod}
-      />
-
-      <ChallengeFormSheet
-        open={challengeDialogOpen}
-        challenge={editingChallenge}
-        goals={goals}
-        onOpenChange={closeChallengeDialog}
-        onSave={saveChallenge}
-      />
+      {selectedChallenge && <ChallengeDetailsSheet open={reportsDialogOpen} challenge={selectedChallenge} participants={participants} reports={reports} onOpenChange={(open) => { if (!open) { closeReportsDialog(); } }} onDownload={downloadChallengeReport} onKick={handleKickParticipant} />}
+      <SelectPaymentMethodSheet open={paymentDialogOpen} onOpenChange={setPaymentDialogOpen} onSelect={selectPaymentMethod} />
+      <ChallengeFormSheet open={challengeDialogOpen} challenge={editingChallenge} goals={goals} onOpenChange={closeChallengeDialog} onSave={saveChallenge} />
     </View>
   );
 }

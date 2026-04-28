@@ -2,6 +2,7 @@
 
 import { ActionChip } from "@/components/native/ActionChip";
 import { SurfaceCard } from "@/components/native/SurfaceCard";
+import { appPalette } from "@/theme/palette";
 
 export function EmptyStateCard({
   title,
@@ -16,8 +17,8 @@ export function EmptyStateCard({
 }) {
   return (
     <SurfaceCard>
-      <Text style={{ fontSize: 16, fontWeight: "600", color: "#0f172a", marginBottom: 8 }}>{title}</Text>
-      <Text style={{ color: "#64748b", marginBottom: 16 }}>{description}</Text>
+      <Text style={{ fontSize: 16, fontWeight: "600", color: appPalette.semantic.textStrong, marginBottom: 8, fontFamily: "Montserrat" }}>{title}</Text>
+      <Text style={{ color: appPalette.semantic.textMuted, marginBottom: 16, fontFamily: "Montserrat", fontSize: 12, lineHeight: 18 }}>{description}</Text>
       <ActionChip onPress={onAction} tone="primary">
         {actionLabel}
       </ActionChip>

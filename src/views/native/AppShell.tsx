@@ -6,6 +6,7 @@ import { parseNativeAppRoute, type NativeAppTab, type NativeMoreTab } from "@/ap
 import { NativeAppHeader } from "@/components/native/NativeAppHeader";
 import { BarChart2, Bell, Gift, Swords, Target } from "@/components/native/icons";
 import { useAppStore } from "@/stores/useAppStore";
+import { appPalette } from "@/theme/palette";
 import NativeChallengesScreen from "@/views/native/challenges";
 import NativeGoalsScreen from "@/views/native/goals";
 import NativeMoreScreen from "@/views/native/more";
@@ -115,7 +116,7 @@ export default function NativeAppShell() {
   }, []);
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: "#ffffff" }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: appPalette.surface.background }}>
       {!!user && (
         <NativeAppHeader
           user={user}
@@ -182,7 +183,7 @@ export default function NativeAppShell() {
       <View
         style={{
           flexDirection: "row",
-          backgroundColor: "#ffffff",
+          backgroundColor: appPalette.surface.background,
           paddingHorizontal: 4,
           paddingVertical: 8,
         }}
@@ -202,18 +203,18 @@ export default function NativeAppShell() {
                 minHeight: 45,
                 borderRadius: 8,
                 borderWidth: 2,
-                borderColor: "#2563eb",
+                borderColor: appPalette.brand.primary,
                 paddingHorizontal: 8,
                 paddingVertical: 4,
                 alignItems: "center",
                 justifyContent: "center",
-                backgroundColor: active ? "#2563eb" : "#ffffff",
+                backgroundColor: active ? appPalette.brand.primary : appPalette.surface.background,
               }}
             >
-              <Icon color={active ? "#ffffff" : "#2563eb"} size={17} strokeWidth={2.5} />
+              <Icon color={active ? appPalette.brand.primaryForeground : appPalette.brand.primary} size={17} strokeWidth={2.5} />
               <Text
                 style={{
-                  color: active ? "#ffffff" : "#2563eb",
+                  color: active ? appPalette.brand.primaryForeground : appPalette.brand.primary,
                   fontSize: 8,
                   fontWeight: "800",
                   fontFamily: "Montserrat",

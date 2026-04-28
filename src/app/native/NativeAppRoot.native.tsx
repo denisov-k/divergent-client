@@ -5,15 +5,16 @@ import { useAppBootstrap } from "@/app/useAppBootstrap";
 import { ActionChip } from "@/components/native/ActionChip";
 import { SurfaceCard } from "@/components/native/SurfaceCard";
 import { useAppStore } from "@/stores/useAppStore";
+import { appPalette } from "@/theme/palette";
 import NativeAppShell from "@/views/native/AppShell";
 import NativeAuthRoot from "@/views/native/auth/NativeAuthRoot";
 
 function NativeLoadingScreen() {
   return (
-    <View style={{ flex: 1, backgroundColor: "#ffffff", padding: 24, justifyContent: "center" }}>
+    <View style={{ flex: 1, backgroundColor: appPalette.surface.background, padding: 24, justifyContent: "center" }}>
       <SurfaceCard>
-        <Text style={{ fontSize: 20, fontWeight: "700", color: "#0f172a", fontFamily: "Montserrat" }}>Запускаем приложение</Text>
-        <Text style={{ color: "#64748b", fontFamily: "Montserrat" }}>
+        <Text style={{ fontSize: 20, fontWeight: "700", color: appPalette.semantic.textStrong, fontFamily: "Montserrat" }}>Запускаем приложение</Text>
+        <Text style={{ color: appPalette.semantic.textMuted, fontFamily: "Montserrat", fontSize: 12, lineHeight: 18 }}>
           Общий bootstrap уже работает и для web, и для будущего Expo/RN entrypoint.
         </Text>
       </SurfaceCard>

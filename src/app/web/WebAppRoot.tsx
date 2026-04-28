@@ -1,4 +1,5 @@
-﻿import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+﻿import { useEffect } from "react";
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 
 import { useAppBootstrap } from "@/app/useAppBootstrap";
 import NativePreviewPage from "@/app/web/NativePreviewPage";
@@ -6,6 +7,7 @@ import { ProtectedRoute } from "@/components/protected-route";
 import Footer from "@/layout/Footer";
 import Header from "@/layout/Header";
 import Layout from "@/layout";
+import { webCssVariables } from "@/theme/palette";
 import ResetPasswordView from "@/views/auth/reset";
 import SignInView from "@/views/auth/sign-in";
 import SignUpView from "@/views/auth/sign-up";
@@ -34,6 +36,13 @@ function renderProtectedNativePreview(component: React.ReactNode) {
 
 export default function WebAppRoot() {
   useAppBootstrap();
+
+  useEffect(() => {
+    const root = document.documentElement;
+    Object.entries(webCssVariables).forEach(([key, value]) => {
+      root.style.setProperty(key, value);
+    });
+  }, []);
 
   return (
     <Router>

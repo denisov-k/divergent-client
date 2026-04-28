@@ -4,6 +4,7 @@ import { Alert, Modal, ScrollView, Text, View } from "react-native";
 import { ActionChip } from "@/components/native/ActionChip";
 import { FieldInput } from "@/components/native/FieldInput";
 import { SectionTabs } from "@/components/native/SectionTabs";
+import { appPalette } from "@/theme/palette";
 import type { Goal, Reminder } from "@/types";
 
 const WEEK_DAYS = [
@@ -144,63 +145,35 @@ export function ReminderFormSheet({
     ]);
   };
 
+  const sectionLabelStyle = { fontSize: 14, fontWeight: "600" as const, color: appPalette.semantic.text, fontFamily: "Montserrat" };
+  const helperStyle = { color: appPalette.semantic.textMuted, fontFamily: "Montserrat", fontSize: 12, lineHeight: 18 };
+
   return (
     <Modal visible={open} transparent animationType="slide" onRequestClose={() => onOpenChange(false)}>
-      <View
-        style={{
-          flex: 1,
-          backgroundColor: "rgba(15, 23, 42, 0.35)",
-          justifyContent: "flex-end",
-        }}
-      >
-        <View
-          style={{
-            maxHeight: "90%",
-            backgroundColor: "#ffffff",
-            borderTopLeftRadius: 24,
-            borderTopRightRadius: 24,
-            padding: 20,
-            gap: 14,
-          }}
-        >
+      <View style={{ flex: 1, backgroundColor: appPalette.surface.overlay, justifyContent: "flex-end" }}>
+        <View style={{ maxHeight: "90%", backgroundColor: appPalette.surface.background, borderTopLeftRadius: 24, borderTopRightRadius: 24, padding: 20, gap: 14 }}>
           <View style={{ gap: 6 }}>
-            <Text style={{ fontSize: 20, fontWeight: "700", color: "#0f172a" }}>
+            <Text style={{ fontSize: 20, fontWeight: "700", color: appPalette.semantic.textStrong, fontFamily: "Montserrat" }}>
               {reminder ? "Редактировать напоминание" : "Новое напоминание"}
             </Text>
-            <Text style={{ color: "#64748b" }}>Полноценная mobile-форма для reminder flow.</Text>
+            <Text style={helperStyle}>Полноценная mobile-форма для reminder flow.</Text>
           </View>
 
           <ScrollView contentContainerStyle={{ gap: 14 }}>
-            <FieldInput
-              label="Название"
-              value={title}
-              onChangeText={setTitle}
-              placeholder="Например, утренняя зарядка"
-            />
+            <FieldInput label="Название" value={title} onChangeText={setTitle} placeholder="Например, утренняя зарядка" />
             <FieldInput label="Время" value={time} onChangeText={setTime} placeholder="09:00" />
 
             <View style={{ gap: 8 }}>
-              <Text style={{ fontSize: 14, fontWeight: "600", color: "#334155" }}>Режим</Text>
-              <SectionTabs
-                tabs={[
-                  { key: "week", label: "Дни недели" },
-                  { key: "month", label: "Числа месяца" },
-                ]}
-                activeTab={mode}
-                onChange={setMode}
-              />
+              <Text style={sectionLabelStyle}>Режим</Text>
+              <SectionTabs tabs={[{ key: "week", label: "Дни недели" }, { key: "month", label: "Числа месяца" }]} activeTab={mode} onChange={setMode} />
             </View>
 
             {mode === "week" ? (
               <View style={{ gap: 8 }}>
-                <Text style={{ fontSize: 14, fontWeight: "600", color: "#334155" }}>Дни недели</Text>
+                <Text style={sectionLabelStyle}>Дни недели</Text>
                 <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8 }}>
                   {WEEK_DAYS.map((day) => (
-                    <ActionChip
-                      key={day.key}
-                      onPress={() => toggleWeekDay(day.key)}
-                      tone={selectedDays.includes(day.key) ? "primary" : "secondary"}
-                    >
+                    <ActionChip key={day.key} onPress={() => toggleWeekDay(day.key)} tone={selectedDays.includes(day.key) ? "primary" : "secondary"}>
                       {day.label}
                     </ActionChip>
                   ))}
@@ -209,14 +182,10 @@ export function ReminderFormSheet({
               </View>
             ) : (
               <View style={{ gap: 8 }}>
-                <Text style={{ fontSize: 14, fontWeight: "600", color: "#334155" }}>Числа месяца</Text>
+                <Text style={sectionLabelStyle}>Числа месяца</Text>
                 <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8 }}>
                   {MONTH_DAYS.map((day) => (
-                    <ActionChip
-                      key={day}
-                      onPress={() => toggleMonthDay(day)}
-                      tone={selectedDaysOfMonth.includes(day) ? "primary" : "secondary"}
-                    >
+                    <ActionChip key={day} onPress={() => toggleMonthDay(day)} tone={selectedDaysOfMonth.includes(day) ? "primary" : "secondary"}>
                       {day}
                     </ActionChip>
                   ))}
@@ -226,17 +195,11 @@ export function ReminderFormSheet({
             )}
 
             <View style={{ gap: 8 }}>
-              <Text style={{ fontSize: 14, fontWeight: "600", color: "#334155" }}>Привязка к цели</Text>
+              <Text style={sectionLabelStyle}>Привязка к цели</Text>
               <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8 }}>
-                <ActionChip onPress={() => { setGoalId(initialGoalId); setTaskId(undefined); }} tone={!goalId ? "primary" : "secondary"}>
-                  Без привязки
-                </ActionChip>
+                <ActionChip onPress={() => { setGoalId(initialGoalId); setTaskId(undefined); }} tone={!goalId ? "primary" : "secondary"}>Без привязки</ActionChip>
                 {goals.map((goal) => (
-                  <ActionChip
-                    key={goal.id}
-                    onPress={() => { setGoalId(goal.id); setTaskId(undefined); }}
-                    tone={goalId === goal.id ? "primary" : "secondary"}
-                  >
+                  <ActionChip key={goal.id} onPress={() => { setGoalId(goal.id); setTaskId(undefined); }} tone={goalId === goal.id ? "primary" : "secondary"}>
                     {goal.title}
                   </ActionChip>
                 ))}
@@ -245,17 +208,11 @@ export function ReminderFormSheet({
 
             {!!goalId && availableTasks.length > 0 && (
               <View style={{ gap: 8 }}>
-                <Text style={{ fontSize: 14, fontWeight: "600", color: "#334155" }}>Привязка к задаче</Text>
+                <Text style={sectionLabelStyle}>Привязка к задаче</Text>
                 <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8 }}>
-                  <ActionChip onPress={() => setTaskId(undefined)} tone={!taskId ? "primary" : "secondary"}>
-                    Без задачи
-                  </ActionChip>
+                  <ActionChip onPress={() => setTaskId(undefined)} tone={!taskId ? "primary" : "secondary"}>Без задачи</ActionChip>
                   {availableTasks.map((task) => (
-                    <ActionChip
-                      key={task.id}
-                      onPress={() => setTaskId(task.id)}
-                      tone={taskId === task.id ? "primary" : "secondary"}
-                    >
+                    <ActionChip key={task.id} onPress={() => setTaskId(task.id)} tone={taskId === task.id ? "primary" : "secondary"}>
                       {task.title}
                     </ActionChip>
                   ))}
@@ -264,32 +221,18 @@ export function ReminderFormSheet({
             )}
 
             <View style={{ gap: 8 }}>
-              <Text style={{ fontSize: 14, fontWeight: "600", color: "#334155" }}>Состояние</Text>
-              <SectionTabs
-                tabs={[
-                  { key: "active", label: "Активно" },
-                  { key: "paused", label: "Выключено" },
-                ]}
-                activeTab={isActive ? "active" : "paused"}
-                onChange={(tab) => setIsActive(tab === "active")}
-              />
+              <Text style={sectionLabelStyle}>Состояние</Text>
+              <SectionTabs tabs={[{ key: "active", label: "Активно" }, { key: "paused", label: "Выключено" }]} activeTab={isActive ? "active" : "paused"} onChange={(tab) => setIsActive(tab === "active")} />
             </View>
           </ScrollView>
 
           <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8 }}>
-            {!!reminder && (
-              <ActionChip onPress={handleDelete} tone="danger">
-                Удалить
-              </ActionChip>
-            )}
+            {!!reminder && <ActionChip onPress={handleDelete} tone="danger">Удалить</ActionChip>}
             <ActionChip onPress={() => onOpenChange(false)}>Отмена</ActionChip>
-            <ActionChip onPress={() => void handleSave()} tone="primary">
-              {isSubmitting ? "Сохраняем..." : reminder ? "Сохранить" : "Создать"}
-            </ActionChip>
+            <ActionChip onPress={() => void handleSave()} tone="primary">{isSubmitting ? "Сохраняем..." : reminder ? "Сохранить" : "Создать"}</ActionChip>
           </View>
         </View>
       </View>
     </Modal>
   );
 }
-

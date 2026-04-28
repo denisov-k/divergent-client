@@ -1,6 +1,7 @@
 ﻿import { View } from "react-native";
 
 import { Award, Crown, Gift, Star, Trophy, Zap } from "@/components/native/icons";
+import { appPalette } from "@/theme/palette";
 import type { RewardIcon } from "@/types";
 
 const iconMap = {
@@ -20,8 +21,8 @@ export function NativeRewardIcon({
   unlocked?: boolean;
 }) {
   const Icon = iconMap[icon] || Trophy;
-  const color = unlocked ? "#16a34a" : "#64748b";
-  const backgroundColor = unlocked ? "#dcfce7" : "#f1f5f9";
+  const color = unlocked ? appPalette.semantic.successText : appPalette.semantic.textMuted;
+  const backgroundColor = unlocked ? appPalette.semantic.successSurface : appPalette.semantic.neutralSurface;
 
   return (
     <View
@@ -38,3 +39,4 @@ export function NativeRewardIcon({
     </View>
   );
 }
+

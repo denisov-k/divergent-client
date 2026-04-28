@@ -4,6 +4,7 @@ import { Alert, Modal, ScrollView, Text, View } from "react-native";
 import { ActionChip } from "@/components/native/ActionChip";
 import { FieldInput } from "@/components/native/FieldInput";
 import { SectionTabs } from "@/components/native/SectionTabs";
+import { appPalette } from "@/theme/palette";
 import type { CategoryOption, Goal, GoalFormData, GoalPeriod, GoalType, Reward, Task } from "@/types";
 
 function createTask(title: string): Task {
@@ -157,80 +158,41 @@ export function GoalFormSheet({
     ]);
   };
 
+  const sectionLabelStyle = { fontSize: 14, fontWeight: "600" as const, color: appPalette.semantic.text, fontFamily: "Montserrat" };
+  const helperStyle = { color: appPalette.semantic.textMuted, fontFamily: "Montserrat", fontSize: 12, lineHeight: 18 };
+
   return (
     <Modal visible={open} transparent animationType="slide" onRequestClose={() => onOpenChange(false)}>
-      <View
-        style={{
-          flex: 1,
-          backgroundColor: "rgba(15, 23, 42, 0.35)",
-          justifyContent: "flex-end",
-        }}
-      >
-        <View
-          style={{
-            maxHeight: "90%",
-            backgroundColor: "#ffffff",
-            borderTopLeftRadius: 24,
-            borderTopRightRadius: 24,
-            padding: 20,
-            gap: 14,
-          }}
-        >
+      <View style={{ flex: 1, backgroundColor: appPalette.surface.overlay, justifyContent: "flex-end" }}>
+        <View style={{ maxHeight: "90%", backgroundColor: appPalette.surface.background, borderTopLeftRadius: 24, borderTopRightRadius: 24, padding: 20, gap: 14 }}>
           <View style={{ gap: 6 }}>
-            <Text style={{ fontSize: 20, fontWeight: "700", color: "#0f172a" }}>
+            <Text style={{ fontSize: 20, fontWeight: "700", color: appPalette.semantic.textStrong, fontFamily: "Montserrat" }}>
               {goal ? "Редактировать цель" : "Новая цель"}
             </Text>
-            <Text style={{ color: "#64748b" }}>
-              Базовая mobile-форма поверх общего goal screen layer.
-            </Text>
+            <Text style={helperStyle}>Базовая mobile-форма поверх общего goal screen layer.</Text>
           </View>
 
           <ScrollView contentContainerStyle={{ gap: 14 }}>
             <FieldInput label="Название" value={title} onChangeText={setTitle} placeholder="Например, 12 книг за год" />
-            <FieldInput
-              label="Описание"
-              value={description}
-              onChangeText={setDescription}
-              placeholder="Коротко опиши цель"
-            />
+            <FieldInput label="Описание" value={description} onChangeText={setDescription} placeholder="Коротко опиши цель" />
 
             <View style={{ gap: 8 }}>
-              <Text style={{ fontSize: 14, fontWeight: "600", color: "#334155" }}>Тип цели</Text>
-              <SectionTabs
-                tabs={[
-                  { key: "TASK", label: "Задачи" },
-                  { key: "PROGRESS", label: "Число" },
-                ]}
-                activeTab={goalType}
-                onChange={setGoalType}
-              />
+              <Text style={sectionLabelStyle}>Тип цели</Text>
+              <SectionTabs tabs={[{ key: "TASK", label: "Задачи" }, { key: "PROGRESS", label: "Число" }]} activeTab={goalType} onChange={setGoalType} />
             </View>
 
             <View style={{ gap: 8 }}>
-              <Text style={{ fontSize: 14, fontWeight: "600", color: "#334155" }}>Период</Text>
-              <SectionTabs
-                tabs={[
-                  { key: "NONE", label: "Без повтора" },
-                  { key: "DAILY", label: "День" },
-                  { key: "WEEKLY", label: "Неделя" },
-                  { key: "MONTHLY", label: "Месяц" },
-                ]}
-                activeTab={goalPeriod}
-                onChange={setGoalPeriod}
-              />
+              <Text style={sectionLabelStyle}>Период</Text>
+              <SectionTabs tabs={[{ key: "NONE", label: "Без повтора" }, { key: "DAILY", label: "День" }, { key: "WEEKLY", label: "Неделя" }, { key: "MONTHLY", label: "Месяц" }]} activeTab={goalPeriod} onChange={setGoalPeriod} />
             </View>
 
             <FieldInput label="Срок (YYYY-MM-DD)" value={dueDate} onChangeText={setDueDate} placeholder="2026-05-01" />
 
             <View style={{ gap: 8 }}>
-              <Text style={{ fontSize: 14, fontWeight: "600", color: "#334155" }}>Категория</Text>
+              <Text style={sectionLabelStyle}>Категория</Text>
               <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8 }}>
                 {categories.map((item) => (
-                  <ActionChip
-                    key={item.value}
-                    onPress={() => setCategory(item.value)}
-                    tone={category === item.value ? "primary" : "secondary"}
-                  >
+                  <ActionChip key={item.value} onPress={() => setCategory(item.value)} tone={category === item.value ? "primary" : "secondary"}>
                     {item.label}
                   </ActionChip>
                 ))}
@@ -238,20 +200,11 @@ export function GoalFormSheet({
             </View>
 
             <View style={{ gap: 8 }}>
-              <Text style={{ fontSize: 14, fontWeight: "600", color: "#334155" }}>Награда</Text>
+              <Text style={sectionLabelStyle}>Награда</Text>
               <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8 }}>
-                <ActionChip
-                  onPress={() => setSelectedRewardId(null)}
-                  tone={activeRewardId ? "secondary" : "primary"}
-                >
-                  Без награды
-                </ActionChip>
+                <ActionChip onPress={() => setSelectedRewardId(null)} tone={activeRewardId ? "secondary" : "primary"}>Без награды</ActionChip>
                 {rewards.map((reward) => (
-                  <ActionChip
-                    key={reward.id}
-                    onPress={() => setSelectedRewardId(reward.id)}
-                    tone={activeRewardId === reward.id ? "primary" : "secondary"}
-                  >
+                  <ActionChip key={reward.id} onPress={() => setSelectedRewardId(reward.id)} tone={activeRewardId === reward.id ? "primary" : "secondary"}>
                     {reward.title}
                   </ActionChip>
                 ))}
@@ -260,69 +213,34 @@ export function GoalFormSheet({
 
             {goalType === "PROGRESS" ? (
               <View style={{ gap: 12 }}>
-                <FieldInput
-                  label="Текущий прогресс"
-                  value={currentValue}
-                  onChangeText={setCurrentValue}
-                  placeholder="0"
-                />
-                <FieldInput
-                  label="Целевое значение"
-                  value={targetValue}
-                  onChangeText={setTargetValue}
-                  placeholder="100"
-                />
+                <FieldInput label="Текущий прогресс" value={currentValue} onChangeText={setCurrentValue} placeholder="0" />
+                <FieldInput label="Целевое значение" value={targetValue} onChangeText={setTargetValue} placeholder="100" />
               </View>
             ) : (
               <View style={{ gap: 12 }}>
-                <Text style={{ fontSize: 14, fontWeight: "600", color: "#334155" }}>Задачи</Text>
+                <Text style={sectionLabelStyle}>Задачи</Text>
 
                 {tasks.length === 0 ? (
-                  <Text style={{ color: "#64748b" }}>Пока нет задач. Добавь первую ниже.</Text>
+                  <Text style={helperStyle}>Пока нет задач. Добавь первую ниже.</Text>
                 ) : (
                   tasks.map((task) => (
-                    <View
-                      key={task.id}
-                      style={{
-                        borderWidth: 1,
-                        borderColor: "#e2e8f0",
-                        borderRadius: 14,
-                        padding: 12,
-                        gap: 8,
-                        backgroundColor: "#f8fafc",
-                      }}
-                    >
-                      <Text style={{ color: "#0f172a", fontWeight: "600" }}>{task.title}</Text>
-                      <ActionChip onPress={() => removeTask(task.id)} tone="danger">
-                        Удалить задачу
-                      </ActionChip>
+                    <View key={task.id} style={{ borderWidth: 1, borderColor: appPalette.semantic.borderSubtle, borderRadius: 14, padding: 12, gap: 8, backgroundColor: appPalette.semantic.neutralSurfaceStrong }}>
+                      <Text style={{ color: appPalette.semantic.textStrong, fontWeight: "600", fontFamily: "Montserrat" }}>{task.title}</Text>
+                      <ActionChip onPress={() => removeTask(task.id)} tone="danger">Удалить задачу</ActionChip>
                     </View>
                   ))
                 )}
 
-                <FieldInput
-                  label="Новая задача"
-                  value={newTaskTitle}
-                  onChangeText={setNewTaskTitle}
-                  placeholder="Например, читать 20 минут"
-                />
-                <ActionChip onPress={addTask} tone="primary">
-                  Добавить задачу
-                </ActionChip>
+                <FieldInput label="Новая задача" value={newTaskTitle} onChangeText={setNewTaskTitle} placeholder="Например, читать 20 минут" />
+                <ActionChip onPress={addTask} tone="primary">Добавить задачу</ActionChip>
               </View>
             )}
           </ScrollView>
 
           <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8 }}>
-            {!!goal && (
-              <ActionChip onPress={handleDelete} tone="danger">
-                Удалить
-              </ActionChip>
-            )}
+            {!!goal && <ActionChip onPress={handleDelete} tone="danger">Удалить</ActionChip>}
             <ActionChip onPress={() => onOpenChange(false)}>Отмена</ActionChip>
-            <ActionChip onPress={() => void handleSave()} tone="primary">
-              {isSubmitting ? "Сохраняем..." : goal ? "Сохранить" : "Создать"}
-            </ActionChip>
+            <ActionChip onPress={() => void handleSave()} tone="primary">{isSubmitting ? "Сохраняем..." : goal ? "Сохранить" : "Создать"}</ActionChip>
           </View>
         </View>
       </View>

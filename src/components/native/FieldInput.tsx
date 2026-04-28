@@ -1,5 +1,7 @@
 ﻿import { Text, TextInput, View } from "react-native";
 
+import { appPalette } from "@/theme/palette";
+
 export function FieldInput({
   label,
   value,
@@ -17,7 +19,7 @@ export function FieldInput({
 }) {
   return (
     <View style={{ gap: 8 }}>
-      <Text style={{ fontSize: 14, fontWeight: "600", color: "#334155" }}>{label}</Text>
+      <Text style={{ fontSize: 14, fontWeight: "600", color: appPalette.semantic.text }}>{label}</Text>
       <TextInput
         value={value}
         onChangeText={onChangeText}
@@ -27,14 +29,14 @@ export function FieldInput({
         autoCapitalize="none"
         style={{
           borderWidth: 1,
-          borderColor: "#cbd5e1",
+          borderColor: appPalette.semantic.borderStrong,
           borderRadius: 12,
           paddingHorizontal: 14,
           paddingVertical: 12,
-          backgroundColor: editable ? "#ffffff" : "#f8fafc",
-          color: "#0f172a",
+          backgroundColor: editable ? appPalette.surface.background : appPalette.ui.inputBackground,
+          color: appPalette.semantic.textStrong,
         }}
-        placeholderTextColor="#94a3b8"
+        placeholderTextColor={appPalette.semantic.textSubtle}
       />
     </View>
   );

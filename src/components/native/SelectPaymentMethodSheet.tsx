@@ -2,6 +2,7 @@
 import { useTranslation } from "react-i18next";
 
 import { ActionChip } from "@/components/native/ActionChip";
+import { appPalette } from "@/theme/palette";
 import type { PaymentMethod } from "@/types";
 
 export function SelectPaymentMethodSheet({
@@ -25,21 +26,21 @@ export function SelectPaymentMethodSheet({
       <View
         style={{
           flex: 1,
-          backgroundColor: "rgba(15, 23, 42, 0.35)",
+          backgroundColor: appPalette.surface.overlay,
           justifyContent: "flex-end",
         }}
       >
         <View
           style={{
-            backgroundColor: "#ffffff",
+            backgroundColor: appPalette.surface.background,
             borderTopLeftRadius: 24,
             borderTopRightRadius: 24,
             padding: 20,
             gap: 14,
           }}
         >
-          <Text style={{ fontSize: 20, fontWeight: "700", color: "#0f172a" }}>{t("challenges.payment_sheet_title")}</Text>
-          <Text style={{ color: "#64748b" }}>{t("challenges.payment_sheet_description")}</Text>
+          <Text style={{ fontSize: 20, fontWeight: "700", color: appPalette.semantic.textStrong, fontFamily: "Montserrat" }}>{t("challenges.payment_sheet_title")}</Text>
+          <Text style={{ color: appPalette.semantic.textMuted, fontFamily: "Montserrat", fontSize: 12, lineHeight: 18 }}>{t("challenges.payment_sheet_description")}</Text>
 
           <View style={{ gap: 10 }}>
             <ActionChip onPress={() => void handleSelect("YOUKASSA")} tone="primary">

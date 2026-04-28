@@ -4,6 +4,7 @@ import { buildChallengesPath, buildGoalsPath } from "@/app/routes";
 import { Edit, Swords, Target } from "@/components/native/icons";
 import { NativeRewardIcon } from "@/components/native/NativeRewardIcon";
 import { SurfaceCard } from "@/components/native/SurfaceCard";
+import { appPalette } from "@/theme/palette";
 import { buildNativeRouteUrl } from "@/platform/appUrl.native";
 import type { Challenge, Goal, Reward } from "@/types";
 
@@ -19,10 +20,10 @@ function SmallBadge({
   icon?: React.ReactNode;
 }) {
   const palette = {
-    neutral: { backgroundColor: "#f1f5f9", color: "#475569", borderColor: "#e2e8f0" },
-    success: { backgroundColor: "#22c55e", color: "#ffffff", borderColor: "#22c55e" },
-    warning: { backgroundColor: "#f97316", color: "#ffffff", borderColor: "#f97316" },
-    info: { backgroundColor: "#2563eb", color: "#ffffff", borderColor: "#2563eb" },
+    neutral: { backgroundColor: appPalette.semantic.neutralSurface, color: appPalette.semantic.neutralText, borderColor: appPalette.semantic.borderSubtle },
+    success: { backgroundColor: appPalette.semantic.successStrong, color: appPalette.semantic.textInverse, borderColor: appPalette.semantic.successStrong },
+    warning: { backgroundColor: appPalette.semantic.warningStrong, color: appPalette.semantic.textInverse, borderColor: appPalette.semantic.warningStrong },
+    info: { backgroundColor: appPalette.brand.primaryStrong, color: appPalette.semantic.textInverse, borderColor: appPalette.brand.primaryStrong },
   }[tone];
 
   const content = (
@@ -74,13 +75,13 @@ export function NativeRewardCard({
 
         <View style={{ flex: 1, minWidth: 0, gap: 8 }}>
           <View style={{ flexDirection: "row", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
-            <Text style={{ fontSize: 12, fontWeight: "500", color: "#0f172a", fontFamily: "Montserrat", lineHeight: 12, flexShrink: 1 }}>
+            <Text style={{ fontSize: 12, fontWeight: "500", color: appPalette.semantic.textStrong, fontFamily: "Montserrat", lineHeight: 12, flexShrink: 1 }}>
               {reward.title}
             </Text>
             {reward.isUnlocked && <SmallBadge tone="success">Получено</SmallBadge>}
           </View>
 
-          <Text style={{ color: "#64748b", fontSize: 12, fontWeight: "400", lineHeight: 18, fontFamily: "Montserrat" }}>
+          <Text style={{ color: appPalette.semantic.textMuted, fontSize: 12, fontWeight: "400", lineHeight: 18, fontFamily: "Montserrat" }}>
             {reward.description}
           </Text>
 
@@ -88,7 +89,7 @@ export function NativeRewardCard({
             {!!goal && (
               <SmallBadge
                 tone="info"
-                icon={<Target size={12} color="#ffffff" />}
+                icon={<Target size={12} color={appPalette.semantic.textInverse} />}
                 onPress={() => void Linking.openURL(buildNativeRouteUrl(buildGoalsPath({ id: goal.id })))}
               >
                 {goal.title}
@@ -98,7 +99,7 @@ export function NativeRewardCard({
             {!!challenge && (
               <SmallBadge
                 tone="warning"
-                icon={<Swords size={12} color="#ffffff" />}
+                icon={<Swords size={12} color={appPalette.semantic.textInverse} />}
                 onPress={() => void Linking.openURL(buildNativeRouteUrl(buildChallengesPath({ id: challenge.id })))}
               >
                 {challenge.title}
@@ -115,10 +116,12 @@ export function NativeRewardCard({
             hitSlop={8}
             style={{ width: 36, height: 36, borderRadius: 8, alignItems: "center", justifyContent: "center" }}
           >
-            <Edit size={14} color="#64748b" />
+            <Edit size={14} color={appPalette.semantic.textMuted} />
           </Pressable>
         )}
       </View>
     </SurfaceCard>
   );
 }
+
+

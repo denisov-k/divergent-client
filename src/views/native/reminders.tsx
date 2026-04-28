@@ -7,6 +7,7 @@ import { NativeReminderCard } from "@/components/native/NativeReminderCard";
 import { ReminderFormSheet } from "@/components/native/ReminderFormSheet";
 import { ScreenHeader } from "@/components/native/ScreenHeader";
 import { useRemindersScreen } from "@/shared/screens/reminders/useRemindersScreen";
+import { appPalette } from "@/theme/palette";
 
 export default function NativeRemindersScreen(props: {
   reminderId?: string | null;
@@ -50,7 +51,7 @@ export default function NativeRemindersScreen(props: {
   };
 
   return (
-    <View style={{ flex: 1, backgroundColor: "#ffffff" }}>
+    <View style={{ flex: 1, backgroundColor: appPalette.surface.background }}>
       <ScreenHeader
         title={t("reminders.title")}
         actionLabel={t("reminders.create")}
@@ -98,3 +99,5 @@ export default function NativeRemindersScreen(props: {
     </View>
   );
 }
+
+

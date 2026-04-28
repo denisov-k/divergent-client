@@ -1,6 +1,7 @@
-import { Image, Pressable, Text, View } from "react-native";
+﻿import { Image, Pressable, Text, View } from "react-native";
 
 import { Settings } from "@/components/native/icons";
+import { appPalette } from "@/theme/palette";
 import type { User } from "@/types";
 
 function getInitials(name: string) {
@@ -36,17 +37,17 @@ export function NativeAppHeader({
           alignItems: "center",
           gap: 16,
           borderWidth: 1,
-          borderColor: "#e2e8f0",
+          borderColor: appPalette.semantic.borderSubtle,
           borderRadius: 12,
           padding: 8,
-          backgroundColor: "#ffffff",
+          backgroundColor: appPalette.surface.card,
         }}
       >
         <View style={{ position: "relative" }}>
           {user.photoUrl ? (
             <Image
               source={{ uri: user.photoUrl }}
-              style={{ width: 56, height: 56, borderRadius: 28, backgroundColor: "#e2e8f0" }}
+              style={{ width: 56, height: 56, borderRadius: 28, backgroundColor: appPalette.semantic.borderSubtle }}
             />
           ) : (
             <View
@@ -54,12 +55,12 @@ export function NativeAppHeader({
                 width: 56,
                 height: 56,
                 borderRadius: 28,
-                backgroundColor: "#dbeafe",
+                backgroundColor: appPalette.semantic.infoSurface,
                 alignItems: "center",
                 justifyContent: "center",
               }}
             >
-              <Text style={{ color: "#1d4ed8", fontSize: 19, fontWeight: "500", fontFamily: "Montserrat", lineHeight: 29 }}>{initials}</Text>
+              <Text style={{ color: appPalette.semantic.infoText, fontSize: 19, fontWeight: "500", fontFamily: "Montserrat", lineHeight: 29 }}>{initials}</Text>
             </View>
           )}
 
@@ -71,14 +72,14 @@ export function NativeAppHeader({
               width: 24,
               height: 24,
               borderRadius: 12,
-              backgroundColor: "#2563eb",
+              backgroundColor: appPalette.brand.primary,
               borderWidth: 2,
-              borderColor: "#ffffff",
+              borderColor: appPalette.surface.background,
               alignItems: "center",
               justifyContent: "center",
             }}
           >
-            <Text style={{ color: "#ffffff", fontSize: 12, fontWeight: "500", fontFamily: "Montserrat", lineHeight: 18 }}>{user.level}</Text>
+            <Text style={{ color: appPalette.brand.primaryForeground, fontSize: 12, fontWeight: "500", fontFamily: "Montserrat", lineHeight: 18 }}>{user.level}</Text>
           </View>
         </View>
 
@@ -86,7 +87,7 @@ export function NativeAppHeader({
           <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
             <Text
               numberOfLines={1}
-              style={{ flex: 1, color: "#0f172a", fontSize: 15, fontWeight: "500", fontFamily: "Montserrat", lineHeight: 23 }}
+              style={{ flex: 1, color: appPalette.semantic.textStrong, fontSize: 15, fontWeight: "500", fontFamily: "Montserrat", lineHeight: 23 }}
             >
               {user.name || user.email || "User"}
             </Text>
@@ -103,24 +104,24 @@ export function NativeAppHeader({
                 backgroundColor: "transparent",
               }}
             >
-              <Settings size={20} color="#64748b" />
+              <Settings size={20} color={appPalette.semantic.textMuted} />
             </Pressable>
           </View>
 
           <View style={{ gap: 6 }}>
             <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
-              <Text style={{ color: "#64748b", fontSize: 12, fontWeight: "400", fontFamily: "Montserrat", lineHeight: 18 }}>Level {user.level}</Text>
-              <Text style={{ color: "#64748b", fontSize: 12, fontWeight: "400", fontFamily: "Montserrat", lineHeight: 18 }}>
+              <Text style={{ color: appPalette.semantic.textMuted, fontSize: 12, fontWeight: "400", fontFamily: "Montserrat", lineHeight: 18 }}>Level {user.level}</Text>
+              <Text style={{ color: appPalette.semantic.textMuted, fontSize: 12, fontWeight: "400", fontFamily: "Montserrat", lineHeight: 18 }}>
                 {user.xp} / {user.requiredXp} XP
               </Text>
             </View>
 
-            <View style={{ height: 8, borderRadius: 999, backgroundColor: "#e2e8f0", overflow: "hidden" }}>
+            <View style={{ height: 8, borderRadius: 999, backgroundColor: appPalette.semantic.borderSubtle, overflow: "hidden" }}>
               <View
                 style={{
                   width: `${progress}%`,
                   height: "100%",
-                  backgroundColor: "#2563eb",
+                  backgroundColor: appPalette.brand.primary,
                   borderRadius: 999,
                 }}
               />

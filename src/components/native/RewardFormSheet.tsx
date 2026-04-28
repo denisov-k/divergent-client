@@ -4,8 +4,9 @@ import { useTranslation } from "react-i18next";
 
 import { ActionChip } from "@/components/native/ActionChip";
 import { FieldInput } from "@/components/native/FieldInput";
-import { SectionTabs } from "@/components/native/SectionTabs";
 import { NativeRewardIcon } from "@/components/native/NativeRewardIcon";
+import { SectionTabs } from "@/components/native/SectionTabs";
+import { appPalette } from "@/theme/palette";
 import type { Goal, Reward, RewardIcon } from "@/types";
 
 const iconOptions: RewardIcon[] = ["trophy", "star", "gift", "crown", "award", "zap"];
@@ -76,24 +77,17 @@ export function RewardFormSheet({
     }
   };
 
+  const sectionLabelStyle = { fontSize: 14, fontWeight: "600" as const, color: appPalette.semantic.text, fontFamily: "Montserrat" };
+
   return (
     <Modal visible={open} transparent animationType="slide" onRequestClose={() => onOpenChange(false)}>
-      <View style={{ flex: 1, backgroundColor: "rgba(15, 23, 42, 0.35)", justifyContent: "flex-end" }}>
-        <View
-          style={{
-            maxHeight: "90%",
-            backgroundColor: "#ffffff",
-            borderTopLeftRadius: 24,
-            borderTopRightRadius: 24,
-            padding: 20,
-            gap: 14,
-          }}
-        >
+      <View style={{ flex: 1, backgroundColor: appPalette.surface.overlay, justifyContent: "flex-end" }}>
+        <View style={{ maxHeight: "90%", backgroundColor: appPalette.surface.background, borderTopLeftRadius: 24, borderTopRightRadius: 24, padding: 20, gap: 14 }}>
           <View style={{ gap: 6 }}>
-            <Text style={{ fontSize: 20, fontWeight: "700", color: "#0f172a" }}>
+            <Text style={{ fontSize: 20, fontWeight: "700", color: appPalette.semantic.textStrong, fontFamily: "Montserrat" }}>
               {reward ? "Редактировать награду" : "Создать новую награду"}
             </Text>
-            <Text style={{ color: "#64748b" }}>
+            <Text style={{ color: appPalette.semantic.textMuted, fontFamily: "Montserrat", fontSize: 12, lineHeight: 18 }}>
               Создайте награду, которую можно получить за достижение определенного опыта
             </Text>
           </View>
@@ -104,13 +98,13 @@ export function RewardFormSheet({
             <FieldInput label="Требуется XP *" value={xpRequires} onChangeText={setXpRequires} placeholder="100" />
 
             <View style={{ gap: 8 }}>
-              <Text style={{ fontSize: 14, fontWeight: "600", color: "#334155" }}>Иконка</Text>
+              <Text style={sectionLabelStyle}>Иконка</Text>
               <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8 }}>
                 {iconOptions.map((option) => (
                   <ActionChip key={option} onPress={() => setIcon(option)} tone={icon === option ? "primary" : "secondary"}>
                     <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
                       <NativeRewardIcon icon={option} />
-                      <Text style={{ color: icon === option ? "#ffffff" : "#334155", fontSize: 12, fontWeight: "500", lineHeight: 18, fontFamily: "Montserrat" }}>{option}</Text>
+                      <Text style={{ color: icon === option ? appPalette.semantic.textInverse : appPalette.semantic.text, fontSize: 12, fontWeight: "500", lineHeight: 18, fontFamily: "Montserrat" }}>{option}</Text>
                     </View>
                   </ActionChip>
                 ))}
@@ -118,25 +112,15 @@ export function RewardFormSheet({
             </View>
 
             <View style={{ gap: 8 }}>
-              <Text style={{ fontSize: 14, fontWeight: "600", color: "#334155" }}>Цель</Text>
-              <SectionTabs
-                tabs={[{ key: "none", label: "Без цели" }, ...goals.map((goal) => ({ key: goal.id, label: goal.title }))]}
-                activeTab={goalId || "none"}
-                onChange={(tab) => setGoalId(tab === "none" ? "" : tab)}
-              />
+              <Text style={sectionLabelStyle}>Цель</Text>
+              <SectionTabs tabs={[{ key: "none", label: "Без цели" }, ...goals.map((goal) => ({ key: goal.id, label: goal.title }))]} activeTab={goalId || "none"} onChange={(tab) => setGoalId(tab === "none" ? "" : tab)} />
             </View>
           </ScrollView>
 
           <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8 }}>
-            {reward && (
-              <ActionChip onPress={() => void onDelete(reward.id)} tone="danger">
-                {t("common.delete")}
-              </ActionChip>
-            )}
+            {reward && <ActionChip onPress={() => void onDelete(reward.id)} tone="danger">{t("common.delete")}</ActionChip>}
             <ActionChip onPress={() => onOpenChange(false)}>{t("common.cancel")}</ActionChip>
-            <ActionChip onPress={() => void handleSave()} tone="primary">
-              {isSubmitting ? t("common.sending") : reward ? t("common.save") : "Создать награду"}
-            </ActionChip>
+            <ActionChip onPress={() => void handleSave()} tone="primary">{isSubmitting ? t("common.sending") : reward ? t("common.save") : "Создать награду"}</ActionChip>
           </View>
         </View>
       </View>

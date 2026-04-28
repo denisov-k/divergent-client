@@ -1,6 +1,8 @@
 ﻿import type { ReactNode } from "react";
 import { View } from "react-native";
 
+import { appPalette } from "@/theme/palette";
+
 export function SurfaceCard({
   children,
   gap = 12,
@@ -15,11 +17,11 @@ export function SurfaceCard({
   return (
     <View
       style={{
-        backgroundColor: "#ffffff",
+        backgroundColor: appPalette.surface.card,
         borderRadius: radius,
         padding,
         borderWidth: 1,
-        borderColor: "#e2e8f0",
+        borderColor: appPalette.semantic.borderSubtle,
         gap,
       }}
     >

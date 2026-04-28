@@ -1,8 +1,9 @@
-import { useEffect, useState } from "react";
+﻿import { useEffect, useState } from "react";
 import { Alert, Modal, Text, View } from "react-native";
 
 import { ActionChip } from "@/components/native/ActionChip";
 import { FieldInput } from "@/components/native/FieldInput";
+import { appPalette } from "@/theme/palette";
 import type { FriendInput } from "@/types";
 
 export function FriendFormSheet({
@@ -55,13 +56,13 @@ export function FriendFormSheet({
       <View
         style={{
           flex: 1,
-          backgroundColor: "rgba(15, 23, 42, 0.35)",
+          backgroundColor: appPalette.surface.overlay,
           justifyContent: "flex-end",
         }}
       >
         <View
           style={{
-            backgroundColor: "#ffffff",
+            backgroundColor: appPalette.surface.background,
             borderTopLeftRadius: 24,
             borderTopRightRadius: 24,
             padding: 20,
@@ -69,8 +70,8 @@ export function FriendFormSheet({
           }}
         >
           <View style={{ gap: 6 }}>
-            <Text style={{ fontSize: 20, fontWeight: "700", color: "#0f172a" }}>Добавить друга</Text>
-            <Text style={{ color: "#64748b" }}>Теперь friends flow в mobile уже не read-only.</Text>
+            <Text style={{ fontSize: 20, fontWeight: "700", color: appPalette.semantic.textStrong, fontFamily: "Montserrat" }}>Добавить друга</Text>
+            <Text style={{ color: appPalette.semantic.textMuted, fontFamily: "Montserrat", fontSize: 12, lineHeight: 18 }}>Теперь friends flow в mobile уже не read-only.</Text>
           </View>
 
           <FieldInput label="Имя" value={name} onChangeText={setName} placeholder="Например, Алина" />

@@ -1,6 +1,8 @@
 ﻿import { Circle, Svg } from "react-native-svg";
 import { Text, View } from "react-native";
 
+import { appPalette } from "@/theme/palette";
+
 interface ProgressRingProps {
   progress: number;
   size?: number;
@@ -20,7 +22,7 @@ export function ProgressRing({ progress, size = 60, strokeWidth = 4 }: ProgressR
           cx={size / 2}
           cy={size / 2}
           r={radius}
-          stroke="#e2e8f0"
+          stroke={appPalette.semantic.borderSubtle}
           strokeWidth={strokeWidth}
           fill="none"
         />
@@ -28,7 +30,7 @@ export function ProgressRing({ progress, size = 60, strokeWidth = 4 }: ProgressR
           cx={size / 2}
           cy={size / 2}
           r={radius}
-          stroke="#2563eb"
+          stroke={appPalette.brand.primaryStrong}
           strokeWidth={strokeWidth}
           fill="none"
           strokeDasharray={`${circumference} ${circumference}`}
@@ -47,7 +49,9 @@ export function ProgressRing({ progress, size = 60, strokeWidth = 4 }: ProgressR
           justifyContent: "center",
         }}
       >
-        <Text style={{ color: "#0f172a", fontWeight: "700", fontSize: 12 }}>{Math.round(normalizedProgress)}%</Text>
+        <Text style={{ color: appPalette.semantic.textStrong, fontWeight: "700", fontSize: 12, fontFamily: "Montserrat" }}>
+          {Math.round(normalizedProgress)}%
+        </Text>
       </View>
     </View>
   );

@@ -1,5 +1,7 @@
 ﻿import { Pressable, Text, View } from "react-native";
 
+import { appPalette } from "@/theme/palette";
+
 export function SectionTabs<T extends string>({
   tabs,
   activeTab,
@@ -19,15 +21,15 @@ export function SectionTabs<T extends string>({
             key={tab.key}
             onPress={() => onChange(tab.key)}
             style={{
-              backgroundColor: active ? "#dbeafe" : "#ffffff",
+              backgroundColor: active ? appPalette.semantic.infoSurface : appPalette.surface.background,
               borderWidth: 1,
-              borderColor: active ? "#93c5fd" : "#e2e8f0",
+              borderColor: active ? appPalette.semantic.infoBorder : appPalette.semantic.borderSubtle,
               borderRadius: 999,
               paddingHorizontal: 14,
               paddingVertical: 10,
             }}
           >
-            <Text style={{ color: active ? "#1d4ed8" : "#334155", fontWeight: "600" }}>{tab.label}</Text>
+            <Text style={{ color: active ? appPalette.semantic.infoText : appPalette.semantic.text, fontWeight: "600", fontFamily: "Montserrat", fontSize: 12, lineHeight: 18 }}>{tab.label}</Text>
           </Pressable>
         );
       })}

@@ -27,6 +27,7 @@ import { SurfaceCard } from "@/components/native/SurfaceCard";
 import { buildNativeRouteUrl } from "@/platform/appUrl.native";
 import { isTaskCompletedThisPeriod } from "@/shared/screens/goals/model";
 import type { CategoryType } from "@/shared/domain";
+import { appPalette } from "@/theme/palette";
 import type { Goal, GoalPeriod, Reward, Task } from "@/types";
 
 const categoryConfig: Record<
@@ -38,13 +39,13 @@ const categoryConfig: Record<
     icon: React.ComponentType<{ size?: string | number; color?: string }>;
   }
 > = {
-  work: { backgroundColor: "#dbeafe", textColor: "#1d4ed8", borderColor: "#bfdbfe", icon: Briefcase },
-  health: { backgroundColor: "#fee2e2", textColor: "#b91c1c", borderColor: "#fecaca", icon: Heart },
-  learning: { backgroundColor: "#f3e8ff", textColor: "#7e22ce", borderColor: "#e9d5ff", icon: GraduationCap },
-  fitness: { backgroundColor: "#dcfce7", textColor: "#15803d", borderColor: "#bbf7d0", icon: Dumbbell },
-  creative: { backgroundColor: "#fce7f3", textColor: "#be185d", borderColor: "#fbcfe8", icon: Palette },
-  personal: { backgroundColor: "#ffedd5", textColor: "#c2410c", borderColor: "#fed7aa", icon: Home },
-  custom: { backgroundColor: "#fef3c7", textColor: "#a16207", borderColor: "#fde68a", icon: Rocket },
+  work: { backgroundColor: appPalette.categories.work.background, textColor: appPalette.categories.work.text, borderColor: appPalette.categories.work.border, icon: Briefcase },
+  health: { backgroundColor: appPalette.categories.health.background, textColor: appPalette.categories.health.text, borderColor: appPalette.categories.health.border, icon: Heart },
+  learning: { backgroundColor: appPalette.categories.learning.background, textColor: appPalette.categories.learning.text, borderColor: appPalette.categories.learning.border, icon: GraduationCap },
+  fitness: { backgroundColor: appPalette.categories.fitness.background, textColor: appPalette.categories.fitness.text, borderColor: appPalette.categories.fitness.border, icon: Dumbbell },
+  creative: { backgroundColor: appPalette.categories.creative.background, textColor: appPalette.categories.creative.text, borderColor: appPalette.categories.creative.border, icon: Palette },
+  personal: { backgroundColor: appPalette.categories.personal.background, textColor: appPalette.categories.personal.text, borderColor: appPalette.categories.personal.border, icon: Home },
+  custom: { backgroundColor: appPalette.categories.custom.background, textColor: appPalette.categories.custom.text, borderColor: appPalette.categories.custom.border, icon: Rocket },
 };
 
 function countTasks(tasks?: Task[]): number {
@@ -142,10 +143,10 @@ function SmallPill({
   onPress?: () => void;
 }) {
   const palette = {
-    neutral: { backgroundColor: "#f1f5f9", color: "#475569" },
-    success: { backgroundColor: "#22c55e", color: "#ffffff" },
-    warning: { backgroundColor: "#f97316", color: "#ffffff" },
-    danger: { backgroundColor: "#ef4444", color: "#ffffff" },
+    neutral: { backgroundColor: appPalette.semantic.neutralSurface, color: appPalette.semantic.neutralText },
+    success: { backgroundColor: appPalette.semantic.successStrong, color: appPalette.semantic.textInverse },
+    warning: { backgroundColor: appPalette.semantic.warningStrong, color: appPalette.semantic.textInverse },
+    danger: { backgroundColor: appPalette.semantic.dangerStrong, color: appPalette.semantic.textInverse },
   }[tone];
 
   const content = (
@@ -242,9 +243,9 @@ function TaskTree({
             <View
               style={{
                 borderWidth: 1,
-                borderColor: "#e2e8f0",
+                borderColor: appPalette.semantic.borderSubtle,
                 borderRadius: 14,
-                backgroundColor: "#f8fafc",
+                backgroundColor: appPalette.semantic.neutralSurfaceStrong,
                 paddingHorizontal: 12,
                 paddingVertical: 10,
                 gap: 8,
@@ -253,7 +254,7 @@ function TaskTree({
               <View style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
                 {hasSubtasks || level > 0 ? (
                   <Pressable onPress={() => setExpanded((current) => ({ ...current, [task.id]: !current[task.id] }))}>
-                    {isOpen ? <ChevronUp size={16} color="#64748b" /> : <ChevronDown size={16} color="#64748b" />}
+                    {isOpen ? <ChevronUp size={16} color={appPalette.semantic.textMuted} /> : <ChevronDown size={16} color={appPalette.semantic.textMuted} />}
                   </Pressable>
                 ) : (
                   <View style={{ width: 16 }} />
@@ -273,23 +274,23 @@ function TaskTree({
                       height: 20,
                       borderRadius: 6,
                       borderWidth: 1.5,
-                      borderColor: completed ? "#2563eb" : "#94a3b8",
-                      backgroundColor: completed ? "#2563eb" : "#ffffff",
+                      borderColor: completed ? appPalette.brand.primaryStrong : appPalette.semantic.textSubtle,
+                      backgroundColor: completed ? appPalette.brand.primaryStrong : appPalette.surface.background,
                       alignItems: "center",
                       justifyContent: "center",
                     }}
                   >
-                    {completed && <Text style={{ color: "#ffffff", fontSize: 12, fontWeight: "500", fontFamily: "Montserrat", lineHeight: 18 }}>✓</Text>}
+                    {completed && <Text style={{ color: appPalette.semantic.textInverse, fontSize: 12, fontWeight: "500", fontFamily: "Montserrat", lineHeight: 18 }}>✓</Text>}
                   </View>
 
                   <View style={{ flex: 1, gap: 2 }}>
-                    <Text style={{ color: completed ? "#64748b" : "#0f172a", textDecorationLine: completed ? "line-through" : "none", fontSize: 12, fontWeight: "400", lineHeight: 18, fontFamily: "Montserrat" }}>
+                    <Text style={{ color: completed ? appPalette.semantic.textMuted : appPalette.semantic.textStrong, textDecorationLine: completed ? "line-through" : "none", fontSize: 12, fontWeight: "400", lineHeight: 18, fontFamily: "Montserrat" }}>
                       {task.title}
                     </Text>
                     {!!task.dueDate && (
                       <View style={{ flexDirection: "row", alignItems: "center", gap: 4 }}>
-                        <Calendar size={12} color="#94a3b8" />
-                        <Text style={{ color: "#94a3b8", fontSize: 12, fontWeight: "400", lineHeight: 18, fontFamily: "Montserrat" }}>{task.dueDate}</Text>
+                        <Calendar size={12} color={appPalette.semantic.textSubtle} />
+                        <Text style={{ color: appPalette.semantic.textSubtle, fontSize: 12, fontWeight: "400", lineHeight: 18, fontFamily: "Montserrat" }}>{task.dueDate}</Text>
                       </View>
                     )}
                   </View>
@@ -298,13 +299,13 @@ function TaskTree({
                 {typeof task.xpReward === "number" && task.xpReward > 0 && (
                   <View
                     style={{
-                      backgroundColor: "#e2e8f0",
+                      backgroundColor: appPalette.semantic.borderSubtle,
                       borderRadius: 8,
                       paddingHorizontal: 8,
                       paddingVertical: 2,
                     }}
                   >
-                    <Text style={{ color: "#334155", fontWeight: "500", fontSize: 12, lineHeight: 18, fontFamily: "Montserrat" }}>+{task.xpReward} XP</Text>
+                    <Text style={{ color: appPalette.semantic.text, fontWeight: "500", fontSize: 12, lineHeight: 18, fontFamily: "Montserrat" }}>+{task.xpReward} XP</Text>
                   </View>
                 )}
               </View>
@@ -382,8 +383,8 @@ export function NativeGoalCard({
       <View style={{ flexDirection: "row", justifyContent: "space-between", gap: 16 }}>
         <View style={{ flex: 1, gap: 8 }}>
           <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
-            <Target size={20} color="#2563eb" />
-            <Text style={{ fontSize: 12, fontWeight: "500", color: "#0f172a", flex: 1, fontFamily: "Montserrat", lineHeight: 12 }}>{goal.title}</Text>
+            <Target size={20} color={appPalette.brand.primaryStrong} />
+            <Text style={{ fontSize: 12, fontWeight: "500", color: appPalette.semantic.textStrong, flex: 1, fontFamily: "Montserrat", lineHeight: 12 }}>{goal.title}</Text>
           </View>
 
           <View
@@ -404,7 +405,7 @@ export function NativeGoalCard({
             <Text style={{ color: categoryPalette.textColor, fontWeight: "500", fontSize: 12, lineHeight: 18, fontFamily: "Montserrat", flexShrink: 1 }}>{categoryLabel}</Text>
           </View>
 
-          {!!goal.description && <Text style={{ color: "#64748b", fontSize: 12, fontWeight: "400", lineHeight: 18, fontFamily: "Montserrat" }}>{goal.description}</Text>}
+          {!!goal.description && <Text style={{ color: appPalette.semantic.textMuted, fontSize: 12, fontWeight: "400", lineHeight: 18, fontFamily: "Montserrat" }}>{goal.description}</Text>}
 
           {!!statusLabel && <SmallPill tone={status === "COMPLETED" ? "success" : "danger"}>{statusLabel}</SmallPill>}
         </View>
@@ -412,28 +413,28 @@ export function NativeGoalCard({
         <View style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
           <ProgressRing progress={progress} size={70} strokeWidth={6} />
           <View>
-            {!goal.challenge && !!onEdit && <SmallAction icon={<Edit size={14} color="#64748b" />} onPress={() => onEdit(goal.id)} />}
-            {!!onAddReminder && <SmallAction icon={<AlarmClock size={14} color="#64748b" />} onPress={() => onAddReminder(goal.id)} />}
-            {!!onGoToProgress && <SmallAction icon={<BarChart2 size={14} color="#64748b" />} onPress={() => onGoToProgress(goal.id)} />}
+            {!goal.challenge && !!onEdit && <SmallAction icon={<Edit size={14} color={appPalette.semantic.textMuted} />} onPress={() => onEdit(goal.id)} />}
+            {!!onAddReminder && <SmallAction icon={<AlarmClock size={14} color={appPalette.semantic.textMuted} />} onPress={() => onAddReminder(goal.id)} />}
+            {!!onGoToProgress && <SmallAction icon={<BarChart2 size={14} color={appPalette.semantic.textMuted} />} onPress={() => onGoToProgress(goal.id)} />}
           </View>
         </View>
       </View>
 
       <View style={{ gap: 8 }}>
         <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
-          <Text style={{ color: "#64748b", fontSize: 12, fontWeight: "400", lineHeight: 18, fontFamily: "Montserrat" }}>{t("goals.progress")}</Text>
+          <Text style={{ color: appPalette.semantic.textMuted, fontSize: 12, fontWeight: "400", lineHeight: 18, fontFamily: "Montserrat" }}>{t("goals.progress")}</Text>
           {goal.goalType === "TASK" ? (
-            <Text style={{ color: "#64748b", fontSize: 12, fontWeight: "400", lineHeight: 18, fontFamily: "Montserrat" }}>
+            <Text style={{ color: appPalette.semantic.textMuted, fontSize: 12, fontWeight: "400", lineHeight: 18, fontFamily: "Montserrat" }}>
               {completedTasks} / {totalTasks} {t("goals.tasks_count")}
             </Text>
           ) : (
-            <Text style={{ color: "#64748b", fontSize: 12, fontWeight: "400", lineHeight: 18, fontFamily: "Montserrat" }}>
+            <Text style={{ color: appPalette.semantic.textMuted, fontSize: 12, fontWeight: "400", lineHeight: 18, fontFamily: "Montserrat" }}>
               {goal.currentValue ?? 0} / {goal.targetValue ?? 0}
             </Text>
           )}
         </View>
-        <View style={{ height: 8, backgroundColor: "#e2e8f0", borderRadius: 999, overflow: "hidden" }}>
-          <View style={{ width: `${progress}%`, height: "100%", backgroundColor: "#2563eb" }} />
+        <View style={{ height: 8, backgroundColor: appPalette.semantic.borderSubtle, borderRadius: 999, overflow: "hidden" }}>
+          <View style={{ width: `${progress}%`, height: "100%", backgroundColor: appPalette.brand.primaryStrong }} />
         </View>
       </View>
 
@@ -447,17 +448,17 @@ export function NativeGoalCard({
             style={{
               flex: 1,
               borderWidth: 1,
-              borderColor: "#cbd5e1",
+              borderColor: appPalette.semantic.borderStrong,
               borderRadius: 8,
               paddingHorizontal: 8,
               paddingVertical: 6,
-              backgroundColor: "#ffffff",
-              color: "#0f172a",
+              backgroundColor: appPalette.semantic.textInverse,
+              color: appPalette.semantic.textStrong,
               fontFamily: "Montserrat",
               fontSize: 10,
               lineHeight: 15,
             }}
-            placeholderTextColor="#94a3b8"
+            placeholderTextColor={appPalette.semantic.textSubtle}
           />
           <ActionChip
             onPress={() => {
@@ -477,8 +478,8 @@ export function NativeGoalCard({
       {goal.goalType === "TASK" && (
         <View style={{ gap: 10 }}>
           <Pressable onPress={() => setIsOpen((current) => !current)} style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
-            <Text style={{ color: "#0f172a", fontSize: 12, fontWeight: "500", lineHeight: 18, fontFamily: "Montserrat" }}>{t("goals.tasks")}</Text>
-            {isOpen ? <ChevronUp size={18} color="#64748b" /> : <ChevronDown size={18} color="#64748b" />}
+            <Text style={{ color: appPalette.semantic.textStrong, fontSize: 12, fontWeight: "500", lineHeight: 18, fontFamily: "Montserrat" }}>{t("goals.tasks")}</Text>
+            {isOpen ? <ChevronUp size={18} color={appPalette.semantic.textMuted} /> : <ChevronDown size={18} color={appPalette.semantic.textMuted} />}
           </Pressable>
 
           {isOpen && (
@@ -493,13 +494,13 @@ export function NativeGoalCard({
         </View>
       )}
 
-      <View style={{ borderTopWidth: 1, borderTopColor: "#e2e8f0", paddingTop: 8, flexDirection: "row", justifyContent: "space-between", gap: 12 }}>
+      <View style={{ borderTopWidth: 1, borderTopColor: appPalette.semantic.borderSubtle, paddingTop: 8, flexDirection: "row", justifyContent: "space-between", gap: 12 }}>
         <View style={{ flex: 1, gap: 8 }}>
           {!!cycleLabel && <SmallPill>{cycleLabel}</SmallPill>}
           {!!goal.challenge && (
             <SmallPill
               tone="warning"
-              icon={<Swords size={12} color="#ffffff" />}
+              icon={<Swords size={12} color={appPalette.semantic.textInverse} />}
               onPress={() => {
                 void Linking.openURL(buildNativeRouteUrl(buildChallengesPath({ id: goal.challenge?.id })));
               }}
@@ -509,8 +510,8 @@ export function NativeGoalCard({
           )}
           {!!goal.dueDate && (
             <View style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
-              <Calendar size={14} color="#94a3b8" />
-              <Text style={{ color: "#64748b", fontSize: 12, fontWeight: "400", lineHeight: 18, fontFamily: "Montserrat" }}>{new Date(goal.dueDate).toISOString().split("T")[0]}</Text>
+              <Calendar size={14} color={appPalette.semantic.textSubtle} />
+              <Text style={{ color: appPalette.semantic.textMuted, fontSize: 12, fontWeight: "400", lineHeight: 18, fontFamily: "Montserrat" }}>{new Date(goal.dueDate).toISOString().split("T")[0]}</Text>
             </View>
           )}
         </View>
@@ -519,7 +520,7 @@ export function NativeGoalCard({
           <View style={{ maxWidth: "50%", alignItems: "flex-end" }}>
             <SmallPill
               tone="success"
-              icon={<Gift size={12} color="#ffffff" />}
+              icon={<Gift size={12} color={appPalette.semantic.textInverse} />}
               onPress={() => {
                 if (!reward.id) {
                   return;
@@ -536,6 +537,8 @@ export function NativeGoalCard({
     </SurfaceCard>
   );
 }
+
+
 
 
 

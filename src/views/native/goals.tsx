@@ -10,6 +10,7 @@ import { NativeGoalCard } from "@/components/native/NativeGoalCard";
 import { Plus, Sparkles } from "@/components/native/icons";
 import { useAppStore } from "@/stores/useAppStore";
 import { useGoalsScreen } from "@/shared/screens/goals/useGoalsScreen";
+import { appPalette } from "@/theme/palette";
 
 export default function NativeGoalsScreen(props: {
   goalId?: string | null;
@@ -64,7 +65,7 @@ export default function NativeGoalsScreen(props: {
   };
 
   return (
-    <View style={{ flex: 1, backgroundColor: "#ffffff" }}>
+    <View style={{ flex: 1, backgroundColor: appPalette.surface.background }}>
       <View
         style={{
           paddingHorizontal: 8,
@@ -73,14 +74,14 @@ export default function NativeGoalsScreen(props: {
           alignItems: "center",
           justifyContent: "space-between",
           gap: 8,
-          backgroundColor: "#ffffff",
+          backgroundColor: appPalette.surface.background,
         }}
       >
         <Text
           style={{
             fontSize: 19,
             fontWeight: "500",
-            color: "#0f172a",
+            color: appPalette.semantic.textStrong,
             fontFamily: "Montserrat",
             lineHeight: 29,
           }}
@@ -95,16 +96,16 @@ export default function NativeGoalsScreen(props: {
               flexDirection: "row",
               alignItems: "center",
               gap: 8,
-              backgroundColor: "#dbeafe",
+              backgroundColor: appPalette.semantic.infoSurface,
               borderWidth: 1,
-              borderColor: "#93c5fd",
+              borderColor: appPalette.semantic.infoBorder,
               borderRadius: 10,
               paddingHorizontal: 12,
               paddingVertical: 10,
             }}
           >
-            <Plus size={16} color="#1d4ed8" />
-            <Text style={{ color: "#1d4ed8", fontSize: 12, fontWeight: "500", lineHeight: 18, fontFamily: "Montserrat" }}>
+            <Plus size={16} color={appPalette.semantic.infoText} />
+            <Text style={{ color: appPalette.semantic.infoText, fontSize: 12, fontWeight: "500", lineHeight: 18, fontFamily: "Montserrat" }}>
               {t("goals.create_goal")}
             </Text>
           </Pressable>
@@ -115,28 +116,21 @@ export default function NativeGoalsScreen(props: {
               flexDirection: "row",
               alignItems: "center",
               gap: 8,
-              backgroundColor: "#a855f7",
+              backgroundColor: appPalette.brand.ai,
               borderRadius: 10,
               paddingHorizontal: 12,
               paddingVertical: 10,
             }}
           >
-            <Sparkles size={16} color="#ffffff" />
-            <Text style={{ color: "#ffffff", fontSize: 12, fontWeight: "500", lineHeight: 18, fontFamily: "Montserrat" }}>
+            <Sparkles size={16} color={appPalette.brand.primaryForeground} />
+            <Text style={{ color: appPalette.brand.primaryForeground, fontSize: 12, fontWeight: "500", lineHeight: 18, fontFamily: "Montserrat" }}>
               {t("goals.open_ai")}
             </Text>
           </Pressable>
         </View>
       </View>
 
-      <ScrollView
-        contentContainerStyle={{
-          paddingHorizontal: 8,
-          paddingTop: 8,
-          paddingBottom: 16,
-          gap: 8,
-        }}
-      >
+      <ScrollView contentContainerStyle={{ paddingHorizontal: 8, gap: 8 }}>
         {goals.length === 0 ? (
           <EmptyStateCard
             title="Пока нет целей"
@@ -168,22 +162,8 @@ export default function NativeGoalsScreen(props: {
         )}
       </ScrollView>
 
-      <CreateReportSheet
-        open={createReportDialogOpen}
-        onOpenChange={setCreateReportDialogOpen}
-        onSubmit={saveReport}
-      />
-
-      <GoalFormSheet
-        open={goalDialogOpen}
-        goal={editingGoal}
-        categories={categories}
-        rewards={rewards}
-        onOpenChange={setGoalDialogOpen}
-        onSave={saveGoal}
-        onDelete={removeGoal}
-      />
-
+      <CreateReportSheet open={createReportDialogOpen} onOpenChange={setCreateReportDialogOpen} onSubmit={saveReport} />
+      <GoalFormSheet open={goalDialogOpen} goal={editingGoal} categories={categories} rewards={rewards} onOpenChange={setGoalDialogOpen} onSave={saveGoal} onDelete={removeGoal} />
       <AiChatSheet
         open={aiOpen}
         onOpenChange={setAiOpen}
@@ -194,3 +174,4 @@ export default function NativeGoalsScreen(props: {
     </View>
   );
 }
+

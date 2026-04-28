@@ -6,6 +6,7 @@ import isoWeek from "dayjs/plugin/isoWeek";
 
 import { Activity } from "@/components/native/icons";
 import { SurfaceCard } from "@/components/native/SurfaceCard";
+import { appPalette } from "@/theme/palette";
 import type { Goal, GoalActivity } from "@/types";
 
 dayjs.extend(isoWeek);
@@ -98,14 +99,14 @@ export function NativePeriodCalendar({ goal, activity, loading }: Props) {
     <SurfaceCard gap={12} padding={16} radius={12}>
       <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
         <View>
-          <Text style={{ color: "#0f172a", fontSize: 14, fontWeight: "500", lineHeight: 20, fontFamily: "Montserrat" }}>Активность</Text>
-          <Text style={{ color: "#64748b", fontSize: 12, fontWeight: "400", lineHeight: 18, fontFamily: "Montserrat" }}>Прогресс в календарном виде</Text>
+          <Text style={{ color: appPalette.semantic.textStrong, fontSize: 14, fontWeight: "500", lineHeight: 20, fontFamily: "Montserrat" }}>Активность</Text>
+          <Text style={{ color: appPalette.semantic.textMuted, fontSize: 12, fontWeight: "400", lineHeight: 18, fontFamily: "Montserrat" }}>Прогресс в календарном виде</Text>
         </View>
-        <Activity size={20} color="#64748b" />
+        <Activity size={20} color={appPalette.semantic.textMuted} />
       </View>
 
       {loading ? (
-        <Text style={{ color: "#64748b", fontSize: 12, fontWeight: "400", lineHeight: 18, fontFamily: "Montserrat" }}>Загрузка активности...</Text>
+        <Text style={{ color: appPalette.semantic.textMuted, fontSize: 12, fontWeight: "400", lineHeight: 18, fontFamily: "Montserrat" }}>Загрузка активности...</Text>
       ) : (
         <ScrollView ref={scrollRef} horizontal showsHorizontalScrollIndicator={false}>
           <View style={{ gap: 6 }}>
@@ -113,7 +114,7 @@ export function NativePeriodCalendar({ goal, activity, loading }: Props) {
               <View style={{ width: 24 }} />
               {monthLabels.map((label, index) => (
                 <View key={`${label.month}-${index}`} style={{ width: label.colspan * 16, alignItems: "center" }}>
-                  <Text style={{ color: "#64748b", fontSize: 10, fontWeight: "400", lineHeight: 14, fontFamily: "Montserrat" }}>
+                  <Text style={{ color: appPalette.semantic.textMuted, fontSize: 10, fontWeight: "400", lineHeight: 14, fontFamily: "Montserrat" }}>
                     {label.colspan > 1 ? label.month : ""}
                   </Text>
                 </View>
@@ -124,7 +125,7 @@ export function NativePeriodCalendar({ goal, activity, loading }: Props) {
             {dayLabels.map((day, rowIdx) => (
               <View key={day} style={{ flexDirection: "row", alignItems: "center", minHeight: 16 }}>
                 <View style={{ width: 24, alignItems: "flex-end", paddingRight: 6 }}>
-                  <Text style={{ color: "#64748b", fontSize: 10, fontWeight: "400", lineHeight: 14, fontFamily: "Montserrat" }}>{day}</Text>
+                  <Text style={{ color: appPalette.semantic.textMuted, fontSize: 10, fontWeight: "400", lineHeight: 14, fontFamily: "Montserrat" }}>{day}</Text>
                 </View>
 
                 {weeks.map((week, colIdx) => {
@@ -134,7 +135,7 @@ export function NativePeriodCalendar({ goal, activity, loading }: Props) {
                   }
 
                   const status = dateMap.get(date.format("YYYY-MM-DD")) || "empty";
-                  const backgroundColor = status === "full" ? "#86efac" : status === "partial" ? "#fde68a" : "#e5e7eb";
+                  const backgroundColor = status === "full" ? appPalette.semantic.successSurfaceStrong : status === "partial" ? appPalette.semantic.warningSurfaceStrong : appPalette.semantic.neutralBorder;
 
                   return (
                     <View key={`${day}-${colIdx}`} style={{ width: 16, height: 16, alignItems: "center", justifyContent: "center" }}>
@@ -144,7 +145,7 @@ export function NativePeriodCalendar({ goal, activity, loading }: Props) {
                 })}
 
                 <View style={{ width: 24, alignItems: "flex-start", paddingLeft: 6 }}>
-                  <Text style={{ color: "#64748b", fontSize: 10, fontWeight: "400", lineHeight: 14, fontFamily: "Montserrat" }}>{day}</Text>
+                  <Text style={{ color: appPalette.semantic.textMuted, fontSize: 10, fontWeight: "400", lineHeight: 14, fontFamily: "Montserrat" }}>{day}</Text>
                 </View>
               </View>
             ))}
@@ -154,4 +155,6 @@ export function NativePeriodCalendar({ goal, activity, loading }: Props) {
     </SurfaceCard>
   );
 }
+
+
 
