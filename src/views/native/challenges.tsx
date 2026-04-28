@@ -1,14 +1,13 @@
 ﻿import { useEffect } from "react";
-import { Alert, Linking, Pressable, ScrollView, Share, Text, View } from "react-native";
+import { Alert, Linking, ScrollView, Share as NativeShare, Text, Pressable, View } from "react-native";
 import { useTranslation } from "react-i18next";
 
-import { ActionChip } from "@/components/native/ActionChip";
 import { ChallengeDetailsSheet } from "@/components/native/ChallengeDetailsSheet";
 import { ChallengeFormSheet } from "@/components/native/ChallengeFormSheet";
 import { EmptyStateCard } from "@/components/native/EmptyStateCard";
-import { ScreenHeader } from "@/components/native/ScreenHeader";
+import { NativeChallengeCard } from "@/components/native/NativeChallengeCard";
 import { SelectPaymentMethodSheet } from "@/components/native/SelectPaymentMethodSheet";
-import { SurfaceCard } from "@/components/native/SurfaceCard";
+import { Plus } from "@/components/native/icons";
 import { buildChallengeShareUrl } from "@/platform/appUrl";
 import { useChallengesScreen } from "@/shared/screens/challenges/useChallengesScreen";
 
@@ -50,7 +49,7 @@ export default function NativeChallengesScreen(props: {
     paymentId: props.paymentId,
     onShareChallenge: async (id) => {
       const url = buildChallengeShareUrl(id);
-      await Share.share({
+      await NativeShare.share({
         url,
         message: t("challenges.share_message", { url }),
       });
@@ -132,128 +131,73 @@ export default function NativeChallengesScreen(props: {
   };
 
   return (
-    <View style={{ flex: 1, backgroundColor: "#f8fafc" }}>
-      <ScreenHeader title={t("challenges.title")} actionLabel={t("common.create")} onAction={openCreateChallenge} />
+    <View style={{ flex: 1, backgroundColor: "#ffffff" }}>
+      <View
+        style={{
+          paddingHorizontal: 8,
+          paddingVertical: 8,
+          flexDirection: "row",
+          alignItems: "center",
+          justifyContent: "space-between",
+          gap: 8,
+          backgroundColor: "#ffffff",
+        }}
+      >
+        <Text
+          style={{
+            fontSize: 19,
+            fontWeight: "500",
+            color: "#0f172a",
+            fontFamily: "Montserrat",
+            lineHeight: 29,
+          }}
+        >
+          {t("challenges.title")}
+        </Text>
 
-      <ScrollView contentContainerStyle={{ padding: 16, gap: 12 }}>
+        <Pressable
+          onPress={openCreateChallenge}
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            gap: 8,
+            backgroundColor: "#dbeafe",
+            borderWidth: 1,
+            borderColor: "#93c5fd",
+            borderRadius: 10,
+            paddingHorizontal: 12,
+            paddingVertical: 10,
+          }}
+        >
+          <Plus size={16} color="#1d4ed8" />
+          <Text style={{ color: "#1d4ed8", fontSize: 12, fontWeight: "500", lineHeight: 18, fontFamily: "Montserrat" }}>
+            {t("challenges.create")}
+          </Text>
+        </Pressable>
+      </View>
+
+      <ScrollView contentContainerStyle={{ paddingHorizontal: 8, paddingTop: 8, paddingBottom: 16, gap: 8 }}>
         {challenges.length === 0 ? (
           <EmptyStateCard
-            title={t("challenges.empty_native_title")}
+            title={t("challenges.empty")}
             description={t("challenges.empty_native_description")}
-            actionLabel={t("challenges.create")}
+            actionLabel={t("challenges.create_first")}
             onAction={openCreateChallenge}
           />
         ) : (
-          challenges.map((challenge) => {
-            const goalsCount = challenge.goals.length;
-            const participantsCount = challenge.participants.length;
-            const isPaid = Boolean(challenge.price && challenge.price > 0);
-
-            return (
-              <SurfaceCard key={challenge.id}>
-                <View style={{ flexDirection: "row", justifyContent: "space-between", gap: 12 }}>
-                  <View style={{ flex: 1 }}>
-                    <Text style={{ fontSize: 18, fontWeight: "700", color: "#0f172a" }}>
-                      {challenge.title}
-                    </Text>
-                    {!!challenge.description && (
-                      <Text style={{ marginTop: 4, color: "#64748b" }}>{challenge.description}</Text>
-                    )}
-                  </View>
-
-                  <Pressable onPress={() => openEditChallenge(challenge.id)}>
-                    <Text style={{ color: "#2563eb", fontWeight: "600" }}>{t("common.edit")}</Text>
-                  </Pressable>
-                </View>
-
-                <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8 }}>
-                  <View
-                    style={{
-                      backgroundColor: "#f1f5f9",
-                      paddingHorizontal: 10,
-                      paddingVertical: 6,
-                      borderRadius: 999,
-                    }}
-                  >
-                    <Text style={{ color: "#334155" }}>{goalsCount} {t("challenges.goals_count")}</Text>
-                  </View>
-                  <View
-                    style={{
-                      backgroundColor: "#f1f5f9",
-                      paddingHorizontal: 10,
-                      paddingVertical: 6,
-                      borderRadius: 999,
-                    }}
-                  >
-                    <Text style={{ color: "#334155" }}>{participantsCount} {t("challenges.participants").toLowerCase()}</Text>
-                  </View>
-                  <View
-                    style={{
-                      backgroundColor: isPaid ? "#fef3c7" : "#dcfce7",
-                      paddingHorizontal: 10,
-                      paddingVertical: 6,
-                      borderRadius: 999,
-                    }}
-                  >
-                    <Text style={{ color: isPaid ? "#92400e" : "#166534" }}>
-                      {isPaid ? `${challenge.price} ₽` : t("challenges.free")}
-                    </Text>
-                  </View>
-                  {challenge.requiresReport && (
-                    <View
-                      style={{
-                        backgroundColor: "#dbeafe",
-                        paddingHorizontal: 10,
-                        paddingVertical: 6,
-                        borderRadius: 999,
-                      }}
-                    >
-                      <Text style={{ color: "#1d4ed8" }}>{t("challenges.requires_report")}</Text>
-                    </View>
-                  )}
-                </View>
-
-                <View style={{ gap: 8 }}>
-                  {challenge.goals.slice(0, 3).map((goal) => (
-                    <View
-                      key={goal.id}
-                      style={{
-                        backgroundColor: "#f8fafc",
-                        paddingHorizontal: 12,
-                        paddingVertical: 10,
-                        borderRadius: 12,
-                      }}
-                    >
-                      <Text style={{ color: "#0f172a" }}>{goal.title}</Text>
-                    </View>
-                  ))}
-                  {challenge.goals.length > 3 && (
-                    <Text style={{ color: "#64748b" }}>{t("challenges.goals_more", { count: challenge.goals.length - 3 })}</Text>
-                  )}
-                </View>
-
-                <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8 }}>
-                  <ActionChip onPress={() => void handleAcceptChallenge(challenge.id)} tone="primary">
-                    {t("challenges.accept")}
-                  </ActionChip>
-
-                  <ActionChip onPress={() => void shareChallenge(challenge.id)}>{t("common.share")}</ActionChip>
-
-                  <ActionChip onPress={() => void handleOpenParticipants(challenge.id)}>
-                    {t("challenges.participants")}
-                  </ActionChip>
-
-                  {!!challenge.link && (
-                    <ActionChip onPress={() => openChallengeLink(challenge.id)}>{t("challenges.link")}</ActionChip>
-                  )}
-
-                  <ActionChip onPress={() => void handleLeaveChallenge(challenge.id)} tone="danger">
-                    {t("challenges.leave")}
-                  </ActionChip>
-                </View>
-              </SurfaceCard>
-            );
-          })
+          challenges.map((challenge) => (
+            <NativeChallengeCard
+              key={challenge.id}
+              challenge={challenge}
+              focused={challenge.id === props.focusId}
+              onEdit={openEditChallenge}
+              onShare={shareChallenge}
+              onAccept={handleAcceptChallenge}
+              onLeave={handleLeaveChallenge}
+              onOpenLink={openChallengeLink}
+              onOpenParticipants={handleOpenParticipants}
+            />
+          ))
         )}
       </ScrollView>
 
@@ -289,4 +233,3 @@ export default function NativeChallengesScreen(props: {
     </View>
   );
 }
-

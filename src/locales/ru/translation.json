@@ -176,6 +176,17 @@
     "title": "Мой прогресс",
     "all_goals": "Все цели",
     "filter_label": "Фильтр по цели",
+    "activity_widget_title": "Активность",
+    "activity_widget_description": "Прогресс в календарном виде",
+    "activity_day_labels": {
+      "mon": "Пн",
+      "tue": "Вт",
+      "wed": "Ср",
+      "thu": "Чт",
+      "fri": "Пт",
+      "sat": "Сб",
+      "sun": "Вс"
+    },
     "subtitle_selected": "Статистика по цели: {{title}}",
     "subtitle_all": "Сводка по задачам, активности и заработанному XP",
     "goal_xp": "XP за цель",
@@ -223,3 +234,4 @@
     "tasks": "Задачи"
   }
 }
+

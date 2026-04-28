@@ -1,10 +1,11 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useRef } from "react";
 import dayjs from "dayjs";
+import { useTranslation } from "react-i18next";
 
 import isoWeek from "dayjs/plugin/isoWeek";
-import {DAYS_OF_WEEK, Goal, GoalActivity} from "@/types";
+import { Goal, GoalActivity } from "@/types";
 
 import {
   Card,
@@ -13,12 +14,9 @@ import {
   CardTitle,
   CardDescription,
 } from "./ui/card";
-import {Activity} from "lucide-react";
-
+import { Activity } from "lucide-react";
 
 dayjs.extend(isoWeek);
-
-const dayLabels = DAYS_OF_WEEK.map(d => d.label);
 
 type Props = {
   goal: Goal;
@@ -27,7 +25,17 @@ type Props = {
 };
 
 export function PeriodCalendar({ goal, activity, loading }: Props) {
+  const { t } = useTranslation();
   const scrollRef = useRef<HTMLDivElement>(null);
+  const dayLabels = [
+    t("progress.activity_day_labels.mon"),
+    t("progress.activity_day_labels.tue"),
+    t("progress.activity_day_labels.wed"),
+    t("progress.activity_day_labels.thu"),
+    t("progress.activity_day_labels.fri"),
+    t("progress.activity_day_labels.sat"),
+    t("progress.activity_day_labels.sun"),
+  ];
 
   useEffect(() => {
     if (!goal) return;
@@ -39,16 +47,13 @@ export function PeriodCalendar({ goal, activity, loading }: Props) {
 
   if (!goal) return null;
 
-
   const daysToShow = 365;
   const today = dayjs();
 
-  // Нормализуем даты для сопоставления
   const dateMap = new Map(
-    activity.data.map(d => [dayjs(d.periodStart).format("YYYY-MM-DD"), d.status])
+    activity.data.map((d) => [dayjs(d.periodStart).format("YYYY-MM-DD"), d.status])
   );
 
-  // 1. Генерация дат с выравниванием по понедельнику
   const firstDate = today.subtract(daysToShow - 1, "day").startOf("isoWeek");
   const lastDate = today;
 
@@ -59,11 +64,10 @@ export function PeriodCalendar({ goal, activity, loading }: Props) {
     current = current.add(1, "day");
   }
 
-  // 2. Разбиваем на недели
   const weeks: (dayjs.Dayjs | null)[][] = [];
   let currentWeek: (dayjs.Dayjs | null)[] = [];
 
-  dates.forEach(date => {
+  dates.forEach((date) => {
     currentWeek.push(date);
     if (currentWeek.length === 7) {
       weeks.push(currentWeek);
@@ -78,13 +82,12 @@ export function PeriodCalendar({ goal, activity, loading }: Props) {
     weeks.push(currentWeek);
   }
 
-  // 3. Строим верхнюю строку месяцев
   const monthLabels: { month: string; colspan: number }[] = [];
-  let lastMonth = weeks[0].find(d => d !== null)?.month();
+  let lastMonth = weeks[0].find((d) => d !== null)?.month();
   let colspan = 0;
 
-  weeks.forEach(w => {
-    const firstDay = w.find(d => d !== null);
+  weeks.forEach((w) => {
+    const firstDay = w.find((d) => d !== null);
     const month = firstDay?.month();
     if (month === lastMonth) {
       colspan++;
@@ -108,70 +111,64 @@ export function PeriodCalendar({ goal, activity, loading }: Props) {
   }
 
   return (
-    <Card className="">
+    <Card>
       <CardHeader className="flex flex-row items-center justify-between pb-2">
         <div>
-          <CardTitle className="text-sm">Активность</CardTitle>
-          <CardDescription>Прогресс в календарном виде</CardDescription>
+          <CardTitle className="text-sm">{t("progress.activity_widget_title")}</CardTitle>
+          <CardDescription>{t("progress.activity_widget_description")}</CardDescription>
         </div>
         <Activity className="size-5 text-muted-foreground" />
       </CardHeader>
       <CardContent>
         {loading ? (
-          <div className="py-6 text-sm text-muted-foreground">
-            Загрузка активности...
-          </div>
+          <div className="py-6 text-sm text-muted-foreground">{t("progress.activity_loading")}</div>
         ) : (
           <div className="overflow-x-auto w-full" ref={scrollRef}>
-            <div className="min-w-max mx-auto flex justify-center">
+            <div className="mx-auto flex min-w-max justify-center">
               <table className="table-auto border-separate border-spacing-[2px]">
                 <thead>
-                <tr>
-                  <td></td>
-                  {monthLabels.map((m, idx) => (
-                    <td
-                      key={idx}
-                      colSpan={m.colspan}
-                      className="text-xs text-center"
-                    >
-                      {m.colspan > 1 ? m.month : ""}
-                    </td>
-                  ))}
-                </tr>
+                  <tr>
+                    <td></td>
+                    {monthLabels.map((m, idx) => (
+                      <td key={idx} colSpan={m.colspan} className="text-center text-xs">
+                        {m.colspan > 1 ? m.month : ""}
+                      </td>
+                    ))}
+                  </tr>
                 </thead>
 
                 <tbody>
-                {dayLabels.map((day, rowIdx) => (
-                  <tr key={day} className="h-4">
-                    <td className="text-xs align-middle pr-1">{day}</td>
-                    {weeks.map((week, colIdx) => {
-                      const date = week[rowIdx];
-                      if (!date)
+                  {dayLabels.map((day, rowIdx) => (
+                    <tr key={day} className="h-4">
+                      <td className="align-middle pr-1 text-xs">{day}</td>
+                      {weeks.map((week, colIdx) => {
+                        const date = week[rowIdx];
+                        if (!date) {
+                          return (
+                            <td key={colIdx}>
+                              <span className="inline-block h-4 w-4"></span>
+                            </td>
+                          );
+                        }
+
+                        const status = dateMap.get(date.format("YYYY-MM-DD")) || "empty";
+
+                        let bgColor = "bg-gray-200";
+                        if (status === "partial") bgColor = "bg-yellow-300";
+                        if (status === "full") bgColor = "bg-green-300";
+
                         return (
-                          <td key={colIdx}>
-                            <span className="inline-block w-4 h-4"></span>
-                          </td>
-                        );
-
-                      const status =
-                        dateMap.get(date.format("YYYY-MM-DD")) || "empty";
-
-                      let bgColor = "bg-gray-200";
-                      if (status === "partial") bgColor = "bg-yellow-300";
-                      if (status === "full") bgColor = "bg-green-300";
-
-                      return (
-                        <td key={colIdx} className="align-middle">
+                          <td key={colIdx} className="align-middle">
                             <span
-                              className={`align-middle inline-block w-4 h-4 rounded-sm cursor-pointer ${bgColor}`}
+                              className={`inline-block h-4 w-4 cursor-pointer rounded-sm align-middle ${bgColor}`}
                               title={date.format("DD.MM.YYYY")}
                             ></span>
-                        </td>
-                      );
-                    })}
-                    <td className="text-xs align-middle pl-1">{day}</td>
-                  </tr>
-                ))}
+                          </td>
+                        );
+                      })}
+                      <td className="align-middle pl-1 text-xs">{day}</td>
+                    </tr>
+                  ))}
                 </tbody>
               </table>
             </div>

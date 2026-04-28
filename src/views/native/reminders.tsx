@@ -1,23 +1,12 @@
 ﻿import { useEffect } from "react";
-import { Alert, Pressable, ScrollView, Text, View } from "react-native";
+import { Alert, ScrollView, View } from "react-native";
 import { useTranslation } from "react-i18next";
 
-import { ActionChip } from "@/components/native/ActionChip";
 import { EmptyStateCard } from "@/components/native/EmptyStateCard";
+import { NativeReminderCard } from "@/components/native/NativeReminderCard";
 import { ReminderFormSheet } from "@/components/native/ReminderFormSheet";
 import { ScreenHeader } from "@/components/native/ScreenHeader";
-import { SurfaceCard } from "@/components/native/SurfaceCard";
 import { useRemindersScreen } from "@/shared/screens/reminders/useRemindersScreen";
-
-const WEEK_DAY_LABELS: Record<string, string> = {
-  mon: "Пн",
-  tue: "Вт",
-  wed: "Ср",
-  thu: "Чт",
-  fri: "Пт",
-  sat: "Сб",
-  sun: "Вс",
-};
 
 export default function NativeRemindersScreen(props: {
   reminderId?: string | null;
@@ -53,84 +42,45 @@ export default function NativeRemindersScreen(props: {
   }, [props.reminderId, props.goalId, props.onConsumeLinkState, openEditReminder, setReminderDialogOpen]);
 
   const handleDeleteReminder = async (id: string) => {
-    await removeReminder(id);
-    Alert.alert(t("reminders.deleted_title"), t("reminders.deleted_description"));
+    const ok = await removeReminder(id);
+    if (ok) {
+      Alert.alert(t("reminders.deleted_title"), t("reminders.deleted_description"));
+    }
+    return ok;
   };
 
   return (
-    <View style={{ flex: 1, backgroundColor: "#f8fafc" }}>
-      <ScreenHeader title={t("reminders.title")} actionLabel={t("common.create")} onAction={openCreateReminder} />
+    <View style={{ flex: 1, backgroundColor: "#ffffff" }}>
+      <ScreenHeader
+        title={t("reminders.title")}
+        actionLabel={t("reminders.create")}
+        onAction={openCreateReminder}
+        paddingHorizontal={8}
+        paddingVertical={8}
+      />
 
-      <ScrollView contentContainerStyle={{ padding: 16, gap: 12 }}>
+      <ScrollView contentContainerStyle={{ paddingHorizontal: 8, paddingTop: 8, paddingBottom: 16, gap: 8 }}>
         {reminders.length === 0 ? (
           <EmptyStateCard
             title={t("reminders.empty_native_title")}
             description={t("reminders.empty_native_description")}
-            actionLabel={t("reminders.create")}
+            actionLabel={t("reminders.create_first")}
             onAction={openCreateReminder}
           />
         ) : (
           reminders.map((reminder) => {
             const goal = goals.find((item) => item.id === reminder.goalId);
+            const task = goal?.tasks.find((item) => item.id === reminder.taskId);
 
             return (
-              <SurfaceCard key={reminder.id} gap={10}>
-                <View style={{ flexDirection: "row", justifyContent: "space-between", gap: 12 }}>
-                  <View style={{ flex: 1 }}>
-                    <Text style={{ fontSize: 18, fontWeight: "700", color: "#0f172a" }}>
-                      {reminder.title}
-                    </Text>
-                    <Text style={{ color: "#64748b", marginTop: 4 }}>{reminder.time}</Text>
-                    {!!goal && <Text style={{ color: "#0f766e", marginTop: 6 }}>{t("reminders.goal_prefix", { title: goal.title })}</Text>}
-                  </View>
-
-                  <Pressable onPress={() => openEditReminder(reminder.id)}>
-                    <Text style={{ color: "#2563eb", fontWeight: "600" }}>{t("common.edit")}</Text>
-                  </Pressable>
-                </View>
-
-                <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8 }}>
-                  {reminder.daysOfWeek.map((day) => (
-                    <View
-                      key={day}
-                      style={{
-                        backgroundColor: "#f1f5f9",
-                        paddingHorizontal: 10,
-                        paddingVertical: 6,
-                        borderRadius: 999,
-                      }}
-                    >
-                      <Text style={{ color: "#334155" }}>{WEEK_DAY_LABELS[day] ?? day}</Text>
-                    </View>
-                  ))}
-                  {reminder.daysOfMonth.map((day) => (
-                    <View
-                      key={day}
-                      style={{
-                        backgroundColor: "#f1f5f9",
-                        paddingHorizontal: 10,
-                        paddingVertical: 6,
-                        borderRadius: 999,
-                      }}
-                    >
-                      <Text style={{ color: "#334155" }}>{day}</Text>
-                    </View>
-                  ))}
-                </View>
-
-                <View style={{ flexDirection: "row", gap: 8, flexWrap: "wrap" }}>
-                  <ActionChip
-                    onPress={() => void toggleReminderState(reminder.id)}
-                    tone={reminder.isActive ? "success" : "secondary"}
-                  >
-                    {reminder.isActive ? t("reminders.status_active") : t("reminders.status_disabled")}
-                  </ActionChip>
-
-                  <ActionChip onPress={() => void handleDeleteReminder(reminder.id)} tone="danger">
-                    {t("common.delete")}
-                  </ActionChip>
-                </View>
-              </SurfaceCard>
+              <NativeReminderCard
+                key={reminder.id}
+                reminder={reminder}
+                goal={goal}
+                task={task}
+                onToggle={() => void toggleReminderState(reminder.id)}
+                onEdit={openEditReminder}
+              />
             );
           })
         )}
@@ -143,7 +93,7 @@ export default function NativeRemindersScreen(props: {
         initialGoalId={props.goalId || undefined}
         onOpenChange={closeReminderDialog}
         onSave={saveReminder}
-        onDelete={removeReminder}
+        onDelete={handleDeleteReminder}
       />
     </View>
   );

@@ -40,13 +40,13 @@ export default function ProgressScreen() {
 
   return (
     <div className="flex w-full flex-1 flex-col px-2">
-      <div className="mb-2 flex items-center justify-between">
+      <div className="mb-2 flex items-center justify-between gap-2">
         <h2 className="py-3">{t("progress.title")}</h2>
 
         <select
           value={goalId || ""}
           onChange={(event) => handleGoalChange(event.target.value)}
-          className="rounded-md border bg-background px-3 py-2 text-sm"
+          className="w-full max-w-[280px] rounded-md border bg-background px-3 py-2 text-sm sm:w-[280px]"
         >
           <option value="">{t("progress.all_goals")}</option>
           {goals.map((goal) => (

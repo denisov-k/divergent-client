@@ -1,17 +1,31 @@
 ﻿import { useEffect } from "react";
 import { Alert, Pressable, ScrollView, Text, View } from "react-native";
+import { useTranslation } from "react-i18next";
 
-import { ActionChip } from "@/components/native/ActionChip";
 import { EmptyStateCard } from "@/components/native/EmptyStateCard";
-import { ScreenHeader } from "@/components/native/ScreenHeader";
-import { SurfaceCard } from "@/components/native/SurfaceCard";
+import { Plus } from "@/components/native/icons";
+import { NativeRewardCard } from "@/components/native/NativeRewardCard";
+import { RewardFormSheet } from "@/components/native/RewardFormSheet";
+import { useAppStore } from "@/stores/useAppStore";
 import { useRewardsScreen } from "@/shared/screens/rewards/useRewardsScreen";
 
 export default function NativeRewardsScreen(props: {
   rewardId?: string | null;
   onConsumeLinkState?: () => void;
 }) {
-  const { rewards, goals, openCreateReward, openEditReward, removeReward } = useRewardsScreen();
+  const { t } = useTranslation();
+  const { challenges } = useAppStore();
+  const {
+    rewards,
+    goals,
+    rewardDialogOpen,
+    editingReward,
+    openCreateReward,
+    openEditReward,
+    saveReward,
+    removeReward,
+    closeRewardDialog,
+  } = useRewardsScreen();
 
   useEffect(() => {
     if (!props.rewardId) {
@@ -28,91 +42,85 @@ export default function NativeRewardsScreen(props: {
   };
 
   return (
-    <View style={{ flex: 1, backgroundColor: "#f8fafc" }}>
-      <ScreenHeader title="Награды" actionLabel="Новая" onAction={openCreateReward} />
+    <View style={{ flex: 1, backgroundColor: "#ffffff" }}>
+      <View
+        style={{
+          paddingHorizontal: 8,
+          paddingVertical: 8,
+          flexDirection: "row",
+          alignItems: "center",
+          justifyContent: "space-between",
+          gap: 8,
+          backgroundColor: "#ffffff",
+        }}
+      >
+        <Text
+          style={{
+            fontSize: 19,
+            fontWeight: "500",
+            color: "#0f172a",
+            fontFamily: "Montserrat",
+            lineHeight: 29,
+          }}
+        >
+          {t("rewards.title")}
+        </Text>
 
-      <ScrollView contentContainerStyle={{ padding: 16, gap: 12 }}>
+        <Pressable
+          onPress={openCreateReward}
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            gap: 8,
+            backgroundColor: "#dbeafe",
+            borderWidth: 1,
+            borderColor: "#93c5fd",
+            borderRadius: 10,
+            paddingHorizontal: 12,
+            paddingVertical: 10,
+          }}
+        >
+          <Plus size={16} color="#1d4ed8" />
+          <Text style={{ color: "#1d4ed8", fontSize: 12, fontWeight: "500", lineHeight: 18, fontFamily: "Montserrat" }}>
+            {t("rewards.add")}
+          </Text>
+        </Pressable>
+      </View>
+
+      <ScrollView contentContainerStyle={{ paddingHorizontal: 8, paddingTop: 8, paddingBottom: 16, gap: 8 }}>
         {rewards.length === 0 ? (
           <EmptyStateCard
             title="Пока нет наград"
-            description="Это native entrypoint для rewards поверх общего screen-layer."
-            actionLabel="Создать награду"
+            description="Создайте первую награду"
+            actionLabel="Создать первую награду"
             onAction={openCreateReward}
           />
         ) : (
           rewards.map((reward) => {
             const goal = goals.find((item) => item.id === reward.goalId);
+            const challenge = goal?.challengeId ? challenges.find((item) => item.id === goal.challengeId) : undefined;
 
             return (
-              <SurfaceCard key={reward.id} gap={10}>
-                <View style={{ flexDirection: "row", justifyContent: "space-between", gap: 12 }}>
-                  <View style={{ flex: 1 }}>
-                    <Text style={{ fontSize: 18, fontWeight: "700", color: "#0f172a" }}>
-                      {reward.title}
-                    </Text>
-                    {!!reward.description && (
-                      <Text style={{ marginTop: 4, color: "#64748b" }}>{reward.description}</Text>
-                    )}
-                  </View>
-
-                  <Pressable onPress={() => openEditReward(reward.id)}>
-                    <Text style={{ color: "#2563eb", fontWeight: "600" }}>Изменить</Text>
-                  </Pressable>
-                </View>
-
-                <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8 }}>
-                  {typeof reward.xpRequires === "number" && reward.xpRequires > 0 && (
-                    <View
-                      style={{
-                        backgroundColor: "#f1f5f9",
-                        paddingHorizontal: 10,
-                        paddingVertical: 6,
-                        borderRadius: 999,
-                      }}
-                    >
-                      <Text style={{ color: "#334155" }}>{reward.xpRequires} XP</Text>
-                    </View>
-                  )}
-
-                  {reward.isUnlocked && (
-                    <View
-                      style={{
-                        backgroundColor: "#dcfce7",
-                        paddingHorizontal: 10,
-                        paddingVertical: 6,
-                        borderRadius: 999,
-                      }}
-                    >
-                      <Text style={{ color: "#166534" }}>Получено</Text>
-                    </View>
-                  )}
-
-                  {!!goal && (
-                    <View
-                      style={{
-                        backgroundColor: "#dbeafe",
-                        paddingHorizontal: 10,
-                        paddingVertical: 6,
-                        borderRadius: 999,
-                      }}
-                    >
-                      <Text style={{ color: "#1d4ed8" }}>Цель: {goal.title}</Text>
-                    </View>
-                  )}
-                </View>
-
-                <View style={{ flexDirection: "row", gap: 8 }}>
-                  <ActionChip onPress={() => openEditReward(reward.id)}>Редактировать</ActionChip>
-
-                  <ActionChip onPress={() => void handleDeleteReward(reward.id)} tone="danger">
-                    Удалить
-                  </ActionChip>
-                </View>
-              </SurfaceCard>
+              <NativeRewardCard
+                key={reward.id}
+                reward={reward}
+                goal={goal}
+                challenge={challenge}
+                onEdit={openEditReward}
+              />
             );
           })
         )}
       </ScrollView>
+
+      <RewardFormSheet
+        open={rewardDialogOpen}
+        reward={editingReward}
+        goals={goals}
+        onOpenChange={closeRewardDialog}
+        onSave={saveReward}
+        onDelete={handleDeleteReward}
+      />
     </View>
   );
 }

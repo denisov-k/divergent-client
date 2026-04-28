@@ -176,6 +176,17 @@
     "title": "My progress",
     "all_goals": "All goals",
     "filter_label": "Goal filter",
+    "activity_widget_title": "Activity",
+    "activity_widget_description": "Progress in calendar view",
+    "activity_day_labels": {
+      "mon": "Mo",
+      "tue": "Tu",
+      "wed": "We",
+      "thu": "Th",
+      "fri": "Fr",
+      "sat": "Sa",
+      "sun": "Su"
+    },
     "subtitle_selected": "Stats for goal: {{title}}",
     "subtitle_all": "Overview of tasks, activity, and earned XP",
     "goal_xp": "Goal XP",
@@ -223,3 +234,4 @@
     "tasks": "Tasks"
   }
 }
+
