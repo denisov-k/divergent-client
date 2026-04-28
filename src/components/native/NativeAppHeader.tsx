@@ -1,4 +1,5 @@
 ﻿import { Image, Pressable, Text, View } from "react-native";
+import { useTranslation } from "react-i18next";
 
 import { Settings } from "@/components/native/Icons";
 import { appPalette } from "@/theme/palette";
@@ -20,6 +21,7 @@ export function NativeAppHeader({
   user: User;
   onOpenSettings: () => void;
 }) {
+  const { t } = useTranslation();
   const progress = user.requiredXp > 0 ? Math.min((user.xp / user.requiredXp) * 100, 100) : 0;
   const initials = getInitials(user.name || user.email || "U");
 
@@ -73,8 +75,6 @@ export function NativeAppHeader({
               height: 24,
               borderRadius: 12,
               backgroundColor: appPalette.brand.primary,
-              borderWidth: 2,
-              borderColor: appPalette.surface.background,
               alignItems: "center",
               justifyContent: "center",
             }}
@@ -110,7 +110,7 @@ export function NativeAppHeader({
 
           <View style={{ gap: 6 }}>
             <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
-              <Text style={{ color: appPalette.semantic.textMuted, fontSize: 12, fontWeight: "400", fontFamily: "Montserrat", lineHeight: 18 }}>Level {user.level}</Text>
+              <Text style={{ color: appPalette.semantic.textMuted, fontSize: 12, fontWeight: "400", fontFamily: "Montserrat", lineHeight: 18 }}>{t("profile.level")} {user.level}</Text>
               <Text style={{ color: appPalette.semantic.textMuted, fontSize: 12, fontWeight: "400", fontFamily: "Montserrat", lineHeight: 18 }}>
                 {user.xp} / {user.requiredXp} XP
               </Text>

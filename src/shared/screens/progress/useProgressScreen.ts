@@ -35,9 +35,19 @@ export function useProgressScreen(goalId?: string | null) {
       return [];
     }
 
+    const weekdayLabelByIsoDay: Record<number, string> = {
+      1: t("weekdays.mon"),
+      2: t("weekdays.tue"),
+      3: t("weekdays.wed"),
+      4: t("weekdays.thu"),
+      5: t("weekdays.fri"),
+      6: t("weekdays.sat"),
+      7: t("weekdays.sun"),
+    };
+
     const days = Array.from({ length: 7 }).map((_, index) => dayjs().subtract(6 - index, "day"));
     const result = days.map((day) => ({
-      name: day.format("dd"),
+      name: weekdayLabelByIsoDay[day.isoWeekday()] ?? day.format("dd"),
       value: 0,
       date: day.format("YYYY-MM-DD"),
     }));
@@ -51,7 +61,7 @@ export function useProgressScreen(goalId?: string | null) {
     });
 
     return result.map(({ name, value }) => ({ name, value }));
-  }, [activity]);
+  }, [activity, t]);
 
   const streakDays = activity?.data.slice(-7).map((item) => item.status === "full");
 

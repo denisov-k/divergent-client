@@ -32,5 +32,6 @@
   Target,
   Trophy,
   Users,
+  X,
   Zap,
 } from "lucide-react-native";

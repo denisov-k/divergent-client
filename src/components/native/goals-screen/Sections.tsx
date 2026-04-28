@@ -125,7 +125,7 @@ export function GoalsScreenContent({
   const { t } = useTranslation();
 
   return (
-    <ScrollView contentContainerStyle={{ paddingHorizontal: 8, paddingBottom: 32, gap: 8 }}>
+      <ScrollView contentContainerStyle={{ paddingHorizontal: 8, gap: 8 }}>
       {goals.length === 0 ? (
         <EmptyStateCard
           title={t("goals.empty_title")}

@@ -95,7 +95,14 @@ export function RewardFormSheet({
       }
     >
       <FieldInput label={t("rewards.dialog.title_label")} value={title} onChangeText={setTitle} placeholder={t("rewards.dialog.title_placeholder")} />
-      <FieldInput label={t("rewards.dialog.description_label")} value={description} onChangeText={setDescription} placeholder={t("rewards.dialog.description_placeholder")} />
+      <FieldInput
+        label={t("rewards.dialog.description_label")}
+        value={description}
+        onChangeText={setDescription}
+        placeholder={t("rewards.dialog.description_placeholder")}
+        multiline
+        numberOfLines={4}
+      />
       <FieldInput label={t("rewards.dialog.xp_label")} value={xpRequires} onChangeText={setXpRequires} placeholder="100" />
       <RewardIconSection icon={icon} onChange={setIcon} />
       <RewardGoalSection goals={goals} goalId={goalId} onChange={setGoalId} />

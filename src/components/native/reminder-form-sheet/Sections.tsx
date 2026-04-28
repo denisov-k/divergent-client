@@ -1,12 +1,229 @@
-import { Text, View } from "react-native";
+import { useMemo, useState } from "react";
+import { Modal, Pressable, ScrollView, Text, View } from "react-native";
 import { useTranslation } from "react-i18next";
 
 import { ActionChip } from "@/components/native/ActionChip";
+import { ChevronDown } from "@/components/native/Icons";
 import { SectionTabs } from "@/components/native/SectionTabs";
 import { formHelperStyle, formSectionLabelStyle } from "@/components/native/form-sheet/Layout";
+import { appPalette } from "@/theme/palette";
 import type { Goal, Task } from "@/types";
 
 import { MONTH_DAYS, type ReminderMode, WEEK_DAYS } from "./constants";
+
+function PickerTrigger(props: { value: string; onPress: () => void }) {
+  return (
+    <Pressable
+      onPress={props.onPress}
+      style={{
+        borderWidth: 1,
+        borderColor: appPalette.semantic.borderStrong,
+        borderRadius: 12,
+        paddingHorizontal: 14,
+        paddingVertical: 12,
+        backgroundColor: appPalette.surface.background,
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "space-between",
+        gap: 8,
+      }}
+    >
+      <Text
+        style={{
+          color: props.value ? appPalette.semantic.textStrong : appPalette.semantic.textSubtle,
+          fontFamily: "Montserrat",
+          fontSize: 14,
+          lineHeight: 20,
+          flex: 1,
+        }}
+        numberOfLines={1}
+      >
+        {props.value}
+      </Text>
+      <ChevronDown size={16} color={appPalette.semantic.textSubtle} />
+    </Pressable>
+  );
+}
+
+function GoalPickerModal(props: {
+  open: boolean;
+  goals: Goal[];
+  goalId?: string;
+  onClose: () => void;
+  onSelect: (goalId: string | undefined) => void;
+}) {
+  const { t } = useTranslation();
+
+  return (
+    <Modal visible={props.open} transparent animationType="fade" onRequestClose={props.onClose}>
+      <View style={{ flex: 1, backgroundColor: appPalette.surface.overlay, justifyContent: "center", padding: 20 }}>
+        <View
+          style={{
+            backgroundColor: appPalette.surface.background,
+            borderRadius: 20,
+            padding: 16,
+            gap: 12,
+            maxHeight: "80%",
+          }}
+        >
+          <Text style={{ color: appPalette.semantic.textStrong, fontSize: 18, fontWeight: "600", fontFamily: "Montserrat" }}>
+            {t("reminders.dialog.bind_goal")}
+          </Text>
+          <ScrollView style={{ flexGrow: 0 }} contentContainerStyle={{ gap: 8 }} showsVerticalScrollIndicator={false}>
+            <Pressable
+              onPress={() => {
+                props.onSelect(undefined);
+                props.onClose();
+              }}
+              style={{
+                borderWidth: 1,
+                borderColor: !props.goalId ? appPalette.semantic.infoBorder : appPalette.semantic.borderSubtle,
+                backgroundColor: !props.goalId ? appPalette.semantic.infoSurface : appPalette.surface.background,
+                borderRadius: 12,
+                paddingHorizontal: 14,
+                paddingVertical: 12,
+              }}
+            >
+              <Text
+                style={{
+                  color: !props.goalId ? appPalette.semantic.infoText : appPalette.semantic.textStrong,
+                  fontFamily: "Montserrat",
+                  fontSize: 14,
+                  lineHeight: 20,
+                }}
+              >
+                {t("reminders.dialog.goal_none")}
+              </Text>
+            </Pressable>
+            {props.goals.map((goal) => {
+              const active = props.goalId === goal.id;
+
+              return (
+                <Pressable
+                  key={goal.id}
+                  onPress={() => {
+                    props.onSelect(goal.id);
+                    props.onClose();
+                  }}
+                  style={{
+                    borderWidth: 1,
+                    borderColor: active ? appPalette.semantic.infoBorder : appPalette.semantic.borderSubtle,
+                    backgroundColor: active ? appPalette.semantic.infoSurface : appPalette.surface.background,
+                    borderRadius: 12,
+                    paddingHorizontal: 14,
+                    paddingVertical: 12,
+                  }}
+                >
+                  <Text
+                    style={{
+                      color: active ? appPalette.semantic.infoText : appPalette.semantic.textStrong,
+                      fontFamily: "Montserrat",
+                      fontSize: 14,
+                      lineHeight: 20,
+                    }}
+                  >
+                    {goal.title}
+                  </Text>
+                </Pressable>
+              );
+            })}
+          </ScrollView>
+          <ActionChip onPress={props.onClose}>{t("common.close")}</ActionChip>
+        </View>
+      </View>
+    </Modal>
+  );
+}
+
+function TaskPickerModal(props: {
+  open: boolean;
+  tasks: Task[];
+  taskId?: string;
+  onClose: () => void;
+  onSelect: (taskId: string | undefined) => void;
+}) {
+  const { t } = useTranslation();
+
+  return (
+    <Modal visible={props.open} transparent animationType="fade" onRequestClose={props.onClose}>
+      <View style={{ flex: 1, backgroundColor: appPalette.surface.overlay, justifyContent: "center", padding: 20 }}>
+        <View
+          style={{
+            backgroundColor: appPalette.surface.background,
+            borderRadius: 20,
+            padding: 16,
+            gap: 12,
+            maxHeight: "80%",
+          }}
+        >
+          <Text style={{ color: appPalette.semantic.textStrong, fontSize: 18, fontWeight: "600", fontFamily: "Montserrat" }}>
+            {t("reminders.dialog.bind_task")}
+          </Text>
+          <ScrollView style={{ flexGrow: 0 }} contentContainerStyle={{ gap: 8 }} showsVerticalScrollIndicator={false}>
+            <Pressable
+              onPress={() => {
+                props.onSelect(undefined);
+                props.onClose();
+              }}
+              style={{
+                borderWidth: 1,
+                borderColor: !props.taskId ? appPalette.semantic.infoBorder : appPalette.semantic.borderSubtle,
+                backgroundColor: !props.taskId ? appPalette.semantic.infoSurface : appPalette.surface.background,
+                borderRadius: 12,
+                paddingHorizontal: 14,
+                paddingVertical: 12,
+              }}
+            >
+              <Text
+                style={{
+                  color: !props.taskId ? appPalette.semantic.infoText : appPalette.semantic.textStrong,
+                  fontFamily: "Montserrat",
+                  fontSize: 14,
+                  lineHeight: 20,
+                }}
+              >
+                {t("reminders.dialog.task_none")}
+              </Text>
+            </Pressable>
+            {props.tasks.map((task) => {
+              const active = props.taskId === task.id;
+
+              return (
+                <Pressable
+                  key={task.id}
+                  onPress={() => {
+                    props.onSelect(task.id);
+                    props.onClose();
+                  }}
+                  style={{
+                    borderWidth: 1,
+                    borderColor: active ? appPalette.semantic.infoBorder : appPalette.semantic.borderSubtle,
+                    backgroundColor: active ? appPalette.semantic.infoSurface : appPalette.surface.background,
+                    borderRadius: 12,
+                    paddingHorizontal: 14,
+                    paddingVertical: 12,
+                  }}
+                >
+                  <Text
+                    style={{
+                      color: active ? appPalette.semantic.infoText : appPalette.semantic.textStrong,
+                      fontFamily: "Montserrat",
+                      fontSize: 14,
+                      lineHeight: 20,
+                    }}
+                  >
+                    {task.title}
+                  </Text>
+                </Pressable>
+              );
+            })}
+          </ScrollView>
+          <ActionChip onPress={props.onClose}>{t("common.close")}</ActionChip>
+        </View>
+      </View>
+    </Modal>
+  );
+}
 
 export function ReminderModeSection(props: { mode: ReminderMode; onChange: (value: ReminderMode) => void }) {
   const { t } = useTranslation();
@@ -33,13 +250,21 @@ export function ReminderScheduleSection(props: {
   onSelectAllMonth: () => void;
 }) {
   const { t } = useTranslation();
+  const weekDayLabels = useMemo(
+    () =>
+      WEEK_DAYS.map((day) => ({
+        ...day,
+        label: t(`weekdays.${day.key}`),
+      })),
+    [t],
+  );
 
   if (props.mode === "week") {
     return (
       <View style={{ gap: 8 }}>
         <Text style={formSectionLabelStyle}>{t("reminders.dialog.mode_week")}</Text>
         <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8 }}>
-          {WEEK_DAYS.map((day) => (
+          {weekDayLabels.map((day) => (
             <ActionChip key={day.key} onPress={() => props.onToggleWeekDay(day.key)} tone={props.selectedDays.includes(day.key) ? "primary" : "secondary"}>
               {day.label}
             </ActionChip>
@@ -68,38 +293,30 @@ export function ReminderScheduleSection(props: {
 export function ReminderGoalSection(props: {
   goals: Goal[];
   goalId?: string;
-  initialGoalId?: string;
   onChangeGoalId: (goalId: string | undefined) => void;
   onResetTask: () => void;
 }) {
   const { t } = useTranslation();
+  const [open, setOpen] = useState(false);
+  const selectedGoalTitle = useMemo(
+    () => props.goals.find((goal) => goal.id === props.goalId)?.title ?? t("reminders.dialog.goal_none"),
+    [props.goals, props.goalId, t],
+  );
 
   return (
     <View style={{ gap: 8 }}>
       <Text style={formSectionLabelStyle}>{t("reminders.dialog.bind_goal")}</Text>
-      <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8 }}>
-        <ActionChip
-          onPress={() => {
-            props.onChangeGoalId(props.initialGoalId);
-            props.onResetTask();
-          }}
-          tone={!props.goalId ? "primary" : "secondary"}
-        >
-          {t("reminders.dialog.goal_none")}
-        </ActionChip>
-        {props.goals.map((goal) => (
-          <ActionChip
-            key={goal.id}
-            onPress={() => {
-              props.onChangeGoalId(goal.id);
-              props.onResetTask();
-            }}
-            tone={props.goalId === goal.id ? "primary" : "secondary"}
-          >
-            {goal.title}
-          </ActionChip>
-        ))}
-      </View>
+      <PickerTrigger value={selectedGoalTitle} onPress={() => setOpen(true)} />
+      <GoalPickerModal
+        open={open}
+        goals={props.goals}
+        goalId={props.goalId}
+        onClose={() => setOpen(false)}
+        onSelect={(nextGoalId) => {
+          props.onChangeGoalId(nextGoalId);
+          props.onResetTask();
+        }}
+      />
     </View>
   );
 }
@@ -111,6 +328,11 @@ export function ReminderTaskSection(props: {
   onChangeTaskId: (taskId: string | undefined) => void;
 }) {
   const { t } = useTranslation();
+  const [open, setOpen] = useState(false);
+  const selectedTaskTitle = useMemo(
+    () => props.availableTasks.find((task) => task.id === props.taskId)?.title ?? t("reminders.dialog.task_none"),
+    [props.availableTasks, props.taskId, t],
+  );
 
   if (!props.visible) {
     return null;
@@ -119,16 +341,14 @@ export function ReminderTaskSection(props: {
   return (
     <View style={{ gap: 8 }}>
       <Text style={formSectionLabelStyle}>{t("reminders.dialog.bind_task")}</Text>
-      <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8 }}>
-        <ActionChip onPress={() => props.onChangeTaskId(undefined)} tone={!props.taskId ? "primary" : "secondary"}>
-          {t("reminders.dialog.task_none")}
-        </ActionChip>
-        {props.availableTasks.map((task) => (
-          <ActionChip key={task.id} onPress={() => props.onChangeTaskId(task.id)} tone={props.taskId === task.id ? "primary" : "secondary"}>
-            {task.title}
-          </ActionChip>
-        ))}
-      </View>
+      <PickerTrigger value={selectedTaskTitle} onPress={() => setOpen(true)} />
+      <TaskPickerModal
+        open={open}
+        tasks={props.availableTasks}
+        taskId={props.taskId}
+        onClose={() => setOpen(false)}
+        onSelect={props.onChangeTaskId}
+      />
     </View>
   );
 }

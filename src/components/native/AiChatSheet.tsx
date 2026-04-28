@@ -4,6 +4,7 @@ import { Modal, ScrollView, Text, TextInput, View } from "react-native";
 
 import { ActionChip } from "@/components/native/ActionChip";
 import { SurfaceCard } from "@/components/native/SurfaceCard";
+import { formatReminderDayLabel } from "@/shared/display/reminders";
 import { useAppStore } from "@/stores/useAppStore";
 import { appPalette } from "@/theme/palette";
 import type { AIChatResponse, ChatMessage, Draft, Goal, Task } from "@/types";
@@ -15,16 +16,6 @@ export function AiChatSheet({ open, onOpenChange, onDraftAdded }: { open: boolea
   const [history, setHistory] = useState<ChatMessage[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
-  const dayLabels: Record<string, string> = {
-    mon: t("weekdays.mon"),
-    tue: t("weekdays.tue"),
-    wed: t("weekdays.wed"),
-    thu: t("weekdays.thu"),
-    fri: t("weekdays.fri"),
-    sat: t("weekdays.sat"),
-    sun: t("weekdays.sun"),
-  };
 
   useEffect(() => {
     if (!open) {
@@ -90,7 +81,7 @@ export function AiChatSheet({ open, onOpenChange, onDraftAdded }: { open: boolea
           </View>
           <ScrollView contentContainerStyle={{ gap: 10, paddingBottom: 4 }}>
             {history.map((message, index) => (
-              <AiChatMessageCard key={`${message.id ?? message.role}-${index}`} message={message} messageId={message.id} onDraftAdded={handleGoalAdded} dayLabels={dayLabels} />
+              <AiChatMessageCard key={`${message.id ?? message.role}-${index}`} message={message} messageId={message.id} onDraftAdded={handleGoalAdded} />
             ))}
           </ScrollView>
           <View style={{ gap: 8 }}>
@@ -121,7 +112,7 @@ export function AiChatSheet({ open, onOpenChange, onDraftAdded }: { open: boolea
   );
 }
 
-function AiChatMessageCard({ message, messageId, onDraftAdded, dayLabels }: { message: ChatMessage; messageId?: string; onDraftAdded: (goal: Goal, messageId?: string) => void; dayLabels: Record<string, string>; }) {
+function AiChatMessageCard({ message, messageId, onDraftAdded }: { message: ChatMessage; messageId?: string; onDraftAdded: (goal: Goal, messageId?: string) => void; }) {
   const tone = useMemo(
     () =>
       message.role === "user"
@@ -135,12 +126,12 @@ function AiChatMessageCard({ message, messageId, onDraftAdded, dayLabels }: { me
       <View style={{ backgroundColor: tone.backgroundColor, borderRadius: 14, padding: 12 }}>
         <Text style={{ color: tone.textColor, fontFamily: "Montserrat", fontSize: 12, lineHeight: 18 }}>{message.content}</Text>
       </View>
-      {message.role === "assistant" && message.goalDraft && <GoalDraftCard draft={message.goalDraft} messageId={message.id ?? messageId} isDraftAdded={message.isDraftAdded} onAdd={onDraftAdded} dayLabels={dayLabels} />}
+      {message.role === "assistant" && message.goalDraft && <GoalDraftCard draft={message.goalDraft} messageId={message.id ?? messageId} isDraftAdded={message.isDraftAdded} onAdd={onDraftAdded} />}
     </View>
   );
 }
 
-function GoalDraftCard({ draft, isDraftAdded, messageId, onAdd, dayLabels }: { draft: Draft; isDraftAdded: boolean; messageId?: string; onAdd: (goal: Goal, messageId?: string) => void; dayLabels: Record<string, string>; }) {
+function GoalDraftCard({ draft, isDraftAdded, messageId, onAdd }: { draft: Draft; isDraftAdded: boolean; messageId?: string; onAdd: (goal: Goal, messageId?: string) => void; }) {
   const { t } = useTranslation();
   const { categories, addDraft } = useAppStore();
   const categoryLabel = categories.find((item) => item.value === draft.goal.category)?.label ?? draft.goal.category;
@@ -185,7 +176,7 @@ function GoalDraftCard({ draft, isDraftAdded, messageId, onAdd, dayLabels }: { d
               <Text style={{ color: appPalette.semantic.textStrong, fontWeight: "600", fontFamily: "Montserrat", fontSize: 12, lineHeight: 18 }}>{reminder.title}</Text>
               <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8 }}>
                 <Pill>{reminder.time}</Pill>
-                {reminder.daysOfWeek.map((day) => <Pill key={day}>{dayLabels[day] ?? day}</Pill>)}
+                {reminder.daysOfWeek.map((day) => <Pill key={day}>{formatReminderDayLabel(day, t)}</Pill>)}
                 {reminder.daysOfMonth.map((day) => <Pill key={day}>{String(day)}</Pill>)}
               </View>
             </View>

@@ -3,6 +3,7 @@ import { useEffect, useRef } from "react";
 import { ScrollView, Text, View } from "react-native";
 
 import dayjs from "dayjs";
+import "dayjs/locale/ru";
 import isoWeek from "dayjs/plugin/isoWeek";
 
 import { Activity } from "@/components/native/Icons";
@@ -19,7 +20,8 @@ type Props = {
 };
 
 export function NativePeriodCalendar({ goal, activity, loading }: Props) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const dayjsLocale = i18n.language?.startsWith("ru") ? "ru" : "en";
   const dayLabels = [
     t("weekdays.mon"),
     t("weekdays.tue"),
@@ -85,7 +87,7 @@ export function NativePeriodCalendar({ goal, activity, loading }: Props) {
     } else {
       if (lastMonth !== undefined) {
         monthLabels.push({
-          month: dayjs().month(lastMonth).format("MMM").replace(".", ""),
+          month: dayjs().locale(dayjsLocale).month(lastMonth).format("MMM").replace(".", ""),
           colspan,
         });
       }
@@ -96,7 +98,7 @@ export function NativePeriodCalendar({ goal, activity, loading }: Props) {
 
   if (lastMonth !== undefined) {
     monthLabels.push({
-      month: dayjs().month(lastMonth).format("MMM").replace(".", ""),
+      month: dayjs().locale(dayjsLocale).month(lastMonth).format("MMM").replace(".", ""),
       colspan,
     });
   }

@@ -1,19 +1,14 @@
-import { Suspense, lazy, useEffect } from "react";
-import { Alert, Pressable, ScrollView, Text, View } from "react-native";
+import { useEffect } from "react";
+import { Alert, ScrollView, View } from "react-native";
 import { useTranslation } from "react-i18next";
 
-const RewardFormSheet = lazy(() => import("@/components/native/RewardFormSheet").then((m) => ({ default: m.RewardFormSheet })));
-
 import { EmptyStateCard } from "@/components/native/EmptyStateCard";
-import { Plus } from "@/components/native/Icons";
+import { RewardFormSheet } from "@/components/native/RewardFormSheet";
 import { NativeRewardCardView } from "@/components/native/NativeRewardCardView";
+import { ScreenHeader } from "@/components/native/ScreenHeader";
 import { useAppStore } from "@/stores/useAppStore";
 import { useRewardsScreen } from "@/shared/screens/rewards/useRewardsScreen";
 import { appPalette } from "@/theme/palette";
-
-function SheetFallback() {
-  return null;
-}
 
 export default function NativeRewardsScreen(props: { rewardId?: string | null; onConsumeLinkState?: () => void }) {
   const { t } = useTranslation();
@@ -33,15 +28,15 @@ export default function NativeRewardsScreen(props: { rewardId?: string | null; o
 
   return (
     <View style={{ flex: 1, backgroundColor: appPalette.surface.background }}>
-      <View style={{ paddingHorizontal: 8, paddingVertical: 8, flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: 8, backgroundColor: appPalette.surface.background }}>
-        <Text style={{ fontSize: 19, fontWeight: "500", color: appPalette.semantic.textStrong, fontFamily: "Montserrat", lineHeight: 29 }}>{t("rewards.title")}</Text>
-        <Pressable onPress={openCreateReward} style={{ flexDirection: "row", alignItems: "center", gap: 8, backgroundColor: appPalette.semantic.infoSurface, borderWidth: 1, borderColor: appPalette.semantic.infoBorder, borderRadius: 10, paddingHorizontal: 12, paddingVertical: 10 }}>
-          <Plus size={16} color={appPalette.semantic.infoText} />
-          <Text style={{ color: appPalette.semantic.infoText, fontSize: 12, fontWeight: "500", lineHeight: 18, fontFamily: "Montserrat" }}>{t("rewards.add")}</Text>
-        </Pressable>
-      </View>
+      <ScreenHeader
+        title={t("rewards.title")}
+        actionLabel={t("rewards.add")}
+        onAction={openCreateReward}
+        paddingHorizontal={8}
+        paddingVertical={8}
+      />
 
-      <ScrollView contentContainerStyle={{ paddingHorizontal: 8, paddingBottom: 32, gap: 8 }}>
+      <ScrollView contentContainerStyle={{ paddingHorizontal: 8, gap: 8 }}>
         {rewards.length === 0 ? (
           <EmptyStateCard title={t("rewards.empty_title")} description={t("rewards.empty_description")} actionLabel={t("common.create_first_reward")} onAction={openCreateReward} />
         ) : (
@@ -52,10 +47,7 @@ export default function NativeRewardsScreen(props: { rewardId?: string | null; o
           })
         )}
       </ScrollView>
-
-      <Suspense fallback={<SheetFallback />}>
-        {rewardDialogOpen && <RewardFormSheet open={rewardDialogOpen} reward={editingReward} goals={goals} onOpenChange={closeRewardDialog} onSave={saveReward} onDelete={handleDeleteReward} />}
-      </Suspense>
+      <RewardFormSheet open={rewardDialogOpen} reward={editingReward} goals={goals} onOpenChange={closeRewardDialog} onSave={saveReward} onDelete={handleDeleteReward} />
     </View>
   );
 }

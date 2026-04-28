@@ -70,7 +70,7 @@ export default function NativeRemindersScreen(props: {
         paddingVertical={8}
       />
 
-      <ScrollView contentContainerStyle={{ paddingHorizontal: 8, paddingBottom: 32, gap: 8 }}>
+      <ScrollView contentContainerStyle={{ paddingHorizontal: 8, gap: 8 }}>
         {reminders.length === 0 ? (
           <EmptyStateCard
             title={t("reminders.empty_native_title")}

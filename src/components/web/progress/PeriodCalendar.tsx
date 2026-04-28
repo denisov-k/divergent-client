@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import dayjs from "dayjs";
+import "dayjs/locale/ru";
 import { useTranslation } from "react-i18next";
 import isoWeek from "dayjs/plugin/isoWeek";
 import { Activity } from "lucide-react";
@@ -18,7 +19,8 @@ type Props = {
 };
 
 export function PeriodCalendar({ goal, activity, loading }: Props) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const dayjsLocale = i18n.language?.startsWith("ru") ? "ru" : "en";
   const scrollRef = useRef<HTMLDivElement>(null);
   const dayLabels = [
     t("progress.activity_day_labels.mon"),
@@ -76,14 +78,14 @@ export function PeriodCalendar({ goal, activity, loading }: Props) {
       colspan++;
     } else {
       if (lastMonth !== undefined) {
-        monthLabels.push({ month: dayjs().month(lastMonth).format("MMM").replace(".", ""), colspan });
+        monthLabels.push({ month: dayjs().locale(dayjsLocale).month(lastMonth).format("MMM").replace(".", ""), colspan });
       }
       lastMonth = month;
       colspan = 1;
     }
   });
   if (lastMonth !== undefined) {
-    monthLabels.push({ month: dayjs().month(lastMonth).format("MMM").replace(".", ""), colspan });
+    monthLabels.push({ month: dayjs().locale(dayjsLocale).month(lastMonth).format("MMM").replace(".", ""), colspan });
   }
 
   return (

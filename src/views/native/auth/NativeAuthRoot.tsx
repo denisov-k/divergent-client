@@ -150,7 +150,7 @@ export default function NativeAuthRoot() {
   return (
     <View style={{ flex: 1, backgroundColor: appPalette.surface.background }}>
       <ScreenHeader title={t("auth.title")} subtitle={t("auth.subtitle")} />
-      <ScrollView contentContainerStyle={{ padding: 16, paddingBottom: 32, gap: 12 }}>
+        <ScrollView contentContainerStyle={{ padding: 16, gap: 12 }}>
         <RuntimeNoticeSection />
         <SectionTabs
           tabs={[

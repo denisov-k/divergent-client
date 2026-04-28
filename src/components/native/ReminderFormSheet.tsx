@@ -169,7 +169,7 @@ export function ReminderFormSheet({
         onSelectAllWeek={() => setSelectedDays(WEEK_DAYS.map((day) => day.key))}
         onSelectAllMonth={() => setSelectedDaysOfMonth(MONTH_DAYS)}
       />
-      <ReminderGoalSection goals={goals} goalId={goalId} initialGoalId={initialGoalId} onChangeGoalId={setGoalId} onResetTask={() => setTaskId(undefined)} />
+      <ReminderGoalSection goals={goals} goalId={goalId} onChangeGoalId={setGoalId} onResetTask={() => setTaskId(undefined)} />
       {goalId && availableTasks.length === 0 && <EmptyTasksHint />}
       <ReminderTaskSection visible={!!goalId && availableTasks.length > 0} availableTasks={availableTasks} taskId={taskId} onChangeTaskId={setTaskId} />
       <ReminderStateSection isActive={isActive} onChange={setIsActive} />
