@@ -1,10 +1,12 @@
 {
   "name": "divergent-client",
   "private": true,
-  "version": "0.5.16",
+  "type": "module",
+  "version": "0.5.17",
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
+    "test": "node --experimental-strip-types --test --experimental-test-isolation=none src/**/*.test.ts",
     "lint": "eslint .",
     "preview": "vite preview",
     "start": "NODE_ENV=production node dist/index.js",
