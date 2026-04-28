@@ -41,7 +41,7 @@ export default function NativeRewardsScreen(props: { rewardId?: string | null; o
         </Pressable>
       </View>
 
-      <ScrollView contentContainerStyle={{ paddingHorizontal: 8, gap: 8 }}>
+      <ScrollView contentContainerStyle={{ paddingHorizontal: 8, paddingBottom: 32, gap: 8 }}>
         {rewards.length === 0 ? (
           <EmptyStateCard title={t("rewards.empty_title")} description={t("rewards.empty_description")} actionLabel={t("common.create_first_reward")} onAction={openCreateReward} />
         ) : (

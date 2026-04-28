@@ -40,7 +40,7 @@ export default function NativeSettingsScreen() {
     <View style={{ flex: 1, backgroundColor: appPalette.surface.background }}>
       <ScreenHeader title={t("settings.title")} subtitle={t("settings.subtitle")} />
 
-      <ScrollView contentContainerStyle={{ paddingHorizontal: 8, gap: 8 }}>
+      <ScrollView contentContainerStyle={{ paddingHorizontal: 8, paddingBottom: 32, gap: 8 }}>
         <ProfileSection user={user} />
         <LanguageSection
           language={language}

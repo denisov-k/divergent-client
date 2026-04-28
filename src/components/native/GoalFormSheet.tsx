@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+﻿import { useEffect, useMemo, useState } from "react";
 import { Alert, View } from "react-native";
 import { useTranslation } from "react-i18next";
 
@@ -7,6 +7,7 @@ import { FieldInput } from "@/components/native/FieldInput";
 import { FormSheetLayout } from "@/components/native/form-sheet/Layout";
 import {
   CategorySection,
+  DueDateSection,
   GoalPeriodSection,
   GoalTypeSection,
   ProgressFieldsSection,
@@ -15,6 +16,35 @@ import {
 } from "@/components/native/goal-form-sheet/Sections";
 import { createTask } from "@/components/native/goal-form-sheet/helpers";
 import type { CategoryOption, Goal, GoalFormData, GoalPeriod, GoalType, Reward, Task } from "@/types";
+
+function addSubtaskRecursive(currentTasks: Task[], parentId: string, subtask: Task): Task[] {
+  return currentTasks.map((task) => {
+    if (task.id === parentId) {
+      return {
+        ...task,
+        subtasks: [...(task.subtasks ?? []), subtask],
+      };
+    }
+
+    if (task.subtasks?.length) {
+      return {
+        ...task,
+        subtasks: addSubtaskRecursive(task.subtasks, parentId, subtask),
+      };
+    }
+
+    return task;
+  });
+}
+
+function removeTaskRecursive(currentTasks: Task[], idToRemove: string): Task[] {
+  return currentTasks
+    .filter((task) => task.id !== idToRemove)
+    .map((task) => ({
+      ...task,
+      subtasks: task.subtasks?.length ? removeTaskRecursive(task.subtasks, idToRemove) : [],
+    }));
+}
 
 export function GoalFormSheet({
   open,
@@ -45,6 +75,9 @@ export function GoalFormSheet({
   const [selectedRewardId, setSelectedRewardId] = useState<string | null>(null);
   const [tasks, setTasks] = useState<Task[]>([]);
   const [newTaskTitle, setNewTaskTitle] = useState("");
+  const [expandedTasks, setExpandedTasks] = useState<Record<string, boolean>>({});
+  const [newSubTaskTitles, setNewSubTaskTitles] = useState<Record<string, string>>({});
+  const [newSubTaskXps, setNewSubTaskXps] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const activeRewardId = useMemo(() => {
@@ -71,6 +104,10 @@ export function GoalFormSheet({
       setTargetValue(goal.targetValue?.toString() ?? "");
       setTasks(goal.tasks ?? []);
       setSelectedRewardId(rewards.find((reward) => reward.goalId === goal.id)?.id ?? null);
+      setExpandedTasks({});
+      setNewSubTaskTitles({});
+      setNewSubTaskXps({});
+      setNewTaskTitle("");
       return;
     }
 
@@ -85,6 +122,9 @@ export function GoalFormSheet({
     setTasks([]);
     setNewTaskTitle("");
     setSelectedRewardId(null);
+    setExpandedTasks({});
+    setNewSubTaskTitles({});
+    setNewSubTaskXps({});
   }, [open, goal, categories, rewards]);
 
   const addTask = () => {
@@ -97,8 +137,33 @@ export function GoalFormSheet({
     setNewTaskTitle("");
   };
 
+  const addSubTask = (parentId: string) => {
+    const nextTitle = (newSubTaskTitles[parentId] ?? "").trim();
+    if (!nextTitle) {
+      return;
+    }
+
+    const nextXpRaw = (newSubTaskXps[parentId] ?? "").trim();
+    const nextXp = nextXpRaw ? Number(nextXpRaw) : undefined;
+
+    setTasks((current) =>
+      addSubtaskRecursive(current, parentId, {
+        ...createTask(nextTitle),
+        parentId,
+        xpReward: Number.isFinite(nextXp) ? nextXp : undefined,
+      }),
+    );
+    setExpandedTasks((current) => ({ ...current, [parentId]: true }));
+    setNewSubTaskTitles((current) => ({ ...current, [parentId]: "" }));
+    setNewSubTaskXps((current) => ({ ...current, [parentId]: "" }));
+  };
+
   const removeTask = (taskId: string) => {
-    setTasks((current) => current.filter((task) => task.id !== taskId));
+    setTasks((current) => removeTaskRecursive(current, taskId));
+  };
+
+  const toggleExpand = (taskId: string) => {
+    setExpandedTasks((current) => ({ ...current, [taskId]: !current[taskId] }));
   };
 
   const handleSave = async () => {
@@ -178,17 +243,38 @@ export function GoalFormSheet({
         </View>
       }
     >
-      <FieldInput label={t("common.title")} value={title} onChangeText={setTitle} placeholder={t("goals.dialog.title_placeholder")} />
-      <FieldInput label={t("common.description")} value={description} onChangeText={setDescription} placeholder={t("goals.dialog.description_placeholder")} />
+      <FieldInput label={t("common.title")} value={title} onChangeText={setTitle} placeholder={t("goals.dialog.title_placeholder")} autoCapitalize="sentences" />
+      <FieldInput
+        label={t("common.description")}
+        value={description}
+        onChangeText={setDescription}
+        placeholder={t("goals.dialog.description_placeholder")}
+        autoCapitalize="sentences"
+        multiline
+        numberOfLines={4}
+      />
       <GoalTypeSection goalType={goalType} onChange={setGoalType} />
       <GoalPeriodSection goalPeriod={goalPeriod} onChange={setGoalPeriod} />
-      <FieldInput label={t("goals.dialog.due_date_label")} value={dueDate} onChangeText={setDueDate} placeholder="2026-05-01" />
+      <DueDateSection dueDate={dueDate} onChange={setDueDate} />
       <CategorySection categories={categories} category={category} onChange={setCategory} />
       <RewardSection rewards={rewards} activeRewardId={activeRewardId} onChange={setSelectedRewardId} />
       {goalType === "PROGRESS" ? (
         <ProgressFieldsSection currentValue={currentValue} targetValue={targetValue} onChangeCurrentValue={setCurrentValue} onChangeTargetValue={setTargetValue} />
       ) : (
-        <TasksSection tasks={tasks} newTaskTitle={newTaskTitle} onChangeNewTaskTitle={setNewTaskTitle} onAddTask={addTask} onRemoveTask={removeTask} />
+        <TasksSection
+          tasks={tasks}
+          newTaskTitle={newTaskTitle}
+          onChangeNewTaskTitle={setNewTaskTitle}
+          onAddTask={addTask}
+          onRemoveTask={removeTask}
+          expandedTasks={expandedTasks}
+          onToggleExpand={toggleExpand}
+          newSubTaskTitles={newSubTaskTitles}
+          newSubTaskXps={newSubTaskXps}
+          onChangeNewSubTaskTitle={(taskId, value) => setNewSubTaskTitles((current) => ({ ...current, [taskId]: value }))}
+          onChangeNewSubTaskXp={(taskId, value) => setNewSubTaskXps((current) => ({ ...current, [taskId]: value }))}
+          onAddSubTask={addSubTask}
+        />
       )}
     </FormSheetLayout>
   );

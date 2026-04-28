@@ -1,4 +1,4 @@
-﻿import { Suspense, lazy, useEffect } from "react";
+﻿import { Suspense, lazy, useEffect, useState } from "react";
 import { Alert, ScrollView, View } from "react-native";
 import { useTranslation } from "react-i18next";
 
@@ -20,6 +20,7 @@ export default function NativeRemindersScreen(props: {
   onConsumeLinkState?: () => void;
 }) {
   const { t } = useTranslation();
+  const [initialGoalId, setInitialGoalId] = useState<string | undefined>(undefined);
   const {
     reminders,
     goals,
@@ -42,6 +43,7 @@ export default function NativeRemindersScreen(props: {
     }
 
     if (props.goalId) {
+      setInitialGoalId(props.goalId);
       setReminderDialogOpen(true);
       props.onConsumeLinkState?.();
     }
@@ -60,18 +62,24 @@ export default function NativeRemindersScreen(props: {
       <ScreenHeader
         title={t("reminders.title")}
         actionLabel={t("reminders.create")}
-        onAction={openCreateReminder}
+        onAction={() => {
+          setInitialGoalId(undefined);
+          openCreateReminder();
+        }}
         paddingHorizontal={8}
         paddingVertical={8}
       />
 
-      <ScrollView contentContainerStyle={{ paddingHorizontal: 8, gap: 8 }}>
+      <ScrollView contentContainerStyle={{ paddingHorizontal: 8, paddingBottom: 32, gap: 8 }}>
         {reminders.length === 0 ? (
           <EmptyStateCard
             title={t("reminders.empty_native_title")}
             description={t("reminders.empty_native_description")}
             actionLabel={t("reminders.create_first")}
-            onAction={openCreateReminder}
+            onAction={() => {
+              setInitialGoalId(undefined);
+              openCreateReminder();
+            }}
           />
         ) : (
           reminders.map((reminder) => {
@@ -98,8 +106,13 @@ export default function NativeRemindersScreen(props: {
             open={reminderDialogOpen}
             reminder={editingReminder}
             goals={goals}
-            initialGoalId={props.goalId || undefined}
-            onOpenChange={closeReminderDialog}
+            initialGoalId={initialGoalId}
+            onOpenChange={(open) => {
+              closeReminderDialog(open);
+              if (!open) {
+                setInitialGoalId(undefined);
+              }
+            }}
             onSave={saveReminder}
             onDelete={handleDeleteReminder}
           />

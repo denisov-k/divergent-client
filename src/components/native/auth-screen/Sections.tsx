@@ -42,13 +42,23 @@ export function SignInSection(props: {
   return (
     <SurfaceCard>
       <CardTitle>{t("auth.signin_title")}</CardTitle>
-      <FieldInput label="Email" value={props.email} onChangeText={props.onChangeEmail} placeholder={t("auth.email_placeholder")} />
+      <FieldInput
+        label={t("common.email")}
+        value={props.email}
+        onChangeText={props.onChangeEmail}
+        placeholder={t("auth.email_placeholder")}
+        keyboardType="email-address"
+        autoComplete="email"
+        textContentType="emailAddress"
+      />
       <FieldInput
         label={t("common.password")}
         value={props.password}
         onChangeText={props.onChangePassword}
         placeholder={t("auth.password_placeholder")}
         secureTextEntry
+        autoComplete="current-password"
+        textContentType="password"
       />
       <ErrorBanner message={props.error} />
       <View style={{ flexDirection: "row", gap: 8, flexWrap: "wrap" }}>
@@ -79,13 +89,23 @@ export function SignUpSection(props: {
     <SurfaceCard>
       <CardTitle>{t("auth.signup_title")}</CardTitle>
       <FieldInput label={t("common.name")} value={props.name} onChangeText={props.onChangeName} placeholder={t("auth.your_name")} />
-      <FieldInput label="Email" value={props.email} onChangeText={props.onChangeEmail} placeholder={t("auth.email_placeholder")} />
+      <FieldInput
+        label={t("common.email")}
+        value={props.email}
+        onChangeText={props.onChangeEmail}
+        placeholder={t("auth.email_placeholder")}
+        keyboardType="email-address"
+        autoComplete="email"
+        textContentType="emailAddress"
+      />
       <FieldInput
         label={t("common.password")}
         value={props.password}
         onChangeText={props.onChangePassword}
         placeholder={t("auth.password_create_placeholder")}
         secureTextEntry
+        autoComplete="new-password"
+        textContentType="newPassword"
       />
       <ErrorBanner message={props.error} />
       <View style={{ flexDirection: "row", gap: 8, flexWrap: "wrap" }}>
@@ -130,7 +150,15 @@ export function ResetSection(props: {
         activeTab={props.resetMode}
         onChange={(value) => props.onChangeMode(value as "request" | "confirm")}
       />
-      <FieldInput label="Email" value={props.email} onChangeText={props.onChangeEmail} placeholder={t("auth.email_placeholder")} />
+      <FieldInput
+        label={t("common.email")}
+        value={props.email}
+        onChangeText={props.onChangeEmail}
+        placeholder={t("auth.email_placeholder")}
+        keyboardType="email-address"
+        autoComplete="email"
+        textContentType="emailAddress"
+      />
       {props.resetMode === "confirm" && (
         <>
           <FieldInput label={t("auth.reset_confirm_tab")} value={props.token} onChangeText={props.onChangeToken} placeholder={t("auth.reset_token_placeholder")} />
@@ -140,6 +168,8 @@ export function ResetSection(props: {
             onChangeText={props.onChangePassword}
             placeholder={t("auth.new_password_placeholder")}
             secureTextEntry
+            autoComplete="new-password"
+            textContentType="newPassword"
           />
           <FieldInput
             label={t("common.confirm_password")}
@@ -147,6 +177,8 @@ export function ResetSection(props: {
             onChangeText={props.onChangeConfirmPassword}
             placeholder={t("auth.confirm_password_placeholder")}
             secureTextEntry
+            autoComplete="new-password"
+            textContentType="newPassword"
           />
         </>
       )}

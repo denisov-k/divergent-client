@@ -1,5 +1,6 @@
-import { useEffect, useState } from "react";
+п»їimport { useEffect, useState } from "react";
 import { Linking, ScrollView, View } from "react-native";
+import { useTranslation } from "react-i18next";
 import { z, ZodError } from "zod";
 
 import { parseNativeAuthRoute, type NativeAuthTab, type NativeResetMode } from "@/app/router.native";
@@ -14,38 +15,8 @@ import {
 import { useAppStore } from "@/stores/useAppStore";
 import { appPalette } from "@/theme/palette";
 
-const signInSchema = z.object({
-  email: z.string().email("Invalid email address"),
-  password: z.string().min(1, "Password is required"),
-});
-const signUpSchema = z.object({
-  email: z.string().email("Invalid email address"),
-  password: z
-    .string()
-    .min(8, "Password must be at least 8 characters")
-    .regex(/[A-Z]/, "Password must contain at least one uppercase letter")
-    .regex(/[a-z]/, "Password must contain at least one lowercase letter")
-    .regex(/[0-9]/, "Password must contain at least one number"),
-  name: z.string().optional(),
-});
-const resetRequestSchema = z.object({ email: z.string().email("Invalid email address") });
-const resetConfirmSchema = z
-  .object({
-    token: z.string().min(1, "Reset token is required"),
-    password: z
-      .string()
-      .min(8, "Password must be at least 8 characters")
-      .regex(/[A-Z]/, "Password must contain at least one uppercase letter")
-      .regex(/[a-z]/, "Password must contain at least one lowercase letter")
-      .regex(/[0-9]/, "Password must contain at least one number"),
-    confirmPassword: z.string(),
-  })
-  .refine((data) => data.password === data.confirmPassword, {
-    path: ["confirmPassword"],
-    message: "Passwords do not match",
-  });
-
 export default function NativeAuthRoot() {
+  const { t } = useTranslation();
   const { loading, loginWithCredentials, signup, passwordReset, confirmPasswordReset } = useAppStore();
   const [activeTab, setActiveTab] = useState<NativeAuthTab>("signin");
   const [signInData, setSignInData] = useState({ email: "", password: "" });
@@ -57,6 +28,42 @@ export default function NativeAuthRoot() {
   const [resetError, setResetError] = useState<string>();
   const [resetSuccess, setResetSuccess] = useState<string>();
   const [resetUrl, setResetUrl] = useState<string>();
+
+  const signInSchema = z.object({
+    email: z.string().email(t("auth.invalid_email")),
+    password: z.string().min(1, t("auth.password_required")),
+  });
+
+  const signUpSchema = z.object({
+    email: z.string().email(t("auth.invalid_email")),
+    password: z
+      .string()
+      .min(8, t("auth.password_min"))
+      .regex(/[A-Z]/, t("auth.password_upper"))
+      .regex(/[a-z]/, t("auth.password_lower"))
+      .regex(/[0-9]/, t("auth.password_number")),
+    name: z.string().optional(),
+  });
+
+  const resetRequestSchema = z.object({
+    email: z.string().email(t("auth.invalid_email")),
+  });
+
+  const resetConfirmSchema = z
+    .object({
+      token: z.string().min(1, t("auth.reset_token_required")),
+      password: z
+        .string()
+        .min(8, t("auth.password_min"))
+        .regex(/[A-Z]/, t("auth.password_upper"))
+        .regex(/[a-z]/, t("auth.password_lower"))
+        .regex(/[0-9]/, t("auth.password_number")),
+      confirmPassword: z.string(),
+    })
+    .refine((data) => data.password === data.confirmPassword, {
+      path: ["confirmPassword"],
+      message: t("auth.passwords_no_match"),
+    });
 
   useEffect(() => {
     const applyLink = (url: string) => {
@@ -85,10 +92,10 @@ export default function NativeAuthRoot() {
 
   const handleValidationError = (error: unknown) =>
     error instanceof ZodError
-      ? error.errors[0]?.message || "Check the form fields."
+      ? error.errors[0]?.message || t("auth.check_fields")
       : error instanceof Error
         ? error.message
-        : "Something went wrong.";
+        : t("auth.check_fields");
 
   const submitSignIn = async () => {
     try {
@@ -96,7 +103,7 @@ export default function NativeAuthRoot() {
       const validated = signInSchema.parse(signInData);
       await loginWithCredentials(validated.email, validated.password);
     } catch (error) {
-      setSignInError(handleValidationError(error) || "Failed to sign in.");
+      setSignInError(handleValidationError(error) || t("auth.signin_failed"));
     }
   };
 
@@ -106,7 +113,7 @@ export default function NativeAuthRoot() {
       const validated = signUpSchema.parse(signUpData);
       await signup(validated.email, validated.password, validated.name);
     } catch (error) {
-      setSignUpError(handleValidationError(error) || "Failed to create account.");
+      setSignUpError(handleValidationError(error) || t("auth.signup_failed"));
     }
   };
 
@@ -118,14 +125,10 @@ export default function NativeAuthRoot() {
       const validated = resetRequestSchema.parse({ email: resetData.email });
       const response = await passwordReset(validated.email);
       setResetUrl(response.resetUrl);
-      setResetSuccess(
-        response.resetUrl
-          ? "Reset link created. You can open it directly or paste the token below."
-          : "If an account exists, a reset link has been prepared.",
-      );
+      setResetSuccess(response.resetUrl ? t("auth.reset_link_ready") : t("auth.reset_link_prepared"));
       setResetMode("confirm");
     } catch (error) {
-      setResetError(handleValidationError(error) || "Failed to request password reset.");
+      setResetError(handleValidationError(error) || t("auth.reset_request_failed"));
     }
   };
 
@@ -135,25 +138,25 @@ export default function NativeAuthRoot() {
       setResetSuccess(undefined);
       const validated = resetConfirmSchema.parse(resetData);
       await confirmPasswordReset(validated.token, validated.password);
-      setResetSuccess("Password updated. You can now sign in with the new password.");
+      setResetSuccess(t("auth.password_updated"));
       setActiveTab("signin");
       setResetMode("request");
       setResetData({ email: resetData.email, token: "", password: "", confirmPassword: "" });
     } catch (error) {
-      setResetError(handleValidationError(error) || "Failed to confirm password reset.");
+      setResetError(handleValidationError(error) || t("auth.reset_confirm_failed"));
     }
   };
 
   return (
     <View style={{ flex: 1, backgroundColor: appPalette.surface.background }}>
-      <ScreenHeader title="Авторизация" subtitle="Email/password flow уже работает в shared store и теперь доступен в mobile shell." />
-      <ScrollView contentContainerStyle={{ padding: 16, gap: 12 }}>
+      <ScreenHeader title={t("auth.title")} subtitle={t("auth.subtitle")} />
+      <ScrollView contentContainerStyle={{ padding: 16, paddingBottom: 32, gap: 12 }}>
         <RuntimeNoticeSection />
         <SectionTabs
           tabs={[
-            { key: "signin", label: "Вход" },
-            { key: "signup", label: "Регистрация" },
-            { key: "reset", label: "Reset" },
+            { key: "signin", label: t("auth.signin_tab") },
+            { key: "signup", label: t("auth.signup_tab") },
+            { key: "reset", label: t("auth.reset_tab") },
           ]}
           activeTab={activeTab}
           onChange={(value) => setActiveTab(value as NativeAuthTab)}

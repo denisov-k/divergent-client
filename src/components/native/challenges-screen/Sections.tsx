@@ -89,7 +89,7 @@ export function ChallengesScreenContent({
   const { t } = useTranslation();
 
   return (
-    <ScrollView contentContainerStyle={{ paddingHorizontal: 8, gap: 8 }}>
+    <ScrollView contentContainerStyle={{ paddingHorizontal: 8, paddingBottom: 32, gap: 8 }}>
       {challenges.length === 0 ? (
         <EmptyStateCard
           title={t("challenges.empty")}
