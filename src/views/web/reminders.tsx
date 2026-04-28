@@ -1,12 +1,18 @@
-﻿import { Plus } from "lucide-react";
+﻿import { lazy, Suspense } from "react";
+import { Plus } from "lucide-react";
 import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
 
+const ReminderDialog = lazy(() => import("@/components/ReminderDialog").then((m) => ({ default: m.ReminderDialog })));
+
 import { ReminderCard } from "@/components/ReminderCard";
-import { ReminderDialog } from "@/components/ReminderDialog";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useRemindersScreen } from "@/shared/screens/reminders/useRemindersScreen";
+
+function DialogFallback() {
+  return null;
+}
 
 export default function RemindersScreen() {
   const { t } = useTranslation();
@@ -65,14 +71,20 @@ export default function RemindersScreen() {
         </div>
       )}
 
-      <ReminderDialog
-        open={reminderDialogOpen}
-        onOpenChange={closeReminderDialog}
-        onSave={handleSaveReminder}
-        onDelete={handleDeleteReminder}
-        reminder={editingReminder}
-        goals={goals}
-      />
+      <Suspense fallback={<DialogFallback />}>
+        {reminderDialogOpen && (
+          <ReminderDialog
+            open={reminderDialogOpen}
+            onOpenChange={closeReminderDialog}
+            onSave={handleSaveReminder}
+            onDelete={handleDeleteReminder}
+            reminder={editingReminder}
+            goals={goals}
+          />
+        )}
+      </Suspense>
     </div>
   );
 }
+
+

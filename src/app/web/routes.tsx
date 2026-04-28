@@ -1,43 +1,52 @@
-﻿import type { ReactNode } from "react";
+﻿import { Suspense, lazy, type ReactNode } from "react";
 import { Route } from "react-router-dom";
 
 import { ProtectedRoute } from "@/components/protected-route";
 import Footer from "@/layout/Footer";
 import Header from "@/layout/Header";
 import Layout from "@/layout";
-import ResetPasswordView from "@/views/auth/reset";
-import SignInView from "@/views/auth/sign-in";
-import SignUpView from "@/views/auth/sign-up";
-import ChallengesView from "@/views/web/challenges";
-import FrensView from "@/views/web/frens";
-import GoalsView from "@/views/web/goals";
-import IndexView from "@/views/web/index";
-import ProgressView from "@/views/web/progress";
-import RemindersView from "@/views/web/reminders";
-import RewardsView from "@/views/web/rewards";
-import SettingsView from "@/views/web/settings";
-import NativePreviewPage from "@/app/web/NativePreviewPage";
+
+const ResetPasswordView = lazy(() => import("@/views/auth/reset"));
+const SignInView = lazy(() => import("@/views/auth/sign-in"));
+const SignUpView = lazy(() => import("@/views/auth/sign-up"));
+const ChallengesView = lazy(() => import("@/views/web/challenges"));
+const FrensView = lazy(() => import("@/views/web/frens"));
+const GoalsView = lazy(() => import("@/views/web/goals"));
+const IndexView = lazy(() => import("@/views/web/index"));
+const ProgressView = lazy(() => import("@/views/web/progress"));
+const RemindersView = lazy(() => import("@/views/web/reminders"));
+const RewardsView = lazy(() => import("@/views/web/rewards"));
+const SettingsView = lazy(() => import("@/views/web/settings"));
+const NativePreviewPage = lazy(() => import("@/app/web/NativePreviewPage"));
+
+function RouteFallback() {
+  return <div className="flex min-h-[40vh] items-center justify-center text-sm text-muted-foreground">Loading...</div>;
+}
+
+function withSuspense(component: ReactNode) {
+  return <Suspense fallback={<RouteFallback />}>{component}</Suspense>;
+}
 
 function renderProtectedWeb(component: ReactNode) {
   return (
     <ProtectedRoute>
       <Layout header={<Header />} footer={<Footer />}>
-        {component}
+        {withSuspense(component)}
       </Layout>
     </ProtectedRoute>
   );
 }
 
 function renderProtectedNativePreview(component: ReactNode) {
-  return <ProtectedRoute>{component}</ProtectedRoute>;
+  return <ProtectedRoute>{withSuspense(component)}</ProtectedRoute>;
 }
 
 export function renderAuthRoutes() {
   return (
     <>
-      <Route path="/signin" element={<SignInView />} />
-      <Route path="/signup" element={<SignUpView />} />
-      <Route path="/reset" element={<ResetPasswordView />} />
+      <Route path="/signin" element={withSuspense(<SignInView />)} />
+      <Route path="/signup" element={withSuspense(<SignUpView />)} />
+      <Route path="/reset" element={withSuspense(<ResetPasswordView />)} />
     </>
   );
 }

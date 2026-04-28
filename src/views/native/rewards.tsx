@@ -1,14 +1,19 @@
-﻿import { useEffect } from "react";
+﻿import { Suspense, lazy, useEffect } from "react";
 import { Alert, Pressable, ScrollView, Text, View } from "react-native";
 import { useTranslation } from "react-i18next";
+
+const RewardFormSheet = lazy(() => import("@/components/native/RewardFormSheet").then((m) => ({ default: m.RewardFormSheet })));
 
 import { EmptyStateCard } from "@/components/native/EmptyStateCard";
 import { Plus } from "@/components/native/icons";
 import { NativeRewardCard } from "@/components/native/NativeRewardCard";
-import { RewardFormSheet } from "@/components/native/RewardFormSheet";
 import { useAppStore } from "@/stores/useAppStore";
 import { useRewardsScreen } from "@/shared/screens/rewards/useRewardsScreen";
 import { appPalette } from "@/theme/palette";
+
+function SheetFallback() {
+  return null;
+}
 
 export default function NativeRewardsScreen(props: {
   rewardId?: string | null;
@@ -73,7 +78,11 @@ export default function NativeRewardsScreen(props: {
         )}
       </ScrollView>
 
-      <RewardFormSheet open={rewardDialogOpen} reward={editingReward} goals={goals} onOpenChange={closeRewardDialog} onSave={saveReward} onDelete={handleDeleteReward} />
+      <Suspense fallback={<SheetFallback />}>
+        {rewardDialogOpen && (
+          <RewardFormSheet open={rewardDialogOpen} reward={editingReward} goals={goals} onOpenChange={closeRewardDialog} onSave={saveReward} onDelete={handleDeleteReward} />
+        )}
+      </Suspense>
     </View>
   );
 }

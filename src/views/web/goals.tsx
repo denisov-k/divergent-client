@@ -1,18 +1,24 @@
-﻿import { Plus, Sparkles } from "lucide-react";
+﻿import { lazy, Suspense } from "react";
+import { Plus, Sparkles } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { toast } from "sonner";
 
-import AiGenerateGoalDialog from "@/components/AiDialog";
-import CreateReportDialog from "@/components/CreateReportDialog";
+const AiGenerateGoalDialog = lazy(() => import("@/components/AiDialog"));
+const CreateReportDialog = lazy(() => import("@/components/CreateReportDialog"));
+const GoalDialog = lazy(() => import("@/components/GoalDialog").then((m) => ({ default: m.GoalDialog })));
+const ReminderDialog = lazy(() => import("@/components/ReminderDialog").then((m) => ({ default: m.ReminderDialog })));
+
 import { GoalCard } from "@/components/GoalCard";
-import { GoalDialog } from "@/components/GoalDialog";
-import { ReminderDialog } from "@/components/ReminderDialog";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { buildProgressPath, buildRemindersPath } from "@/app/routes";
 import { useGoalsScreen } from "@/shared/screens/goals/useGoalsScreen";
 import type { Goal } from "@/types";
+
+function DialogFallback() {
+  return null;
+}
 
 export default function GoalsScreen() {
   const { t } = useTranslation();
@@ -47,7 +53,7 @@ export default function GoalsScreen() {
     toggleGoalTask,
   } = useGoalsScreen({
     focusId,
-    onNavigateToProgress: (goalId) => navigate(buildProgressPath({ goalId })), 
+    onNavigateToProgress: (goalId) => navigate(buildProgressPath({ goalId })),
     onReminderCreated: () => navigate(buildRemindersPath()),
   });
 
@@ -141,31 +147,40 @@ export default function GoalsScreen() {
         )}
       </div>
 
-      <GoalDialog
-        open={goalDialogOpen}
-        onOpenChange={setGoalDialogOpen}
-        onSave={handleSaveGoal}
-        onDelete={handleDeleteGoal}
-        goal={editingGoal}
-        categories={categories}
-        rewards={rewards}
-        onAddCategory={handleAddCategory}
-      />
-      <ReminderDialog
-        open={reminderDialogOpen}
-        onOpenChange={setReminderDialogOpen}
-        onSave={handleSaveReminder}
-        reminder={undefined}
-        goals={goals}
-        initialGoalId={selectedGoalIdForReminder}
-      />
-      <CreateReportDialog
-        open={createReportDialogOpen}
-        onOpenChange={setCreateReportDialogOpen}
-        onSubmit={handleSaveReport}
-      />
-      <AiGenerateGoalDialog open={aiOpen} onOpenChange={setAiOpen} onDraftAdded={onDraftAdded} />
+      <Suspense fallback={<DialogFallback />}>
+        {goalDialogOpen && (
+          <GoalDialog
+            open={goalDialogOpen}
+            onOpenChange={setGoalDialogOpen}
+            onSave={handleSaveGoal}
+            onDelete={handleDeleteGoal}
+            goal={editingGoal}
+            categories={categories}
+            rewards={rewards}
+            onAddCategory={handleAddCategory}
+          />
+        )}
+        {reminderDialogOpen && (
+          <ReminderDialog
+            open={reminderDialogOpen}
+            onOpenChange={setReminderDialogOpen}
+            onSave={handleSaveReminder}
+            reminder={undefined}
+            goals={goals}
+            initialGoalId={selectedGoalIdForReminder}
+          />
+        )}
+        {createReportDialogOpen && (
+          <CreateReportDialog
+            open={createReportDialogOpen}
+            onOpenChange={setCreateReportDialogOpen}
+            onSubmit={handleSaveReport}
+          />
+        )}
+        {aiOpen && <AiGenerateGoalDialog open={aiOpen} onOpenChange={setAiOpen} onDraftAdded={onDraftAdded} />}
+      </Suspense>
     </div>
   );
 }
+
 

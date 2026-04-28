@@ -1,16 +1,21 @@
-﻿import { useEffect } from "react";
+﻿import { Suspense, lazy, useEffect } from "react";
 import { Alert, Pressable, ScrollView, Text, View } from "react-native";
 import { useTranslation } from "react-i18next";
 
-import { AiChatSheet } from "@/components/native/AiChatSheet";
-import { CreateReportSheet } from "@/components/native/CreateReportSheet";
+const AiChatSheet = lazy(() => import("@/components/native/AiChatSheet").then((m) => ({ default: m.AiChatSheet })));
+const CreateReportSheet = lazy(() => import("@/components/native/CreateReportSheet").then((m) => ({ default: m.CreateReportSheet })));
+const GoalFormSheet = lazy(() => import("@/components/native/GoalFormSheet").then((m) => ({ default: m.GoalFormSheet })));
+
 import { EmptyStateCard } from "@/components/native/EmptyStateCard";
-import { GoalFormSheet } from "@/components/native/GoalFormSheet";
 import { NativeGoalCard } from "@/components/native/NativeGoalCard";
 import { Plus, Sparkles } from "@/components/native/icons";
 import { useAppStore } from "@/stores/useAppStore";
 import { useGoalsScreen } from "@/shared/screens/goals/useGoalsScreen";
 import { appPalette } from "@/theme/palette";
+
+function SheetFallback() {
+  return null;
+}
 
 export default function NativeGoalsScreen(props: {
   goalId?: string | null;
@@ -162,16 +167,23 @@ export default function NativeGoalsScreen(props: {
         )}
       </ScrollView>
 
-      <CreateReportSheet open={createReportDialogOpen} onOpenChange={setCreateReportDialogOpen} onSubmit={saveReport} />
-      <GoalFormSheet open={goalDialogOpen} goal={editingGoal} categories={categories} rewards={rewards} onOpenChange={setGoalDialogOpen} onSave={saveGoal} onDelete={removeGoal} />
-      <AiChatSheet
-        open={aiOpen}
-        onOpenChange={setAiOpen}
-        onDraftAdded={(goal) => {
-          Alert.alert("Черновик добавлен", `Цель \"${goal.title}\" появилась в списке.`);
-        }}
-      />
+      <Suspense fallback={<SheetFallback />}>
+        {createReportDialogOpen && (
+          <CreateReportSheet open={createReportDialogOpen} onOpenChange={setCreateReportDialogOpen} onSubmit={saveReport} />
+        )}
+        {goalDialogOpen && (
+          <GoalFormSheet open={goalDialogOpen} goal={editingGoal} categories={categories} rewards={rewards} onOpenChange={setGoalDialogOpen} onSave={saveGoal} onDelete={removeGoal} />
+        )}
+        {aiOpen && (
+          <AiChatSheet
+            open={aiOpen}
+            onOpenChange={setAiOpen}
+            onDraftAdded={(goal) => {
+              Alert.alert("Черновик добавлен", `Цель \"${goal.title}\" появилась в списке.`);
+            }}
+          />
+        )}
+      </Suspense>
     </View>
   );
 }
-

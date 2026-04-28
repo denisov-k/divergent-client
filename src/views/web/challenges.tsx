@@ -1,18 +1,24 @@
-﻿import { Plus } from "lucide-react";
+﻿import { lazy, Suspense } from "react";
+import { Plus } from "lucide-react";
 import { useSearchParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
-import { AcceptChallengeDialog } from "@/components/AcceptChallengeDialog";
+const AcceptChallengeDialog = lazy(() => import("@/components/AcceptChallengeDialog").then((m) => ({ default: m.AcceptChallengeDialog })));
+const ChallengeParticipantDialog = lazy(() => import("@/components/ChallengeParticipantDialog").then((m) => ({ default: m.ChallengeParticipantDialog })));
+const CreateChallengeDialog = lazy(() => import("@/components/CreateChallengeDialog").then((m) => ({ default: m.CreateChallengeDialog })));
+const LeaveChallengeDialog = lazy(() => import("@/components/LeaveChallengeDialog").then((m) => ({ default: m.LeaveChallengeDialog })));
+const SelectPaymentMethodDialog = lazy(() => import("@/components/SelectPaymentMethodDialog").then((m) => ({ default: m.SelectPaymentMethodDialog })));
+
 import { ChallengeCard } from "@/components/ChallengeCard";
-import { ChallengeParticipantDialog } from "@/components/ChallengeParticipantDialog";
-import { CreateChallengeDialog } from "@/components/CreateChallengeDialog";
-import { LeaveChallengeDialog } from "@/components/LeaveChallengeDialog";
-import { SelectPaymentMethodDialog } from "@/components/SelectPaymentMethodDialog";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { buildChallengeShareUrl } from "@/platform/appUrl";
 import { openExternalLink, shareLink } from "@/platform/browser";
 import { useChallengesScreen } from "@/shared/screens/challenges/useChallengesScreen";
+
+function DialogFallback() {
+  return null;
+}
 
 export default function ChallengesScreen() {
   const { t } = useTranslation();
@@ -108,47 +114,57 @@ export default function ChallengesScreen() {
         </div>
       )}
 
-      <CreateChallengeDialog
-        goals={goals}
-        open={challengeDialogOpen}
-        onOpenChange={closeChallengeDialog}
-        challenge={editingChallenge}
-        onSave={handleSaveChallenge}
-      />
+      <Suspense fallback={<DialogFallback />}>
+        {challengeDialogOpen && (
+          <CreateChallengeDialog
+            goals={goals}
+            open={challengeDialogOpen}
+            onOpenChange={closeChallengeDialog}
+            challenge={editingChallenge}
+            onSave={handleSaveChallenge}
+          />
+        )}
 
-      <SelectPaymentMethodDialog
-        open={paymentDialogOpen}
-        onOpenChange={setPaymentDialogOpen}
-        onSelect={selectPaymentMethod}
-      />
+        {paymentDialogOpen && (
+          <SelectPaymentMethodDialog
+            open={paymentDialogOpen}
+            onOpenChange={setPaymentDialogOpen}
+            onSelect={selectPaymentMethod}
+          />
+        )}
 
-      {selectedChallenge && (
-        <AcceptChallengeDialog
-          challenge={selectedChallenge}
-          isOpen={acceptDialogOpen}
-          onOpenChange={closeAcceptDialog}
-          onAccept={acceptSelectedChallenge}
-          onShare={shareChallenge}
-        />
-      )}
+        {selectedChallenge && acceptDialogOpen && (
+          <AcceptChallengeDialog
+            challenge={selectedChallenge}
+            isOpen={acceptDialogOpen}
+            onOpenChange={closeAcceptDialog}
+            onAccept={acceptSelectedChallenge}
+            onShare={shareChallenge}
+          />
+        )}
 
-      {selectedChallenge && (
-        <ChallengeParticipantDialog
-          challenge={selectedChallenge}
-          reports={reports}
-          isOpen={reportsDialogOpen}
-          onOpenChange={closeReportsDialog}
-          onDownload={downloadChallengeReport}
-          onKick={kickChallengeParticipant}
-          participants={participants}
-        />
-      )}
+        {selectedChallenge && reportsDialogOpen && (
+          <ChallengeParticipantDialog
+            challenge={selectedChallenge}
+            reports={reports}
+            isOpen={reportsDialogOpen}
+            onOpenChange={closeReportsDialog}
+            onDownload={downloadChallengeReport}
+            onKick={kickChallengeParticipant}
+            participants={participants}
+          />
+        )}
 
-      <LeaveChallengeDialog
-        open={leaveDialogOpen}
-        onOpenChange={setLeaveDialogOpen}
-        onConfirm={handleConfirmLeave}
-      />
+        {leaveDialogOpen && (
+          <LeaveChallengeDialog
+            open={leaveDialogOpen}
+            onOpenChange={setLeaveDialogOpen}
+            onConfirm={handleConfirmLeave}
+          />
+        )}
+      </Suspense>
     </div>
   );
 }
+
+

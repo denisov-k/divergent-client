@@ -1,16 +1,21 @@
-﻿import { useEffect } from "react";
+﻿import { Suspense, lazy, useEffect } from "react";
 import { Alert, Linking, ScrollView, Share as NativeShare, Text, Pressable, View } from "react-native";
 import { useTranslation } from "react-i18next";
 
-import { ChallengeDetailsSheet } from "@/components/native/ChallengeDetailsSheet";
-import { ChallengeFormSheet } from "@/components/native/ChallengeFormSheet";
+const ChallengeDetailsSheet = lazy(() => import("@/components/native/ChallengeDetailsSheet").then((m) => ({ default: m.ChallengeDetailsSheet })));
+const ChallengeFormSheet = lazy(() => import("@/components/native/ChallengeFormSheet").then((m) => ({ default: m.ChallengeFormSheet })));
+const SelectPaymentMethodSheet = lazy(() => import("@/components/native/SelectPaymentMethodSheet").then((m) => ({ default: m.SelectPaymentMethodSheet })));
+
 import { EmptyStateCard } from "@/components/native/EmptyStateCard";
 import { NativeChallengeCard } from "@/components/native/NativeChallengeCard";
-import { SelectPaymentMethodSheet } from "@/components/native/SelectPaymentMethodSheet";
 import { Plus } from "@/components/native/icons";
 import { buildChallengeShareUrl } from "@/platform/appUrl";
 import { useChallengesScreen } from "@/shared/screens/challenges/useChallengesScreen";
 import { appPalette } from "@/theme/palette";
+
+function SheetFallback() {
+  return null;
+}
 
 export default function NativeChallengesScreen(props: {
   focusId?: string | null;
@@ -179,9 +184,17 @@ export default function NativeChallengesScreen(props: {
         )}
       </ScrollView>
 
-      {selectedChallenge && <ChallengeDetailsSheet open={reportsDialogOpen} challenge={selectedChallenge} participants={participants} reports={reports} onOpenChange={(open) => { if (!open) { closeReportsDialog(); } }} onDownload={downloadChallengeReport} onKick={handleKickParticipant} />}
-      <SelectPaymentMethodSheet open={paymentDialogOpen} onOpenChange={setPaymentDialogOpen} onSelect={selectPaymentMethod} />
-      <ChallengeFormSheet open={challengeDialogOpen} challenge={editingChallenge} goals={goals} onOpenChange={closeChallengeDialog} onSave={saveChallenge} />
+      <Suspense fallback={<SheetFallback />}>
+        {selectedChallenge && reportsDialogOpen && (
+          <ChallengeDetailsSheet open={reportsDialogOpen} challenge={selectedChallenge} participants={participants} reports={reports} onOpenChange={(open) => { if (!open) { closeReportsDialog(); } }} onDownload={downloadChallengeReport} onKick={handleKickParticipant} />
+        )}
+        {paymentDialogOpen && (
+          <SelectPaymentMethodSheet open={paymentDialogOpen} onOpenChange={setPaymentDialogOpen} onSelect={selectPaymentMethod} />
+        )}
+        {challengeDialogOpen && (
+          <ChallengeFormSheet open={challengeDialogOpen} challenge={editingChallenge} goals={goals} onOpenChange={closeChallengeDialog} onSave={saveChallenge} />
+        )}
+      </Suspense>
     </View>
   );
 }

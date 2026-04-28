@@ -1,13 +1,18 @@
-﻿import { useEffect } from "react";
+﻿import { Suspense, lazy, useEffect } from "react";
 import { Alert, ScrollView, View } from "react-native";
 import { useTranslation } from "react-i18next";
 
+const ReminderFormSheet = lazy(() => import("@/components/native/ReminderFormSheet").then((m) => ({ default: m.ReminderFormSheet })));
+
 import { EmptyStateCard } from "@/components/native/EmptyStateCard";
 import { NativeReminderCard } from "@/components/native/NativeReminderCard";
-import { ReminderFormSheet } from "@/components/native/ReminderFormSheet";
 import { ScreenHeader } from "@/components/native/ScreenHeader";
 import { useRemindersScreen } from "@/shared/screens/reminders/useRemindersScreen";
 import { appPalette } from "@/theme/palette";
+
+function SheetFallback() {
+  return null;
+}
 
 export default function NativeRemindersScreen(props: {
   reminderId?: string | null;
@@ -87,17 +92,19 @@ export default function NativeRemindersScreen(props: {
         )}
       </ScrollView>
 
-      <ReminderFormSheet
-        open={reminderDialogOpen}
-        reminder={editingReminder}
-        goals={goals}
-        initialGoalId={props.goalId || undefined}
-        onOpenChange={closeReminderDialog}
-        onSave={saveReminder}
-        onDelete={handleDeleteReminder}
-      />
+      <Suspense fallback={<SheetFallback />}>
+        {reminderDialogOpen && (
+          <ReminderFormSheet
+            open={reminderDialogOpen}
+            reminder={editingReminder}
+            goals={goals}
+            initialGoalId={props.goalId || undefined}
+            onOpenChange={closeReminderDialog}
+            onSave={saveReminder}
+            onDelete={handleDeleteReminder}
+          />
+        )}
+      </Suspense>
     </View>
   );
 }
-
-

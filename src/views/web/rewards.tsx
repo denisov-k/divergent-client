@@ -1,13 +1,19 @@
-﻿import { Plus } from "lucide-react";
+﻿import { lazy, Suspense } from "react";
+import { Plus } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useSearchParams } from "react-router-dom";
 import { toast } from "sonner";
 
+const RewardDialog = lazy(() => import("@/components/RewardDialog").then((m) => ({ default: m.RewardDialog })));
+
 import { RewardCard } from "@/components/RewardCard";
-import { RewardDialog } from "@/components/RewardDialog";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useRewardsScreen } from "@/shared/screens/rewards/useRewardsScreen";
+
+function DialogFallback() {
+  return null;
+}
 
 export default function RewardsScreen() {
   const { t } = useTranslation();
@@ -69,14 +75,20 @@ export default function RewardsScreen() {
         </div>
       )}
 
-      <RewardDialog
-        open={rewardDialogOpen}
-        onOpenChange={closeRewardDialog}
-        onSave={handleSaveReward}
-        onDelete={handleDeleteReward}
-        reward={editingReward}
-        goals={goals}
-      />
+      <Suspense fallback={<DialogFallback />}>
+        {rewardDialogOpen && (
+          <RewardDialog
+            open={rewardDialogOpen}
+            onOpenChange={closeRewardDialog}
+            onSave={handleSaveReward}
+            onDelete={handleDeleteReward}
+            reward={editingReward}
+            goals={goals}
+          />
+        )}
+      </Suspense>
     </div>
   );
 }
+
+

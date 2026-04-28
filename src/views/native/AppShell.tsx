@@ -1,4 +1,4 @@
-﻿import { useEffect, useState } from "react";
+﻿import { Suspense, lazy, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Linking, Pressable, SafeAreaView, Text, View } from "react-native";
 
@@ -7,12 +7,23 @@ import { NativeAppHeader } from "@/components/native/NativeAppHeader";
 import { BarChart2, Bell, Gift, Swords, Target } from "@/components/native/icons";
 import { useAppStore } from "@/stores/useAppStore";
 import { appPalette } from "@/theme/palette";
-import NativeChallengesScreen from "@/views/native/challenges";
-import NativeGoalsScreen from "@/views/native/goals";
-import NativeMoreScreen from "@/views/native/more";
-import NativeProgressScreen from "@/views/native/progress";
-import NativeRemindersScreen from "@/views/native/reminders";
-import NativeRewardsScreen from "@/views/native/rewards";
+
+const NativeChallengesScreen = lazy(() => import("@/views/native/challenges"));
+const NativeGoalsScreen = lazy(() => import("@/views/native/goals"));
+const NativeMoreScreen = lazy(() => import("@/views/native/more"));
+const NativeProgressScreen = lazy(() => import("@/views/native/progress"));
+const NativeRemindersScreen = lazy(() => import("@/views/native/reminders"));
+const NativeRewardsScreen = lazy(() => import("@/views/native/rewards"));
+
+function NativeScreenFallback() {
+  return (
+    <View style={{ flex: 1, alignItems: "center", justifyContent: "center", backgroundColor: appPalette.surface.background }}>
+      <Text style={{ color: appPalette.semantic.textMuted, fontFamily: "Montserrat", fontSize: 12, lineHeight: 18 }}>
+        Loading...
+      </Text>
+    </View>
+  );
+}
 
 export default function NativeAppShell() {
   const { t } = useTranslation();
@@ -128,56 +139,58 @@ export default function NativeAppShell() {
       )}
 
       <View style={{ flex: 1 }}>
-        {activeTab === "goals" && (
-          <NativeGoalsScreen
-            goalId={goalLinkState.goalId}
-            onConsumeLinkState={() => {
-              setGoalLinkState({});
-            }}
-          />
-        )}
-        {activeTab === "reminders" && (
-          <NativeRemindersScreen
-            reminderId={reminderLinkState.reminderId}
-            goalId={reminderLinkState.goalId}
-            onConsumeLinkState={() => {
-              setReminderLinkState({});
-            }}
-          />
-        )}
-        {activeTab === "challenges" && (
-          <NativeChallengesScreen
-            focusId={challengeLinkState.focusId}
-            paymentId={challengeLinkState.paymentId}
-            onConsumeLinkState={() => {
-              setChallengeLinkState({});
-            }}
-          />
-        )}
-        {activeTab === "rewards" && (
-          <NativeRewardsScreen
-            rewardId={rewardLinkState.rewardId}
-            onConsumeLinkState={() => {
-              setRewardLinkState({});
-            }}
-          />
-        )}
-        {activeTab === "progress" && (
-          <NativeProgressScreen
-            goalId={progressLinkState.goalId}
-            onConsumeLinkState={() => {
-              setProgressLinkState({});
-            }}
-          />
-        )}
-        {activeTab === "more" && (
-          <NativeMoreScreen
-            activeScreen={moreLinkState.screen}
-            onConsumeLinkState={() => {
-              setMoreLinkState({});
-            }}
-          />
-        )}
+        <Suspense fallback={<NativeScreenFallback />}>
+          {activeTab === "goals" && (
+            <NativeGoalsScreen
+              goalId={goalLinkState.goalId}
+              onConsumeLinkState={() => {
+                setGoalLinkState({});
+              }}
+            />
+          )}
+          {activeTab === "reminders" && (
+            <NativeRemindersScreen
+              reminderId={reminderLinkState.reminderId}
+              goalId={reminderLinkState.goalId}
+              onConsumeLinkState={() => {
+                setReminderLinkState({});
+              }}
+            />
+          )}
+          {activeTab === "challenges" && (
+            <NativeChallengesScreen
+              focusId={challengeLinkState.focusId}
+              paymentId={challengeLinkState.paymentId}
+              onConsumeLinkState={() => {
+                setChallengeLinkState({});
+              }}
+            />
+          )}
+          {activeTab === "rewards" && (
+            <NativeRewardsScreen
+              rewardId={rewardLinkState.rewardId}
+              onConsumeLinkState={() => {
+                setRewardLinkState({});
+              }}
+            />
+          )}
+          {activeTab === "progress" && (
+            <NativeProgressScreen
+              goalId={progressLinkState.goalId}
+              onConsumeLinkState={() => {
+                setProgressLinkState({});
+              }}
+            />
+          )}
+          {activeTab === "more" && (
+            <NativeMoreScreen
+              activeScreen={moreLinkState.screen}
+              onConsumeLinkState={() => {
+                setMoreLinkState({});
+              }}
+            />
+          )}
+        </Suspense>
       </View>
 
       <View
