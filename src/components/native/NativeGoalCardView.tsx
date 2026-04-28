@@ -1,4 +1,4 @@
-﻿import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { View } from "react-native";
 
@@ -13,6 +13,7 @@ import {
 } from "@/components/native/GoalCardParts";
 import { SurfaceCard } from "@/components/native/SurfaceCard";
 import { isTaskCompletedThisPeriod } from "@/shared/screens/goals/model";
+import { appPalette } from "@/theme/palette";
 import type { Goal, GoalPeriod, Reward, Task } from "@/types";
 
 function countTasks(tasks?: Task[]): number {
@@ -47,10 +48,11 @@ function getGoalStatus(goal: Goal) {
   return "ACTIVE" as const;
 }
 
-export function NativeGoalCardView({ goal, categoryLabel, reward, userTimeZone, autoExpand = false, onEdit, onTaskToggle, onAddReminder, onAddProgress, onGoToProgress }: { goal: Goal; categoryLabel: string; reward?: Reward | null; userTimeZone: string; autoExpand?: boolean; onEdit?: (id: string) => void; onTaskToggle: (goalId: string, taskId: string) => Promise<void>; onAddReminder?: (id: string) => void; onAddProgress?: (goalId: string, delta: number) => void; onGoToProgress?: (id: string) => void }) {
+export function NativeGoalCardView({ goal, categoryLabel, reward, userTimeZone, autoExpand = false, focused = false, onEdit, onTaskToggle, onAddReminder, onAddProgress, onGoToProgress }: { goal: Goal; categoryLabel: string; reward?: Reward | null; userTimeZone: string; autoExpand?: boolean; focused?: boolean; onEdit?: (id: string) => void; onTaskToggle: (goalId: string, taskId: string) => Promise<void>; onAddReminder?: (id: string) => void; onAddProgress?: (goalId: string, delta: number) => void; onGoToProgress?: (id: string) => void }) {
   const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState(autoExpand);
   const [progressDelta, setProgressDelta] = useState("");
+  const [highlight, setHighlight] = useState(focused);
 
   const safeTasks = goal.tasks ?? [];
   const totalTasks = countTasks(safeTasks);
@@ -75,33 +77,49 @@ export function NativeGoalCardView({ goal, categoryLabel, reward, userTimeZone, 
     return null;
   }, [goal.goalPeriod, t]);
 
+  useEffect(() => {
+    if (autoExpand) {
+      setIsOpen(true);
+    }
+  }, [autoExpand]);
+
+  useEffect(() => {
+    if (!focused) {
+      return;
+    }
+
+    setHighlight(true);
+    const timeout = setTimeout(() => setHighlight(false), 2000);
+    return () => clearTimeout(timeout);
+  }, [focused]);
+
   return (
-    <SurfaceCard gap={16} padding={24} radius={12}>
-      <View style={{ flexDirection: "row", alignItems: "flex-start", justifyContent: "space-between", gap: 16 }}>
-        <GoalCardHeader goal={goal} categoryLabel={categoryLabel} statusLabel={statusLabel} />
-        <View style={{ flexDirection: "row", alignItems: "center", gap: 10, flexShrink: 0 }}>
-          <ProgressRing progress={progress} size={70} strokeWidth={6} />
-          <GoalCardActions goal={goal} onEdit={onEdit} onAddReminder={onAddReminder} onGoToProgress={onGoToProgress} />
+    <View style={{ backgroundColor: highlight ? appPalette.semantic.infoSurfaceStrong : "transparent", borderRadius: 12 }}>
+      <SurfaceCard gap={16} padding={24} radius={12}>
+        <View style={{ flexDirection: "row", alignItems: "flex-start", justifyContent: "space-between", gap: 16 }}>
+          <GoalCardHeader goal={goal} categoryLabel={categoryLabel} statusLabel={statusLabel} />
+          <View style={{ flexDirection: "row", alignItems: "center", gap: 10, flexShrink: 0 }}>
+            <ProgressRing progress={progress} size={70} strokeWidth={6} />
+            <GoalCardActions goal={goal} onEdit={onEdit} onAddReminder={onAddReminder} onGoToProgress={onGoToProgress} />
+          </View>
         </View>
-      </View>
-      <GoalProgressSection goal={goal} progress={progress} completedTasks={completedTasks} totalTasks={totalTasks} />
-      {goal.goalType === "PROGRESS" && (
-        <GoalNumericProgressInput
-          progressDelta={progressDelta}
-          onChangeProgressDelta={setProgressDelta}
-          onAddProgress={() => {
-            const value = Number(progressDelta);
-            if (!Number.isNaN(value) && value !== 0) {
-              onAddProgress?.(goal.id, value);
-              setProgressDelta("");
-            }
-          }}
-        />
-      )}
-      {goal.goalType === "TASK" && <GoalTaskSection goal={goal} isOpen={isOpen} onToggleOpen={() => setIsOpen((current) => !current)} onTaskToggle={onTaskToggle} disabledTasks={disabledTasks} />}
-      <GoalFooter goal={goal} reward={reward} cycleLabel={cycleLabel} />
-    </SurfaceCard>
+        <GoalProgressSection goal={goal} progress={progress} completedTasks={completedTasks} totalTasks={totalTasks} />
+        {goal.goalType === "PROGRESS" && (
+          <GoalNumericProgressInput
+            progressDelta={progressDelta}
+            onChangeProgressDelta={setProgressDelta}
+            onAddProgress={() => {
+              const value = Number(progressDelta);
+              if (!Number.isNaN(value) && value !== 0) {
+                onAddProgress?.(goal.id, value);
+                setProgressDelta("");
+              }
+            }}
+          />
+        )}
+        {goal.goalType === "TASK" && <GoalTaskSection goal={goal} isOpen={isOpen} onToggleOpen={() => setIsOpen((current) => !current)} onTaskToggle={onTaskToggle} disabledTasks={disabledTasks} />}
+        <GoalFooter goal={goal} reward={reward} cycleLabel={cycleLabel} />
+      </SurfaceCard>
+    </View>
   );
 }
-
-

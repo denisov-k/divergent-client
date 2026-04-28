@@ -1,10 +1,10 @@
-import { Linking, Text, View } from "react-native";
+import { Text, View } from "react-native";
 import { useTranslation } from "react-i18next";
 
+import { useNativeNavigation } from "@/app/native/NativeNavigation";
 import { buildChallengesPath, buildGoalsPath } from "@/app/routes";
 import { Edit, Swords, Target } from "@/components/native/Icons";
 import { NativeRewardIcon } from "@/components/native/NativeRewardIcon";
-import { buildNativeRouteUrl } from "@/platform/appUrl.native";
 import { appPalette } from "@/theme/palette";
 import type { Challenge, Goal, Reward } from "@/types";
 
@@ -47,6 +47,7 @@ export function RewardCardLinks({
   challenge?: Challenge;
 }) {
   const { t } = useTranslation();
+  const { navigateToPath } = useNativeNavigation();
 
   return (
     <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8 }}>
@@ -54,7 +55,7 @@ export function RewardCardLinks({
         <RewardBadge
           tone="info"
           icon={<Target size={12} color={appPalette.semantic.textInverse} />}
-          onPress={() => void Linking.openURL(buildNativeRouteUrl(buildGoalsPath({ id: goal.id })))}
+          onPress={() => navigateToPath(buildGoalsPath({ id: goal.id }))}
         >
           {goal.title}
         </RewardBadge>
@@ -64,7 +65,7 @@ export function RewardCardLinks({
         <RewardBadge
           tone="warning"
           icon={<Swords size={12} color={appPalette.semantic.textInverse} />}
-          onPress={() => void Linking.openURL(buildNativeRouteUrl(buildChallengesPath({ id: challenge.id })))}
+          onPress={() => navigateToPath(buildChallengesPath({ id: challenge.id }))}
         >
           {challenge.title}
         </RewardBadge>

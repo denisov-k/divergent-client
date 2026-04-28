@@ -1,9 +1,9 @@
-import { Linking, Pressable, Text, View } from "react-native";
+import { Pressable, Text, View } from "react-native";
 import { useTranslation } from "react-i18next";
 
+import { useNativeNavigation } from "@/app/native/NativeNavigation";
 import { buildGoalsPath } from "@/app/routes";
 import { Calendar, ChevronDown, ChevronUp, Swords, Users } from "@/components/native/Icons";
-import { buildNativeRouteUrl } from "@/platform/appUrl.native";
 import { appPalette } from "@/theme/palette";
 import type { Challenge, Goal, Leader } from "@/types";
 
@@ -81,15 +81,16 @@ export function ChallengeGoalsSection({
   onToggleOpen: () => void;
 }) {
   const { t } = useTranslation();
+  const { navigateToPath } = useNativeNavigation();
 
   const openGoal = (goalId: string) => {
     if (!canOpenGoals) return;
-    void Linking.openURL(buildNativeRouteUrl(buildGoalsPath({ id: goalId })));
+    navigateToPath(buildGoalsPath({ id: goalId }));
   };
 
   return (
     <View style={{ gap: 10 }}>
-      <Pressable onPress={onToggleOpen} style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
+      <Pressable onPress={(event) => { event.stopPropagation(); onToggleOpen(); }} style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
         <Text style={{ color: appPalette.semantic.textStrong, fontSize: 12, fontWeight: "500", lineHeight: 18, fontFamily: "Montserrat" }}>{t("challenges.goals")}</Text>
         {isOpen ? <ChevronUp size={18} color={appPalette.semantic.textMuted} /> : <ChevronDown size={18} color={appPalette.semantic.textMuted} />}
       </Pressable>
@@ -98,7 +99,7 @@ export function ChallengeGoalsSection({
           {goals.map((goal) => (
             <Pressable
               key={goal.id}
-              onPress={() => openGoal(goal.id)}
+              onPress={(event) => { event.stopPropagation(); openGoal(goal.id); }}
               style={{
                 flexDirection: "row",
                 alignItems: "center",
@@ -140,7 +141,7 @@ export function ChallengeRulesSection({
 
   return (
     <View style={{ gap: 10 }}>
-      <Pressable onPress={onToggleOpen} style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
+      <Pressable onPress={(event) => { event.stopPropagation(); onToggleOpen(); }} style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
         <Text style={{ color: appPalette.semantic.textStrong, fontSize: 12, fontWeight: "500", lineHeight: 18, fontFamily: "Montserrat" }}>{t("challenges.rules")}</Text>
         {isOpen ? <ChevronUp size={18} color={appPalette.semantic.textMuted} /> : <ChevronDown size={18} color={appPalette.semantic.textMuted} />}
       </Pressable>
@@ -164,7 +165,7 @@ export function ChallengeLeaderboardSection({
 
   return (
     <View style={{ gap: 10 }}>
-      <Pressable onPress={() => void onToggleOpen()} style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
+      <Pressable onPress={(event) => { event.stopPropagation(); void onToggleOpen(); }} style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
         <Text style={{ color: appPalette.semantic.textStrong, fontSize: 12, fontWeight: "500", lineHeight: 18, fontFamily: "Montserrat" }}>{t("challenges.top_participants")}</Text>
         {isOpen ? <ChevronUp size={18} color={appPalette.semantic.textMuted} /> : <ChevronDown size={18} color={appPalette.semantic.textMuted} />}
       </Pressable>

@@ -6,7 +6,14 @@ export function ChallengeCardAction({ icon, onPress }: { icon: React.ReactNode; 
   if (!onPress) return null;
 
   return (
-    <Pressable onPress={onPress} hitSlop={8} style={{ width: 36, height: 36, borderRadius: 8, alignItems: "center", justifyContent: "center" }}>
+    <Pressable
+      onPress={(event) => {
+        event.stopPropagation();
+        onPress();
+      }}
+      hitSlop={8}
+      style={{ width: 36, height: 36, borderRadius: 8, alignItems: "center", justifyContent: "center" }}
+    >
       {icon}
     </Pressable>
   );
@@ -53,7 +60,10 @@ export function ChallengePrimaryButton({
 }) {
   return (
     <Pressable
-      onPress={onPress}
+      onPress={(event) => {
+        event.stopPropagation();
+        onPress();
+      }}
       style={{
         backgroundColor: appPalette.brand.primary,
         borderRadius: 10,

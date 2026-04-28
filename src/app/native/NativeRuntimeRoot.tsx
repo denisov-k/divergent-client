@@ -63,5 +63,5 @@ export function NativeRuntimeRoot({
     return <NativeAuthScreen showSessionReset={mode === "preview"} />;
   }
 
-  return <NativeAppShell />;
+  return <NativeAppShell mode={mode} />;
 }

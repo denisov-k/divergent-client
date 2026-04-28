@@ -71,6 +71,7 @@ export function ChallengesScreenContent({
   onCreate,
   onEdit,
   onShare,
+  onSelect,
   onAccept,
   onLeave,
   onOpenLink,
@@ -81,6 +82,7 @@ export function ChallengesScreenContent({
   onCreate: () => void;
   onEdit: (id: string) => void;
   onShare: (id: string) => void;
+  onSelect: (challenge: Challenge) => void;
   onAccept: (id: string) => void;
   onLeave: (id: string) => void;
   onOpenLink: (id: string) => void;
@@ -105,6 +107,7 @@ export function ChallengesScreenContent({
             focused={challenge.id === focusedChallengeId}
             onEdit={onEdit}
             onShare={onShare}
+            onSelect={onSelect}
             onAccept={onAccept}
             onLeave={onLeave}
             onOpenLink={onOpenLink}

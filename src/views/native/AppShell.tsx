@@ -1,7 +1,8 @@
-import { Suspense, lazy, useEffect, useState } from "react";
+import { Suspense, lazy, useCallback, useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Linking, Pressable, SafeAreaView, Text, View } from "react-native";
 
+import { NativeNavigationProvider } from "@/app/native/NativeNavigation";
 import { parseNativeAppRoute, type NativeAppTab } from "@/app/router.native";
 import { NativeAppHeader } from "@/components/native/NativeAppHeader";
 import { BarChart2, Bell, Gift, Swords, Target } from "@/components/native/Icons";
@@ -25,7 +26,54 @@ function NativeScreenFallback() {
   );
 }
 
-export default function NativeAppShell() {
+function syncPreviewUrl(state: ReturnType<typeof parseNativeAppRoute>) {
+  if (typeof window === "undefined" || !state?.tab) {
+    return;
+  }
+
+  const params = new URLSearchParams(window.location.search);
+  params.set("tab", state.tab);
+  params.delete("id");
+  params.delete("goalId");
+  params.delete("reminderId");
+  params.delete("rewardId");
+  params.delete("paymentId");
+
+  if (state.tab === "goals" && state.goalId) {
+    params.set("id", state.goalId);
+  }
+
+  if (state.tab === "reminders") {
+    if (state.reminderId) {
+      params.set("id", state.reminderId);
+    }
+    if (state.goalId) {
+      params.set("goalId", state.goalId);
+    }
+  }
+
+  if (state.tab === "challenges") {
+    if (state.focusId) {
+      params.set("id", state.focusId);
+    }
+    if (state.paymentId) {
+      params.set("paymentId", state.paymentId);
+    }
+  }
+
+  if (state.tab === "rewards" && state.rewardId) {
+    params.set("id", state.rewardId);
+  }
+
+  if (state.tab === "progress" && state.goalId) {
+    params.set("goalId", state.goalId);
+  }
+
+  const next = `${window.location.pathname}?${params.toString()}`;
+  window.history.replaceState({}, "", next);
+}
+
+export default function NativeAppShell({ mode = "standalone" }: { mode?: "preview" | "standalone" }) {
   const { t } = useTranslation();
   const { user } = useAppStore();
   const [activeTab, setActiveTab] = useState<NativeAppTab>("goals");
@@ -53,54 +101,69 @@ export default function NativeAppShell() {
     { key: "reminders", label: t("navigation.reminders"), icon: Bell },
   ];
 
+  const clearTransientState = useCallback(() => {
+    setGoalLinkState({});
+    setReminderLinkState({});
+    setChallengeLinkState({});
+    setRewardLinkState({});
+    setProgressLinkState({});
+  }, []);
+
+  const applyRoute = useCallback((state: ReturnType<typeof parseNativeAppRoute>) => {
+    if (!state?.tab) {
+      return;
+    }
+
+    setActiveTab(state.tab);
+    clearTransientState();
+
+    if (mode === "preview") {
+      syncPreviewUrl(state);
+    }
+
+    if (state.tab === "goals") {
+      setGoalLinkState({ goalId: state.goalId ?? null });
+      return;
+    }
+
+    if (state.tab === "reminders") {
+      setReminderLinkState({
+        reminderId: state.reminderId ?? null,
+        goalId: state.goalId ?? null,
+      });
+      return;
+    }
+
+    if (state.tab === "challenges") {
+      setChallengeLinkState({
+        focusId: state.focusId ?? null,
+        paymentId: state.paymentId ?? null,
+      });
+      return;
+    }
+
+    if (state.tab === "rewards") {
+      setRewardLinkState({ rewardId: state.rewardId ?? null });
+      return;
+    }
+
+    if (state.tab === "progress") {
+      setProgressLinkState({ goalId: state.goalId ?? null });
+    }
+  }, [clearTransientState, mode]);
+
+  const applyLink = useCallback((url: string) => {
+    applyRoute(parseNativeAppRoute(url));
+  }, [applyRoute]);
+
+  const navigationValue = useMemo(() => ({
+    navigateToPath: (path: string) => {
+      const normalizedPath = path.startsWith("/") ? path.slice(1) : path;
+      applyLink(`divergent://${normalizedPath}`);
+    },
+  }), [applyLink]);
+
   useEffect(() => {
-    const clearTransientState = () => {
-      setGoalLinkState({});
-      setReminderLinkState({});
-      setChallengeLinkState({});
-      setRewardLinkState({});
-      setProgressLinkState({});
-    };
-
-    const applyLink = (url: string) => {
-      const state = parseNativeAppRoute(url);
-      if (!state?.tab) {
-        return;
-      }
-
-      setActiveTab(state.tab);
-      clearTransientState();
-
-      if (state.tab === "goals") {
-        setGoalLinkState({ goalId: state.goalId ?? null });
-        return;
-      }
-
-      if (state.tab === "reminders") {
-        setReminderLinkState({
-          reminderId: state.reminderId ?? null,
-          goalId: state.goalId ?? null,
-        });
-        return;
-      }
-
-      if (state.tab === "challenges") {
-        setChallengeLinkState({
-          focusId: state.focusId ?? null,
-          paymentId: state.paymentId ?? null,
-        });
-        return;
-      }
-
-      if (state.tab === "rewards") {
-        setRewardLinkState({ rewardId: state.rewardId ?? null });
-        return;
-      }
-
-      if (state.tab === "progress") {
-        setProgressLinkState({ goalId: state.goalId ?? null });
-      }
-    };
 
     void Linking.getInitialURL().then((url) => {
       if (url) {
@@ -115,111 +178,113 @@ export default function NativeAppShell() {
     return () => {
       subscription.remove();
     };
-  }, []);
+  }, [applyLink]);
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: appPalette.surface.background }}>
-      {!!user && <NativeAppHeader user={user} onOpenSettings={() => setActiveTab("settings")} />}
+    <NativeNavigationProvider value={navigationValue}>
+      <SafeAreaView style={{ flex: 1, backgroundColor: appPalette.surface.background }}>
+        {!!user && <NativeAppHeader user={user} onOpenSettings={() => setActiveTab("settings")} />}
 
-      <View style={{ flex: 1 }}>
-        <Suspense fallback={<NativeScreenFallback />}>
-          {activeTab === "goals" && (
-            <NativeGoalsScreen
-              goalId={goalLinkState.goalId}
-              onConsumeLinkState={() => {
-                setGoalLinkState({});
-              }}
-            />
-          )}
-          {activeTab === "reminders" && (
-            <NativeRemindersScreen
-              reminderId={reminderLinkState.reminderId}
-              goalId={reminderLinkState.goalId}
-              onConsumeLinkState={() => {
-                setReminderLinkState({});
-              }}
-            />
-          )}
-          {activeTab === "challenges" && (
-            <NativeChallengesScreen
-              focusId={challengeLinkState.focusId}
-              paymentId={challengeLinkState.paymentId}
-              onConsumeLinkState={() => {
-                setChallengeLinkState({});
-              }}
-            />
-          )}
-          {activeTab === "rewards" && (
-            <NativeRewardsScreen
-              rewardId={rewardLinkState.rewardId}
-              onConsumeLinkState={() => {
-                setRewardLinkState({});
-              }}
-            />
-          )}
-          {activeTab === "progress" && (
-            <NativeProgressScreen
-              goalId={progressLinkState.goalId}
-              onConsumeLinkState={() => {
-                setProgressLinkState({});
-              }}
-            />
-          )}
-          {activeTab === "settings" && <NativeSettingsScreen />}
-        </Suspense>
-      </View>
+        <View style={{ flex: 1 }}>
+          <Suspense fallback={<NativeScreenFallback />}>
+            {activeTab === "goals" && (
+              <NativeGoalsScreen
+                goalId={goalLinkState.goalId}
+                onConsumeLinkState={() => {
+                  setGoalLinkState({});
+                }}
+              />
+            )}
+            {activeTab === "reminders" && (
+              <NativeRemindersScreen
+                reminderId={reminderLinkState.reminderId}
+                goalId={reminderLinkState.goalId}
+                onConsumeLinkState={() => {
+                  setReminderLinkState({});
+                }}
+              />
+            )}
+            {activeTab === "challenges" && (
+              <NativeChallengesScreen
+                focusId={challengeLinkState.focusId}
+                paymentId={challengeLinkState.paymentId}
+                onConsumeLinkState={() => {
+                  setChallengeLinkState({});
+                }}
+              />
+            )}
+            {activeTab === "rewards" && (
+              <NativeRewardsScreen
+                rewardId={rewardLinkState.rewardId}
+                onConsumeLinkState={() => {
+                  setRewardLinkState({});
+                }}
+              />
+            )}
+            {activeTab === "progress" && (
+              <NativeProgressScreen
+                goalId={progressLinkState.goalId}
+                onConsumeLinkState={() => {
+                  setProgressLinkState({});
+                }}
+              />
+            )}
+            {activeTab === "settings" && <NativeSettingsScreen />}
+          </Suspense>
+        </View>
 
-      <View
-        style={{
-          flexDirection: "row",
-          backgroundColor: appPalette.surface.background,
-          paddingHorizontal: 4,
-          paddingVertical: 8,
-        }}
-      >
-        {tabs.map((tab) => {
-          const active = tab.key === activeTab;
-          const Icon = tab.icon;
+        <View
+          style={{
+            flexDirection: "row",
+            backgroundColor: appPalette.surface.background,
+            paddingHorizontal: 4,
+            paddingVertical: 8,
+          }}
+        >
+          {tabs.map((tab) => {
+            const active = tab.key === activeTab;
+            const Icon = tab.icon;
 
-          return (
-            <Pressable
-              key={tab.key}
-              onPress={() => setActiveTab(tab.key)}
-              style={{
-                flex: 1,
-                minWidth: 0,
-                marginHorizontal: 4,
-                minHeight: 45,
-                borderRadius: 8,
-                borderWidth: 2,
-                borderColor: appPalette.brand.primary,
-                paddingHorizontal: 8,
-                paddingVertical: 4,
-                alignItems: "center",
-                justifyContent: "center",
-                backgroundColor: active ? appPalette.brand.primary : appPalette.surface.background,
-              }}
-            >
-              <Icon color={active ? appPalette.brand.primaryForeground : appPalette.brand.primary} size={17} strokeWidth={2.5} />
-              <Text
+            return (
+              <Pressable
+                key={tab.key}
+                onPress={() => setActiveTab(tab.key)}
                 style={{
-                  color: active ? appPalette.brand.primaryForeground : appPalette.brand.primary,
-                  fontSize: 8,
-                  fontWeight: "800",
-                  fontFamily: "Montserrat",
-                  textTransform: "uppercase",
-                  textAlign: "center",
-                  lineHeight: 8,
-                  marginTop: 2,
+                  flex: 1,
+                  minWidth: 0,
+                  marginHorizontal: 4,
+                  minHeight: 45,
+                  borderRadius: 8,
+                  borderWidth: 2,
+                  borderColor: appPalette.brand.primary,
+                  paddingHorizontal: 8,
+                  paddingVertical: 4,
+                  alignItems: "center",
+                  justifyContent: "center",
+                  backgroundColor: active ? appPalette.brand.primary : appPalette.surface.background,
                 }}
               >
-                {tab.label}
-              </Text>
-            </Pressable>
-          );
-        })}
-      </View>
-    </SafeAreaView>
+                <Icon color={active ? appPalette.brand.primaryForeground : appPalette.brand.primary} size={17} strokeWidth={2.5} />
+                <Text
+                  style={{
+                    color: active ? appPalette.brand.primaryForeground : appPalette.brand.primary,
+                    fontSize: 8,
+                    fontWeight: "800",
+                    fontFamily: "Montserrat",
+                    textTransform: "uppercase",
+                    textAlign: "center",
+                    lineHeight: 8,
+                    marginTop: 2,
+                  }}
+                >
+                  {tab.label}
+                </Text>
+              </Pressable>
+            );
+          })}
+        </View>
+      </SafeAreaView>
+    </NativeNavigationProvider>
   );
 }
 

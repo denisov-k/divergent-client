@@ -1,5 +1,5 @@
 ﻿import { useState } from "react";
-import { View } from "react-native";
+import { Pressable, View } from "react-native";
 import { useTranslation } from "react-i18next";
 
 import { ProgressRing } from "@/components/shared/ProgressRing";
@@ -27,6 +27,7 @@ export function NativeChallengeCardView({
   focused = false,
   onEdit,
   onShare,
+  onSelect,
   onAccept,
   onLeave,
   onOpenLink,
@@ -36,6 +37,7 @@ export function NativeChallengeCardView({
   focused?: boolean;
   onEdit?: (id: string) => void;
   onShare?: (id: string) => void;
+  onSelect?: (challenge: Challenge) => void;
   onAccept?: (id: string) => void;
   onLeave?: (id: string) => void;
   onOpenLink?: (id: string) => void;
@@ -69,7 +71,8 @@ export function NativeChallengeCardView({
 
   return (
     <View style={{ opacity: (hasEnded || hasStarted) && !isParticipant ? 0.6 : 1 }}>
-      <SurfaceCard gap={12} padding={24} radius={12}>
+      <Pressable onPress={() => onSelect?.(challenge)}>
+        <SurfaceCard gap={12} padding={24} radius={12}>
         <View style={{ flexDirection: "row", justifyContent: "space-between", gap: 16 }}>
           <ChallengeCardHeader
             challenge={challenge}
@@ -132,7 +135,8 @@ export function NativeChallengeCardView({
         />
 
         <ChallengeFooter challenge={challenge} />
-      </SurfaceCard>
+        </SurfaceCard>
+      </Pressable>
     </View>
   );
 }

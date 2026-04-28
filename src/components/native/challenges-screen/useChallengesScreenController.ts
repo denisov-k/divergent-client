@@ -52,10 +52,11 @@ export function useChallengesScreenController(props: {
   const handleAcceptChallenge = async (id: string) => {
     const result = await screen.acceptSelectedChallenge(id);
     if (result.status === "ignored") {
-      return;
+      return result;
     }
 
     showAcceptChallengeResult(result.status, t);
+    return result;
   };
 
   const handleOpenParticipants = async (id: string) => {

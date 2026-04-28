@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Linking, Pressable, Text, TextInput, View } from "react-native";
+import { Pressable, Text, TextInput, View } from "react-native";
 
+import { useNativeNavigation } from "@/app/native/NativeNavigation";
 import { buildChallengesPath, buildRewardsPath } from "@/app/routes";
 import { ActionChip } from "@/components/native/ActionChip";
 import {
@@ -22,7 +23,6 @@ import {
   Swords,
   Target,
 } from "@/components/native/Icons";
-import { buildNativeRouteUrl } from "@/platform/appUrl.native";
 import { formatGoalDate } from "@/shared/display/goals";
 import { isTaskCompletedThisPeriod } from "@/shared/screens/goals/model";
 import type { CategoryType } from "@/shared/domain";
@@ -203,12 +203,14 @@ export function GoalTaskSection({ goal, isOpen, onToggleOpen, onTaskToggle, disa
 }
 
 export function GoalFooter({ goal, reward, cycleLabel }: { goal: Goal; reward?: Reward | null; cycleLabel: string | null }) {
+  const { navigateToPath } = useNativeNavigation();
+
   return (
     <View style={{ borderTopWidth: 1, borderTopColor: appPalette.semantic.borderSubtle, paddingTop: 8, flexDirection: "row", justifyContent: "space-between", gap: 12 }}>
       <View style={{ flex: 1, minWidth: 0, gap: 8 }}>
         {!!cycleLabel && <SmallPill>{cycleLabel}</SmallPill>}
         {!!goal.challenge && (
-          <SmallPill tone="warning" icon={<Swords size={12} color={appPalette.semantic.textInverse} />} onPress={() => void Linking.openURL(buildNativeRouteUrl(buildChallengesPath({ id: goal.challenge?.id })))}>
+          <SmallPill tone="warning" icon={<Swords size={12} color={appPalette.semantic.textInverse} />} onPress={() => navigateToPath(buildChallengesPath({ id: goal.challenge?.id }))}>
             {goal.challenge.title}
           </SmallPill>
         )}
@@ -221,7 +223,7 @@ export function GoalFooter({ goal, reward, cycleLabel }: { goal: Goal; reward?: 
       </View>
       {!!reward && (
         <View style={{ maxWidth: "50%", alignItems: "flex-end" }}>
-          <SmallPill tone="success" icon={<Gift size={12} color={appPalette.semantic.textInverse} />} onPress={() => { if (!reward.id) return; void Linking.openURL(buildNativeRouteUrl(buildRewardsPath({ id: reward.id }))); }}>
+          <SmallPill tone="success" icon={<Gift size={12} color={appPalette.semantic.textInverse} />} onPress={() => { if (!reward.id) return; navigateToPath(buildRewardsPath({ id: reward.id })); }}>
             {reward.title}
           </SmallPill>
         </View>

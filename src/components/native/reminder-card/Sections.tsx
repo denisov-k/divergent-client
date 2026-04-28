@@ -1,20 +1,12 @@
-import { Linking, Text, View } from "react-native";
+import { Text, View } from "react-native";
 
+import { useNativeNavigation } from "@/app/native/NativeNavigation";
 import { buildGoalsPath } from "@/app/routes";
 import { Bell, CircleCheck, Clock, Edit, Repeat, Target } from "@/components/native/Icons";
-import { buildNativeRouteUrl } from "@/platform/appUrl.native";
 import { appPalette } from "@/theme/palette";
 import type { Goal, Reminder, Task } from "@/types";
 
 import { ReminderAction, ReminderBadge, ReminderSwitch, useReminderDayFormatter } from "./Primitives";
-
-function openGoal(goalId?: string) {
-  if (!goalId) {
-    return;
-  }
-
-  void Linking.openURL(buildNativeRouteUrl(buildGoalsPath({ id: goalId })));
-}
 
 export function ReminderHeader({
   reminder,
@@ -82,6 +74,8 @@ export function ReminderLinksSection({
   goal?: Goal;
   task?: Task;
 }) {
+  const { navigateToPath } = useNativeNavigation();
+
   if (!goal && !task) {
     return null;
   }
@@ -89,12 +83,12 @@ export function ReminderLinksSection({
   return (
     <View style={{ borderTopWidth: 1, borderTopColor: appPalette.semantic.borderSubtle, paddingTop: 8, flexDirection: "row", flexWrap: "wrap", gap: 8 }}>
       {!!goal && (
-        <ReminderBadge tone="info" icon={<Target size={12} color={appPalette.semantic.infoText} />} onPress={() => openGoal(goal.id)}>
+        <ReminderBadge tone="info" icon={<Target size={12} color={appPalette.semantic.infoText} />} onPress={() => goal?.id && navigateToPath(buildGoalsPath({ id: goal.id }))}>
           {goal.title}
         </ReminderBadge>
       )}
       {!!goal && !!task && (
-        <ReminderBadge tone="info" icon={<CircleCheck size={12} color={appPalette.semantic.infoText} />} onPress={() => openGoal(goal.id)}>
+        <ReminderBadge tone="info" icon={<CircleCheck size={12} color={appPalette.semantic.infoText} />} onPress={() => goal?.id && navigateToPath(buildGoalsPath({ id: goal.id }))}>
           {task.title}
         </ReminderBadge>
       )}

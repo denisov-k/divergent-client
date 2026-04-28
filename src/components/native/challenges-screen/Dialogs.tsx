@@ -12,6 +12,9 @@ import type {
 const ChallengeDetailsSheet = lazy(() =>
   import("@/components/native/ChallengeDetailsSheet").then((m) => ({ default: m.ChallengeDetailsSheet })),
 );
+const AcceptChallengeSheet = lazy(() =>
+  import("@/components/native/AcceptChallengeSheet").then((m) => ({ default: m.AcceptChallengeSheet })),
+);
 const ChallengeFormSheet = lazy(() =>
   import("@/components/native/ChallengeFormSheet").then((m) => ({ default: m.ChallengeFormSheet })),
 );
@@ -26,6 +29,7 @@ function SheetFallback() {
 export function ChallengesScreenDialogs({
   selectedChallenge,
   reportsDialogOpen,
+  acceptDialogOpen,
   participants,
   reports,
   paymentDialogOpen,
@@ -33,15 +37,19 @@ export function ChallengesScreenDialogs({
   editingChallenge,
   goals,
   onCloseReports,
+  onCloseAcceptDialog,
   onSetPaymentDialogOpen,
   onCloseChallengeDialog,
   onDownloadReport,
   onKickParticipant,
   onSaveChallenge,
+  onAcceptChallenge,
+  onShareChallenge,
   onSelectPaymentMethod,
 }: {
   selectedChallenge?: Challenge | null;
   reportsDialogOpen: boolean;
+  acceptDialogOpen: boolean;
   participants: ChallengeParticipant[];
   reports: Report[];
   paymentDialogOpen: boolean;
@@ -49,15 +57,32 @@ export function ChallengesScreenDialogs({
   editingChallenge?: Challenge | null;
   goals: Goal[];
   onCloseReports: () => void;
+  onCloseAcceptDialog: () => void;
   onSetPaymentDialogOpen: (open: boolean) => void;
   onCloseChallengeDialog: (open: boolean) => void;
   onDownloadReport: (reportId: string) => Promise<boolean>;
   onKickParticipant: (challengeId: string, userId: string) => Promise<void>;
   onSaveChallenge: (data: ChallengeInput) => Promise<unknown>;
+  onAcceptChallenge: (id: string) => Promise<{ status: "accepted" | "payment_required" | "ignored" }>;
+  onShareChallenge: (id: string) => void;
   onSelectPaymentMethod: (method: PaymentMethod) => Promise<boolean>;
 }) {
   return (
     <Suspense fallback={<SheetFallback />}>
+      {selectedChallenge && acceptDialogOpen && (
+        <AcceptChallengeSheet
+          open={acceptDialogOpen}
+          challenge={selectedChallenge}
+          onOpenChange={(open) => {
+            if (!open) {
+              onCloseAcceptDialog();
+            }
+          }}
+          onAccept={onAcceptChallenge}
+          onShare={onShareChallenge}
+        />
+      )}
+
       {selectedChallenge && reportsDialogOpen && (
         <ChallengeDetailsSheet
           open={reportsDialogOpen}

@@ -1,3 +1,4 @@
+import { useEffect, useRef, useState } from "react";
 import { Pressable, ScrollView, Text, View } from "react-native";
 import { useTranslation } from "react-i18next";
 
@@ -123,9 +124,24 @@ export function GoalsScreenContent({
   onGoToProgress: (id: string) => void;
 }) {
   const { t } = useTranslation();
+  const scrollRef = useRef<ScrollView | null>(null);
+  const [itemOffsets, setItemOffsets] = useState<Record<string, number>>({});
+
+  useEffect(() => {
+    if (!focusedGoalId) {
+      return;
+    }
+
+    const y = itemOffsets[focusedGoalId];
+    if (typeof y !== "number") {
+      return;
+    }
+
+    scrollRef.current?.scrollTo({ y: Math.max(y - 12, 0), animated: true });
+  }, [focusedGoalId, itemOffsets]);
 
   return (
-      <ScrollView contentContainerStyle={{ paddingHorizontal: 8, gap: 8 }}>
+      <ScrollView ref={scrollRef} contentContainerStyle={{ paddingHorizontal: 8, gap: 8 }}>
       {goals.length === 0 ? (
         <EmptyStateCard
           title={t("goals.empty_title")}
@@ -140,19 +156,27 @@ export function GoalsScreenContent({
             categories.find((item) => item.value === goal.category)?.label ?? goal.category;
 
           return (
-            <NativeGoalCardView
+            <View
               key={goal.id}
-              goal={goal}
-              categoryLabel={categoryLabel}
-              reward={reward}
-              userTimeZone={userTimeZone}
-              autoExpand={goal.id === focusedGoalId}
-              onEdit={onEdit}
-              onTaskToggle={onTaskToggle}
-              onAddReminder={onAddReminder}
-              onAddProgress={onAddProgress}
-              onGoToProgress={onGoToProgress}
-            />
+              onLayout={(event) => {
+                const { y } = event.nativeEvent.layout;
+                setItemOffsets((current) => (current[goal.id] === y ? current : { ...current, [goal.id]: y }));
+              }}
+            >
+              <NativeGoalCardView
+                goal={goal}
+                categoryLabel={categoryLabel}
+                reward={reward}
+                userTimeZone={userTimeZone}
+                autoExpand={goal.id === focusedGoalId}
+                focused={goal.id === focusedGoalId}
+                onEdit={onEdit}
+                onTaskToggle={onTaskToggle}
+                onAddReminder={onAddReminder}
+                onAddProgress={onAddProgress}
+                onGoToProgress={onGoToProgress}
+              />
+            </View>
           );
         })
       )}

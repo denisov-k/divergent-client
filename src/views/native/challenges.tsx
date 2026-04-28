@@ -22,11 +22,14 @@ export default function NativeChallengesScreen(props: {
     editingChallenge,
     paymentDialogOpen,
     reportsDialogOpen,
+    acceptDialogOpen,
     selectedChallenge,
     closeChallengeDialog,
     setPaymentDialogOpen,
     openCreateChallenge,
     openEditChallenge,
+    selectChallenge,
+    closeAcceptDialog,
     shareChallenge,
     downloadChallengeReport,
     closeReportsDialog,
@@ -49,6 +52,7 @@ export default function NativeChallengesScreen(props: {
         onCreate={openCreateChallenge}
         onEdit={openEditChallenge}
         onShare={shareChallenge}
+        onSelect={selectChallenge}
         onAccept={handleAcceptChallenge}
         onLeave={handleLeaveChallenge}
         onOpenLink={openChallengeLink}
@@ -58,6 +62,7 @@ export default function NativeChallengesScreen(props: {
       <ChallengesScreenDialogs
         selectedChallenge={selectedChallenge}
         reportsDialogOpen={reportsDialogOpen}
+        acceptDialogOpen={acceptDialogOpen}
         participants={participants}
         reports={reports}
         paymentDialogOpen={paymentDialogOpen}
@@ -65,11 +70,14 @@ export default function NativeChallengesScreen(props: {
         editingChallenge={editingChallenge}
         goals={goals}
         onCloseReports={closeReportsDialog}
+        onCloseAcceptDialog={closeAcceptDialog}
         onSetPaymentDialogOpen={setPaymentDialogOpen}
         onCloseChallengeDialog={closeChallengeDialog}
         onDownloadReport={downloadChallengeReport}
         onKickParticipant={handleKickParticipant}
         onSaveChallenge={saveChallenge}
+        onAcceptChallenge={handleAcceptChallenge}
+        onShareChallenge={shareChallenge}
         onSelectPaymentMethod={selectPaymentMethod}
       />
     </View>
