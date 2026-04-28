@@ -54,4 +54,12 @@ export default defineConfig({
       },
     },
   },
+  build: {
+    rollupOptions: {
+      input: {
+        app: path.resolve(__dirname, "index.html"),
+        nativePreview: path.resolve(__dirname, "native-preview.html"),
+      },
+    },
+  },
 });

@@ -2,11 +2,7 @@
 import { BrowserRouter as Router, Routes } from "react-router-dom";
 
 import { useAppBootstrap } from "@/app/useAppBootstrap";
-import {
-  renderAuthRoutes,
-  renderNativePreviewRoutes,
-  renderProductWebRoutes,
-} from "@/app/web/routes";
+import { renderAuthRoutes, renderProductWebRoutes } from "@/app/web/routes";
 import { webCssVariables } from "@/theme/palette";
 
 export default function WebAppRoot() {
@@ -24,7 +20,6 @@ export default function WebAppRoot() {
       <Routes>
         {renderAuthRoutes()}
         {renderProductWebRoutes()}
-        {renderNativePreviewRoutes()}
       </Routes>
     </Router>
   );

@@ -17,7 +17,6 @@ const ProgressView = lazy(() => import("@/views/web/progress"));
 const RemindersView = lazy(() => import("@/views/web/reminders"));
 const RewardsView = lazy(() => import("@/views/web/rewards"));
 const SettingsView = lazy(() => import("@/views/web/settings"));
-const NativePreviewPage = lazy(() => import("@/app/web/NativePreviewPage"));
 
 function RouteFallback() {
   return <div className="flex min-h-[40vh] items-center justify-center text-sm text-muted-foreground">Loading...</div>;
@@ -35,10 +34,6 @@ function renderProtectedWeb(component: ReactNode) {
       </Layout>
     </ProtectedRoute>
   );
-}
-
-function renderProtectedNativePreview(component: ReactNode) {
-  return <ProtectedRoute>{withSuspense(component)}</ProtectedRoute>;
 }
 
 export function renderAuthRoutes() {
@@ -64,8 +59,4 @@ export function renderProductWebRoutes() {
       <Route path="/progress" element={renderProtectedWeb(<ProgressView />)} />
     </>
   );
-}
-
-export function renderNativePreviewRoutes() {
-  return <Route path="/native" element={renderProtectedNativePreview(<NativePreviewPage />)} />;
 }

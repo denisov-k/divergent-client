@@ -26,3 +26,4 @@ Notes:
 - native uses `Config.native.ts` and does not fetch `/config/*.json`
 - mobile session persistence already goes through native session adapter
 - native payments now request return URLs like `divergent://challenges`, and the backend appends `paymentId` and `id`
+- isolated web preview now has its own entrypoint at `native-preview.html`
