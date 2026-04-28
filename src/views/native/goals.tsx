@@ -1,23 +1,14 @@
-﻿import { useEffect } from "react";
-import { useTranslation } from "react-i18next";
-import { useAppStore } from "@/stores/useAppStore";
+﻿import { View } from "react-native";
 
 import { GoalsScreenDialogs } from "@/components/native/goals-screen/Dialogs";
-import {
-  showDraftAddedAlert,
-  showGoalTaskToggleResultAlert,
-} from "@/components/native/goals-screen/alerts";
 import { GoalsScreenContent, GoalsScreenHeader } from "@/components/native/goals-screen/Sections";
-import { useGoalsScreen } from "@/shared/screens/goals/useGoalsScreen";
+import { useGoalsScreenController } from "@/components/native/goals-screen/useGoalsScreenController";
 import { appPalette } from "@/theme/palette";
-import { View } from "react-native";
 
 export default function NativeGoalsScreen(props: {
   goalId?: string | null;
   onConsumeLinkState?: () => void;
 }) {
-  const { t } = useTranslation();
-  const { user } = useAppStore();
   const {
     goals,
     rewards,
@@ -37,19 +28,10 @@ export default function NativeGoalsScreen(props: {
     setGoalDialogOpen,
     setCreateReportDialogOpen,
     setAiOpen,
-    toggleGoalTask,
-  } = useGoalsScreen({ focusId: props.goalId });
-
-  useEffect(() => {
-    if (!props.goalId) return;
-    openEditGoal(props.goalId);
-    props.onConsumeLinkState?.();
-  }, [props.goalId, props.onConsumeLinkState, openEditGoal]);
-
-  const handleTaskToggle = async (goalId: string, taskId: string) => {
-    const result = await toggleGoalTask(goalId, taskId);
-    showGoalTaskToggleResultAlert(result, t);
-  };
+    userTimeZone,
+    handleTaskToggle,
+    handleDraftAdded,
+  } = useGoalsScreenController(props);
 
   return (
     <View style={{ flex: 1, backgroundColor: appPalette.surface.background }}>
@@ -59,7 +41,7 @@ export default function NativeGoalsScreen(props: {
         goals={goals}
         rewards={rewards}
         categories={categories}
-        userTimeZone={user?.timeZone ?? "UTC"}
+        userTimeZone={userTimeZone}
         focusedGoalId={props.goalId}
         onCreate={openCreateGoal}
         onEdit={openEditGoal}
@@ -82,7 +64,7 @@ export default function NativeGoalsScreen(props: {
         onSaveReport={saveReport}
         onSaveGoal={saveGoal}
         onDeleteGoal={removeGoal}
-        onDraftAdded={(goal) => showDraftAddedAlert(goal.title, t)}
+        onDraftAdded={(goal) => handleDraftAdded(goal.title)}
       />
     </View>
   );

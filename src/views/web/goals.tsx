@@ -43,7 +43,6 @@ export default function GoalsScreen() {
     saveReport,
     toggleGoalTask,
   } = useGoalsScreen({
-    focusId,
     onNavigateToProgress: (goalId) => navigate(buildProgressPath({ goalId })),
     onReminderCreated: () => navigate(buildRemindersPath()),
   });
@@ -123,3 +122,7 @@ export default function GoalsScreen() {
     </div>
   );
 }
+
+
+
+

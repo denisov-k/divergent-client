@@ -20,10 +20,9 @@ type ToggleTaskResult =
 
 export function useGoalsScreen(
   options: {
-    focusId?: string | null;
     onNavigateToProgress?: (goalId: string) => void;
     onReminderCreated?: () => void;
-  } = {}
+  } = {},
 ) {
   const {
     goals,
@@ -167,7 +166,6 @@ export function useGoalsScreen(
     goals,
     rewards,
     categories,
-    focusId: options.focusId ?? null,
     goalDialogOpen,
     editingGoal,
     createReportDialogOpen,
