@@ -1,14 +1,13 @@
 ﻿import { useEffect } from "react";
-import { Alert, ScrollView, Text, View } from "react-native";
+import { Alert, Pressable, ScrollView, Text, View } from "react-native";
+import { useTranslation } from "react-i18next";
 
-import { ActionChip } from "@/components/native/ActionChip";
 import { AiChatSheet } from "@/components/native/AiChatSheet";
 import { CreateReportSheet } from "@/components/native/CreateReportSheet";
 import { EmptyStateCard } from "@/components/native/EmptyStateCard";
 import { GoalFormSheet } from "@/components/native/GoalFormSheet";
 import { NativeGoalCard } from "@/components/native/NativeGoalCard";
-import { ScreenHeader } from "@/components/native/ScreenHeader";
-import { SurfaceCard } from "@/components/native/SurfaceCard";
+import { Plus, Sparkles } from "@/components/native/icons";
 import { useAppStore } from "@/stores/useAppStore";
 import { useGoalsScreen } from "@/shared/screens/goals/useGoalsScreen";
 
@@ -16,6 +15,7 @@ export default function NativeGoalsScreen(props: {
   goalId?: string | null;
   onConsumeLinkState?: () => void;
 }) {
+  const { t } = useTranslation();
   const { user } = useAppStore();
   const {
     goals,
@@ -28,6 +28,7 @@ export default function NativeGoalsScreen(props: {
     openEditGoal,
     openReminderForGoal,
     addProgress,
+    navigateToProgress,
     saveGoal,
     removeGoal,
     createReportDialogOpen,
@@ -64,13 +65,69 @@ export default function NativeGoalsScreen(props: {
 
   return (
     <View style={{ flex: 1, backgroundColor: "#ffffff" }}>
-      <ScreenHeader
-        title="Цели"
-        actionLabel="Новая цель"
-        onAction={openCreateGoal}
-        paddingHorizontal={8}
-        paddingVertical={8}
-      />
+      <View
+        style={{
+          paddingHorizontal: 8,
+          paddingVertical: 8,
+          flexDirection: "row",
+          alignItems: "center",
+          justifyContent: "space-between",
+          gap: 8,
+          backgroundColor: "#ffffff",
+        }}
+      >
+        <Text
+          style={{
+            fontSize: 19,
+            fontWeight: "500",
+            color: "#0f172a",
+            fontFamily: "Montserrat",
+            lineHeight: 29,
+          }}
+        >
+          {t("goals.title")}
+        </Text>
+
+        <View style={{ flexDirection: "row", gap: 8 }}>
+          <Pressable
+            onPress={openCreateGoal}
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              gap: 8,
+              backgroundColor: "#dbeafe",
+              borderWidth: 1,
+              borderColor: "#93c5fd",
+              borderRadius: 10,
+              paddingHorizontal: 12,
+              paddingVertical: 10,
+            }}
+          >
+            <Plus size={16} color="#1d4ed8" />
+            <Text style={{ color: "#1d4ed8", fontSize: 12, fontWeight: "500", lineHeight: 18, fontFamily: "Montserrat" }}>
+              {t("goals.create_goal")}
+            </Text>
+          </Pressable>
+
+          <Pressable
+            onPress={() => setAiOpen(true)}
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              gap: 8,
+              backgroundColor: "#a855f7",
+              borderRadius: 10,
+              paddingHorizontal: 12,
+              paddingVertical: 10,
+            }}
+          >
+            <Sparkles size={16} color="#ffffff" />
+            <Text style={{ color: "#ffffff", fontSize: 12, fontWeight: "500", lineHeight: 18, fontFamily: "Montserrat" }}>
+              {t("goals.open_ai")}
+            </Text>
+          </Pressable>
+        </View>
+      </View>
 
       <ScrollView
         contentContainerStyle={{
@@ -80,20 +137,6 @@ export default function NativeGoalsScreen(props: {
           gap: 8,
         }}
       >
-        <SurfaceCard>
-          <View style={{ gap: 8 }}>
-            <Text style={{ fontSize: 16, fontWeight: "600", color: "#0f172a", fontFamily: "Montserrat" }}>AI-помощник</Text>
-            <Text style={{ color: "#64748b", fontFamily: "Montserrat" }}>
-              Тот же сценарий генерации целей через AI, что и в вебе, теперь доступен и в mobile-клиенте.
-            </Text>
-            <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8 }}>
-              <ActionChip onPress={() => setAiOpen(true)} tone="secondary">
-                Открыть AI
-              </ActionChip>
-            </View>
-          </View>
-        </SurfaceCard>
-
         {goals.length === 0 ? (
           <EmptyStateCard
             title="Пока нет целей"
@@ -118,6 +161,7 @@ export default function NativeGoalsScreen(props: {
                 onTaskToggle={handleTaskToggle}
                 onAddReminder={openReminderForGoal}
                 onAddProgress={addProgress}
+                onGoToProgress={navigateToProgress}
               />
             );
           })
