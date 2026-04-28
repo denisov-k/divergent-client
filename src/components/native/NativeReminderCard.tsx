@@ -109,8 +109,8 @@ function ReminderSwitch({ checked, onPress }: { checked: boolean; onPress?: () =
         height: 20,
         borderRadius: 999,
         borderWidth: 1,
-        borderColor: checked ? appPalette.brand.primaryStrong : appPalette.semantic.borderStrong,
-        backgroundColor: checked ? appPalette.brand.primaryStrong : appPalette.surface.background,
+        borderColor: checked ? appPalette.brand.primary : appPalette.semantic.borderStrong,
+        backgroundColor: checked ? appPalette.brand.primary : appPalette.surface.background,
         padding: 2,
         justifyContent: "center",
       }}
@@ -157,7 +157,7 @@ export function NativeReminderCard({
       <View style={{ flexDirection: "row", justifyContent: "space-between", gap: 16 }}>
         <View style={{ flex: 1, gap: 8 }}>
           <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
-            <Bell size={20} color={reminder.isActive ? appPalette.brand.primaryStrong : appPalette.semantic.textSubtle} />
+            <Bell size={20} color={reminder.isActive ? appPalette.brand.primary : appPalette.semantic.textSubtle} />
             <Text style={{ fontSize: 12, fontWeight: "500", color: appPalette.semantic.textStrong, flex: 1, fontFamily: "Montserrat", lineHeight: 12 }}>
               {reminder.title}
             </Text>
@@ -204,5 +204,6 @@ export function NativeReminderCard({
     </SurfaceCard>
   );
 }
+
 
 

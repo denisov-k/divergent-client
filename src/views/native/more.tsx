@@ -19,7 +19,7 @@ export default function NativeMoreScreen(props: { activeScreen?: NativeMoreTab; 
   }, [props.activeScreen, props.onConsumeLinkState]);
 
   if (activeTab === "frens") return <View style={{ flex: 1 }}><View style={{ paddingHorizontal: 16, paddingTop: 12 }}><ActionChip onPress={() => setActiveTab("menu")}>Назад</ActionChip></View><NativeFrensScreen /></View>;
-  if (activeTab === "settings") return <View style={{ flex: 1 }}><View style={{ paddingHorizontal: 16, paddingTop: 12 }}><ActionChip onPress={() => setActiveTab("menu")}>Назад</ActionChip></View><NativeSettingsScreen /></View>;
+  if (activeTab === "settings") return <NativeSettingsScreen />;
 
   return (
     <View style={{ flex: 1, backgroundColor: appPalette.ui.inputBackground }}>
@@ -38,3 +38,4 @@ export default function NativeMoreScreen(props: { activeScreen?: NativeMoreTab; 
     </View>
   );
 }
+

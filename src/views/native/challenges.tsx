@@ -159,7 +159,7 @@ export default function NativeChallengesScreen(props: {
         </Pressable>
       </View>
 
-      <ScrollView contentContainerStyle={{ paddingHorizontal: 8, paddingTop: 8, paddingBottom: 16, gap: 8 }}>
+      <ScrollView contentContainerStyle={{ paddingHorizontal: 8, gap: 8 }}>
         {challenges.length === 0 ? (
           <EmptyStateCard title={t("challenges.empty")} description={t("challenges.empty_native_description")} actionLabel={t("challenges.create_first")} onAction={openCreateChallenge} />
         ) : (

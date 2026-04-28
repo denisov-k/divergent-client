@@ -274,8 +274,8 @@ function TaskTree({
                       height: 20,
                       borderRadius: 6,
                       borderWidth: 1.5,
-                      borderColor: completed ? appPalette.brand.primaryStrong : appPalette.semantic.textSubtle,
-                      backgroundColor: completed ? appPalette.brand.primaryStrong : appPalette.surface.background,
+                      borderColor: completed ? appPalette.brand.primary : appPalette.semantic.textSubtle,
+                      backgroundColor: completed ? appPalette.brand.primary : appPalette.surface.background,
                       alignItems: "center",
                       justifyContent: "center",
                     }}
@@ -383,7 +383,7 @@ export function NativeGoalCard({
       <View style={{ flexDirection: "row", justifyContent: "space-between", gap: 16 }}>
         <View style={{ flex: 1, gap: 8 }}>
           <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
-            <Target size={20} color={appPalette.brand.primaryStrong} />
+            <Target size={20} color={appPalette.brand.primary} />
             <Text style={{ fontSize: 12, fontWeight: "500", color: appPalette.semantic.textStrong, flex: 1, fontFamily: "Montserrat", lineHeight: 12 }}>{goal.title}</Text>
           </View>
 
@@ -434,7 +434,7 @@ export function NativeGoalCard({
           )}
         </View>
         <View style={{ height: 8, backgroundColor: appPalette.semantic.borderSubtle, borderRadius: 999, overflow: "hidden" }}>
-          <View style={{ width: `${progress}%`, height: "100%", backgroundColor: appPalette.brand.primaryStrong }} />
+          <View style={{ width: `${progress}%`, height: "100%", backgroundColor: appPalette.brand.primary }} />
         </View>
       </View>
 
@@ -537,6 +537,7 @@ export function NativeGoalCard({
     </SurfaceCard>
   );
 }
+
 
 
 

@@ -23,7 +23,7 @@ function SmallBadge({
     neutral: { backgroundColor: appPalette.semantic.neutralSurface, color: appPalette.semantic.neutralText, borderColor: appPalette.semantic.borderSubtle },
     success: { backgroundColor: appPalette.semantic.successStrong, color: appPalette.semantic.textInverse, borderColor: appPalette.semantic.successStrong },
     warning: { backgroundColor: appPalette.semantic.warningStrong, color: appPalette.semantic.textInverse, borderColor: appPalette.semantic.warningStrong },
-    info: { backgroundColor: appPalette.brand.primaryStrong, color: appPalette.semantic.textInverse, borderColor: appPalette.brand.primaryStrong },
+    info: { backgroundColor: appPalette.brand.primary, color: appPalette.semantic.textInverse, borderColor: appPalette.brand.primary },
   }[tone];
 
   const content = (
@@ -123,5 +123,6 @@ export function NativeRewardCard({
     </SurfaceCard>
   );
 }
+
 
 

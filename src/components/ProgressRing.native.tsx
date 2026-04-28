@@ -30,7 +30,7 @@ export function ProgressRing({ progress, size = 60, strokeWidth = 4 }: ProgressR
           cx={size / 2}
           cy={size / 2}
           r={radius}
-          stroke={appPalette.brand.primaryStrong}
+          stroke={appPalette.brand.primary}
           strokeWidth={strokeWidth}
           fill="none"
           strokeDasharray={`${circumference} ${circumference}`}
@@ -56,3 +56,4 @@ export function ProgressRing({ progress, size = 60, strokeWidth = 4 }: ProgressR
     </View>
   );
 }
+

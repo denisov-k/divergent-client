@@ -44,7 +44,7 @@ export default function NativeProgressScreen(props: { goalId?: string | null; on
         <Pressable onPress={() => setPickerOpen(true)} style={{ minWidth: 180, maxWidth: 220, borderRadius: 8, borderWidth: 1, borderColor: appPalette.semantic.borderSubtle, backgroundColor: appPalette.surface.background, paddingHorizontal: 12, paddingVertical: 10, flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: 8 }}><Text style={{ color: appPalette.semantic.textStrong, fontSize: 12, fontWeight: "400", lineHeight: 18, fontFamily: "Montserrat", flex: 1 }} numberOfLines={1}>{selectedLabel}</Text><ChevronDown size={16} color={appPalette.semantic.textMuted} /></Pressable>
       </View>
 
-      <ScrollView contentContainerStyle={{ paddingHorizontal: 8, paddingTop: 8, paddingBottom: 16, gap: 8 }}>
+      <ScrollView contentContainerStyle={{ paddingHorizontal: 8, gap: 8 }}>
         {selectedGoal && selectedGoal.goalType === "TASK" && activity && <NativePeriodCalendar goal={selectedGoal} activity={activity} loading={loadingActivity} />}
         <View style={{ gap: 8 }}>{selectedGoal && <StatCard title={t("progress.goal_xp")} value={xp} description={t("progress.goal_xp_description")} icon={<Zap size={20} color={appPalette.semantic.textMuted} />} />}{!selectedGoal && <StatCard title={t("progress.completed_goals")} value={completedGoals} description={t("progress.completed_goals_description", { count: filteredGoals.length })} icon={<Target size={20} color={appPalette.semantic.textMuted} />} />}{!selectedGoal && <StatCard title={t("progress.rewards_received")} value={unlockedRewards} description={t("progress.rewards_received_description", { count: rewards.length })} icon={<Trophy size={20} color={appPalette.semantic.textMuted} />} />}</View>
 
