@@ -1,3 +1,4 @@
+import { useEffect, useRef, useState } from "react";
 import { Pressable, ScrollView, Text, View } from "react-native";
 import { useTranslation } from "react-i18next";
 
@@ -89,9 +90,24 @@ export function ChallengesScreenContent({
   onOpenParticipants: (id: string) => void;
 }) {
   const { t } = useTranslation();
+  const scrollRef = useRef<ScrollView | null>(null);
+  const [itemOffsets, setItemOffsets] = useState<Record<string, number>>({});
+
+  useEffect(() => {
+    if (!focusedChallengeId) {
+      return;
+    }
+
+    const y = itemOffsets[focusedChallengeId];
+    if (typeof y !== "number") {
+      return;
+    }
+
+    scrollRef.current?.scrollTo({ y: Math.max(y - 12, 0), animated: true });
+  }, [focusedChallengeId, itemOffsets]);
 
   return (
-      <ScrollView contentContainerStyle={{ paddingHorizontal: 8, gap: 8 }}>
+      <ScrollView ref={scrollRef} contentContainerStyle={{ paddingHorizontal: 8, gap: 8 }}>
       {challenges.length === 0 ? (
         <EmptyStateCard
           title={t("challenges.empty")}
@@ -101,18 +117,25 @@ export function ChallengesScreenContent({
         />
       ) : (
         challenges.map((challenge) => (
-          <NativeChallengeCardView
+          <View
             key={challenge.id}
-            challenge={challenge}
-            focused={challenge.id === focusedChallengeId}
-            onEdit={onEdit}
-            onShare={onShare}
-            onSelect={onSelect}
-            onAccept={onAccept}
-            onLeave={onLeave}
-            onOpenLink={onOpenLink}
-            onOpenParticipants={onOpenParticipants}
-          />
+            onLayout={(event) => {
+              const { y } = event.nativeEvent.layout;
+              setItemOffsets((current) => (current[challenge.id] === y ? current : { ...current, [challenge.id]: y }));
+            }}
+          >
+            <NativeChallengeCardView
+              challenge={challenge}
+              focused={challenge.id === focusedChallengeId}
+              onEdit={onEdit}
+              onShare={onShare}
+              onSelect={onSelect}
+              onAccept={onAccept}
+              onLeave={onLeave}
+              onOpenLink={onOpenLink}
+              onOpenParticipants={onOpenParticipants}
+            />
+          </View>
         ))
       )}
     </ScrollView>

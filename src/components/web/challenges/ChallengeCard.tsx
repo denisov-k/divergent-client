@@ -98,9 +98,6 @@ export function ChallengeCard({
         hover:shadow-md transition-all
         ${(hasEnded || hasStarted) && !isParticipant ? "opacity-60" : ""}
       `}
-      onClick={() => {
-        onSelect?.(challenge);
-      }}
     >
       <CardHeader>
         <div className="flex items-start justify-between gap-4">
@@ -235,6 +232,11 @@ export function ChallengeCard({
         </div>
 
         <div className="flex justify-center gap-2">
+          {onSelect && (
+            <div className="flex justify-center py-2">
+              <Button onClick={() => onSelect(challenge)}>{t("common.details")}</Button>
+            </div>
+          )}
           {onOpenLink && challenge.link && isParticipant && (
             <div className="flex justify-center py-2">
               <Button onClick={(e) => (e.stopPropagation(), onOpenLink(challenge.id))}>{t("common.community")}</Button>

@@ -1,4 +1,5 @@
-﻿import { View } from "react-native";
+﻿import { useEffect, useState } from "react";
+import { View } from "react-native";
 
 import { ChallengesScreenDialogs } from "@/components/native/challenges-screen/Dialogs";
 import {
@@ -7,12 +8,18 @@ import {
 } from "@/components/native/challenges-screen/Sections";
 import { useChallengesScreenController } from "@/components/native/challenges-screen/useChallengesScreenController";
 import { appPalette } from "@/theme/palette";
+import type { Challenge } from "@/types";
 
 export default function NativeChallengesScreen(props: {
   focusId?: string | null;
   paymentId?: string | null;
   onConsumeLinkState?: () => void;
 }) {
+  const [focusedChallengeId, setFocusedChallengeId] = useState<string | null | undefined>(props.focusId);
+  const [activeChallenge, setActiveChallenge] = useState<Challenge | null>(null);
+  const [activeDialog, setActiveDialog] = useState<"details" | "participants" | null>(null);
+  const [participantsLoading, setParticipantsLoading] = useState(false);
+
   const {
     challenges,
     goals,
@@ -21,18 +28,13 @@ export default function NativeChallengesScreen(props: {
     challengeDialogOpen,
     editingChallenge,
     paymentDialogOpen,
-    reportsDialogOpen,
-    acceptDialogOpen,
-    selectedChallenge,
     closeChallengeDialog,
     setPaymentDialogOpen,
     openCreateChallenge,
     openEditChallenge,
-    selectChallenge,
     closeAcceptDialog,
     shareChallenge,
     downloadChallengeReport,
-    closeReportsDialog,
     saveChallenge,
     selectPaymentMethod,
     openChallengeLink,
@@ -42,35 +44,88 @@ export default function NativeChallengesScreen(props: {
     handleKickParticipant,
   } = useChallengesScreenController(props);
 
+  useEffect(() => {
+    if (!props.focusId) {
+      return;
+    }
+
+    setFocusedChallengeId(props.focusId);
+    const challenge = challenges.find((item) => item.id === props.focusId);
+    if (challenge) {
+      setActiveChallenge(challenge);
+      setActiveDialog("details");
+    }
+
+    const timeout = setTimeout(() => setFocusedChallengeId(null), 2200);
+    return () => clearTimeout(timeout);
+  }, [props.focusId, challenges]);
+
+  const openChallengeDetails = (challenge: Challenge) => {
+    setParticipantsLoading(false);
+    setActiveChallenge(challenge);
+    setActiveDialog("details");
+  };
+
+  const closeChallengeDetails = () => {
+    setActiveDialog(null);
+    setActiveChallenge(null);
+    setParticipantsLoading(false);
+    closeAcceptDialog();
+  };
+
+  const openChallengeParticipants = async (id: string) => {
+    const challenge = challenges.find((item) => item.id === id) ?? null;
+    if (!challenge) {
+      return;
+    }
+
+    setActiveChallenge(challenge);
+    setActiveDialog("participants");
+    setParticipantsLoading(true);
+    try {
+      await handleOpenParticipants(id);
+    } finally {
+      setParticipantsLoading(false);
+    }
+  };
+
+  const closeChallengeParticipants = () => {
+    setActiveDialog(null);
+    setActiveChallenge(null);
+    setParticipantsLoading(false);
+  };
+
   return (
     <View style={{ flex: 1, backgroundColor: appPalette.surface.background }}>
       <ChallengesScreenHeader onCreate={openCreateChallenge} />
 
       <ChallengesScreenContent
         challenges={challenges}
-        focusedChallengeId={props.focusId}
+        focusedChallengeId={focusedChallengeId}
         onCreate={openCreateChallenge}
         onEdit={openEditChallenge}
         onShare={shareChallenge}
-        onSelect={selectChallenge}
+        onSelect={openChallengeDetails}
         onAccept={handleAcceptChallenge}
         onLeave={handleLeaveChallenge}
         onOpenLink={openChallengeLink}
-        onOpenParticipants={handleOpenParticipants}
+        onOpenParticipants={openChallengeParticipants}
       />
 
       <ChallengesScreenDialogs
-        selectedChallenge={selectedChallenge}
-        reportsDialogOpen={reportsDialogOpen}
-        acceptDialogOpen={acceptDialogOpen}
+        acceptChallenge={activeDialog === "details" ? activeChallenge : null}
+        reportsChallenge={activeDialog === "participants" ? activeChallenge : null}
+        reportsDialogOpen={activeDialog === "participants"}
+        acceptDialogOpen={activeDialog === "details"}
+        reportsLoading={participantsLoading}
         participants={participants}
         reports={reports}
         paymentDialogOpen={paymentDialogOpen}
         challengeDialogOpen={challengeDialogOpen}
         editingChallenge={editingChallenge}
         goals={goals}
-        onCloseReports={closeReportsDialog}
-        onCloseAcceptDialog={closeAcceptDialog}
+        onCloseReports={closeChallengeParticipants}
+        onCloseAcceptDialog={closeChallengeDetails}
         onSetPaymentDialogOpen={setPaymentDialogOpen}
         onCloseChallengeDialog={closeChallengeDialog}
         onDownloadReport={downloadChallengeReport}

@@ -57,7 +57,8 @@
     "export_report_title": "Экспорт отчёта",
     "export_report_error_title": "Не удалось экспортировать отчёт",
     "export_report_error_description": "На этом устройстве не удалось подготовить отчёт для обмена.",
-    "xp": "XP"
+    "xp": "XP",
+    "details": "Детали"
   },
   "profile": {
     "level": "Уровень",
@@ -309,7 +310,8 @@
     "visibility": {
       "public": "Публичный",
       "private": "Приватный"
-    }
+    },
+    "loading_participants_description": "Загружаем участников и отчеты для этого челленджа."
   },
   "payments": {
     "select_method": "Выберите способ оплаты",

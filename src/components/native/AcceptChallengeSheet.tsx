@@ -1,4 +1,4 @@
-import { useState } from "react";
+﻿import { useState } from "react";
 import { Modal, Pressable, ScrollView, Text, View } from "react-native";
 import { useTranslation } from "react-i18next";
 
@@ -63,6 +63,18 @@ function ChallengeStatusBadge({
   );
 }
 
+function formatChallengeDate(value?: string | null) {
+  if (!value) {
+    return "—";
+  }
+
+  try {
+    return new Date(value).toLocaleDateString("ru-RU");
+  } catch {
+    return value;
+  }
+}
+
 export function AcceptChallengeSheet({
   open,
   challenge,
@@ -71,7 +83,7 @@ export function AcceptChallengeSheet({
   onShare,
 }: {
   open: boolean;
-  challenge: Challenge;
+  challenge: Challenge | null;
   onOpenChange: (open: boolean) => void;
   onAccept: (id: string) => Promise<{ status: "accepted" | "payment_required" | "ignored" }>;
   onShare: (id: string) => void;
@@ -83,10 +95,19 @@ export function AcceptChallengeSheet({
   const [showLeaderboard, setShowLeaderboard] = useState(false);
   const [leaderboard, setLeaderboard] = useState<Leader[]>([]);
 
-  const { challengeStatus, hasEnded, hasStarted, isParticipant, progress } = getChallengeDerivedState(
-    challenge,
-    user?.id,
-  );
+  const safeChallenge = challenge;
+  const safeGoals = safeChallenge?.goals ?? [];
+  const safeParticipants = safeChallenge?.participants ?? [];
+
+  const { challengeStatus, hasEnded, hasStarted, isParticipant, progress } = safeChallenge
+    ? getChallengeDerivedState(safeChallenge, user?.id)
+    : {
+        challengeStatus: "ACTIVE" as const,
+        hasEnded: false,
+        hasStarted: false,
+        isParticipant: false,
+        progress: 0,
+      };
 
   const statusLabel =
     challengeStatus === "COMPLETED"
@@ -96,18 +117,26 @@ export function AcceptChallengeSheet({
         : t("challenges.status_active");
 
   const openLeaderboard = async () => {
+    if (!safeChallenge) {
+      return;
+    }
+
     if (showLeaderboard) {
       setShowLeaderboard(false);
       return;
     }
 
-    const nextLeaderboard = await getLeaderboard(challenge.id);
+    const nextLeaderboard = await getLeaderboard(safeChallenge.id);
     setLeaderboard(nextLeaderboard);
     setShowLeaderboard(true);
   };
 
   const handleAccept = async () => {
-    await onAccept(challenge.id);
+    if (!safeChallenge) {
+      return;
+    }
+
+    await onAccept(safeChallenge.id);
     onOpenChange(false);
   };
 
@@ -133,9 +162,9 @@ export function AcceptChallengeSheet({
                 fontFamily: "Montserrat",
               }}
             >
-              {challenge.title}
+              {safeChallenge?.title ?? ""}
             </Text>
-            {!!challenge.description && (
+            {!!safeChallenge?.description && (
               <Text
                 style={{
                   color: appPalette.semantic.textMuted,
@@ -144,32 +173,32 @@ export function AcceptChallengeSheet({
                   lineHeight: 18,
                 }}
               >
-                {challenge.description}
+                {safeChallenge.description}
               </Text>
             )}
           </View>
 
           <View style={{ flexDirection: "row", alignItems: "center", gap: 16 }}>
-            <ProgressRing progress={progress * 100} size={70} strokeWidth={6} />
+            <ProgressRing progress={Number.isFinite(progress) ? progress * 100 : 0} size={70} strokeWidth={6} />
 
             <View style={{ flex: 1, gap: 8 }}>
               <View style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
                 <Calendar size={14} color={appPalette.semantic.textSubtle} />
                 <Text style={{ color: appPalette.semantic.textMuted, fontFamily: "Montserrat", fontSize: 12, lineHeight: 18 }}>
-                  {challenge.startsAt ? new Date(challenge.startsAt).toLocaleDateString("ru-RU") : "—"} {" > "}
-                  {challenge.endsAt ? new Date(challenge.endsAt).toLocaleDateString("ru-RU") : "—"}
+                  {formatChallengeDate(safeChallenge?.startsAt)} {" > "}
+                  {formatChallengeDate(safeChallenge?.endsAt)}
                 </Text>
               </View>
 
               <View style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
                 <Users size={14} color={appPalette.semantic.textSubtle} />
                 <Text style={{ color: appPalette.semantic.textMuted, fontFamily: "Montserrat", fontSize: 12, lineHeight: 18 }}>
-                  {t("challenges.participants_count")} {challenge.participants.length}
+                  {t("challenges.participants_count")} {safeParticipants.length}
                 </Text>
               </View>
 
               <ChallengeStatusBadge tone="neutral">
-                {challenge.isPublic ? t("challenges.visibility.public") : t("challenges.visibility.private")}
+                {safeChallenge?.isPublic ? t("challenges.visibility.public") : t("challenges.visibility.private")}
               </ChallengeStatusBadge>
               {challengeStatus !== "ACTIVE" && (
                 <ChallengeStatusBadge tone={challengeStatus === "COMPLETED" ? "success" : "danger"}>
@@ -180,7 +209,7 @@ export function AcceptChallengeSheet({
           </View>
 
           <ScrollView contentContainerStyle={{ gap: 10 }}>
-            {challenge.goals.length > 0 && (
+            {safeGoals.length > 0 && (
               <View style={{ gap: 8 }}>
                 <Pressable
                   onPress={() => setShowGoals((current) => !current)}
@@ -193,7 +222,7 @@ export function AcceptChallengeSheet({
                 </Pressable>
                 {showGoals && (
                   <View style={{ gap: 8 }}>
-                    {challenge.goals.map((goal) => (
+                    {safeGoals.map((goal) => (
                       <SurfaceCard key={goal.id} gap={8} padding={12} radius={12}>
                         <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
                           <Text style={{ flex: 1, color: appPalette.semantic.textStrong, fontSize: 12, lineHeight: 18, fontFamily: "Montserrat" }}>
@@ -208,7 +237,7 @@ export function AcceptChallengeSheet({
               </View>
             )}
 
-            {!!challenge.rules && (
+            {!!safeChallenge?.rules && (
               <View style={{ gap: 8 }}>
                 <Pressable
                   onPress={() => setShowRules((current) => !current)}
@@ -221,7 +250,7 @@ export function AcceptChallengeSheet({
                 </Pressable>
                 {showRules && (
                   <Text style={{ color: appPalette.semantic.textMuted, fontFamily: "Montserrat", fontSize: 12, lineHeight: 18 }}>
-                    {challenge.rules}
+                    {safeChallenge.rules}
                   </Text>
                 )}
               </View>
@@ -273,15 +302,15 @@ export function AcceptChallengeSheet({
                 {t("challenges.participation_cost")}
               </Text>
               <Text style={{ color: appPalette.semantic.textStrong, fontFamily: "Montserrat", fontSize: 12, lineHeight: 18, fontWeight: "500" }}>
-                {challenge.price ? `${challenge.price} ${t("common.rubles_short")}` : t("challenges.free")}
+                {safeChallenge?.price ? `${safeChallenge.price} ${t("common.rubles_short")}` : t("challenges.free")}
               </Text>
             </View>
           </ScrollView>
 
           <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8 }}>
             <ActionChip onPress={() => onOpenChange(false)}>{t("common.close")}</ActionChip>
-            <ActionChip onPress={() => onShare(challenge.id)} tone="secondary">{t("common.share")}</ActionChip>
-            {!isParticipant && !hasStarted && !hasEnded && (
+            {!!safeChallenge && <ActionChip onPress={() => onShare(safeChallenge.id)} tone="secondary">{t("common.share")}</ActionChip>}
+            {!!safeChallenge && !isParticipant && !hasStarted && !hasEnded && (
               <ActionChip onPress={() => void handleAccept()} tone="primary">
                 {t("challenges.accept")}
               </ActionChip>

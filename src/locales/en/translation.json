@@ -15,6 +15,7 @@
     "edit": "Edit",
     "loading": "Loading...",
     "open": "Open",
+    "details": "Details",
     "hide": "Hide",
     "community": "Community",
     "participants": "Participants",
@@ -309,7 +310,8 @@
     "visibility": {
       "public": "Public",
       "private": "Private"
-    }
+    },
+    "loading_participants_description": "Loading participants and reports for this challenge."
   },
   "payments": {
     "select_method": "Choose payment method",

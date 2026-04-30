@@ -103,10 +103,10 @@ export function useChallengesScreen(options: {
     setAcceptDialogOpen(false);
   };
 
-  const openParticipants = async (id: string) => {
+  const loadParticipantsData = async (id: string) => {
     const challenge = challenges.find((item) => item.id === id);
     if (!challenge) {
-      return false;
+      return null;
     }
 
     const nextReports = await getReports(challenge.id);
@@ -114,7 +114,21 @@ export function useChallengesScreen(options: {
 
     setReports(nextReports);
     setParticipants(nextParticipants);
-    setSelectedChallenge(challenge);
+
+    return {
+      challenge,
+      reports: nextReports,
+      participants: nextParticipants,
+    };
+  };
+
+  const openParticipants = async (id: string) => {
+    const loaded = await loadParticipantsData(id);
+    if (!loaded) {
+      return false;
+    }
+
+    setSelectedChallenge(loaded.challenge);
     setReportsDialogOpen(true);
     return true;
   };
@@ -227,6 +241,7 @@ export function useChallengesScreen(options: {
     confirmLeaveChallenge,
     selectChallenge,
     closeAcceptDialog,
+    loadParticipantsData,
     openParticipants,
     downloadChallengeReport,
     closeReportsDialog,

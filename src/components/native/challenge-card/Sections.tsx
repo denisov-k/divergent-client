@@ -229,6 +229,7 @@ export function ChallengePriceSection({
 }
 
 export function ChallengeActionsRow({
+  onOpenDetails,
   isParticipant,
   isCreator,
   hasStarted,
@@ -238,6 +239,7 @@ export function ChallengeActionsRow({
   onOpenParticipants,
   onAccept,
 }: {
+  onOpenDetails?: () => void;
   isParticipant: boolean;
   isCreator: boolean;
   hasStarted: boolean;
@@ -251,6 +253,7 @@ export function ChallengeActionsRow({
 
   return (
     <View style={{ flexDirection: "row", flexWrap: "wrap", justifyContent: "center", gap: 8 }}>
+      {!!onOpenDetails && <ChallengePrimaryButton label={t("common.details")} onPress={onOpenDetails} />}
       {!!onOpenLink && hasLink && isParticipant && <ChallengePrimaryButton label={t("common.community")} onPress={onOpenLink} />}
       {!!onOpenParticipants && isCreator && <ChallengePrimaryButton label={t("common.participants")} onPress={onOpenParticipants} />}
       {!!onAccept && !isParticipant && !hasStarted && !hasEnded && <ChallengePrimaryButton label={t("challenges.accept")} onPress={onAccept} />}

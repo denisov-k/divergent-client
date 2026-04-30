@@ -60,7 +60,7 @@ export function useChallengesScreenController(props: {
   };
 
   const handleOpenParticipants = async (id: string) => {
-    await screen.openParticipants(id);
+    return await screen.loadParticipantsData(id);
   };
 
   const handleLeaveChallenge = async (id: string) => {

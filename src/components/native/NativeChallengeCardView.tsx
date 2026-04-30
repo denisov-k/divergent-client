@@ -1,5 +1,5 @@
-﻿import { useState } from "react";
-import { Pressable, View } from "react-native";
+﻿import { useEffect, useState } from "react";
+import { View } from "react-native";
 import { useTranslation } from "react-i18next";
 
 import { ProgressRing } from "@/components/shared/ProgressRing";
@@ -49,6 +49,7 @@ export function NativeChallengeCardView({
   const [isRulesOpen, setIsRulesOpen] = useState(false);
   const [isLeaderboardOpen, setIsLeaderboardOpen] = useState(false);
   const [leaderboard, setLeaderboard] = useState<Leader[]>([]);
+  const [highlight, setHighlight] = useState(focused);
 
   const { isCreator, isParticipant, completedGoals, progress, hasStarted, hasEnded, challengeStatus } = getChallengeDerivedState(challenge, user?.id);
   const statusLabel =
@@ -69,75 +70,89 @@ export function NativeChallengeCardView({
     setIsLeaderboardOpen(true);
   };
 
-  return (
-    <View style={{ opacity: (hasEnded || hasStarted) && !isParticipant ? 0.6 : 1 }}>
-      <Pressable onPress={() => onSelect?.(challenge)}>
-        <SurfaceCard gap={12} padding={24} radius={12}>
-        <View style={{ flexDirection: "row", justifyContent: "space-between", gap: 16 }}>
-          <ChallengeCardHeader
-            challenge={challenge}
-            isCreator={isCreator}
-            isParticipant={isParticipant}
-            challengeStatus={challengeStatus}
-            statusLabel={statusLabel}
-          />
+  useEffect(() => {
+    if (!focused) {
+      return;
+    }
 
-          <View style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
-            {isParticipant && <ProgressRing progress={progress * 100} size={70} strokeWidth={6} />}
-            <View>
-              {isCreator && !!onEdit && <ChallengeCardAction icon={<Edit size={14} color={appPalette.semantic.textMuted} />} onPress={() => onEdit(challenge.id)} />}
-              {!!onShare && <ChallengeCardAction icon={<Share size={14} color={appPalette.semantic.textMuted} />} onPress={() => onShare(challenge.id)} />}
-              {!isCreator && isParticipant && !!onLeave && <ChallengeCardAction icon={<DoorOpen size={14} color={appPalette.semantic.textMuted} />} onPress={() => onLeave(challenge.id)} />}
+    setHighlight(true);
+    const timeout = setTimeout(() => setHighlight(false), 2000);
+    return () => clearTimeout(timeout);
+  }, [focused]);
+
+  return (
+    <View
+      style={{
+        opacity: (hasEnded || hasStarted) && !isParticipant ? 0.6 : 1,
+        backgroundColor: highlight ? appPalette.semantic.infoSurfaceStrong : "transparent",
+        borderRadius: 12,
+      }}
+    >
+      <SurfaceCard gap={12} padding={24} radius={12}>
+          <View style={{ flexDirection: "row", justifyContent: "space-between", gap: 16 }}>
+            <ChallengeCardHeader
+              challenge={challenge}
+              isCreator={isCreator}
+              isParticipant={isParticipant}
+              challengeStatus={challengeStatus}
+              statusLabel={statusLabel}
+            />
+
+            <View style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
+              {isParticipant && <ProgressRing progress={progress * 100} size={70} strokeWidth={6} />}
+              <View>
+                {isCreator && !!onEdit && <ChallengeCardAction icon={<Edit size={14} color={appPalette.semantic.textMuted} />} onPress={() => onEdit(challenge.id)} />}
+                {!!onShare && <ChallengeCardAction icon={<Share size={14} color={appPalette.semantic.textMuted} />} onPress={() => onShare(challenge.id)} />}
+                {!isCreator && isParticipant && !!onLeave && <ChallengeCardAction icon={<DoorOpen size={14} color={appPalette.semantic.textMuted} />} onPress={() => onLeave(challenge.id)} />}
+              </View>
             </View>
           </View>
-        </View>
 
-        {isParticipant && (
-          <ChallengeProgressSection
-            progress={progress}
-            completedGoals={completedGoals}
-            totalGoals={challenge.goals.length}
+          {isParticipant && (
+            <ChallengeProgressSection
+              progress={progress}
+              completedGoals={completedGoals}
+              totalGoals={challenge.goals.length}
+            />
+          )}
+
+          <ChallengeGoalsSection
+            focused={focused}
+            isOpen={isGoalsOpen}
+            goals={challenge.goals}
+            canOpenGoals={isParticipant}
+            onToggleOpen={() => setIsGoalsOpen((current) => !current)}
           />
-        )}
 
-        <ChallengeGoalsSection
-          focused={focused}
-          isOpen={isGoalsOpen}
-          goals={challenge.goals}
-          canOpenGoals={isParticipant}
-          onToggleOpen={() => setIsGoalsOpen((current) => !current)}
-        />
+          <ChallengeRulesSection
+            rules={challenge.rules}
+            isOpen={isRulesOpen}
+            onToggleOpen={() => setIsRulesOpen((current) => !current)}
+          />
 
-        <ChallengeRulesSection
-          rules={challenge.rules}
-          isOpen={isRulesOpen}
-          onToggleOpen={() => setIsRulesOpen((current) => !current)}
-        />
+          <ChallengeLeaderboardSection
+            focused={focused}
+            isOpen={isLeaderboardOpen}
+            leaderboard={leaderboard}
+            onToggleOpen={openLeaderboard}
+          />
 
-        <ChallengeLeaderboardSection
-          focused={focused}
-          isOpen={isLeaderboardOpen}
-          leaderboard={leaderboard}
-          onToggleOpen={openLeaderboard}
-        />
+          <ChallengePriceSection focused={focused} price={challenge.price} />
 
-        <ChallengePriceSection focused={focused} price={challenge.price} />
+          <ChallengeActionsRow
+            onOpenDetails={onSelect ? () => onSelect(challenge) : undefined}
+            isParticipant={isParticipant}
+            isCreator={isCreator}
+            hasStarted={hasStarted}
+            hasEnded={hasEnded}
+            hasLink={Boolean(challenge.link)}
+            onOpenLink={onOpenLink ? () => onOpenLink(challenge.id) : undefined}
+            onOpenParticipants={onOpenParticipants ? () => onOpenParticipants(challenge.id) : undefined}
+            onAccept={onAccept ? () => onAccept(challenge.id) : undefined}
+          />
 
-        <ChallengeActionsRow
-          isParticipant={isParticipant}
-          isCreator={isCreator}
-          hasStarted={hasStarted}
-          hasEnded={hasEnded}
-          hasLink={Boolean(challenge.link)}
-          onOpenLink={onOpenLink ? () => onOpenLink(challenge.id) : undefined}
-          onOpenParticipants={onOpenParticipants ? () => onOpenParticipants(challenge.id) : undefined}
-          onAccept={onAccept ? () => onAccept(challenge.id) : undefined}
-        />
-
-        <ChallengeFooter challenge={challenge} />
-        </SurfaceCard>
-      </Pressable>
+          <ChallengeFooter challenge={challenge} />
+      </SurfaceCard>
     </View>
   );
 }
-

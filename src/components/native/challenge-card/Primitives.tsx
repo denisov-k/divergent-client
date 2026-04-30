@@ -1,5 +1,7 @@
 import { Pressable, Text, View } from "react-native";
 
+import { ActionChip } from "@/components/native/ActionChip";
+
 import { appPalette } from "@/theme/palette";
 
 export function ChallengeCardAction({ icon, onPress }: { icon: React.ReactNode; onPress?: () => void }) {
@@ -58,20 +60,5 @@ export function ChallengePrimaryButton({
   label: string;
   onPress: () => void;
 }) {
-  return (
-    <Pressable
-      onPress={(event) => {
-        event.stopPropagation();
-        onPress();
-      }}
-      style={{
-        backgroundColor: appPalette.brand.primary,
-        borderRadius: 10,
-        paddingHorizontal: 12,
-        paddingVertical: 10,
-      }}
-    >
-      <Text style={{ color: appPalette.brand.primaryForeground, fontSize: 12, fontWeight: "500", lineHeight: 18, fontFamily: "Montserrat" }}>{label}</Text>
-    </Pressable>
-  );
+  return <ActionChip onPress={onPress} tone="primary">{label}</ActionChip>;
 }
