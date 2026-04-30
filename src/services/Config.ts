@@ -1,11 +1,59 @@
-﻿import axios, { AxiosResponse } from "axios";
+import axios, { AxiosResponse } from "axios";
 
 let p: Promise<unknown> | null = null;
 
 const BASE_URL = "/config/{env}.json";
 const http = axios.create();
+const DEFAULT_NATIVE_CONFIG = {
+  app: {
+    publicURL: "https://divergentclub.ru",
+    scheme: "divergent",
+  },
+  api: {
+    http: {
+      baseURL: "https://server.divergentclub.ru",
+    },
+    telegram: {
+      twaURL: "https://t.me/divergent_app_bot/start",
+    },
+  },
+};
+
+function isNativeRuntime() {
+  return typeof navigator !== "undefined" && navigator.product === "ReactNative";
+}
+
+function readNativeEnvConfig() {
+  const publicURL = process.env.EXPO_PUBLIC_APP_PUBLIC_URL || "";
+  const scheme = process.env.EXPO_PUBLIC_APP_SCHEME || "";
+  const twaURL = process.env.EXPO_PUBLIC_TELEGRAM_BOT_URL || "";
+  const apiBaseURL = process.env.EXPO_PUBLIC_API_BASE_URL || "";
+
+  if (!publicURL && !scheme && !twaURL && !apiBaseURL) {
+    return null;
+  }
+
+  return {
+    app: {
+      publicURL: publicURL || DEFAULT_NATIVE_CONFIG.app.publicURL,
+      scheme: scheme || DEFAULT_NATIVE_CONFIG.app.scheme,
+    },
+    api: {
+      http: {
+        baseURL: apiBaseURL || DEFAULT_NATIVE_CONFIG.api.http.baseURL,
+      },
+      telegram: {
+        twaURL: twaURL || DEFAULT_NATIVE_CONFIG.api.telegram.twaURL,
+      },
+    },
+  } satisfies ConfigInterface["data"];
+}
 
 function resolveRuntimeEnv() {
+  if (isNativeRuntime()) {
+    return process.env.NODE_ENV || "production";
+  }
+
   if (typeof window === "undefined") {
     return process.env.NODE_ENV || "production";
   }
@@ -60,30 +108,35 @@ const Config: ConfigInterface = {
   },
   init() {
     if (!p) {
-      p = new Promise((resolve, reject) => {
-        return Promise.all([this._loadEnv(resolveRuntimeEnv())]).then(([envResponse]) => {
-          if (typeof envResponse.data !== "object") {
-            return reject("Bad config file");
-          }
+      p = (async () => {
+        if (isNativeRuntime()) {
+          this.data = readNativeEnvConfig() || DEFAULT_NATIVE_CONFIG;
+          return this.data;
+        }
 
-          const nextData = envResponse.data as Partial<ConfigInterface["data"]>;
-          this.data = {
-            app: {
-              publicURL: nextData.app?.publicURL || "",
-              scheme: nextData.app?.scheme || "",
+        const envResponse = await this._loadEnv(resolveRuntimeEnv());
+        if (typeof envResponse.data !== "object") {
+          throw new Error("Bad config file");
+        }
+
+        const nextData = envResponse.data as Partial<ConfigInterface["data"]>;
+        this.data = {
+          app: {
+            publicURL: nextData.app?.publicURL || "",
+            scheme: nextData.app?.scheme || "",
+          },
+          api: {
+            http: {
+              baseURL: nextData.api?.http?.baseURL || "",
             },
-            api: {
-              http: {
-                baseURL: nextData.api?.http?.baseURL || "",
-              },
-              telegram: {
-                twaURL: nextData.api?.telegram?.twaURL || "",
-              },
+            telegram: {
+              twaURL: nextData.api?.telegram?.twaURL || "",
             },
-          };
-          resolve(this.data);
-        });
-      });
+          },
+        };
+
+        return this.data;
+      })();
     }
     return p;
   },

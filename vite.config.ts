@@ -1,7 +1,7 @@
-﻿import path from "path";
+import fs from "fs";
+import path from "path";
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
-import basicSsl from "@vitejs/plugin-basic-ssl";
 import commonjs from "vite-plugin-commonjs";
 
 export default defineConfig({
@@ -10,6 +10,10 @@ export default defineConfig({
     port: 8081,
     strictPort: true,
     cors: true,
+    https: {
+      key: fs.readFileSync(path.resolve(__dirname, "localhost+2-key.pem")),
+      cert: fs.readFileSync(path.resolve(__dirname, "localhost+2.pem")),
+    },
   },
   preview: {
     port: 8080,
@@ -17,7 +21,6 @@ export default defineConfig({
   },
   plugins: [
     react(),
-    basicSsl(),
     commonjs({
       filter(id) {
         if (id.includes("node_modules/react-native-svg")) {

@@ -15,6 +15,8 @@ import type {
   User,
 } from "@/types";
 
+const API_TIMEOUT_MS = 15000;
+
 function normalizeFriend(friend: Partial<FriendSummary> & { id: string; name: string; level: number; currentXp: number }): FriendSummary {
   return {
     id: friend.id,
@@ -33,17 +35,30 @@ async function fetchJSON(url: string, options: RequestInit = {}) {
   const isFormData = options.body instanceof FormData;
   const baseUrl = Config.data.api.http.baseURL;
   const sessionToken = await readSessionToken();
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), API_TIMEOUT_MS);
 
-  const res = await fetch(baseUrl + url, {
-    ...options,
-    credentials: "include",
-    headers: {
-      ...(baseUrl.includes("ngrok-free.dev") ? { "ngrok-skip-browser-warning": "true" } : {}),
-      ...(!isFormData ? { "Content-Type": "application/json" } : {}),
-      ...(sessionToken ? { Authorization: `Bearer ${sessionToken}` } : {}),
-      ...(options.headers || {}),
-    },
-  });
+  let res: Response;
+  try {
+    res = await fetch(baseUrl + url, {
+      ...options,
+      credentials: "include",
+      signal: controller.signal,
+      headers: {
+        ...(baseUrl.includes("ngrok-free.dev") ? { "ngrok-skip-browser-warning": "true" } : {}),
+        ...(!isFormData ? { "Content-Type": "application/json" } : {}),
+        ...(sessionToken ? { Authorization: `Bearer ${sessionToken}` } : {}),
+        ...(options.headers || {}),
+      },
+    });
+  } catch (error) {
+    if (error instanceof Error && error.name === "AbortError") {
+      throw new Error(`Request timed out for ${url}`);
+    }
+    throw error;
+  } finally {
+    clearTimeout(timeoutId);
+  }
 
   const nextSessionToken = res.headers.get("x-session-token");
   if (nextSessionToken) {

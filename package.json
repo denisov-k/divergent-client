@@ -2,7 +2,7 @@
   "name": "divergent-client",
   "private": true,
   "type": "module",
-  "version": "0.5.19",
+  "version": "0.5.20",
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
@@ -48,7 +48,7 @@
     "react-is": "^18.2.0",
     "react-native": "0.83.6",
     "react-native-gesture-handler": "^2.30.0",
-    "react-native-reanimated": "^4.2.2",
+    "react-native-reanimated": "4.2.1",
     "react-native-svg": "^15.15.3",
     "react-native-svg-web": "1.0.2",
     "react-native-web": "^0.21.2",
