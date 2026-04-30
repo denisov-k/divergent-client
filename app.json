@@ -3,7 +3,6 @@
     "name": "Divergent",
     "slug": "divergent-client",
     "scheme": "divergent",
-    "entryPoint": "./src/index.native.tsx",
     "android": {
       "package": "com.anonymous.divergentclient"
     },
