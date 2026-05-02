@@ -51,7 +51,6 @@ public enum TelegramLogin {
   private static var codeVerifier: String?
   private static let baseUrl = "https://oauth.telegram.org"
 
-  @MainActor
   public static func configure(
     clientId: String,
     redirectUri: String,
