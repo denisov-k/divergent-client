@@ -112,6 +112,13 @@ export async function register(email: string, password: string, name?: string) {
   });
 }
 
+export async function loginWithTelegramIdToken(idToken: string) {
+  return fetchJSON("/api/auth/telegram/native-login", {
+    method: "POST",
+    body: JSON.stringify({ idToken }),
+  });
+}
+
 export async function logout() {
   const result = await fetchJSON("/api/auth/logout", {
     method: "POST",

@@ -11,8 +11,14 @@ import {
   SignInSection,
   SignUpSection,
 } from "@/components/native/auth-screen/Sections";
+import * as api from "@/shared/api/client";
 import { buildNativeRouteUrl } from "@/platform/appUrl.native";
 import { openAuthSession } from "@/platform/authSession";
+import {
+  configureNativeTelegramLogin,
+  isNativeTelegramLoginSupported,
+  loginWithNativeTelegram,
+} from "@/platform/telegramLogin";
 import { writeSessionToken } from "@/platform/session";
 import { createTelegramLoginUrl } from "@/platform/telegram";
 import { useAppStore } from "@/stores/useAppStore";
@@ -118,6 +124,8 @@ export default function NativeAuthRoot() {
   };
 
   useEffect(() => {
+    configureNativeTelegramLogin();
+
     void Linking.getInitialURL().then((url) => {
       if (url) applyLink(url);
     });
@@ -196,6 +204,13 @@ export default function NativeAuthRoot() {
     try {
       setSignInError(undefined);
       setSignInSuccess(undefined);
+
+      if (isNativeTelegramLoginSupported()) {
+        const result = await loginWithNativeTelegram();
+        await api.loginWithTelegramIdToken(result.idToken);
+        await refreshUser();
+        return;
+      }
 
       const loginUrl = createTelegramLoginUrl("/");
       const redirectUrl = buildNativeRouteUrl("/signin");

@@ -9,7 +9,13 @@
     },
     "ios": {
       "bundleIdentifier": "com.spritemedia.divergent",
+      "associatedDomains": [
+        "applinks:app262127326-login.tg.dev"
+      ],
       "infoPlist": {
+        "LSApplicationQueriesSchemes": [
+          "tg"
+        ],
         "ITSAppUsesNonExemptEncryption": false
       }
     },

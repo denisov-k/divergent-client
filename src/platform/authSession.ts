@@ -1,4 +1,6 @@
-import type { AuthSessionResult } from "@/platform/authSession.native";
+export type AuthSessionResult =
+  | { type: "success"; url: string }
+  | { type: "cancel" | "dismiss" | "opened" | "locked" };
 
 export async function openAuthSession(url: string, _redirectUrl: string): Promise<AuthSessionResult> {
   if (typeof window !== "undefined") {

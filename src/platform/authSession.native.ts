@@ -1,8 +1,5 @@
 import * as WebBrowser from "expo-web-browser";
-
-export type AuthSessionResult =
-  | { type: "success"; url: string }
-  | { type: "cancel" | "dismiss" | "opened" | "locked" };
+import type { AuthSessionResult } from "@/platform/authSession";
 
 export async function openAuthSession(url: string, redirectUrl: string) {
   return (await WebBrowser.openAuthSessionAsync(url, redirectUrl)) as AuthSessionResult;
