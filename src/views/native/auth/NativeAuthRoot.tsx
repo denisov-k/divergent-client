@@ -11,7 +11,10 @@ import {
   SignInSection,
   SignUpSection,
 } from "@/components/native/auth-screen/Sections";
+import { buildNativeRouteUrl } from "@/platform/appUrl.native";
+import { openAuthSession } from "@/platform/authSession.native";
 import { writeSessionToken } from "@/platform/session";
+import { createTelegramLoginUrl } from "@/platform/telegram";
 import { useAppStore } from "@/stores/useAppStore";
 
 export default function NativeAuthRoot() {
@@ -73,48 +76,48 @@ export default function NativeAuthRoot() {
       message: t("auth.passwords_no_match"),
     });
 
-  useEffect(() => {
-    const applyLink = (url: string) => {
-      const state = parseNativeAuthRoute(url);
-      if (!state) return;
-      if (state.tab) setActiveTab(state.tab);
-      if (state.email) {
-        setSignInData((prev) => ({ ...prev, email: state.email || prev.email }));
-        setSignUpData((prev) => ({ ...prev, email: state.email || prev.email }));
-        setResetData((prev) => ({ ...prev, email: state.email || prev.email }));
-      }
-      if (state.authToken) {
-        setSignInError(undefined);
-        setSignInSuccess(undefined);
-        void writeSessionToken(state.authToken).then(() => refreshUser());
-        return;
-      }
-      if (state.referrerId || state.referrerLinkId) {
-        setReferrerData({
-          referrerId: state.referrerId,
-          referrerLinkId: state.referrerLinkId,
-        });
-      }
-      if (state.resetStatus === "success") {
-        setActiveTab("signin");
-        setSignInError(undefined);
-        setSignInSuccess(t("auth.password_updated"));
-      }
-      if (state.error) {
-        setActiveTab("signin");
-        setSignInSuccess(undefined);
-        setSignInError(
-          state.error === "telegram_oauth_failed"
-            ? `Telegram sign in failed. Please try again.${state.errorDetail ? ` (${state.errorDetail})` : ""}`
-            : "Telegram sign in is not available right now."
-        );
-      }
-      if (state.tab === "reset") {
-        setResetMode(state.resetMode || "request");
-        if (state.token) setResetData((prev) => ({ ...prev, token: state.token || prev.token }));
-      }
-    };
+  const applyLink = (url: string) => {
+    const state = parseNativeAuthRoute(url);
+    if (!state) return;
+    if (state.tab) setActiveTab(state.tab);
+    if (state.email) {
+      setSignInData((prev) => ({ ...prev, email: state.email || prev.email }));
+      setSignUpData((prev) => ({ ...prev, email: state.email || prev.email }));
+      setResetData((prev) => ({ ...prev, email: state.email || prev.email }));
+    }
+    if (state.authToken) {
+      setSignInError(undefined);
+      setSignInSuccess(undefined);
+      void writeSessionToken(state.authToken).then(() => refreshUser());
+      return;
+    }
+    if (state.referrerId || state.referrerLinkId) {
+      setReferrerData({
+        referrerId: state.referrerId,
+        referrerLinkId: state.referrerLinkId,
+      });
+    }
+    if (state.resetStatus === "success") {
+      setActiveTab("signin");
+      setSignInError(undefined);
+      setSignInSuccess(t("auth.password_updated"));
+    }
+    if (state.error) {
+      setActiveTab("signin");
+      setSignInSuccess(undefined);
+      setSignInError(
+        state.error === "telegram_oauth_failed"
+          ? `Telegram sign in failed. Please try again.${state.errorDetail ? ` (${state.errorDetail})` : ""}`
+          : "Telegram sign in is not available right now."
+      );
+    }
+    if (state.tab === "reset") {
+      setResetMode(state.resetMode || "request");
+      if (state.token) setResetData((prev) => ({ ...prev, token: state.token || prev.token }));
+    }
+  };
 
+  useEffect(() => {
     void Linking.getInitialURL().then((url) => {
       if (url) applyLink(url);
     });
@@ -189,6 +192,16 @@ export default function NativeAuthRoot() {
     }
   };
 
+  const startTelegramSignIn = async () => {
+    const loginUrl = createTelegramLoginUrl("/");
+    const redirectUrl = buildNativeRouteUrl("/signin");
+    const result = await openAuthSession(loginUrl, redirectUrl);
+
+    if (result.type === "success" && "url" in result && result.url) {
+      applyLink(result.url);
+    }
+  };
+
   return (
     <AuthScreenShell>
       <View style={{ flex: 1, paddingHorizontal: 16, paddingVertical: 40, justifyContent: "center" }}>
@@ -205,6 +218,7 @@ export default function NativeAuthRoot() {
             onChangeEmail={(value) => setSignInData((prev) => ({ ...prev, email: value }))}
             onChangePassword={(value) => setSignInData((prev) => ({ ...prev, password: value }))}
             onSubmit={submitSignIn}
+            onTelegramSignIn={startTelegramSignIn}
             onOpenSignUp={() => setActiveTab("signup")}
             onOpenReset={() => setActiveTab("reset")}
           />

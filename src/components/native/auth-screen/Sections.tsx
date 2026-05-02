@@ -3,9 +3,7 @@ import { useTranslation } from "react-i18next";
 
 import { ActionChip } from "@/components/native/ActionChip";
 import { FieldInput } from "@/components/native/FieldInput";
-import { redirectToUrl } from "@/platform/browser";
 import { platformCapabilities } from "@/platform/capabilities";
-import { createTelegramLoginUrl } from "@/platform/telegram";
 import { appPalette } from "@/theme/palette";
 
 import {
@@ -32,6 +30,7 @@ export function SignInSection(props: {
   onChangeEmail: (value: string) => void;
   onChangePassword: (value: string) => void;
   onSubmit: () => Promise<void>;
+  onTelegramSignIn: () => Promise<void>;
   onOpenSignUp: () => void;
   onOpenReset: () => void;
 }) {
@@ -84,7 +83,7 @@ export function SignInSection(props: {
             <Text style={{ color: appPalette.semantic.textStrong, fontFamily: "Montserrat", fontSize: 14 }}>
               Continue with Telegram
             </Text>
-            <ActionChip onPress={() => redirectToUrl(createTelegramLoginUrl("/"))}>
+            <ActionChip onPress={() => void props.onTelegramSignIn()}>
               Sign in with Telegram
             </ActionChip>
           </View>

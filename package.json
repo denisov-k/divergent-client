@@ -2,7 +2,7 @@
   "name": "divergent-client",
   "private": true,
   "type": "module",
-  "version": "0.5.23",
+  "version": "0.5.24",
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
@@ -37,6 +37,7 @@
     "expo-font": "^55.0.6",
     "expo-secure-store": "^55.0.13",
     "expo-sharing": "^55.0.18",
+    "expo-web-browser": "^55.0.14",
     "i18next": "^25.5.2",
     "lucide-react": "^0.468.0",
     "lucide-react-native": "^0.577.0",

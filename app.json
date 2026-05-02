@@ -3,6 +3,7 @@
     "name": "Divergent",
     "slug": "divergent-client",
     "scheme": "divergent",
+    "icon": "./public/icon.jpg",
     "android": {
       "package": "com.spritemedia.divergent"
     },
