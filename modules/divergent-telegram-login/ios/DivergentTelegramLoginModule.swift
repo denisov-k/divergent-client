@@ -4,7 +4,7 @@ public final class DivergentTelegramLoginModule: Module {
   public func definition() -> ModuleDefinition {
     Name("DivergentTelegramLogin")
 
-    Function("configure") { (clientId: String, redirectUri: String, scopes: [String], fallbackScheme: String?) in
+    AsyncFunction("configure") { (clientId: String, redirectUri: String, scopes: [String], fallbackScheme: String?) in
       TelegramNativeLoginController.shared.configure(
         clientId: clientId,
         redirectUri: redirectUri,
@@ -12,6 +12,7 @@ public final class DivergentTelegramLoginModule: Module {
         fallbackScheme: fallbackScheme
       )
     }
+    .runOnQueue(.main)
 
     AsyncFunction("loginAsync") { (promise: Promise) in
       TelegramNativeLoginController.shared.login(promise: promise)
