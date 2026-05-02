@@ -2,9 +2,7 @@ import { Text, View } from "react-native";
 import { useTranslation } from "react-i18next";
 
 import { useAppBootstrap } from "@/app/useAppBootstrap";
-import { ActionChip } from "@/components/native/ActionChip";
 import { SurfaceCard } from "@/components/native/SurfaceCard";
-import { useAppStore } from "@/stores/useAppStore";
 import { appPalette } from "@/theme/palette";
 import NativeAppShell from "@/views/native/AppShell";
 import NativeAuthRoot from "@/views/native/auth/NativeAuthRoot";
@@ -30,20 +28,8 @@ function NativeLoadingScreen({ mode }: { mode: NativeRuntimeMode }) {
   );
 }
 
-function NativeAuthScreen({ showSessionReset }: { showSessionReset: boolean }) {
-  const { t } = useTranslation();
-  const { logout } = useAppStore();
-
-  return (
-    <View style={{ flex: 1 }}>
-      <NativeAuthRoot />
-      {showSessionReset && (
-        <View style={{ paddingHorizontal: 16, paddingBottom: 16 }}>
-          <ActionChip onPress={logout}>{t("runtime.reset_local_session")}</ActionChip>
-        </View>
-      )}
-    </View>
-  );
+function NativeAuthScreen() {
+  return <NativeAuthRoot />;
 }
 
 export function NativeRuntimeRoot({
@@ -60,7 +46,7 @@ export function NativeRuntimeRoot({
   }
 
   if (!user) {
-    return <NativeAuthScreen showSessionReset={mode === "preview"} />;
+    return <NativeAuthScreen />;
   }
 
   return <NativeAppShell mode={mode} />;

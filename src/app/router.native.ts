@@ -16,6 +16,12 @@ export type NativeAuthRoute = {
   resetMode?: NativeResetMode;
   email?: string;
   token?: string;
+  authToken?: string;
+  referrerId?: string;
+  referrerLinkId?: string;
+  resetStatus?: string;
+  error?: string;
+  errorDetail?: string;
 };
 
 export type NativeRoute = NativeAppRoute | NativeAuthRoute;
@@ -61,7 +67,13 @@ function normalizeRoute(value: string | null): string | undefined {
 
 function parseAuthRoute(parsed: URL): NativeAuthRoute | null {
   const token = parsed.searchParams.get("token") || undefined;
+  const authToken = parsed.searchParams.get("authToken") || undefined;
   const email = parsed.searchParams.get("email") || undefined;
+  const referrerId = parsed.searchParams.get("referrerId") || undefined;
+  const referrerLinkId = parsed.searchParams.get("referrerLinkId") || undefined;
+  const resetStatus = parsed.searchParams.get("reset") || undefined;
+  const error = parsed.searchParams.get("error") || undefined;
+  const errorDetail = parsed.searchParams.get("error_detail") || undefined;
   const requestedTab = normalizeAuthTab(parsed.searchParams.get("tab"));
   const requestedMode = normalizeResetMode(parsed.searchParams.get("mode"));
   const path = parsed.pathname.toLowerCase();
@@ -73,15 +85,19 @@ function parseAuthRoute(parsed: URL): NativeAuthRoute | null {
       resetMode: token ? "confirm" : requestedMode || "request",
       email,
       token,
+      authToken,
+      resetStatus,
+      error,
+      errorDetail,
     };
   }
 
   if (path.includes("signup")) {
-    return { kind: "auth", tab: "signup", email };
+    return { kind: "auth", tab: "signup", email, referrerId, referrerLinkId };
   }
 
   if (path.includes("signin") || path.includes("login")) {
-    return { kind: "auth", tab: "signin", email };
+    return { kind: "auth", tab: "signin", email, authToken, resetStatus, error, errorDetail };
   }
 
   if (requestedTab) {
@@ -91,6 +107,12 @@ function parseAuthRoute(parsed: URL): NativeAuthRoute | null {
       resetMode: requestedTab === "reset" ? (token ? "confirm" : requestedMode) : undefined,
       email,
       token,
+      authToken,
+      referrerId,
+      referrerLinkId,
+      resetStatus,
+      error,
+      errorDetail,
     };
   }
 
@@ -101,6 +123,20 @@ function parseAuthRoute(parsed: URL): NativeAuthRoute | null {
       resetMode: "confirm",
       email,
       token,
+      resetStatus,
+      error,
+      errorDetail,
+    };
+  }
+
+  if (authToken) {
+    return {
+      kind: "auth",
+      tab: "signin",
+      authToken,
+      resetStatus,
+      error,
+      errorDetail,
     };
   }
 

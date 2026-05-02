@@ -1,28 +1,36 @@
 ﻿import { useEffect, useState } from "react";
-import { Linking, ScrollView, View } from "react-native";
+import { Linking, View } from "react-native";
 import { useTranslation } from "react-i18next";
 import { z, ZodError } from "zod";
 
 import { parseNativeAuthRoute, type NativeAuthTab, type NativeResetMode } from "@/app/router.native";
-import { ScreenHeader } from "@/components/native/ScreenHeader";
-import { SectionTabs } from "@/components/native/SectionTabs";
+import { AuthScreenShell } from "@/components/native/auth-screen/Primitives";
 import {
   ResetSection,
   RuntimeNoticeSection,
   SignInSection,
   SignUpSection,
 } from "@/components/native/auth-screen/Sections";
+import { writeSessionToken } from "@/platform/session";
 import { useAppStore } from "@/stores/useAppStore";
-import { appPalette } from "@/theme/palette";
 
 export default function NativeAuthRoot() {
   const { t } = useTranslation();
-  const { loading, loginWithCredentials, signup, passwordReset, confirmPasswordReset } = useAppStore();
+  const {
+    loading,
+    loginWithCredentials,
+    signup,
+    passwordReset,
+    confirmPasswordReset,
+    refreshUser,
+  } = useAppStore();
   const [activeTab, setActiveTab] = useState<NativeAuthTab>("signin");
   const [signInData, setSignInData] = useState({ email: "", password: "" });
   const [signInError, setSignInError] = useState<string>();
+  const [signInSuccess, setSignInSuccess] = useState<string>();
   const [signUpData, setSignUpData] = useState({ name: "", email: "", password: "" });
   const [signUpError, setSignUpError] = useState<string>();
+  const [referrerData, setReferrerData] = useState<{ referrerId?: string; referrerLinkId?: string }>({});
   const [resetMode, setResetMode] = useState<NativeResetMode>("request");
   const [resetData, setResetData] = useState({ email: "", token: "", password: "", confirmPassword: "" });
   const [resetError, setResetError] = useState<string>();
@@ -75,6 +83,32 @@ export default function NativeAuthRoot() {
         setSignUpData((prev) => ({ ...prev, email: state.email || prev.email }));
         setResetData((prev) => ({ ...prev, email: state.email || prev.email }));
       }
+      if (state.authToken) {
+        setSignInError(undefined);
+        setSignInSuccess(undefined);
+        void writeSessionToken(state.authToken).then(() => refreshUser());
+        return;
+      }
+      if (state.referrerId || state.referrerLinkId) {
+        setReferrerData({
+          referrerId: state.referrerId,
+          referrerLinkId: state.referrerLinkId,
+        });
+      }
+      if (state.resetStatus === "success") {
+        setActiveTab("signin");
+        setSignInError(undefined);
+        setSignInSuccess(t("auth.password_updated"));
+      }
+      if (state.error) {
+        setActiveTab("signin");
+        setSignInSuccess(undefined);
+        setSignInError(
+          state.error === "telegram_oauth_failed"
+            ? `Telegram sign in failed. Please try again.${state.errorDetail ? ` (${state.errorDetail})` : ""}`
+            : "Telegram sign in is not available right now."
+        );
+      }
       if (state.tab === "reset") {
         setResetMode(state.resetMode || "request");
         if (state.token) setResetData((prev) => ({ ...prev, token: state.token || prev.token }));
@@ -100,6 +134,7 @@ export default function NativeAuthRoot() {
   const submitSignIn = async () => {
     try {
       setSignInError(undefined);
+      setSignInSuccess(undefined);
       const validated = signInSchema.parse(signInData);
       await loginWithCredentials(validated.email, validated.password);
     } catch (error) {
@@ -111,7 +146,13 @@ export default function NativeAuthRoot() {
     try {
       setSignUpError(undefined);
       const validated = signUpSchema.parse(signUpData);
-      await signup(validated.email, validated.password, validated.name);
+      await signup(
+        validated.email,
+        validated.password,
+        validated.name,
+        referrerData.referrerId,
+        referrerData.referrerLinkId
+      );
     } catch (error) {
       setSignUpError(handleValidationError(error) || t("auth.signup_failed"));
     }
@@ -140,6 +181,7 @@ export default function NativeAuthRoot() {
       await confirmPasswordReset(validated.token, validated.password);
       setResetSuccess(t("auth.password_updated"));
       setActiveTab("signin");
+      setSignInSuccess(t("auth.password_updated"));
       setResetMode("request");
       setResetData({ email: resetData.email, token: "", password: "", confirmPassword: "" });
     } catch (error) {
@@ -148,29 +190,22 @@ export default function NativeAuthRoot() {
   };
 
   return (
-    <View style={{ flex: 1, backgroundColor: appPalette.surface.background }}>
-      <ScreenHeader title={t("auth.title")} subtitle={t("auth.subtitle")} />
-        <ScrollView contentContainerStyle={{ padding: 16, gap: 12 }}>
+    <AuthScreenShell>
+      <View style={{ flex: 1, paddingHorizontal: 16, paddingVertical: 40, justifyContent: "center" }}>
+        <View style={{ width: "100%", maxWidth: 440, alignSelf: "center", gap: 12 }}>
         <RuntimeNoticeSection />
-        <SectionTabs
-          tabs={[
-            { key: "signin", label: t("auth.signin_tab") },
-            { key: "signup", label: t("auth.signup_tab") },
-            { key: "reset", label: t("auth.reset_tab") },
-          ]}
-          activeTab={activeTab}
-          onChange={(value) => setActiveTab(value as NativeAuthTab)}
-        />
 
         {activeTab === "signin" && (
           <SignInSection
             email={signInData.email}
             password={signInData.password}
             error={signInError}
+            success={signInSuccess}
             loading={loading}
             onChangeEmail={(value) => setSignInData((prev) => ({ ...prev, email: value }))}
             onChangePassword={(value) => setSignInData((prev) => ({ ...prev, password: value }))}
             onSubmit={submitSignIn}
+            onOpenSignUp={() => setActiveTab("signup")}
             onOpenReset={() => setActiveTab("reset")}
           />
         )}
@@ -195,6 +230,7 @@ export default function NativeAuthRoot() {
             resetMode={resetMode}
             email={resetData.email}
             token={resetData.token}
+            tokenProvided={Boolean(resetData.token)}
             password={resetData.password}
             confirmPassword={resetData.confirmPassword}
             error={resetError}
@@ -211,7 +247,8 @@ export default function NativeAuthRoot() {
             onBackToSignIn={() => setActiveTab("signin")}
           />
         )}
-      </ScrollView>
-    </View>
+        </View>
+      </View>
+    </AuthScreenShell>
   );
 }

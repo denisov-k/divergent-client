@@ -1,5 +1,5 @@
 ﻿export const platformCapabilities = {
-  telegramLogin: false,
+  telegramLogin: true,
   browserRedirects: true,
   nativeFilePersistence: true,
 };

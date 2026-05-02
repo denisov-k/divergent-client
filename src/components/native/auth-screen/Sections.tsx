@@ -3,47 +3,48 @@ import { useTranslation } from "react-i18next";
 
 import { ActionChip } from "@/components/native/ActionChip";
 import { FieldInput } from "@/components/native/FieldInput";
-import { SectionTabs } from "@/components/native/SectionTabs";
-import { SurfaceCard } from "@/components/native/SurfaceCard";
+import { redirectToUrl } from "@/platform/browser";
 import { platformCapabilities } from "@/platform/capabilities";
+import { createTelegramLoginUrl } from "@/platform/telegram";
 import { appPalette } from "@/theme/palette";
 
-import { CardTitle, ErrorBanner, SuccessBanner } from "./Primitives";
+import {
+  AuthCard,
+  CardSubtitle,
+  CardTitle,
+  DividerLabel,
+  ErrorBanner,
+  InlineLink,
+  PrimaryButton,
+  SuccessBanner,
+} from "./Primitives";
 
 export function RuntimeNoticeSection() {
-  const { t } = useTranslation();
-
-  if (platformCapabilities.telegramLogin) {
-    return null;
-  }
-
-  return (
-    <SurfaceCard>
-      <CardTitle>{t("auth.runtime_title")}</CardTitle>
-      <Text style={{ color: appPalette.semantic.textMuted, fontFamily: "Montserrat", fontSize: 12, lineHeight: 18 }}>
-        {t("auth.runtime_description")}
-      </Text>
-    </SurfaceCard>
-  );
+  return null;
 }
 
 export function SignInSection(props: {
   email: string;
   password: string;
   error?: string;
+  success?: string;
   loading: boolean;
   onChangeEmail: (value: string) => void;
   onChangePassword: (value: string) => void;
   onSubmit: () => Promise<void>;
+  onOpenSignUp: () => void;
   onOpenReset: () => void;
 }) {
   const { t } = useTranslation();
 
   return (
-    <SurfaceCard>
-      <CardTitle>{t("auth.signin_title")}</CardTitle>
+    <AuthCard>
+      <View style={{ gap: 8 }}>
+        <CardTitle>Welcome back</CardTitle>
+        <CardSubtitle>Sign in with email or continue with Telegram.</CardSubtitle>
+      </View>
       <FieldInput
-        label={t("common.email")}
+        label="Email"
         value={props.email}
         onChangeText={props.onChangeEmail}
         placeholder={t("auth.email_placeholder")}
@@ -52,7 +53,7 @@ export function SignInSection(props: {
         textContentType="emailAddress"
       />
       <FieldInput
-        label={t("common.password")}
+        label="Password"
         value={props.password}
         onChangeText={props.onChangePassword}
         placeholder={t("auth.password_placeholder")}
@@ -61,13 +62,39 @@ export function SignInSection(props: {
         textContentType="password"
       />
       <ErrorBanner message={props.error} />
-      <View style={{ flexDirection: "row", gap: 8, flexWrap: "wrap" }}>
-        <ActionChip onPress={() => void props.onSubmit()} tone="primary">
-          {props.loading ? t("auth.signin_submitting") : t("auth.signin_submit")}
-        </ActionChip>
-        <ActionChip onPress={props.onOpenReset}>{t("auth.reset_password")}</ActionChip>
+      <SuccessBanner message={props.success} />
+      <PrimaryButton
+        onPress={() => void props.onSubmit()}
+        disabled={props.loading}
+        label={props.loading ? "Signing in..." : "Sign in"}
+      />
+      {platformCapabilities.telegramLogin && (
+        <>
+          <DividerLabel>or</DividerLabel>
+          <View
+            style={{
+              borderRadius: 16,
+              borderWidth: 1,
+              borderColor: appPalette.semantic.borderSubtle,
+              backgroundColor: "#f8fafc",
+              padding: 16,
+              gap: 12,
+            }}
+          >
+            <Text style={{ color: appPalette.semantic.textStrong, fontFamily: "Montserrat", fontSize: 14 }}>
+              Continue with Telegram
+            </Text>
+            <ActionChip onPress={() => redirectToUrl(createTelegramLoginUrl("/"))}>
+              Sign in with Telegram
+            </ActionChip>
+          </View>
+        </>
+      )}
+      <View style={{ flexDirection: "row", justifyContent: "space-between", gap: 12, paddingTop: 4 }}>
+        <InlineLink label="Create account" onPress={props.onOpenSignUp} />
+        <InlineLink label="Reset password" onPress={props.onOpenReset} tone="muted" />
       </View>
-    </SurfaceCard>
+    </AuthCard>
   );
 }
 
@@ -86,11 +113,14 @@ export function SignUpSection(props: {
   const { t } = useTranslation();
 
   return (
-    <SurfaceCard>
-      <CardTitle>{t("auth.signup_title")}</CardTitle>
-      <FieldInput label={t("common.name")} value={props.name} onChangeText={props.onChangeName} placeholder={t("auth.your_name")} />
+    <AuthCard>
+      <View style={{ gap: 8 }}>
+        <CardTitle>Create account</CardTitle>
+        <CardSubtitle>Start with email and password, then continue in the app.</CardSubtitle>
+      </View>
+      <FieldInput label="Name" value={props.name} onChangeText={props.onChangeName} placeholder={t("auth.your_name")} autoCapitalize="words" />
       <FieldInput
-        label={t("common.email")}
+        label="Email"
         value={props.email}
         onChangeText={props.onChangeEmail}
         placeholder={t("auth.email_placeholder")}
@@ -99,7 +129,7 @@ export function SignUpSection(props: {
         textContentType="emailAddress"
       />
       <FieldInput
-        label={t("common.password")}
+        label="Password"
         value={props.password}
         onChangeText={props.onChangePassword}
         placeholder={t("auth.password_create_placeholder")}
@@ -108,13 +138,15 @@ export function SignUpSection(props: {
         textContentType="newPassword"
       />
       <ErrorBanner message={props.error} />
-      <View style={{ flexDirection: "row", gap: 8, flexWrap: "wrap" }}>
-        <ActionChip onPress={() => void props.onSubmit()} tone="primary">
-          {props.loading ? t("auth.signup_submitting") : t("auth.signup_submit")}
-        </ActionChip>
-        <ActionChip onPress={props.onOpenSignIn}>{t("auth.already_have_account")}</ActionChip>
+      <PrimaryButton
+        onPress={() => void props.onSubmit()}
+        disabled={props.loading}
+        label={props.loading ? "Creating account..." : "Create account"}
+      />
+      <View style={{ paddingTop: 4 }}>
+        <InlineLink label="Already have an account? Sign in" onPress={props.onOpenSignIn} />
       </View>
-    </SurfaceCard>
+    </AuthCard>
   );
 }
 
@@ -122,6 +154,7 @@ export function ResetSection(props: {
   resetMode: "request" | "confirm";
   email: string;
   token: string;
+  tokenProvided?: boolean;
   password: string;
   confirmPassword: string;
   error?: string;
@@ -138,32 +171,41 @@ export function ResetSection(props: {
   onBackToSignIn: () => void;
 }) {
   const { t } = useTranslation();
+  const showTokenField = props.resetMode === "confirm" && !props.tokenProvided;
+  const isConfirm = props.resetMode === "confirm";
 
   return (
-    <SurfaceCard>
-      <CardTitle>{t("auth.reset_title")}</CardTitle>
-      <SectionTabs
-        tabs={[
-          { key: "request", label: t("auth.reset_request_tab") },
-          { key: "confirm", label: t("auth.reset_confirm_tab") },
-        ]}
-        activeTab={props.resetMode}
-        onChange={(value) => props.onChangeMode(value as "request" | "confirm")}
-      />
+    <AuthCard>
+      <View style={{ gap: 8 }}>
+        <CardTitle>Reset password</CardTitle>
+        <CardSubtitle>
+          {isConfirm
+            ? "Choose a new password for your account."
+            : "Enter your email and we will generate a password reset link."}
+        </CardSubtitle>
+      </View>
       <FieldInput
-        label={t("common.email")}
+        label="Email"
         value={props.email}
         onChangeText={props.onChangeEmail}
         placeholder={t("auth.email_placeholder")}
         keyboardType="email-address"
         autoComplete="email"
         textContentType="emailAddress"
+        editable={!isConfirm || !props.tokenProvided}
       />
-      {props.resetMode === "confirm" && (
+      {isConfirm && (
         <>
-          <FieldInput label={t("auth.reset_confirm_tab")} value={props.token} onChangeText={props.onChangeToken} placeholder={t("auth.reset_token_placeholder")} />
+          {showTokenField && (
+            <FieldInput
+              label="Token"
+              value={props.token}
+              onChangeText={props.onChangeToken}
+              placeholder={t("auth.reset_token_placeholder")}
+            />
+          )}
           <FieldInput
-            label={t("common.new_password")}
+            label="New password"
             value={props.password}
             onChangeText={props.onChangePassword}
             placeholder={t("auth.new_password_placeholder")}
@@ -172,7 +214,7 @@ export function ResetSection(props: {
             textContentType="newPassword"
           />
           <FieldInput
-            label={t("common.confirm_password")}
+            label="Confirm password"
             value={props.confirmPassword}
             onChangeText={props.onChangeConfirmPassword}
             placeholder={t("auth.confirm_password_placeholder")}
@@ -192,18 +234,20 @@ export function ResetSection(props: {
           <ActionChip onPress={() => void Linking.openURL(props.resetUrl!)}>{t("common.open")}</ActionChip>
         </View>
       )}
-      <View style={{ flexDirection: "row", gap: 8, flexWrap: "wrap" }}>
-        {props.resetMode === "request" ? (
-          <ActionChip onPress={() => void props.onSubmitRequest()} tone="primary">
-            {props.loading ? t("auth.reset_request_submitting") : t("auth.reset_request_submit")}
-          </ActionChip>
-        ) : (
-          <ActionChip onPress={() => void props.onSubmitConfirm()} tone="primary">
-            {props.loading ? t("auth.reset_confirm_submitting") : t("auth.reset_confirm_submit")}
-          </ActionChip>
+      <PrimaryButton
+        onPress={() => void (isConfirm ? props.onSubmitConfirm() : props.onSubmitRequest())}
+        disabled={props.loading}
+        label={props.loading ? "Submitting..." : isConfirm ? "Save new password" : "Request reset"}
+      />
+      <View style={{ flexDirection: "row", justifyContent: "space-between", gap: 12, paddingTop: 4 }}>
+        {!props.tokenProvided && (
+          <InlineLink
+            label={isConfirm ? "Back to request reset" : "Have a token? Enter it manually"}
+            onPress={() => props.onChangeMode(isConfirm ? "request" : "confirm")}
+          />
         )}
-        <ActionChip onPress={props.onBackToSignIn}>{t("auth.back_to_signin")}</ActionChip>
+        <InlineLink label="Back to sign in" onPress={props.onBackToSignIn} tone="muted" />
       </View>
-    </SurfaceCard>
+    </AuthCard>
   );
 }
