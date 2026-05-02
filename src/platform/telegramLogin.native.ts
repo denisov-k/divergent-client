@@ -8,7 +8,7 @@ type NativeTelegramLoginModule = {
 const moduleRef = requireOptionalNativeModule<NativeTelegramLoginModule>("DivergentTelegramLogin");
 
 const DEFAULT_CLIENT_ID = "8460145268";
-const DEFAULT_REDIRECT_URI = "https://app262127326-login.tg.dev";
+const DEFAULT_REDIRECT_URI = "divergent://tglogin";
 const DEFAULT_SCOPES = ["profile"];
 const DEFAULT_FALLBACK_SCHEME = "divergent";
 
