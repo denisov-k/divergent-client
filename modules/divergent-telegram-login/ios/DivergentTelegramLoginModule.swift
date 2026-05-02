@@ -28,6 +28,7 @@ final class TelegramNativeLoginController {
 
   private init() {}
 
+  @MainActor
   func configure(clientId: String, redirectUri: String, scopes: [String], fallbackScheme: String?) {
     redirectUriHost = URLComponents(string: redirectUri)?.host
     TelegramLogin.configure(
