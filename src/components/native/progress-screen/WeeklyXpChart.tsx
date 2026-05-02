@@ -10,6 +10,10 @@ const SvgPrimitives = Svg as typeof Svg & {
 };
 
 export function WeeklyXpChart({ data }: { data: { name: string; value: number }[] }) {
+  if (data.length === 0) {
+    return null;
+  }
+
   const width = 320;
   const height = 176;
   const paddingLeft = 16;

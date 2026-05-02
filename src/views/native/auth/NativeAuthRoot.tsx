@@ -113,8 +113,8 @@ export default function NativeAuthRoot() {
       setSignInSuccess(undefined);
       setSignInError(
         state.error === "telegram_oauth_failed"
-          ? `Telegram sign in failed. Please try again.${state.errorDetail ? ` (${state.errorDetail})` : ""}`
-          : "Telegram sign in is not available right now."
+          ? `${t("auth.telegram_signin_failed")}${state.errorDetail ? ` (${state.errorDetail})` : ""}`
+          : t("auth.telegram_signin_unavailable")
       );
     }
     if (state.tab === "reset") {
@@ -220,7 +220,7 @@ export default function NativeAuthRoot() {
       }
     } catch (error) {
       console.error(error);
-      setSignInError(error instanceof Error ? error.message : "Telegram sign in failed to start.");
+      setSignInError(error instanceof Error ? error.message : t("auth.telegram_signin_start_failed"));
     }
   };
 

@@ -1,4 +1,4 @@
-import { Alert, Text, View } from "react-native";
+﻿import { Alert, Text, View } from "react-native";
 import { useTranslation } from "react-i18next";
 
 import { ActionChip } from "@/components/native/ActionChip";
@@ -39,7 +39,7 @@ export function LanguageSection(props: {
           English
         </ActionChip>
         <ActionChip onPress={() => props.onChangeLanguage("ru")} tone={props.language === "ru" ? "primary" : "secondary"}>
-          �������
+          Русский
         </ActionChip>
       </View>
       {props.isSavingProfile && (

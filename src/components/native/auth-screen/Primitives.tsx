@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+﻿import type { ReactNode } from "react";
 import { Pressable, Text, View } from "react-native";
 
 import { appPalette } from "@/theme/palette";
@@ -138,6 +138,35 @@ export function PrimaryButton(props: { label: string; onPress?: () => void; disa
         alignItems: "center",
         justifyContent: "center",
         backgroundColor: props.disabled ? "#93c5fd" : appPalette.brand.primaryStrong,
+        paddingHorizontal: 16,
+        paddingVertical: 12,
+      }}
+    >
+      <Text
+        style={{
+          color: "#ffffff",
+          fontFamily: "Montserrat",
+          fontSize: 14,
+          fontWeight: "700",
+        }}
+      >
+        {props.label}
+      </Text>
+    </Pressable>
+  );
+}
+
+export function TelegramButton(props: { label: string; onPress?: () => void; disabled?: boolean }) {
+  return (
+    <Pressable
+      disabled={props.disabled}
+      onPress={props.onPress}
+      style={{
+        minHeight: 44,
+        borderRadius: 12,
+        alignItems: "center",
+        justifyContent: "center",
+        backgroundColor: props.disabled ? "#7dd3fc" : "#229ED9",
         paddingHorizontal: 16,
         paddingVertical: 12,
       }}

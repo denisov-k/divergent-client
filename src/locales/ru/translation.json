@@ -1,4 +1,4 @@
-{
+﻿{
   "common": {
     "yes": "Да",
     "no": "Нет",
@@ -116,9 +116,9 @@
   },
   "auth": {
     "title": "Авторизация",
-    "subtitle": "Email/password flow уже работает в shared store и теперь доступен в mobile shell.",
+    "subtitle": "Вход по email и паролю уже работает в общем store и теперь доступен в мобильной оболочке.",
     "runtime_title": "Возможности mobile runtime",
-    "runtime_description": "Telegram login сейчас остаётся web-only сценарием и не включён в standalone mobile runtime.",
+    "runtime_description": "Вход через Telegram сейчас остаётся web-only сценарием и не включён в standalone mobile runtime.",
     "signin_tab": "Вход",
     "signup_tab": "Регистрация",
     "reset_tab": "Сброс",
@@ -160,7 +160,22 @@
     "password_create_placeholder": "8+ символов, верхний/нижний регистр и цифра",
     "new_password_placeholder": "Создайте новый пароль",
     "confirm_password_placeholder": "Повторите новый пароль",
-    "reset_token_placeholder": "Вставьте токен из ссылки"
+    "reset_token_placeholder": "Вставьте токен из ссылки",
+    "signin_welcome_title": "С возвращением",
+    "signin_welcome_subtitle": "Войдите по email или продолжите через Telegram.",
+    "signup_subtitle": "Начните с email и пароля, а затем продолжите в приложении.",
+    "reset_request_subtitle": "Введите email, и мы создадим ссылку для сброса пароля.",
+    "reset_confirm_subtitle": "Придумайте новый пароль для своего аккаунта.",
+    "reset_token_label": "Токен",
+    "or_divider": "или",
+    "telegram_signin": "Войти через Telegram",
+    "create_account_link": "Создать аккаунт",
+    "already_have_account_signin": "Уже есть аккаунт? Войти",
+    "back_to_reset_request": "Назад к запросу сброса",
+    "have_token": "Есть токен? Ввести вручную",
+    "telegram_signin_failed": "Не удалось войти через Telegram. Попробуйте ещё раз.",
+    "telegram_signin_unavailable": "Вход через Telegram сейчас недоступен.",
+    "telegram_signin_start_failed": "Не удалось запустить вход через Telegram."
   },
   "goals": {
     "tasks": "Задачи цели",

@@ -51,7 +51,7 @@ export default function NativeProgressScreenView(props: { goalId?: string | null
           <ProgressStreakSection current={streakMeta.current} longest={streakMeta.longest} days={streakMeta.days} />
         )}
 
-        {selectedGoal && selectedGoal.goalType === "TASK" && <ProgressWeeklyXpSection data={weeklyXpData} />}
+        {selectedGoal && selectedGoal.goalType === "TASK" && weeklyXpData.length > 0 && <ProgressWeeklyXpSection data={weeklyXpData} />}
 
         {!selectedGoal && <ProgressCategoriesSection categoryData={categoryData} />}
       </ScrollView>

@@ -15,6 +15,7 @@ import {
   InlineLink,
   PrimaryButton,
   SuccessBanner,
+  TelegramButton,
 } from "./Primitives";
 
 export function RuntimeNoticeSection() {
@@ -39,11 +40,11 @@ export function SignInSection(props: {
   return (
     <AuthCard>
       <View style={{ gap: 8 }}>
-        <CardTitle>Welcome back</CardTitle>
-        <CardSubtitle>Sign in with email or continue with Telegram.</CardSubtitle>
+        <CardTitle>{t("auth.signin_welcome_title")}</CardTitle>
+        <CardSubtitle>{t("auth.signin_welcome_subtitle")}</CardSubtitle>
       </View>
       <FieldInput
-        label="Email"
+        label={t("common.email")}
         value={props.email}
         onChangeText={props.onChangeEmail}
         placeholder={t("auth.email_placeholder")}
@@ -52,7 +53,7 @@ export function SignInSection(props: {
         textContentType="emailAddress"
       />
       <FieldInput
-        label="Password"
+        label={t("common.password")}
         value={props.password}
         onChangeText={props.onChangePassword}
         placeholder={t("auth.password_placeholder")}
@@ -65,33 +66,21 @@ export function SignInSection(props: {
       <PrimaryButton
         onPress={() => void props.onSubmit()}
         disabled={props.loading}
-        label={props.loading ? "Signing in..." : "Sign in"}
+        label={props.loading ? t("auth.signin_submitting") : t("auth.signin_submit")}
       />
       {platformCapabilities.telegramLogin && (
         <>
-          <DividerLabel>or</DividerLabel>
-          <View
-            style={{
-              borderRadius: 16,
-              borderWidth: 1,
-              borderColor: appPalette.semantic.borderSubtle,
-              backgroundColor: "#f8fafc",
-              padding: 16,
-              gap: 12,
-            }}
-          >
-            <Text style={{ color: appPalette.semantic.textStrong, fontFamily: "Montserrat", fontSize: 14 }}>
-              Continue with Telegram
-            </Text>
-            <ActionChip onPress={() => void props.onTelegramSignIn()}>
-              Sign in with Telegram
-            </ActionChip>
-          </View>
+          <DividerLabel>{t("auth.or_divider")}</DividerLabel>
+          <TelegramButton
+            onPress={() => void props.onTelegramSignIn()}
+            disabled={props.loading}
+            label={t("auth.telegram_signin")}
+          />
         </>
       )}
       <View style={{ flexDirection: "row", justifyContent: "space-between", gap: 12, paddingTop: 4 }}>
-        <InlineLink label="Create account" onPress={props.onOpenSignUp} />
-        <InlineLink label="Reset password" onPress={props.onOpenReset} tone="muted" />
+        <InlineLink label={t("auth.create_account_link")} onPress={props.onOpenSignUp} />
+        <InlineLink label={t("auth.reset_password")} onPress={props.onOpenReset} tone="muted" />
       </View>
     </AuthCard>
   );
@@ -114,12 +103,12 @@ export function SignUpSection(props: {
   return (
     <AuthCard>
       <View style={{ gap: 8 }}>
-        <CardTitle>Create account</CardTitle>
-        <CardSubtitle>Start with email and password, then continue in the app.</CardSubtitle>
+        <CardTitle>{t("auth.signup_title")}</CardTitle>
+        <CardSubtitle>{t("auth.signup_subtitle")}</CardSubtitle>
       </View>
-      <FieldInput label="Name" value={props.name} onChangeText={props.onChangeName} placeholder={t("auth.your_name")} autoCapitalize="words" />
+      <FieldInput label={t("common.name")} value={props.name} onChangeText={props.onChangeName} placeholder={t("auth.your_name")} autoCapitalize="words" />
       <FieldInput
-        label="Email"
+        label={t("common.email")}
         value={props.email}
         onChangeText={props.onChangeEmail}
         placeholder={t("auth.email_placeholder")}
@@ -128,7 +117,7 @@ export function SignUpSection(props: {
         textContentType="emailAddress"
       />
       <FieldInput
-        label="Password"
+        label={t("common.password")}
         value={props.password}
         onChangeText={props.onChangePassword}
         placeholder={t("auth.password_create_placeholder")}
@@ -140,10 +129,10 @@ export function SignUpSection(props: {
       <PrimaryButton
         onPress={() => void props.onSubmit()}
         disabled={props.loading}
-        label={props.loading ? "Creating account..." : "Create account"}
+        label={props.loading ? t("auth.signup_submitting") : t("auth.signup_submit")}
       />
       <View style={{ paddingTop: 4 }}>
-        <InlineLink label="Already have an account? Sign in" onPress={props.onOpenSignIn} />
+        <InlineLink label={t("auth.already_have_account_signin")} onPress={props.onOpenSignIn} />
       </View>
     </AuthCard>
   );
@@ -176,15 +165,11 @@ export function ResetSection(props: {
   return (
     <AuthCard>
       <View style={{ gap: 8 }}>
-        <CardTitle>Reset password</CardTitle>
-        <CardSubtitle>
-          {isConfirm
-            ? "Choose a new password for your account."
-            : "Enter your email and we will generate a password reset link."}
-        </CardSubtitle>
+        <CardTitle>{t("auth.reset_title")}</CardTitle>
+        <CardSubtitle>{isConfirm ? t("auth.reset_confirm_subtitle") : t("auth.reset_request_subtitle")}</CardSubtitle>
       </View>
       <FieldInput
-        label="Email"
+        label={t("common.email")}
         value={props.email}
         onChangeText={props.onChangeEmail}
         placeholder={t("auth.email_placeholder")}
@@ -197,14 +182,14 @@ export function ResetSection(props: {
         <>
           {showTokenField && (
             <FieldInput
-              label="Token"
+              label={t("auth.reset_token_label")}
               value={props.token}
               onChangeText={props.onChangeToken}
               placeholder={t("auth.reset_token_placeholder")}
             />
           )}
           <FieldInput
-            label="New password"
+            label={t("common.new_password")}
             value={props.password}
             onChangeText={props.onChangePassword}
             placeholder={t("auth.new_password_placeholder")}
@@ -213,7 +198,7 @@ export function ResetSection(props: {
             textContentType="newPassword"
           />
           <FieldInput
-            label="Confirm password"
+            label={t("common.confirm_password")}
             value={props.confirmPassword}
             onChangeText={props.onChangeConfirmPassword}
             placeholder={t("auth.confirm_password_placeholder")}
@@ -236,16 +221,16 @@ export function ResetSection(props: {
       <PrimaryButton
         onPress={() => void (isConfirm ? props.onSubmitConfirm() : props.onSubmitRequest())}
         disabled={props.loading}
-        label={props.loading ? "Submitting..." : isConfirm ? "Save new password" : "Request reset"}
+        label={props.loading ? t("auth.reset_request_submitting") : isConfirm ? t("auth.reset_confirm_submit") : t("auth.reset_request_submit")}
       />
       <View style={{ flexDirection: "row", justifyContent: "space-between", gap: 12, paddingTop: 4 }}>
         {!props.tokenProvided && (
           <InlineLink
-            label={isConfirm ? "Back to request reset" : "Have a token? Enter it manually"}
+            label={isConfirm ? t("auth.back_to_reset_request") : t("auth.have_token")}
             onPress={() => props.onChangeMode(isConfirm ? "request" : "confirm")}
           />
         )}
-        <InlineLink label="Back to sign in" onPress={props.onBackToSignIn} tone="muted" />
+        <InlineLink label={t("auth.back_to_signin")} onPress={props.onBackToSignIn} tone="muted" />
       </View>
     </AuthCard>
   );
