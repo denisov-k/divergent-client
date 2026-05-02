@@ -2,6 +2,7 @@
   "platforms": ["apple"],
   "apple": {
     "modules": ["DivergentTelegramLoginModule"],
-    "appDelegateSubscribers": ["DivergentTelegramLoginAppDelegateSubscriber"]
+    "appDelegateSubscribers": ["DivergentTelegramLoginAppDelegateSubscriber"],
+    "podspecPath": "ios/DivergentTelegramLogin.podspec"
   }
 }
