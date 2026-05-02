@@ -12,7 +12,7 @@ import {
   SignUpSection,
 } from "@/components/native/auth-screen/Sections";
 import { buildNativeRouteUrl } from "@/platform/appUrl.native";
-import { openAuthSession } from "@/platform/authSession.native";
+import { openAuthSession } from "@/platform/authSession";
 import { writeSessionToken } from "@/platform/session";
 import { createTelegramLoginUrl } from "@/platform/telegram";
 import { useAppStore } from "@/stores/useAppStore";
@@ -193,12 +193,20 @@ export default function NativeAuthRoot() {
   };
 
   const startTelegramSignIn = async () => {
-    const loginUrl = createTelegramLoginUrl("/");
-    const redirectUrl = buildNativeRouteUrl("/signin");
-    const result = await openAuthSession(loginUrl, redirectUrl);
+    try {
+      setSignInError(undefined);
+      setSignInSuccess(undefined);
 
-    if (result.type === "success" && "url" in result && result.url) {
-      applyLink(result.url);
+      const loginUrl = createTelegramLoginUrl("/");
+      const redirectUrl = buildNativeRouteUrl("/signin");
+      const result = await openAuthSession(loginUrl, redirectUrl);
+
+      if (result.type === "success" && "url" in result && result.url) {
+        applyLink(result.url);
+      }
+    } catch (error) {
+      console.error(error);
+      setSignInError(error instanceof Error ? error.message : "Telegram sign in failed to start.");
     }
   };
 
