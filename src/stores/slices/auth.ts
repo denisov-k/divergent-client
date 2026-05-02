@@ -3,15 +3,24 @@ import { loadAppData } from "@/shared/app/loadAppData";
 import { clearSessionToken } from "@/platform/session";
 import type { AuthSlice, StoreSlice } from "@/stores/types";
 
+async function hydrateAppData(set: Parameters<StoreSlice<AuthSlice>>[0]) {
+  try {
+    set(await loadAppData());
+  } catch (err) {
+    console.error(err);
+  }
+}
+
 async function finalizeAuthenticatedState(set: Parameters<StoreSlice<AuthSlice>>[0]) {
   const user = await api.fetchUser();
 
   set({
     user,
     token: null,
-    ...(await loadAppData()),
     initialized: true,
   });
+
+  await hydrateAppData(set);
 }
 
 export const createAuthSlice: StoreSlice<AuthSlice> = (set, get) => ({
@@ -104,10 +113,10 @@ export const createAuthSlice: StoreSlice<AuthSlice> = (set, get) => ({
     set({ loading: true });
     try {
       const user = await api.fetchUser();
-      set({ user });
+      set({ user, initialized: true });
 
       if (user) {
-        set(await loadAppData());
+        await hydrateAppData(set);
       }
     } catch (err) {
       console.error(err);

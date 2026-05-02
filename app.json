@@ -4,10 +4,10 @@
     "slug": "divergent-client",
     "scheme": "divergent",
     "android": {
-      "package": "com.anonymous.divergentclient"
+      "package": "com.spritemedia.divergent"
     },
     "ios": {
-      "bundleIdentifier": "com.anonymous.divergentclient",
+      "bundleIdentifier": "com.spritemedia.divergent",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
       }

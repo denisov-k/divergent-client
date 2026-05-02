@@ -17,6 +17,15 @@ import type {
 
 const API_TIMEOUT_MS = 15000;
 
+function isPublicAuthRoute(url: string) {
+  return (
+    url === "/api/auth/login" ||
+    url === "/api/auth/register" ||
+    url === "/api/auth/password-reset/request" ||
+    url === "/api/auth/password-reset/confirm"
+  );
+}
+
 function normalizeFriend(friend: Partial<FriendSummary> & { id: string; name: string; level: number; currentXp: number }): FriendSummary {
   return {
     id: friend.id,
@@ -34,7 +43,8 @@ function normalizeFriend(friend: Partial<FriendSummary> & { id: string; name: st
 async function fetchJSON(url: string, options: RequestInit = {}) {
   const isFormData = options.body instanceof FormData;
   const baseUrl = Config.data.api.http.baseURL;
-  const sessionToken = await readSessionToken();
+  const publicAuthRoute = isPublicAuthRoute(url);
+  const sessionToken = publicAuthRoute ? null : await readSessionToken();
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), API_TIMEOUT_MS);
 
@@ -42,7 +52,7 @@ async function fetchJSON(url: string, options: RequestInit = {}) {
   try {
     res = await fetch(baseUrl + url, {
       ...options,
-      credentials: "include",
+      credentials: publicAuthRoute ? "omit" : "include",
       signal: controller.signal,
       headers: {
         ...(baseUrl.includes("ngrok-free.dev") ? { "ngrok-skip-browser-warning": "true" } : {}),
