@@ -11,7 +11,6 @@ import {
   SignInSection,
   SignUpSection,
 } from "@/components/native/auth-screen/Sections";
-import * as api from "@/shared/api/client";
 import { buildNativeRouteUrl } from "@/platform/appUrl.native";
 import { openAuthSession } from "@/platform/authSession";
 import {
@@ -28,6 +27,7 @@ export default function NativeAuthRoot() {
   const {
     loading,
     loginWithCredentials,
+    loginWithTelegramIdToken,
     signup,
     passwordReset,
     confirmPasswordReset,
@@ -207,8 +207,7 @@ export default function NativeAuthRoot() {
 
       if (isNativeTelegramLoginSupported()) {
         const result = await loginWithNativeTelegram();
-        await api.loginWithTelegramIdToken(result.idToken);
-        await refreshUser();
+        await loginWithTelegramIdToken(result.idToken);
         return;
       }
 

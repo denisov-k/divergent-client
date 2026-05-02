@@ -53,6 +53,19 @@ export const createAuthSlice: StoreSlice<AuthSlice> = (set, get) => ({
     }
   },
 
+  loginWithTelegramIdToken: async (idToken: string) => {
+    set({ loading: true });
+    try {
+      await api.loginWithTelegramIdToken(idToken);
+      await finalizeAuthenticatedState(set);
+    } catch (err) {
+      console.error(err);
+      throw err;
+    } finally {
+      set({ loading: false });
+    }
+  },
+
   signOut: async () => {
     set({ loading: true });
     try {

@@ -37,6 +37,7 @@ export interface AppStoreState {
 export interface AuthSlice {
   initialize: () => Promise<void>;
   loginWithCredentials: (email: string, password: string) => Promise<void>;
+  loginWithTelegramIdToken: (idToken: string) => Promise<void>;
   signup: (
     email: string,
     password: string,
