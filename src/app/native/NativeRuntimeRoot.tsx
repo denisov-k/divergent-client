@@ -1,6 +1,8 @@
-import { ActivityIndicator, View } from "react-native";
+import { useEffect } from "react";
+import { ActivityIndicator, Alert, View } from "react-native";
 
 import { useAppBootstrap } from "@/app/useAppBootstrap";
+import { consumeLastNativeFatalError } from "@/platform/nativeDiagnostics";
 import { appPalette } from "@/theme/palette";
 import NativeAppShell from "@/views/native/AppShell";
 import NativeAuthRoot from "@/views/native/auth/NativeAuthRoot";
@@ -38,6 +40,21 @@ export function NativeRuntimeRoot({
   ready?: boolean;
 }) {
   const { initialized, user } = useAppBootstrap();
+
+  useEffect(() => {
+    if (!ready || !initialized) {
+      return;
+    }
+
+    void (async () => {
+      const lastFatalError = await consumeLastNativeFatalError();
+      if (!lastFatalError) {
+        return;
+      }
+
+      Alert.alert("Last native fatal error", lastFatalError);
+    })();
+  }, [initialized, ready]);
 
   if (!ready || !initialized) {
     return <NativeLoadingScreen mode={mode} />;

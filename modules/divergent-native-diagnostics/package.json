@@ -1,0 +1,15 @@
+{
+  "name": "@divergent/native-diagnostics",
+  "version": "0.0.1",
+  "private": true,
+  "description": "Local Expo module for iOS fatal React Native diagnostics",
+  "main": "index.js",
+  "license": "MIT",
+  "peerDependencies": {
+    "expo": "*",
+    "react-native": "*"
+  },
+  "dependencies": {
+    "expo-modules-core": "*"
+  }
+}

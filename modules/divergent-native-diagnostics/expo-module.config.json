@@ -1,0 +1,8 @@
+{
+  "platforms": ["apple"],
+  "apple": {
+    "modules": ["DivergentNativeDiagnosticsModule"],
+    "appDelegateSubscribers": ["DivergentNativeDiagnosticsAppDelegateSubscriber"],
+    "podspecPath": "ios/DivergentNativeDiagnostics.podspec"
+  }
+}

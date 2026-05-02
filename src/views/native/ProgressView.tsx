@@ -3,7 +3,6 @@ import { ScrollView, View } from "react-native";
 import { useTranslation } from "react-i18next";
 
 import { Target, Trophy, Zap } from "@/components/native/Icons";
-import { NativePeriodCalendar } from "@/components/native/NativePeriodCalendar";
 import {
   ProgressCategoriesSection,
   ProgressGoalPickerModal,
@@ -19,7 +18,7 @@ export default function NativeProgressScreenView(props: { goalId?: string | null
   const { t } = useTranslation();
   const [goalId, setGoalId] = useState<string | null>(props.goalId || null);
   const [pickerOpen, setPickerOpen] = useState(false);
-  const { goals, rewards, selectedGoal, filteredGoals, xp, activity, loadingActivity, completedGoals, categoryData, weeklyXpData, streakDays } = useProgressScreen(goalId);
+  const { goals, rewards, selectedGoal, filteredGoals, xp, activity, completedGoals, categoryData, weeklyXpData, streakDays } = useProgressScreen(goalId);
 
   useEffect(() => {
     if (props.goalId === undefined) return;
@@ -39,8 +38,6 @@ export default function NativeProgressScreenView(props: { goalId?: string | null
       <ProgressHeader title={t("progress.title")} selectedLabel={selectedLabel} onOpenPicker={() => setPickerOpen(true)} />
 
       <ScrollView contentContainerStyle={{ paddingHorizontal: 8, gap: 8 }}>
-        {selectedGoal && selectedGoal.goalType === "TASK" && activity && <NativePeriodCalendar goal={selectedGoal} activity={activity} loading={loadingActivity} />}
-
         <View style={{ gap: 8 }}>
           {selectedGoal && <ProgressStatCard title={t("progress.goal_xp")} value={xp} description={t("progress.goal_xp_description")} icon={<Zap size={20} color={appPalette.semantic.textMuted} />} />}
           {!selectedGoal && <ProgressStatCard title={t("progress.completed_goals")} value={completedGoals} description={t("progress.completed_goals_description", { count: filteredGoals.length })} icon={<Target size={20} color={appPalette.semantic.textMuted} />} />}
