@@ -19,12 +19,20 @@ final class DivergentNativeDiagnosticsStore {
 
     let previousFatalHandler = RCTGetFatalHandler()
     RCTSetFatalHandler { error in
-      self.persistFatalError(error: error)
+      guard let error else {
+        return
+      }
+
+      self.persistFatalError(error: error as NSError)
       previousFatalHandler?(error)
     }
 
     let previousExceptionHandler = RCTGetFatalExceptionHandler()
     RCTSetFatalExceptionHandler { exception in
+      guard let exception else {
+        return
+      }
+
       self.persistFatalException(exception)
       previousExceptionHandler?(exception)
     }
