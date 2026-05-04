@@ -32,14 +32,14 @@ export function StreakCard({ currentStreak, longestStreak, streakDays }: StreakC
           <div>
             <div className="flex items-baseline gap-2">
               <span className="text-3xl">{currentStreak}</span>
-              <span className="text-muted-foreground">{t("progress.streak.day", { count: currentStreak })}</span>
+              <span className="text-muted-foreground">{t("progress.streak.day_one", { count: currentStreak })}</span>
             </div>
             <p className="mt-1 text-sm text-muted-foreground">{t("progress.streak.current")}</p>
           </div>
           <div className="text-right">
             <div className="flex items-baseline gap-2">
               <span className="text-xl text-muted-foreground">{longestStreak}</span>
-              <span className="text-sm text-muted-foreground">{t("progress.streak.day", { count: longestStreak })}</span>
+              <span className="text-sm text-muted-foreground">{t("progress.streak.day_one", { count: longestStreak })}</span>
             </div>
             <p className="mt-1 text-sm text-muted-foreground">{t("progress.streak.record")}</p>
           </div>

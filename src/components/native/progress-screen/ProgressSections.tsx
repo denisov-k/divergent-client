@@ -68,7 +68,7 @@ export function ProgressStreakSection({
         <View style={{ flex: 1 }}>
           <View style={{ flexDirection: "row", alignItems: "baseline", gap: 8 }}>
             <Text style={{ color: appPalette.semantic.textStrong, fontSize: 30, fontWeight: "500", lineHeight: 36, fontFamily: "Montserrat" }}>{current}</Text>
-            <Text style={{ color: appPalette.semantic.textMuted, fontSize: 12, fontWeight: "400", lineHeight: 18, fontFamily: "Montserrat" }}>{t("progress.streak.day", { count: current })}</Text>
+            <Text style={{ color: appPalette.semantic.textMuted, fontSize: 12, fontWeight: "400", lineHeight: 18, fontFamily: "Montserrat" }}>{t("progress.streak.day_one", { count: current })}</Text>
           </View>
           <Text style={{ color: appPalette.semantic.textMuted, fontSize: 12, fontWeight: "400", lineHeight: 18, fontFamily: "Montserrat" }}>{t("progress.streak.current")}</Text>
         </View>
@@ -76,7 +76,7 @@ export function ProgressStreakSection({
         <View style={{ flex: 1, alignItems: "flex-end" }}>
           <View style={{ flexDirection: "row", alignItems: "baseline", gap: 8 }}>
             <Text style={{ color: appPalette.semantic.textMuted, fontSize: 24, fontWeight: "500", lineHeight: 30, fontFamily: "Montserrat" }}>{longest}</Text>
-            <Text style={{ color: appPalette.semantic.textMuted, fontSize: 12, fontWeight: "400", lineHeight: 18, fontFamily: "Montserrat" }}>{t("progress.streak.day", { count: longest })}</Text>
+            <Text style={{ color: appPalette.semantic.textMuted, fontSize: 12, fontWeight: "400", lineHeight: 18, fontFamily: "Montserrat" }}>{t("progress.streak.day_one", { count: longest })}</Text>
           </View>
           <Text style={{ color: appPalette.semantic.textMuted, fontSize: 12, fontWeight: "400", lineHeight: 18, fontFamily: "Montserrat" }}>{t("progress.streak.record")}</Text>
         </View>
