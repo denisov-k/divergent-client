@@ -5,6 +5,7 @@ import { useTranslation } from "react-i18next";
 import { EmptyStateCard } from "@/components/native/EmptyStateCard";
 import { NativeGoalCardView } from "@/components/native/NativeGoalCardView";
 import { Plus, Sparkles } from "@/components/native/Icons";
+import { AppLoader } from "@/components/shared/AppLoader";
 import { appPalette } from "@/theme/palette";
 import type { CategoryOption, Goal, Reward } from "@/types";
 
@@ -99,6 +100,7 @@ export function GoalsScreenHeader({
 }
 
 export function GoalsScreenContent({
+  loading,
   goals,
   rewards,
   categories,
@@ -111,6 +113,7 @@ export function GoalsScreenContent({
   onAddProgress,
   onGoToProgress,
 }: {
+  loading: boolean;
   goals: Goal[];
   rewards: Reward[];
   categories: CategoryOption[];
@@ -139,6 +142,16 @@ export function GoalsScreenContent({
 
     scrollRef.current?.scrollTo({ y: Math.max(y - 12, 0), animated: true });
   }, [focusedGoalId, itemOffsets]);
+
+  const showInitialLoading = loading && goals.length === 0;
+
+  if (showInitialLoading) {
+    return (
+      <View style={{ flex: 1, paddingHorizontal: 8 }}>
+        <AppLoader fullScreen />
+      </View>
+    );
+  }
 
   return (
       <ScrollView ref={scrollRef} contentContainerStyle={{ paddingHorizontal: 8, gap: 8 }}>

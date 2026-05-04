@@ -49,7 +49,7 @@ export function ProgressRing({ progress, size = 60, strokeWidth = 4 }: ProgressR
           justifyContent: "center",
         }}
       >
-        <Text style={{ color: appPalette.semantic.textStrong, fontWeight: "700", fontSize: 12, fontFamily: "Montserrat" }}>
+        <Text style={{ color: appPalette.semantic.textStrong, fontWeight: "400", fontSize: 12, fontFamily: "Montserrat" }}>
           {Math.round(normalizedProgress)}%
         </Text>
       </View>

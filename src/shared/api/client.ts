@@ -3,6 +3,7 @@ import { readDownloadResponse } from "@/platform/download";
 import { clearSessionToken, readSessionToken, writeSessionToken } from "@/platform/session";
 import { createReportUploadBody } from "@/platform/upload";
 import type {
+  AIChatResponse,
   Challenge,
   ChallengeApi,
   ChallengeInput,
@@ -17,6 +18,18 @@ import type {
 
 const API_TIMEOUT_MS = 15000;
 const AI_API_TIMEOUT_MS = 180000;
+const AI_JOB_POLL_INTERVAL_MS = 1500;
+
+type AIChatJobStatus = "pending" | "running" | "completed" | "failed";
+
+type AIChatJobResponse = {
+  id: string;
+  status: AIChatJobStatus;
+  createdAt: string;
+  updatedAt: string;
+  result?: AIChatResponse;
+  error?: string;
+};
 
 function isPublicAuthRoute(url: string) {
   return (
@@ -103,6 +116,10 @@ async function fetchJSON(url: string, options: FetchJSONOptions = {}) {
   }
 
   return res.json();
+}
+
+function sleep(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 export async function loginWithCredentials(email: string, password: string) {
@@ -243,11 +260,30 @@ export async function kickParticipant(challengeId: string, userId: string) {
 }
 
 export async function chatAI(message: string) {
-  return await fetchJSON(`/api/ai/chat`, {
+  const job = (await fetchJSON(`/api/ai/chat`, {
     method: "POST",
     body: JSON.stringify({ message }),
-    timeoutMs: AI_API_TIMEOUT_MS,
-  });
+  })) as AIChatJobResponse;
+
+  const startedAt = Date.now();
+
+  while (Date.now() - startedAt < AI_API_TIMEOUT_MS) {
+    const currentJob = (await fetchJSON(`/api/ai/chat/${job.id}`, {
+      method: "GET",
+    })) as AIChatJobResponse;
+
+    if (currentJob.status === "completed" && currentJob.result) {
+      return currentJob.result;
+    }
+
+    if (currentJob.status === "failed") {
+      throw new Error(currentJob.error || "AI request failed");
+    }
+
+    await sleep(AI_JOB_POLL_INTERVAL_MS);
+  }
+
+  throw new Error("AI job timed out");
 }
 
 export async function getChatHistory() {

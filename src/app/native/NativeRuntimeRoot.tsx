@@ -1,9 +1,9 @@
 import { useEffect } from "react";
-import { ActivityIndicator, Alert, View } from "react-native";
+import { Alert } from "react-native";
 
 import { useAppBootstrap } from "@/app/useAppBootstrap";
+import { AppLoader } from "@/components/shared/AppLoader";
 import { consumeLastNativeFatalError } from "@/platform/nativeDiagnostics";
-import { appPalette } from "@/theme/palette";
 import NativeAppShell from "@/views/native/AppShell";
 import NativeAuthRoot from "@/views/native/auth/NativeAuthRoot";
 
@@ -12,20 +12,7 @@ type NativeRuntimeMode = "preview" | "standalone";
 function NativeLoadingScreen({ mode }: { mode: NativeRuntimeMode }) {
   void mode;
 
-  return (
-    <View
-      style={{
-        flex: 1,
-        backgroundColor: appPalette.surface.background,
-        alignItems: "center",
-        justifyContent: "center",
-        paddingHorizontal: 24,
-        gap: 16,
-      }}
-    >
-      <ActivityIndicator size="large" color={appPalette.brand.primary} />
-    </View>
-  );
+  return <AppLoader fullScreen />;
 }
 
 function NativeAuthScreen() {

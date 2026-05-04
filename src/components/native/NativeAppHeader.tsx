@@ -49,20 +49,20 @@ export function NativeAppHeader({
           {user.photoUrl ? (
             <Image
               source={{ uri: user.photoUrl }}
-              style={{ width: 56, height: 56, borderRadius: 28, backgroundColor: appPalette.semantic.borderSubtle }}
+              style={{ width: 64, height: 64, borderRadius: 32, backgroundColor: appPalette.semantic.borderSubtle }}
             />
           ) : (
             <View
               style={{
-                width: 56,
-                height: 56,
-                borderRadius: 28,
+                width: 64,
+                height: 64,
+                borderRadius: 32,
                 backgroundColor: appPalette.semantic.infoSurface,
                 alignItems: "center",
                 justifyContent: "center",
               }}
             >
-              <Text style={{ color: appPalette.semantic.infoText, fontSize: 19, fontWeight: "500", fontFamily: "Montserrat", lineHeight: 29 }}>{initials}</Text>
+              <Text style={{ color: appPalette.semantic.infoText, fontSize: 21, fontWeight: "500", fontFamily: "Montserrat", lineHeight: 29 }}>{initials}</Text>
             </View>
           )}
 

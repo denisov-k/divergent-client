@@ -10,6 +10,7 @@ export default function NativeGoalsScreen(props: {
   onConsumeLinkState?: () => void;
 }) {
   const {
+    loading,
     goals,
     rewards,
     categories,
@@ -38,6 +39,7 @@ export default function NativeGoalsScreen(props: {
       <GoalsScreenHeader onCreate={openCreateGoal} onOpenAi={() => setAiOpen(true)} />
 
       <GoalsScreenContent
+        loading={loading}
         goals={goals}
         rewards={rewards}
         categories={categories}

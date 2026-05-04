@@ -6,6 +6,7 @@ import { NativeNavigationProvider } from "@/app/native/NativeNavigation";
 import { parseNativeAppRoute, type NativeAppTab } from "@/app/router.native";
 import { NativeAppHeader } from "@/components/native/NativeAppHeader";
 import { BarChart2, Bell, Gift, Swords, Target } from "@/components/native/Icons";
+import { AppLoader } from "@/components/shared/AppLoader";
 import { useAppStore } from "@/stores/useAppStore";
 import { appPalette } from "@/theme/palette";
 
@@ -17,13 +18,7 @@ const NativeRewardsScreen = lazy(() => import("@/views/native/rewards"));
 const NativeSettingsScreen = lazy(() => import("@/views/native/settings"));
 
 function NativeScreenFallback() {
-  return (
-    <View style={{ flex: 1, alignItems: "center", justifyContent: "center", backgroundColor: appPalette.surface.background }}>
-      <Text style={{ color: appPalette.semantic.textMuted, fontFamily: "Montserrat", fontSize: 12, lineHeight: 18 }}>
-        Loading...
-      </Text>
-    </View>
-  );
+  return <AppLoader fullScreen />;
 }
 
 function syncPreviewUrl(state: ReturnType<typeof parseNativeAppRoute>) {

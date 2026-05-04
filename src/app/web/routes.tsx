@@ -1,6 +1,7 @@
 ﻿import { Suspense, lazy, type ReactNode } from "react";
 import { Route } from "react-router-dom";
 
+import { AppLoader } from "@/components/shared/AppLoader";
 import { ProtectedRoute } from "@/components/shared/ProtectedRoute";
 import Footer from "@/layout/Footer";
 import Header from "@/layout/Header";
@@ -19,7 +20,7 @@ const RewardsView = lazy(() => import("@/views/web/rewards"));
 const SettingsView = lazy(() => import("@/views/web/settings"));
 
 function RouteFallback() {
-  return <div className="flex min-h-[40vh] items-center justify-center text-sm text-muted-foreground">Loading...</div>;
+  return <AppLoader />;
 }
 
 function withSuspense(component: ReactNode) {

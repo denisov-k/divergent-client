@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Modal, ScrollView, Text, TextInput, View } from "react-native";
 
@@ -16,6 +16,19 @@ export function AiChatSheet({ open, onOpenChange, onDraftAdded }: { open: boolea
   const [history, setHistory] = useState<ChatMessage[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const scrollRef = useRef<ScrollView>(null);
+
+  useEffect(() => {
+    if (!open || history.length === 0) {
+      return;
+    }
+
+    const frameId = requestAnimationFrame(() => {
+      scrollRef.current?.scrollToEnd({ animated: true });
+    });
+
+    return () => cancelAnimationFrame(frameId);
+  }, [history, open]);
 
   useEffect(() => {
     if (!open) {
@@ -79,7 +92,13 @@ export function AiChatSheet({ open, onOpenChange, onDraftAdded }: { open: boolea
             <Text style={{ fontSize: 20, fontWeight: "700", color: appPalette.semantic.textStrong, fontFamily: "Montserrat" }}>{t("ai.goal_sheet_title")}</Text>
             <Text style={{ color: appPalette.semantic.textMuted, fontFamily: "Montserrat", fontSize: 12, lineHeight: 18 }}>{t("ai.goal_sheet_description")}</Text>
           </View>
-          <ScrollView contentContainerStyle={{ gap: 10, paddingBottom: 4 }}>
+          <ScrollView
+            ref={scrollRef}
+            contentContainerStyle={{ gap: 10, paddingBottom: 4 }}
+            onContentSizeChange={() => {
+              scrollRef.current?.scrollToEnd({ animated: true });
+            }}
+          >
             {history.map((message, index) => (
               <AiChatMessageCard key={`${message.id ?? message.role}-${index}`} message={message} messageId={message.id} onDraftAdded={handleGoalAdded} />
             ))}

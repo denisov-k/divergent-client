@@ -18,6 +18,7 @@ export default function GoalsScreen() {
   const focusId = searchParams.get("id");
 
   const {
+    loading,
     goals,
     rewards,
     categories,
@@ -87,6 +88,7 @@ export default function GoalsScreen() {
       <GoalsScreenHeader onCreate={openCreateGoal} onOpenAi={() => setAiOpen(true)} />
 
       <GoalsScreenContent
+        loading={loading}
         goals={goals}
         rewards={rewards}
         focusId={focusId}

@@ -4,7 +4,6 @@ import { Pressable, Text, TextInput, View } from "react-native";
 
 import { useNativeNavigation } from "@/app/native/NativeNavigation";
 import { buildChallengesPath, buildRewardsPath } from "@/app/routes";
-import { ActionChip } from "@/components/native/ActionChip";
 import {
   AlarmClock,
   BarChart2,
@@ -182,8 +181,44 @@ export function GoalNumericProgressInput({ progressDelta, onChangeProgressDelta,
 
   return (
     <View style={{ flexDirection: "row", gap: 8, alignItems: "center" }}>
-      <TextInput value={progressDelta} onChangeText={onChangeProgressDelta} placeholder={t("goals.add_value_placeholder")} keyboardType="numeric" style={{ flex: 1, borderWidth: 1, borderColor: appPalette.semantic.borderStrong, borderRadius: 8, paddingHorizontal: 8, paddingVertical: 6, backgroundColor: appPalette.semantic.textInverse, color: appPalette.semantic.textStrong, fontFamily: "Montserrat", fontSize: 10, lineHeight: 15 }} placeholderTextColor={appPalette.semantic.textSubtle} />
-      <ActionChip onPress={onAddProgress} tone="primary">+</ActionChip>
+      <TextInput
+        value={progressDelta}
+        onChangeText={onChangeProgressDelta}
+        placeholder={t("goals.add_value_placeholder")}
+        keyboardType="numeric"
+        style={{
+          flex: 1,
+          minHeight: 40,
+          borderWidth: 1,
+          borderColor: appPalette.semantic.borderStrong,
+          borderRadius: 8,
+          paddingHorizontal: 12,
+          paddingVertical: 8,
+          backgroundColor: appPalette.semantic.textInverse,
+          color: appPalette.semantic.textStrong,
+          fontFamily: "Montserrat",
+          fontSize: 12,
+          lineHeight: 18,
+        }}
+        placeholderTextColor={appPalette.semantic.textSubtle}
+      />
+      <Pressable
+        onPress={onAddProgress}
+        style={{
+          minHeight: 40,
+          minWidth: 40,
+          borderRadius: 10,
+          paddingHorizontal: 12,
+          paddingVertical: 8,
+          borderWidth: 1,
+          borderColor: appPalette.semantic.infoBorder,
+          backgroundColor: appPalette.semantic.infoSurface,
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        <Text style={{ color: appPalette.semantic.infoText, fontWeight: "500", fontSize: 16, lineHeight: 18, fontFamily: "Montserrat" }}>+</Text>
+      </Pressable>
     </View>
   );
 }

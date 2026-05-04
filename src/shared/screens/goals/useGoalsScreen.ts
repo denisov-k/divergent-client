@@ -25,6 +25,7 @@ export function useGoalsScreen(
   } = {},
 ) {
   const {
+    loading,
     goals,
     addGoal,
     updateGoal,
@@ -163,6 +164,7 @@ export function useGoalsScreen(
   };
 
   return {
+    loading,
     goals,
     rewards,
     categories,

@@ -1,6 +1,7 @@
 import { Plus, Sparkles } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
+import { AppLoader } from "@/components/shared/AppLoader";
 import { GoalCard } from "@/components/web/goals/GoalCard";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -33,6 +34,7 @@ export function GoalsScreenHeader({
 }
 
 export function GoalsScreenContent({
+  loading,
   goals,
   rewards,
   focusId,
@@ -43,6 +45,7 @@ export function GoalsScreenContent({
   onAddProgress,
   onGoToProgress,
 }: {
+  loading: boolean;
   goals: Goal[];
   rewards: Reward[];
   focusId?: string | null;
@@ -54,6 +57,13 @@ export function GoalsScreenContent({
   onGoToProgress: (id: string) => void;
 }) {
   const { t } = useTranslation();
+  const showInitialLoading = loading && goals.length === 0;
+
+  if (showInitialLoading) {
+    return (
+      <AppLoader fullScreen />
+    );
+  }
 
   if (goals.length === 0) {
     return (
