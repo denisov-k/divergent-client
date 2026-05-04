@@ -8,6 +8,20 @@ import type { Goal } from "@/types";
 
 import { WeeklyXpChart } from "./WeeklyXpChart";
 
+function getStreakDayLabel(count: number, language: string, t: (key: string) => string) {
+  const category = new Intl.PluralRules(language.startsWith("ru") ? "ru" : "en").select(count);
+
+  if (category === "one") {
+    return t("progress.streak.day_one");
+  }
+
+  if (category === "few") {
+    return t("progress.streak.day_few");
+  }
+
+  return t("progress.streak.day_many");
+}
+
 export function ProgressHeader({
   title,
   selectedLabel,
@@ -55,7 +69,9 @@ export function ProgressStreakSection({
   longest: number;
   days: boolean[];
 }) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const currentDayLabel = getStreakDayLabel(current, i18n.language, t);
+  const longestDayLabel = getStreakDayLabel(longest, i18n.language, t);
 
   return (
     <SurfaceCard gap={16} padding={16} radius={12}>
@@ -68,7 +84,7 @@ export function ProgressStreakSection({
         <View style={{ flex: 1 }}>
           <View style={{ flexDirection: "row", alignItems: "baseline", gap: 8 }}>
             <Text style={{ color: appPalette.semantic.textStrong, fontSize: 30, fontWeight: "500", lineHeight: 36, fontFamily: "Montserrat" }}>{current}</Text>
-            <Text style={{ color: appPalette.semantic.textMuted, fontSize: 12, fontWeight: "400", lineHeight: 18, fontFamily: "Montserrat" }}>{t("progress.streak.day_one", { count: current })}</Text>
+            <Text style={{ color: appPalette.semantic.textMuted, fontSize: 12, fontWeight: "400", lineHeight: 18, fontFamily: "Montserrat" }}>{currentDayLabel}</Text>
           </View>
           <Text style={{ color: appPalette.semantic.textMuted, fontSize: 12, fontWeight: "400", lineHeight: 18, fontFamily: "Montserrat" }}>{t("progress.streak.current")}</Text>
         </View>
@@ -76,7 +92,7 @@ export function ProgressStreakSection({
         <View style={{ flex: 1, alignItems: "flex-end" }}>
           <View style={{ flexDirection: "row", alignItems: "baseline", gap: 8 }}>
             <Text style={{ color: appPalette.semantic.textMuted, fontSize: 24, fontWeight: "500", lineHeight: 30, fontFamily: "Montserrat" }}>{longest}</Text>
-            <Text style={{ color: appPalette.semantic.textMuted, fontSize: 12, fontWeight: "400", lineHeight: 18, fontFamily: "Montserrat" }}>{t("progress.streak.day_one", { count: longest })}</Text>
+            <Text style={{ color: appPalette.semantic.textMuted, fontSize: 12, fontWeight: "400", lineHeight: 18, fontFamily: "Montserrat" }}>{longestDayLabel}</Text>
           </View>
           <Text style={{ color: appPalette.semantic.textMuted, fontSize: 12, fontWeight: "400", lineHeight: 18, fontFamily: "Montserrat" }}>{t("progress.streak.record")}</Text>
         </View>

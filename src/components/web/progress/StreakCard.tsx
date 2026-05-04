@@ -7,6 +7,20 @@ import { useTranslation } from "react-i18next";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
+function getStreakDayLabel(count: number, language: string, t: (key: string) => string) {
+  const category = new Intl.PluralRules(language.startsWith("ru") ? "ru" : "en").select(count);
+
+  if (category === "one") {
+    return t("progress.streak.day_one");
+  }
+
+  if (category === "few") {
+    return t("progress.streak.day_few");
+  }
+
+  return t("progress.streak.day_many");
+}
+
 dayjs.extend(isoWeek);
 dayjs.locale("ru");
 
@@ -19,7 +33,9 @@ interface StreakCardProps {
 const today = dayjs();
 
 export function StreakCard({ currentStreak, longestStreak, streakDays }: StreakCardProps) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const currentDayLabel = getStreakDayLabel(currentStreak, i18n.language, t);
+  const longestDayLabel = getStreakDayLabel(longestStreak, i18n.language, t);
 
   return (
     <Card className="mb-2 break-inside-avoid border-orange-200 bg-gradient-to-br from-orange-50/50 to-transparent">
@@ -32,14 +48,14 @@ export function StreakCard({ currentStreak, longestStreak, streakDays }: StreakC
           <div>
             <div className="flex items-baseline gap-2">
               <span className="text-3xl">{currentStreak}</span>
-              <span className="text-muted-foreground">{t("progress.streak.day_one", { count: currentStreak })}</span>
+              <span className="text-muted-foreground">{currentDayLabel}</span>
             </div>
             <p className="mt-1 text-sm text-muted-foreground">{t("progress.streak.current")}</p>
           </div>
           <div className="text-right">
             <div className="flex items-baseline gap-2">
               <span className="text-xl text-muted-foreground">{longestStreak}</span>
-              <span className="text-sm text-muted-foreground">{t("progress.streak.day_one", { count: longestStreak })}</span>
+              <span className="text-sm text-muted-foreground">{longestDayLabel}</span>
             </div>
             <p className="mt-1 text-sm text-muted-foreground">{t("progress.streak.record")}</p>
           </div>
