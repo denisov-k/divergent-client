@@ -2,7 +2,7 @@
   "name": "divergent-client",
   "private": true,
   "type": "module",
-  "version": "0.5.33",
+  "version": "0.5.34",
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
@@ -37,6 +37,7 @@
     "expo-document-picker": "^55.0.13",
     "expo-file-system": "^55.0.17",
     "expo-font": "^55.0.6",
+    "expo-haptics": "^55.0.14",
     "expo-secure-store": "^55.0.13",
     "expo-sharing": "^55.0.18",
     "expo-web-browser": "^55.0.14",

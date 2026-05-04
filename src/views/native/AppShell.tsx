@@ -1,6 +1,7 @@
 import { Suspense, lazy, useCallback, useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Linking, Platform, Pressable, SafeAreaView, Text, Vibration, View } from "react-native";
+import * as Haptics from "expo-haptics";
+import { Linking, Platform, Pressable, SafeAreaView, Text, View } from "react-native";
 
 import { NativeNavigationProvider } from "@/app/native/NativeNavigation";
 import { parseNativeAppRoute, type NativeAppTab } from "@/app/router.native";
@@ -26,7 +27,7 @@ function triggerNavigationHaptic() {
     return;
   }
 
-  Vibration.vibrate(2);
+  void Haptics.selectionAsync();
 }
 
 function syncPreviewUrl(state: ReturnType<typeof parseNativeAppRoute>) {
@@ -293,4 +294,3 @@ export default function NativeAppShell({ mode = "standalone" }: { mode?: "previe
     </NativeNavigationProvider>
   );
 }
-
