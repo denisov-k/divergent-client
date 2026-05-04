@@ -26,7 +26,7 @@ function triggerNavigationHaptic() {
     return;
   }
 
-  Vibration.vibrate(10);
+  Vibration.vibrate(2);
 }
 
 function syncPreviewUrl(state: ReturnType<typeof parseNativeAppRoute>) {
