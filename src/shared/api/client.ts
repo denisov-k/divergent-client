@@ -16,6 +16,7 @@ import type {
 } from "@/types";
 
 const API_TIMEOUT_MS = 15000;
+const AI_API_TIMEOUT_MS = 180000;
 
 function isPublicAuthRoute(url: string) {
   return (
@@ -40,25 +41,31 @@ function normalizeFriend(friend: Partial<FriendSummary> & { id: string; name: st
   };
 }
 
-async function fetchJSON(url: string, options: RequestInit = {}) {
+type FetchJSONOptions = RequestInit & {
+  timeoutMs?: number;
+};
+
+async function fetchJSON(url: string, options: FetchJSONOptions = {}) {
+  const { timeoutMs, ...requestOptions } = options;
   const isFormData = options.body instanceof FormData;
   const baseUrl = Config.data.api.http.baseURL;
   const publicAuthRoute = isPublicAuthRoute(url);
   const sessionToken = publicAuthRoute ? null : await readSessionToken();
   const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), API_TIMEOUT_MS);
+  const requestTimeoutMs = timeoutMs ?? API_TIMEOUT_MS;
+  const timeoutId = setTimeout(() => controller.abort(), requestTimeoutMs);
 
   let res: Response;
   try {
     res = await fetch(baseUrl + url, {
-      ...options,
+      ...requestOptions,
       credentials: publicAuthRoute ? "omit" : "include",
       signal: controller.signal,
       headers: {
         ...(baseUrl.includes("ngrok-free.dev") ? { "ngrok-skip-browser-warning": "true" } : {}),
         ...(!isFormData ? { "Content-Type": "application/json" } : {}),
         ...(sessionToken ? { Authorization: `Bearer ${sessionToken}` } : {}),
-        ...(options.headers || {}),
+        ...(requestOptions.headers || {}),
       },
     });
   } catch (error) {
@@ -239,6 +246,7 @@ export async function chatAI(message: string) {
   return await fetchJSON(`/api/ai/chat`, {
     method: "POST",
     body: JSON.stringify({ message }),
+    timeoutMs: AI_API_TIMEOUT_MS,
   });
 }
 
