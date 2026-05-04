@@ -173,7 +173,7 @@ export function ProgressGoalPickerModal({
   const { t } = useTranslation();
 
   return (
-    <Modal visible={open} transparent animationType="fade" onRequestClose={onClose}>
+    <Modal visible={open} transparent animationType="none" onRequestClose={onClose}>
       <Pressable onPress={onClose} style={{ flex: 1, backgroundColor: appPalette.surface.overlay, justifyContent: "center", padding: 20 }}>
         <Pressable onPress={() => {}} style={{ backgroundColor: appPalette.surface.background, borderRadius: 16, padding: 16, gap: 8 }}>
           <Text style={{ color: appPalette.semantic.textStrong, fontSize: 16, fontWeight: "500", lineHeight: 24, fontFamily: "Montserrat" }}>{t("progress.filter_label")}</Text>

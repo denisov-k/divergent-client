@@ -141,7 +141,7 @@ export function AcceptChallengeSheet({
   };
 
   return (
-    <Modal visible={open} transparent animationType="slide" onRequestClose={() => onOpenChange(false)}>
+    <Modal visible={open} transparent animationType="none" onRequestClose={() => onOpenChange(false)}>
       <View style={{ flex: 1, backgroundColor: appPalette.surface.overlay, justifyContent: "flex-end" }}>
         <View
           style={{

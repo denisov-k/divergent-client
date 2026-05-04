@@ -1,8 +1,11 @@
 import { useEffect, useMemo, useState } from "react";
-import { ScrollView, View } from "react-native";
+import { Pressable, ScrollView, Text, View } from "react-native";
 import { useTranslation } from "react-i18next";
 
 import { Target, Trophy, Zap } from "@/components/native/Icons";
+import { NativePeriodCalendar } from "@/components/native/NativePeriodCalendar";
+import { NativeScreenErrorBoundary } from "@/components/native/NativeScreenErrorBoundary";
+import { SurfaceCard } from "@/components/native/SurfaceCard";
 import {
   ProgressCategoriesSection,
   ProgressGoalPickerModal,
@@ -13,12 +16,63 @@ import {
 import { ProgressStatCard } from "@/components/native/progress-screen/ProgressPrimitives";
 import { useProgressScreen } from "@/shared/screens/progress/useProgressScreen";
 import { appPalette } from "@/theme/palette";
+import type { GoalActivity } from "@/types";
 
-export default function NativeProgressScreenView(props: { goalId?: string | null; onConsumeLinkState?: () => void }) {
-  const { t } = useTranslation();
+function ProgressGoalErrorCard({
+  title,
+  description,
+  actionLabel,
+  onPress,
+}: {
+  title: string;
+  description: string;
+  actionLabel: string;
+  onPress: () => void;
+}) {
+  return (
+    <SurfaceCard gap={12} padding={16} radius={12}>
+      <View style={{ gap: 4 }}>
+        <Text style={{ color: appPalette.semantic.textStrong, fontSize: 14, fontWeight: "500", lineHeight: 20, fontFamily: "Montserrat" }}>{title}</Text>
+        <Text style={{ color: appPalette.semantic.textMuted, fontSize: 12, fontWeight: "400", lineHeight: 18, fontFamily: "Montserrat" }}>{description}</Text>
+      </View>
+      <Pressable
+        onPress={onPress}
+        style={{
+          alignSelf: "flex-start",
+          borderRadius: 10,
+          borderWidth: 1,
+          borderColor: appPalette.semantic.infoBorder,
+          backgroundColor: appPalette.semantic.infoSurface,
+          paddingHorizontal: 12,
+          paddingVertical: 10,
+        }}
+      >
+        <Text style={{ color: appPalette.semantic.infoText, fontSize: 12, fontWeight: "500", lineHeight: 18, fontFamily: "Montserrat" }}>{actionLabel}</Text>
+      </Pressable>
+    </SurfaceCard>
+  );
+}
+
+function NativeProgressScreenContent(props: { goalId?: string | null; onConsumeLinkState?: () => void }) {
+  const { t, i18n } = useTranslation();
   const [goalId, setGoalId] = useState<string | null>(props.goalId || null);
   const [pickerOpen, setPickerOpen] = useState(false);
-  const { goals, rewards, selectedGoal, filteredGoals, xp, activity, completedGoals, categoryData, weeklyXpData, streakDays } = useProgressScreen(goalId);
+  const {
+    goals,
+    rewards,
+    selectedGoal,
+    filteredGoals,
+    xp,
+    activity,
+    loadingActivity,
+    xpError,
+    activityError,
+    completedGoals,
+    categoryData,
+    weeklyXpData,
+    streakDays,
+    retryGoalMetrics,
+  } = useProgressScreen(goalId);
 
   useEffect(() => {
     if (props.goalId === undefined) return;
@@ -32,6 +86,23 @@ export default function NativeProgressScreenView(props: { goalId?: string | null
     [activity, streakDays]
   );
   const selectedLabel = selectedGoal?.title || t("progress.all_goals");
+  const progressLoadErrorDescription = i18n.language?.startsWith("ru")
+    ? "Не удалось загрузить прогресс по этой цели. Попробуй повторить запрос ещё раз."
+    : "Couldn't load progress for this goal. Try requesting it again.";
+  const retryLabel = i18n.language?.startsWith("ru") ? "Повторить" : "Retry";
+  const taskGoalFallbackActivity = useMemo<GoalActivity | null>(() => {
+    if (!selectedGoal || selectedGoal.goalType !== "TASK") {
+      return null;
+    }
+
+    return activity ?? {
+      currentStreak: 0,
+      longestStreak: 0,
+      period: selectedGoal.goalPeriod,
+      data: [],
+    };
+  }, [activity, selectedGoal]);
+  const showTaskGoalError = !!selectedGoal && selectedGoal.goalType === "TASK" && (xpError || activityError);
 
   return (
     <View style={{ flex: 1, backgroundColor: appPalette.surface.background }}>
@@ -43,6 +114,19 @@ export default function NativeProgressScreenView(props: { goalId?: string | null
           {!selectedGoal && <ProgressStatCard title={t("progress.completed_goals")} value={completedGoals} description={t("progress.completed_goals_description", { count: filteredGoals.length })} icon={<Target size={20} color={appPalette.semantic.textMuted} />} />}
           {!selectedGoal && <ProgressStatCard title={t("progress.rewards_received")} value={unlockedRewards} description={t("progress.rewards_received_description", { count: rewards.length })} icon={<Trophy size={20} color={appPalette.semantic.textMuted} />} />}
         </View>
+
+        {selectedGoal && selectedGoal.goalType === "TASK" && taskGoalFallbackActivity && (
+          <NativePeriodCalendar goal={selectedGoal} activity={taskGoalFallbackActivity} loading={loadingActivity} />
+        )}
+
+        {showTaskGoalError && (
+          <ProgressGoalErrorCard
+            title={t("progress.activity_widget_title")}
+            description={progressLoadErrorDescription}
+            actionLabel={retryLabel}
+            onPress={retryGoalMetrics}
+          />
+        )}
 
         {selectedGoal && selectedGoal.goalType === "TASK" && streakMeta && (
           <ProgressStreakSection current={streakMeta.current} longest={streakMeta.longest} days={streakMeta.days} />
@@ -64,5 +148,27 @@ export default function NativeProgressScreenView(props: { goalId?: string | null
         }}
       />
     </View>
+  );
+}
+
+export default function NativeProgressScreenView(props: { goalId?: string | null; onConsumeLinkState?: () => void }) {
+  const { t, i18n } = useTranslation();
+  const [boundaryKey, setBoundaryKey] = useState(0);
+  const fallbackMessage = i18n.language?.startsWith("ru")
+    ? "Экран прогресса временно не удалось отрисовать. Сбросим выбор цели и откроем безопасное состояние."
+    : "The progress screen couldn't be rendered right now. We'll reset the selected goal and reopen a safe state.";
+
+  return (
+    <NativeScreenErrorBoundary
+      key={boundaryKey}
+      title={t("progress.title")}
+      message={fallbackMessage}
+      resetLabel={t("progress.all_goals")}
+      onReset={() => {
+        setBoundaryKey((value) => value + 1);
+      }}
+    >
+      <NativeProgressScreenContent {...props} />
+    </NativeScreenErrorBoundary>
   );
 }

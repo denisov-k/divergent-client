@@ -113,7 +113,7 @@ function CalendarModal(props: {
   const weekdayLabels = ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"];
 
   return (
-    <Modal visible={props.open} transparent animationType="fade" onRequestClose={props.onClose}>
+    <Modal visible={props.open} transparent animationType="none" onRequestClose={props.onClose}>
       <View style={{ flex: 1, backgroundColor: appPalette.surface.overlay, justifyContent: "center", padding: 20 }}>
         <View style={{ backgroundColor: appPalette.surface.background, borderRadius: 20, padding: 16, gap: 12 }}>
           <Text style={{ color: appPalette.semantic.textStrong, fontSize: 18, fontWeight: "600", fontFamily: "Montserrat" }}>
@@ -269,7 +269,7 @@ function GoalsMultiSelectModal(props: {
   const { t } = useTranslation();
 
   return (
-    <Modal visible={props.open} transparent animationType="fade" onRequestClose={props.onClose}>
+    <Modal visible={props.open} transparent animationType="none" onRequestClose={props.onClose}>
       <View style={{ flex: 1, backgroundColor: appPalette.surface.overlay, justifyContent: "center", padding: 20 }}>
         <View
           style={{

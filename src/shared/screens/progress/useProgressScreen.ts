@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import dayjs from "dayjs";
 
@@ -12,6 +12,9 @@ export function useProgressScreen(goalId?: string | null) {
   const [xp, setXp] = useState<number>(0);
   const [activity, setActivity] = useState<GoalActivity>();
   const [loadingActivity, setLoadingActivity] = useState(false);
+  const [xpError, setXpError] = useState(false);
+  const [activityError, setActivityError] = useState(false);
+  const [reloadKey, setReloadKey] = useState(0);
 
   const selectedGoal = useMemo(() => goals.find((goal) => goal.id === goalId), [goals, goalId]);
   const filteredGoals = useMemo(() => (selectedGoal ? [selectedGoal] : goals), [selectedGoal, goals]);
@@ -65,33 +68,88 @@ export function useProgressScreen(goalId?: string | null) {
 
   const streakDays = activity?.data.slice(-7).map((item) => item.status === "full");
 
+  const retryGoalMetrics = useCallback(() => {
+    setXpError(false);
+    setActivityError(false);
+    setReloadKey((value) => value + 1);
+  }, []);
+
   useEffect(() => {
+    let active = true;
+
     const loadXp = async () => {
-      const nextXp = selectedGoal ? await getGoalXp(selectedGoal.id) : user!.xp;
-      setXp(nextXp);
+      try {
+        const fallbackXp = user?.xp ?? 0;
+        const nextXp = selectedGoal ? await getGoalXp(selectedGoal.id) : fallbackXp;
+
+        if (active) {
+          setXpError(false);
+          setXp(nextXp);
+        }
+      } catch (error) {
+        console.error("Failed to load progress XP", {
+          goalId: selectedGoal?.id ?? null,
+          error,
+        });
+
+        if (active) {
+          setXpError(true);
+          setXp(user?.xp ?? 0);
+        }
+      }
     };
 
     void loadXp();
-  }, [selectedGoal, getGoalXp, user]);
+
+    return () => {
+      active = false;
+    };
+  }, [selectedGoal, getGoalXp, reloadKey, user]);
 
   useEffect(() => {
     if (!selectedGoal || selectedGoal.goalType !== "TASK") {
       setActivity(undefined);
+      setLoadingActivity(false);
+      setActivityError(false);
       return;
     }
 
+    let active = true;
+
     const loadActivity = async () => {
       try {
-        setLoadingActivity(true);
+        if (active) {
+          setLoadingActivity(true);
+        }
+
         const response = await getActivity(selectedGoal.id);
-        setActivity(response);
+        if (active) {
+          setActivityError(false);
+          setActivity(response);
+        }
+      } catch (error) {
+        console.error("Failed to load goal activity", {
+          goalId: selectedGoal.id,
+          error,
+        });
+
+        if (active) {
+          setActivityError(true);
+          setActivity(undefined);
+        }
       } finally {
-        setLoadingActivity(false);
+        if (active) {
+          setLoadingActivity(false);
+        }
       }
     };
 
     void loadActivity();
-  }, [selectedGoal, getActivity]);
+
+    return () => {
+      active = false;
+    };
+  }, [selectedGoal, getActivity, reloadKey]);
 
   return {
     user,
@@ -103,9 +161,12 @@ export function useProgressScreen(goalId?: string | null) {
     xp,
     activity,
     loadingActivity,
+    xpError,
+    activityError,
     completedGoals,
     categoryData,
     weeklyXpData,
     streakDays,
+    retryGoalMetrics,
   };
 }

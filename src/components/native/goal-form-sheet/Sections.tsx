@@ -87,7 +87,7 @@ function OptionPickerModal<T extends string>(props: {
   const { t } = useTranslation();
 
   return (
-    <Modal visible={props.open} transparent animationType="fade" onRequestClose={props.onClose}>
+    <Modal visible={props.open} transparent animationType="none" onRequestClose={props.onClose}>
       <View style={{ flex: 1, backgroundColor: appPalette.surface.overlay, justifyContent: "center", padding: 20 }}>
         <View
           style={{
@@ -178,7 +178,7 @@ function DueDatePickerModal(props: {
   const weekdayLabels = ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"];
 
   return (
-    <Modal visible={props.open} transparent animationType="fade" onRequestClose={props.onClose}>
+    <Modal visible={props.open} transparent animationType="none" onRequestClose={props.onClose}>
       <View style={{ flex: 1, backgroundColor: appPalette.surface.overlay, justifyContent: "center", padding: 20 }}>
         <View
           style={{

@@ -22,7 +22,7 @@ export function ChallengeDetailsSheet({ open, challenge, loading = false, partic
   const toggleParticipant = (userId: string) => setExpandedUsers((current) => ({ ...current, [userId]: !current[userId] }));
 
   return (
-    <Modal visible={open} transparent animationType="slide" onRequestClose={() => onOpenChange(false)}>
+    <Modal visible={open} transparent animationType="none" onRequestClose={() => onOpenChange(false)}>
       <View style={{ flex: 1, backgroundColor: appPalette.surface.overlay, justifyContent: "flex-end" }}>
         <View style={{ maxHeight: "88%", backgroundColor: appPalette.surface.background, borderTopLeftRadius: 24, borderTopRightRadius: 24, padding: 20, gap: 14 }}>
           <View style={{ gap: 6 }}><Text style={{ fontSize: 20, fontWeight: "700", color: appPalette.semantic.textStrong, fontFamily: "Montserrat" }}>{challenge.title}</Text><Text style={{ color: appPalette.semantic.textMuted, fontFamily: "Montserrat", fontSize: 12, lineHeight: 18 }}>{t("challenges.participants_count")} {participants.length} • {t("challenges.reports_count", { count: reports.length })}</Text></View>

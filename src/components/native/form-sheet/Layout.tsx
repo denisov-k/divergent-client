@@ -12,7 +12,7 @@ export function FormSheetLayout(props: {
   footer: ReactNode;
 }) {
   return (
-    <Modal visible={props.open} transparent animationType="slide" onRequestClose={() => props.onOpenChange(false)}>
+    <Modal visible={props.open} transparent animationType="none" onRequestClose={() => props.onOpenChange(false)}>
       <View style={{ flex: 1, backgroundColor: appPalette.surface.overlay, justifyContent: "flex-end" }}>
         <View
           style={{

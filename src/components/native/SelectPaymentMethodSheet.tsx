@@ -22,7 +22,7 @@ export function SelectPaymentMethodSheet({
   };
 
   return (
-    <Modal visible={open} transparent animationType="slide" onRequestClose={() => onOpenChange(false)}>
+    <Modal visible={open} transparent animationType="none" onRequestClose={() => onOpenChange(false)}>
       <View
         style={{
           flex: 1,

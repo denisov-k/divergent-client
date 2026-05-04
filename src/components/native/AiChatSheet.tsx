@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Modal, ScrollView, Text, TextInput, View } from "react-native";
+import { KeyboardAvoidingView, Modal, Platform, ScrollView, Text, TextInput, View } from "react-native";
 
 import { ActionChip } from "@/components/native/ActionChip";
 import { SurfaceCard } from "@/components/native/SurfaceCard";
@@ -85,48 +85,54 @@ export function AiChatSheet({ open, onOpenChange, onDraftAdded }: { open: boolea
   };
 
   return (
-    <Modal visible={open} transparent animationType="slide" onRequestClose={() => onOpenChange(false)}>
-      <View style={{ flex: 1, backgroundColor: appPalette.surface.overlay, justifyContent: "flex-end" }}>
-        <View style={{ maxHeight: "92%", backgroundColor: appPalette.surface.background, borderTopLeftRadius: 24, borderTopRightRadius: 24, padding: 20, gap: 14 }}>
-          <View style={{ gap: 6 }}>
-            <Text style={{ fontSize: 20, fontWeight: "700", color: appPalette.semantic.textStrong, fontFamily: "Montserrat" }}>{t("ai.goal_sheet_title")}</Text>
-            <Text style={{ color: appPalette.semantic.textMuted, fontFamily: "Montserrat", fontSize: 12, lineHeight: 18 }}>{t("ai.goal_sheet_description")}</Text>
-          </View>
-          <ScrollView
-            ref={scrollRef}
-            contentContainerStyle={{ gap: 10, paddingBottom: 4 }}
-            onContentSizeChange={() => {
-              scrollRef.current?.scrollToEnd({ animated: true });
-            }}
-          >
-            {history.map((message, index) => (
-              <AiChatMessageCard key={`${message.id ?? message.role}-${index}`} message={message} messageId={message.id} onDraftAdded={handleGoalAdded} />
-            ))}
-          </ScrollView>
-          <View style={{ gap: 8 }}>
-            <TextInput
-              value={prompt}
-              onChangeText={setPrompt}
-              placeholder={t("ai.goal_prompt_placeholder")}
-              multiline
-              textAlignVertical="top"
-              style={{ minHeight: 96, borderWidth: 1, borderColor: appPalette.semantic.borderStrong, borderRadius: 16, paddingHorizontal: 14, paddingVertical: 12, backgroundColor: appPalette.surface.background, color: appPalette.semantic.textStrong, fontFamily: "Montserrat", fontSize: 12, lineHeight: 18 }}
-              placeholderTextColor={appPalette.semantic.textSubtle}
-            />
-            {!!error && (
-              <View style={{ backgroundColor: appPalette.semantic.dangerSurface, borderRadius: 12, padding: 12 }}>
-                <Text style={{ color: appPalette.semantic.dangerText, fontFamily: "Montserrat", fontSize: 12, lineHeight: 18 }}>{error}</Text>
-              </View>
-            )}
-          </View>
-          <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8 }}>
-            <ActionChip onPress={() => onOpenChange(false)}>{t("common.close")}</ActionChip>
-            <ActionChip onPress={() => void handleGenerate()} tone="primary">
-              {loading ? t("ai.thinking") : t("ai.ask_ai")}
-            </ActionChip>
+    <Modal visible={open} transparent animationType="none" onRequestClose={() => onOpenChange(false)}>
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={Platform.OS === "ios" ? "padding" : undefined}
+        keyboardVerticalOffset={Platform.OS === "ios" ? 12 : 0}
+      >
+        <View style={{ flex: 1, backgroundColor: appPalette.surface.overlay, justifyContent: "flex-end" }}>
+          <View style={{ maxHeight: "92%", backgroundColor: appPalette.surface.background, borderTopLeftRadius: 24, borderTopRightRadius: 24, padding: 20, gap: 14 }}>
+            <View style={{ gap: 6 }}>
+              <Text style={{ fontSize: 20, fontWeight: "700", color: appPalette.semantic.textStrong, fontFamily: "Montserrat" }}>{t("ai.goal_sheet_title")}</Text>
+            </View>
+            <ScrollView
+              ref={scrollRef}
+              contentContainerStyle={{ gap: 10, paddingBottom: 4 }}
+              keyboardShouldPersistTaps="handled"
+              onContentSizeChange={() => {
+                scrollRef.current?.scrollToEnd({ animated: true });
+              }}
+            >
+              {history.map((message, index) => (
+                <AiChatMessageCard key={`${message.id ?? message.role}-${index}`} message={message} messageId={message.id} onDraftAdded={handleGoalAdded} />
+              ))}
+            </ScrollView>
+            <View style={{ gap: 8 }}>
+              <TextInput
+                value={prompt}
+                onChangeText={setPrompt}
+                placeholder={t("ai.goal_prompt_placeholder")}
+                multiline
+                textAlignVertical="top"
+                style={{ minHeight: 96, borderWidth: 1, borderColor: appPalette.semantic.borderStrong, borderRadius: 16, paddingHorizontal: 14, paddingVertical: 12, backgroundColor: appPalette.surface.background, color: appPalette.semantic.textStrong, fontFamily: "Montserrat", fontSize: 12, lineHeight: 18 }}
+                placeholderTextColor={appPalette.semantic.textSubtle}
+              />
+              {!!error && (
+                <View style={{ backgroundColor: appPalette.semantic.dangerSurface, borderRadius: 12, padding: 12 }}>
+                  <Text style={{ color: appPalette.semantic.dangerText, fontFamily: "Montserrat", fontSize: 12, lineHeight: 18 }}>{error}</Text>
+                </View>
+              )}
+            </View>
+            <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8 }}>
+              <ActionChip onPress={() => onOpenChange(false)}>{t("common.close")}</ActionChip>
+              <ActionChip onPress={() => void handleGenerate()} tone="primary">
+                {loading ? t("ai.thinking") : t("ai.ask_ai")}
+              </ActionChip>
+            </View>
           </View>
         </View>
-      </View>
+      </KeyboardAvoidingView>
     </Modal>
   );
 }
