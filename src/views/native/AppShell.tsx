@@ -1,13 +1,13 @@
 import { Suspense, lazy, useCallback, useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
-import * as Haptics from "expo-haptics";
-import { Linking, Platform, Pressable, SafeAreaView, Text, View } from "react-native";
+import { Linking, Pressable, SafeAreaView, Text, View } from "react-native";
 
 import { NativeNavigationProvider } from "@/app/native/NativeNavigation";
 import { parseNativeAppRoute, type NativeAppTab } from "@/app/router.native";
 import { NativeAppHeader } from "@/components/native/NativeAppHeader";
 import { BarChart2, Bell, Gift, Swords, Target } from "@/components/native/Icons";
 import { AppLoader } from "@/components/shared/AppLoader";
+import { triggerSelectionHaptic } from "@/platform/haptics";
 import { useAppStore } from "@/stores/useAppStore";
 import { appPalette } from "@/theme/palette";
 
@@ -20,14 +20,6 @@ const NativeSettingsScreen = lazy(() => import("@/views/native/settings"));
 
 function NativeScreenFallback() {
   return <AppLoader fullScreen />;
-}
-
-function triggerNavigationHaptic() {
-  if (Platform.OS === "web") {
-    return;
-  }
-
-  void Haptics.selectionAsync();
 }
 
 function syncPreviewUrl(state: ReturnType<typeof parseNativeAppRoute>) {
@@ -253,7 +245,7 @@ export default function NativeAppShell({ mode = "standalone" }: { mode?: "previe
               <Pressable
                 key={tab.key}
                 onPress={() => {
-                  triggerNavigationHaptic();
+                  void triggerSelectionHaptic();
                   setActiveTab(tab.key);
                 }}
                 style={{
