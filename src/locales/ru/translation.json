@@ -485,6 +485,7 @@
     "goal_prompt_placeholder": "Опиши цель, привычку или challenge-flow",
     "goal_response_error": "Не удалось получить ответ от AI.",
     "thinking": "Думаем...",
+    "preparing_draft": "Подготавливаю черновик...",
     "ask_ai": "Спросить AI",
     "add_to_goals": "Добавить в цели",
     "already_added": "Уже добавлено",

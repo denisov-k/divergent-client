@@ -20,6 +20,13 @@ import type {
 } from "@/types";
 import type { ChallengeInput } from "@/types";
 
+type AIChatStreamHandlers = {
+  onAccepted?: () => void;
+  onMessage?: (message: string) => void;
+  onStatus?: (status: "started" | "streaming" | "completed") => void;
+  onDraftStatus?: (status: "preparing") => void;
+};
+
 export interface AppStoreState {
   initialized: boolean;
   loading: boolean;
@@ -76,6 +83,7 @@ export interface AppStoreActions {
   kickParticipant: (challengeId: string, userId: string) => Promise<void>;
   downloadReport: (report: Report) => Promise<void>;
   chatAI: (prompt: string) => Promise<AIChatResponse>;
+  chatAIStream: (prompt: string, handlers?: AIChatStreamHandlers) => Promise<AIChatResponse>;
   getChatHistory: () => Promise<ChatMessage[]>;
   addDraft: (messageId: string) => Promise<Goal>;
   addReward: (reward: Reward) => Promise<void>;

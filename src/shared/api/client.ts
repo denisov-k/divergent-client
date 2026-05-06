@@ -20,6 +20,13 @@ const API_TIMEOUT_MS = 15000;
 const AI_API_TIMEOUT_MS = 180000;
 const AI_JOB_POLL_INTERVAL_MS = 1500;
 
+type AIChatStreamHandlers = {
+  onAccepted?: () => void;
+  onMessage?: (message: string) => void;
+  onStatus?: (status: "started" | "streaming" | "completed") => void;
+  onDraftStatus?: (status: "preparing") => void;
+};
+
 type AIChatJobStatus = "pending" | "running" | "completed" | "failed";
 
 type AIChatJobResponse = {
@@ -58,7 +65,7 @@ type FetchJSONOptions = RequestInit & {
   timeoutMs?: number;
 };
 
-async function fetchJSON(url: string, options: FetchJSONOptions = {}) {
+async function fetchWithAuth(url: string, options: FetchJSONOptions = {}) {
   const { timeoutMs, ...requestOptions } = options;
   const isFormData = options.body instanceof FormData;
   const baseUrl = Config.data.api.http.baseURL;
@@ -68,9 +75,8 @@ async function fetchJSON(url: string, options: FetchJSONOptions = {}) {
   const requestTimeoutMs = timeoutMs ?? API_TIMEOUT_MS;
   const timeoutId = setTimeout(() => controller.abort(), requestTimeoutMs);
 
-  let res: Response;
   try {
-    res = await fetch(baseUrl + url, {
+    return await fetch(baseUrl + url, {
       ...requestOptions,
       credentials: publicAuthRoute ? "omit" : "include",
       signal: controller.signal,
@@ -85,10 +91,15 @@ async function fetchJSON(url: string, options: FetchJSONOptions = {}) {
     if (error instanceof Error && error.name === "AbortError") {
       throw new Error(`Request timed out for ${url}`);
     }
+
     throw error;
   } finally {
     clearTimeout(timeoutId);
   }
+}
+
+async function fetchJSON(url: string, options: FetchJSONOptions = {}) {
+  const res = await fetchWithAuth(url, options);
 
   const nextSessionToken = res.headers.get("x-session-token");
   if (nextSessionToken) {
@@ -120,6 +131,56 @@ async function fetchJSON(url: string, options: FetchJSONOptions = {}) {
 
 function sleep(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+function isNativeRuntime() {
+  return typeof navigator !== "undefined" && navigator.product === "ReactNative";
+}
+
+function supportsStreamingAiRequests() {
+  if (isNativeRuntime()) {
+    return false;
+  }
+
+  return typeof TextDecoder !== "undefined";
+}
+
+function parseSseEventBlock(block: string) {
+  const lines = block
+    .split(/\r?\n/)
+    .map((line) => line.trimEnd())
+    .filter(Boolean);
+
+  let event = "message";
+  const dataLines: string[] = [];
+
+  for (const line of lines) {
+    if (line.startsWith(":")) {
+      continue;
+    }
+
+    if (line.startsWith("event:")) {
+      event = line.slice("event:".length).trim();
+      continue;
+    }
+
+    if (line.startsWith("data:")) {
+      dataLines.push(line.slice("data:".length).trim());
+    }
+  }
+
+  if (!dataLines.length) {
+    return null;
+  }
+
+  try {
+    return {
+      event,
+      data: JSON.parse(dataLines.join("\n")) as Record<string, unknown>,
+    };
+  } catch {
+    return null;
+  }
 }
 
 export async function loginWithCredentials(email: string, password: string) {
@@ -259,16 +320,18 @@ export async function kickParticipant(challengeId: string, userId: string) {
   });
 }
 
-export async function chatAI(message: string) {
-  const job = (await fetchJSON(`/api/ai/chat`, {
+async function createAIChatJob(message: string) {
+  return (await fetchJSON(`/api/ai/chat`, {
     method: "POST",
     body: JSON.stringify({ message }),
   })) as AIChatJobResponse;
+}
 
+async function waitForAIChatJob(jobId: string) {
   const startedAt = Date.now();
 
   while (Date.now() - startedAt < AI_API_TIMEOUT_MS) {
-    const currentJob = (await fetchJSON(`/api/ai/chat/${job.id}`, {
+    const currentJob = (await fetchJSON(`/api/ai/chat/${jobId}`, {
       method: "GET",
     })) as AIChatJobResponse;
 
@@ -284,6 +347,126 @@ export async function chatAI(message: string) {
   }
 
   throw new Error("AI job timed out");
+}
+
+export async function chatAI(message: string) {
+  const job = await createAIChatJob(message);
+  return waitForAIChatJob(job.id);
+}
+
+export async function chatAIStream(message: string, handlers: AIChatStreamHandlers = {}) {
+  if (!supportsStreamingAiRequests()) {
+    const job = await createAIChatJob(message);
+    handlers.onAccepted?.();
+    handlers.onStatus?.("started");
+    return waitForAIChatJob(job.id);
+  }
+
+  const res = await fetchWithAuth(`/api/ai/chat/stream`, {
+    method: "POST",
+    body: JSON.stringify({ message }),
+    timeoutMs: AI_API_TIMEOUT_MS,
+  });
+
+  const nextSessionToken = res.headers.get("x-session-token");
+  if (nextSessionToken) {
+    await writeSessionToken(nextSessionToken);
+  }
+
+  const contentType = res.headers.get("content-type") || "";
+
+  if (!res.ok) {
+    if (res.status === 401) {
+      await clearSessionToken();
+    }
+
+    if (contentType.includes("application/json")) {
+      const data = (await res.json()) as { error?: string };
+      throw new Error(data.error || `API error: ${res.status}`);
+    }
+
+    const text = await res.text();
+    throw new Error(text || `API error: ${res.status}`);
+  }
+
+  if (!contentType.includes("text/event-stream")) {
+    throw new Error(`Expected event stream but received ${contentType || "unknown content type"}`);
+  }
+
+  if (!res.body) {
+    throw new Error("Streaming response body is not available");
+  }
+
+  const reader = res.body.getReader();
+  const decoder = new TextDecoder();
+  let buffer = "";
+  let finalResult: AIChatResponse | null = null;
+  let streamError: string | null = null;
+
+  while (true) {
+    const { done, value } = await reader.read();
+    buffer += decoder.decode(value || new Uint8Array(), { stream: !done });
+
+    const blocks = buffer.split(/\r?\n\r?\n/);
+    buffer = blocks.pop() ?? "";
+
+    for (const block of blocks) {
+      const parsed = parseSseEventBlock(block);
+      if (!parsed) {
+        continue;
+      }
+
+      if (parsed.event === "status") {
+        const status = parsed.data.status;
+        if (status === "started" || status === "streaming" || status === "completed") {
+          handlers.onStatus?.(status);
+        }
+        continue;
+      }
+
+      if (parsed.event === "ready") {
+        handlers.onAccepted?.();
+        continue;
+      }
+
+      if (parsed.event === "message" && typeof parsed.data.content === "string") {
+        handlers.onMessage?.(parsed.data.content);
+        continue;
+      }
+
+      if (parsed.event === "draft_status") {
+        const status = parsed.data.status;
+        if (status === "preparing") {
+          handlers.onDraftStatus?.(status);
+        }
+        continue;
+      }
+
+      if (parsed.event === "result") {
+        finalResult = parsed.data as unknown as AIChatResponse;
+        continue;
+      }
+
+      if (parsed.event === "error" && typeof parsed.data.error === "string") {
+        streamError = parsed.data.error;
+        continue;
+      }
+    }
+
+    if (done) {
+      break;
+    }
+  }
+
+  if (streamError) {
+    throw new Error(streamError);
+  }
+
+  if (!finalResult) {
+    throw new Error("AI stream ended without a final result");
+  }
+
+  return finalResult;
 }
 
 export async function getChatHistory() {

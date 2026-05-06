@@ -22,12 +22,15 @@ const daysMap = Object.fromEntries(DAYS_OF_WEEK.map((d) => [d.key, d.label])) as
 
 export default function AiChatDialog({ open, onOpenChange, onDraftAdded }: Props) {
   const { t } = useTranslation();
-  const { chatAI, getChatHistory } = useAppStore();
+  const { chatAIStream, getChatHistory } = useAppStore();
 
   const [prompt, setPrompt] = useState("");
   const [history, setHistory] = useState<ChatMessage[]>([]);
   const [loading, setLoading] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [streamingMessageId, setStreamingMessageId] = useState<string | null>(null);
+  const [draftPendingMessageId, setDraftPendingMessageId] = useState<string | null>(null);
 
   const scrollRef = useRef<HTMLDivElement>(null);
 
@@ -39,32 +42,64 @@ export default function AiChatDialog({ open, onOpenChange, onDraftAdded }: Props
   const handleGenerate = async () => {
     if (!prompt.trim()) return;
 
+    const currentPrompt = prompt.trim();
+    const streamingMessageId = `stream-${Date.now()}`;
+    setStreamingMessageId(streamingMessageId);
+    setDraftPendingMessageId(null);
     setPrompt("");
 
-    const userMessage: ChatMessage = { role: "user", content: prompt, isDraftAdded: false };
+    const userMessage: ChatMessage = { role: "user", content: currentPrompt, isDraftAdded: false };
+    const assistantMessage: ChatMessage = {
+      id: streamingMessageId,
+      role: "assistant",
+      content: "",
+      isDraftAdded: false,
+    };
 
-    setHistory((h) => [...h, userMessage]);
+    setHistory((h) => [...h, userMessage, assistantMessage]);
     setLoading(true);
+    setSubmitting(true);
     setError(null);
 
     try {
-      const data: AIChatResponse = await chatAI(prompt);
+      const data: AIChatResponse = await chatAIStream(currentPrompt, {
+        onAccepted: () => {
+          setSubmitting(false);
+        },
+        onMessage: (content) => {
+          setHistory((items) =>
+            items.map((item) =>
+              item.id === streamingMessageId ? { ...item, content } : item
+            )
+          );
+        },
+        onDraftStatus: () => {
+          setDraftPendingMessageId(streamingMessageId);
+        },
+      });
 
       if (data.message) {
-        setHistory((h) => [
-          ...h,
-          {
-            id: data.id,
-            role: "assistant",
-            content: data.message,
-            goalDraft: data.goalDraft ?? null,
-            isDraftAdded: data.isDraftAdded,
-          },
-        ]);
+        setHistory((items) =>
+          items.map((item) =>
+            item.id === streamingMessageId
+              ? {
+                  id: data.id,
+                  role: "assistant",
+                  content: data.message,
+                  goalDraft: data.goalDraft ?? null,
+                  isDraftAdded: data.isDraftAdded,
+                }
+              : item
+          )
+        );
       }
     } catch {
+      setHistory((items) => items.filter((item) => item.id !== streamingMessageId));
       setError(t("ai.goal_response_error"));
     } finally {
+      setSubmitting(false);
+      setStreamingMessageId((current) => (current === streamingMessageId ? null : current));
+      setDraftPendingMessageId((current) => (current === streamingMessageId ? null : current));
       setLoading(false);
     }
   };
@@ -74,6 +109,9 @@ export default function AiChatDialog({ open, onOpenChange, onDraftAdded }: Props
       setPrompt("");
       setHistory([]);
       setError(null);
+      setSubmitting(false);
+      setStreamingMessageId(null);
+      setDraftPendingMessageId(null);
     }
     onOpenChange(nextOpen);
   };
@@ -109,7 +147,14 @@ export default function AiChatDialog({ open, onOpenChange, onDraftAdded }: Props
 
         <div ref={scrollRef} className="flex-1 overflow-y-auto rounded bg-gray-50 p-2 space-y-2">
           {history.map((message, index) => (
-            <ChatMessageItem key={index} message={message} messageId={message.id} onDraftAdded={handleGoalAdded} />
+            <ChatMessageItem
+              key={index}
+              message={message}
+              messageId={message.id}
+              onDraftAdded={handleGoalAdded}
+              isDraftPending={message.id === streamingMessageId}
+              isPreparingDraft={message.id === draftPendingMessageId}
+            />
           ))}
         </div>
 
@@ -120,7 +165,7 @@ export default function AiChatDialog({ open, onOpenChange, onDraftAdded }: Props
 
         <DialogFooter>
           <Button onClick={handleGenerate} disabled={loading || !prompt.trim()} size="sm">
-            {loading ? t("ai.asking") : t("ai.ask")}
+            {submitting ? t("ai.asking") : t("ai.ask")}
           </Button>
         </DialogFooter>
       </DialogContent>
@@ -132,19 +177,31 @@ function ChatMessageItem({
   message,
   messageId,
   onDraftAdded,
+  isDraftPending,
+  isPreparingDraft,
 }: {
   message: ChatMessage;
   messageId?: string;
   onDraftAdded: (goal: Goal) => void;
+  isDraftPending: boolean;
+  isPreparingDraft: boolean;
 }) {
+  const { t } = useTranslation();
+  const messageContent = message.content || (isDraftPending ? t("ai.thinking") : "");
+
   return (
     <div className="space-y-1">
       <div className={`whitespace-pre-wrap rounded p-2 ${message.role === "user" ? "bg-blue-100 text-blue-900" : "bg-gray-100 text-gray-800"}`}>
-        {message.content}
+        {messageContent}
       </div>
 
       {message.role === "assistant" && message.goalDraft && (
         <GoalDraftPreview draft={message.goalDraft} messageId={messageId} onAdd={onDraftAdded} isDraftAdded={message.isDraftAdded} />
+      )}
+      {message.role === "assistant" && !message.goalDraft && isPreparingDraft && (
+        <div className="rounded border border-blue-200 bg-blue-50 px-3 py-2 text-xs text-blue-800">
+          {t("ai.preparing_draft")}
+        </div>
       )}
     </div>
   );

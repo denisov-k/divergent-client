@@ -23,11 +23,14 @@ const rewardIconMap: Record<RewardIconType, React.ComponentType<{ size?: string 
 
 export function AiChatSheet({ open, onOpenChange, onDraftAdded }: { open: boolean; onOpenChange: (open: boolean) => void; onDraftAdded: (goal: Goal) => void }) {
   const { t } = useTranslation();
-  const { chatAI, getChatHistory } = useAppStore();
+  const { chatAIStream, getChatHistory } = useAppStore();
   const [prompt, setPrompt] = useState("");
   const [history, setHistory] = useState<ChatMessage[]>([]);
   const [loading, setLoading] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [streamingMessageId, setStreamingMessageId] = useState<string | null>(null);
+  const [draftPendingMessageId, setDraftPendingMessageId] = useState<string | null>(null);
   const scrollRef = useRef<ScrollView>(null);
 
   useEffect(() => {
@@ -47,6 +50,9 @@ export function AiChatSheet({ open, onOpenChange, onDraftAdded }: { open: boolea
       setPrompt("");
       setHistory([]);
       setError(null);
+      setSubmitting(false);
+      setStreamingMessageId(null);
+      setDraftPendingMessageId(null);
       return;
     }
 
@@ -65,27 +71,61 @@ export function AiChatSheet({ open, onOpenChange, onDraftAdded }: { open: boolea
   const handleGenerate = async () => {
     if (!prompt.trim()) return;
     const currentPrompt = prompt.trim();
+    const streamingMessageId = `stream-${Date.now()}`;
+    setStreamingMessageId(streamingMessageId);
+    setDraftPendingMessageId(null);
     setPrompt("");
-    setHistory((items) => [...items, { role: "user", content: currentPrompt, isDraftAdded: false }]);
+    setHistory((items) => [
+      ...items,
+      { role: "user", content: currentPrompt, isDraftAdded: false },
+      {
+        id: streamingMessageId,
+        role: "assistant",
+        content: "",
+        isDraftAdded: false,
+      },
+    ]);
     setLoading(true);
+    setSubmitting(true);
     setError(null);
     try {
-      const data: AIChatResponse = await chatAI(currentPrompt);
+      const data: AIChatResponse = await chatAIStream(currentPrompt, {
+        onAccepted: () => {
+          setSubmitting(false);
+        },
+        onMessage: (content) => {
+          setHistory((items) =>
+            items.map((item) =>
+              item.id === streamingMessageId ? { ...item, content } : item
+            )
+          );
+        },
+        onDraftStatus: () => {
+          setDraftPendingMessageId(streamingMessageId);
+        },
+      });
       if (data.message) {
-        setHistory((items) => [
-          ...items,
-          {
-            id: data.id,
-            role: "assistant",
-            content: data.message,
-            goalDraft: data.goalDraft ?? null,
-            isDraftAdded: data.isDraftAdded,
-          },
-        ]);
+        setHistory((items) =>
+          items.map((item) =>
+            item.id === streamingMessageId
+              ? {
+                  id: data.id,
+                  role: "assistant",
+                  content: data.message,
+                  goalDraft: data.goalDraft ?? null,
+                  isDraftAdded: data.isDraftAdded,
+                }
+              : item
+          )
+        );
       }
     } catch {
+      setHistory((items) => items.filter((item) => item.id !== streamingMessageId));
       setError(t("ai.goal_response_error"));
     } finally {
+      setSubmitting(false);
+      setStreamingMessageId((current) => (current === streamingMessageId ? null : current));
+      setDraftPendingMessageId((current) => (current === streamingMessageId ? null : current));
       setLoading(false);
     }
   };
@@ -106,7 +146,7 @@ export function AiChatSheet({ open, onOpenChange, onDraftAdded }: { open: boolea
         <View style={{ flex: 1, backgroundColor: appPalette.surface.overlay, justifyContent: "flex-end" }}>
           <View style={{ maxHeight: "92%", backgroundColor: appPalette.surface.background, borderTopLeftRadius: 24, borderTopRightRadius: 24, padding: 20, gap: 14 }}>
             <View style={{ gap: 6 }}>
-              <Text style={{ fontSize: 20, fontWeight: "700", color: appPalette.semantic.textStrong, fontFamily: "Montserrat" }}>{t("ai.goal_sheet_title")}</Text>
+              <Text style={{ fontSize: 20, fontWeight: "700", color: appPalette.semantic.textStrong, fontFamily: "Montserrat" }}>{t("ai.title")}</Text>
             </View>
             <ScrollView
               ref={scrollRef}
@@ -117,7 +157,14 @@ export function AiChatSheet({ open, onOpenChange, onDraftAdded }: { open: boolea
               }}
             >
               {history.map((message, index) => (
-                <AiChatMessageCard key={`${message.id ?? message.role}-${index}`} message={message} messageId={message.id} onDraftAdded={handleGoalAdded} />
+                <AiChatMessageCard
+                  key={`${message.id ?? message.role}-${index}`}
+                  message={message}
+                  messageId={message.id}
+                  onDraftAdded={handleGoalAdded}
+                  isDraftPending={message.id === streamingMessageId}
+                  isPreparingDraft={message.id === draftPendingMessageId}
+                />
               ))}
             </ScrollView>
             <View style={{ gap: 8 }}>
@@ -138,8 +185,8 @@ export function AiChatSheet({ open, onOpenChange, onDraftAdded }: { open: boolea
             </View>
             <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8 }}>
               <ActionChip onPress={() => onOpenChange(false)}>{t("common.close")}</ActionChip>
-              <ActionChip onPress={() => void handleGenerate()} tone="primary">
-                {loading ? t("ai.asking") : t("ai.ask")}
+              <ActionChip onPress={() => void handleGenerate()} tone="primary" disabled={loading || !prompt.trim()}>
+                {submitting ? t("ai.asking") : t("ai.ask")}
               </ActionChip>
             </View>
           </View>
@@ -149,7 +196,8 @@ export function AiChatSheet({ open, onOpenChange, onDraftAdded }: { open: boolea
   );
 }
 
-function AiChatMessageCard({ message, messageId, onDraftAdded }: { message: ChatMessage; messageId?: string; onDraftAdded: (goal: Goal, messageId?: string) => void; }) {
+function AiChatMessageCard({ message, messageId, onDraftAdded, isDraftPending, isPreparingDraft }: { message: ChatMessage; messageId?: string; onDraftAdded: (goal: Goal, messageId?: string) => void; isDraftPending: boolean; isPreparingDraft: boolean; }) {
+  const { t } = useTranslation();
   const tone = useMemo(
     () =>
       message.role === "user"
@@ -157,13 +205,21 @@ function AiChatMessageCard({ message, messageId, onDraftAdded }: { message: Chat
         : { backgroundColor: appPalette.ui.inputBackground, textColor: appPalette.semantic.text },
     [message.role],
   );
+  const messageContent = message.content || (isDraftPending ? t("ai.thinking") : "");
 
   return (
     <View style={{ gap: 8 }}>
       <View style={{ backgroundColor: tone.backgroundColor, borderRadius: 14, padding: 12 }}>
-        <Text style={{ color: tone.textColor, fontFamily: "Montserrat", fontSize: 12, lineHeight: 18 }}>{message.content}</Text>
+        <Text style={{ color: tone.textColor, fontFamily: "Montserrat", fontSize: 12, lineHeight: 18 }}>{messageContent}</Text>
       </View>
       {message.role === "assistant" && message.goalDraft && <GoalDraftCard draft={message.goalDraft} messageId={message.id ?? messageId} isDraftAdded={message.isDraftAdded} onAdd={onDraftAdded} />}
+      {message.role === "assistant" && !message.goalDraft && isPreparingDraft && (
+        <View style={{ borderRadius: 14, paddingHorizontal: 12, paddingVertical: 10, borderWidth: 1, borderColor: appPalette.brand.primary, backgroundColor: appPalette.semantic.infoSurface }}>
+          <Text style={{ color: appPalette.semantic.infoTextStrong, fontFamily: "Montserrat", fontSize: 12, lineHeight: 18 }}>
+            {t("ai.preparing_draft")}
+          </Text>
+        </View>
+      )}
     </View>
   );
 }

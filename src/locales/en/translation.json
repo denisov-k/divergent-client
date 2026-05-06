@@ -483,9 +483,10 @@
                "goal_sheet_title":  "AI for goals",
                "goal_sheet_description":  "The same AI goal flow, only in a mobile sheet.",
                "goal_prompt_placeholder":  "Describe a goal, habit, or challenge flow",
-               "goal_response_error":  "Could not get a response from AI.",
-               "thinking":  "Thinking...",
-               "ask_ai":  "Ask AI",
+                 "goal_response_error":  "Could not get a response from AI.",
+                 "thinking":  "Thinking...",
+                 "preparing_draft":  "Preparing draft...",
+                 "ask_ai":  "Ask AI",
                "add_to_goals":  "Add to goals",
                "already_added":  "Already added",
                "xp_required":  "Requires {{xp}} XP"

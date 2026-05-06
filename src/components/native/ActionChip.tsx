@@ -33,26 +33,30 @@ export function ActionChip({
   children,
   onPress,
   tone = "secondary",
+  disabled = false,
 }: {
   children: ReactNode;
   onPress?: () => void;
   tone?: ActionChipTone;
+  disabled?: boolean;
 }) {
   const palette = toneStyles[tone];
 
   return (
     <Pressable
       onPress={onPress}
+      disabled={disabled}
       style={{
-        backgroundColor: palette.backgroundColor,
+        backgroundColor: disabled ? appPalette.semantic.borderSubtle : palette.backgroundColor,
         borderRadius: 10,
         paddingHorizontal: 12,
         paddingVertical: 10,
         borderWidth: 1,
-        borderColor: palette.borderColor ?? palette.backgroundColor,
+        borderColor: disabled ? appPalette.semantic.borderSubtle : (palette.borderColor ?? palette.backgroundColor),
+        opacity: disabled ? 0.7 : 1,
       }}
     >
-      <Text style={{ color: palette.textColor, fontWeight: "500", fontSize: 12, lineHeight: 18, fontFamily: "Montserrat" }}>{children}</Text>
+      <Text style={{ color: disabled ? appPalette.semantic.textMuted : palette.textColor, fontWeight: "500", fontSize: 12, lineHeight: 18, fontFamily: "Montserrat" }}>{children}</Text>
     </Pressable>
   );
 }

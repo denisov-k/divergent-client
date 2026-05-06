@@ -2,13 +2,25 @@ import * as api from "@/shared/api/client";
 import type { AppStoreActions, StoreSlice } from "@/stores/types";
 import type { Reminder } from "@/types";
 
-type AiSlice = Pick<AppStoreActions, "chatAI" | "getChatHistory" | "addDraft">;
+type AiSlice = Pick<AppStoreActions, "chatAI" | "chatAIStream" | "getChatHistory" | "addDraft">;
 
 export const createAiSlice: StoreSlice<AiSlice> = (set) => ({
   chatAI: async (message) => {
     set({ loading: true });
     try {
       return await api.chatAI(message);
+    } catch (err) {
+      console.error(err);
+      throw err;
+    } finally {
+      set({ loading: false });
+    }
+  },
+
+  chatAIStream: async (message, handlers) => {
+    set({ loading: true });
+    try {
+      return await api.chatAIStream(message, handlers);
     } catch (err) {
       console.error(err);
       throw err;
