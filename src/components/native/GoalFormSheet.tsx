@@ -75,6 +75,7 @@ export function GoalFormSheet({
   const [selectedRewardId, setSelectedRewardId] = useState<string | null>(null);
   const [tasks, setTasks] = useState<Task[]>([]);
   const [newTaskTitle, setNewTaskTitle] = useState("");
+  const [newTaskXp, setNewTaskXp] = useState("");
   const [expandedTasks, setExpandedTasks] = useState<Record<string, boolean>>({});
   const [newSubTaskTitles, setNewSubTaskTitles] = useState<Record<string, string>>({});
   const [newSubTaskXps, setNewSubTaskXps] = useState<Record<string, string>>({});
@@ -108,6 +109,7 @@ export function GoalFormSheet({
       setNewSubTaskTitles({});
       setNewSubTaskXps({});
       setNewTaskTitle("");
+      setNewTaskXp("");
       return;
     }
 
@@ -121,6 +123,7 @@ export function GoalFormSheet({
     setTargetValue("");
     setTasks([]);
     setNewTaskTitle("");
+    setNewTaskXp("");
     setSelectedRewardId(null);
     setExpandedTasks({});
     setNewSubTaskTitles({});
@@ -133,8 +136,12 @@ export function GoalFormSheet({
       return;
     }
 
-    setTasks((current) => [...current, createTask(nextTitle)]);
+    const nextXpRaw = newTaskXp.trim();
+    const nextXp = nextXpRaw ? Number(nextXpRaw) : undefined;
+
+    setTasks((current) => [...current, createTask(nextTitle, Number.isFinite(nextXp) ? nextXp : undefined)]);
     setNewTaskTitle("");
+    setNewTaskXp("");
   };
 
   const addSubTask = (parentId: string) => {
@@ -264,7 +271,9 @@ export function GoalFormSheet({
         <TasksSection
           tasks={tasks}
           newTaskTitle={newTaskTitle}
+          newTaskXp={newTaskXp}
           onChangeNewTaskTitle={setNewTaskTitle}
+          onChangeNewTaskXp={setNewTaskXp}
           onAddTask={addTask}
           onRemoveTask={removeTask}
           expandedTasks={expandedTasks}

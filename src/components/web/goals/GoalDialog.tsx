@@ -50,6 +50,7 @@ export function GoalDialog({
   const [dueDate, setDueDate] = useState<Date | undefined>(goal?.dueDate ? new Date(goal.dueDate) : undefined);
   const [tasks, setTasks] = useState<Task[]>(goal?.tasks || []);
   const [newTaskTitle, setNewTaskTitle] = useState("");
+  const [newTaskXp, setNewTaskXp] = useState("");
   const [rewardId, setRewardId] = useState(rewards.find((r) => r.goalId === goal?.id)?.id || "none");
   const [isCreatingCategory, setIsCreatingCategory] = useState(false);
   const [newCategoryName, setNewCategoryName] = useState("");
@@ -90,6 +91,7 @@ export function GoalDialog({
     setNumericTarget("");
     setNumericCurrent("");
     setNewTaskTitle("");
+    setNewTaskXp("");
     setIsCreatingCategory(false);
     setNewCategoryName("");
     setExpandedTasks({});
@@ -111,17 +113,21 @@ export function GoalDialog({
 
   const handleAddTask = () => {
     if (!newTaskTitle.trim()) return;
+    const newTaskXpValue = newTaskXp.trim();
+    const parsedXp = newTaskXpValue ? Number(newTaskXpValue) : undefined;
 
     const newTask: Task = {
       id: generateId(),
       title: newTaskTitle,
       lastCompletedAt: "",
+      xpReward: Number.isFinite(parsedXp) ? parsedXp : undefined,
       parentId: null,
       subtasks: [],
     };
 
     setTasks([...tasks, newTask]);
     setNewTaskTitle("");
+    setNewTaskXp("");
   };
 
   function addSubtaskRecursive(currentTasks: Task[], parentId: string, subtask: Task): Task[] {
@@ -147,11 +153,14 @@ export function GoalDialog({
   const handleAddSubTask = (parentId: string) => {
     const subtaskTitle = newSubTaskTitles[parentId];
     if (!subtaskTitle?.trim()) return;
+    const newSubTaskXp = newSubTaskXps[parentId]?.trim();
+    const parsedXp = newSubTaskXp ? Number(newSubTaskXp) : undefined;
 
     const newSubTask: Task = {
       id: generateId(),
       title: subtaskTitle,
       lastCompletedAt: "",
+      xpReward: Number.isFinite(parsedXp) ? parsedXp : undefined,
       parentId,
       subtasks: [],
     };
@@ -414,6 +423,14 @@ export function GoalDialog({
                       handleAddTask();
                     }
                   }}
+                />
+                <Input
+                  type="number"
+                  min={0}
+                  className="w-24"
+                  placeholder={t("common.xp")}
+                  value={newTaskXp}
+                  onChange={(e) => setNewTaskXp(e.target.value)}
                 />
                 <Button type="button" onClick={() => handleAddTask()} size="icon">
                   <Plus className="size-4" />

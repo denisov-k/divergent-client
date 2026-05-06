@@ -571,7 +571,9 @@ export function ProgressFieldsSection(props: {
 export function TasksSection(props: {
   tasks: Task[];
   newTaskTitle: string;
+  newTaskXp: string;
   onChangeNewTaskTitle: (value: string) => void;
+  onChangeNewTaskXp: (value: string) => void;
   onAddTask: () => void;
   onRemoveTask: (taskId: string) => void;
   expandedTasks: Record<string, boolean>;
@@ -616,6 +618,14 @@ export function TasksSection(props: {
             onChangeText={props.onChangeNewTaskTitle}
             placeholder={t("goals.dialog.task_placeholder")}
             autoCapitalize="sentences"
+          />
+        </View>
+        <View style={{ width: 88 }}>
+          <FieldInput
+            value={props.newTaskXp}
+            onChangeText={props.onChangeNewTaskXp}
+            placeholder={t("common.xp")}
+            keyboardType="numeric"
           />
         </View>
         <IconButton onPress={props.onAddTask}>

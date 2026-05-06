@@ -85,17 +85,15 @@ function TaskTree({ tasks, goalPeriod, onTaskToggle, goalId, level = 0, disabled
           <View key={task.id} style={{ gap: 8, marginLeft: level * 12 }}>
             <View style={{ borderWidth: 1, borderColor: appPalette.semantic.borderSubtle, borderRadius: 14, backgroundColor: appPalette.semantic.neutralSurfaceStrong, paddingHorizontal: 12, paddingVertical: 10, gap: 8 }}>
               <View style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
-                {hasSubtasks || level > 0 ? (
+                {hasSubtasks ? (
                   <Pressable onPress={() => setExpanded((current) => ({ ...current, [task.id]: !current[task.id] }))}>
                     {isOpen ? <ChevronUp size={16} color={appPalette.semantic.textMuted} /> : <ChevronDown size={16} color={appPalette.semantic.textMuted} />}
                   </Pressable>
-                ) : (
-                  <View style={{ width: 16 }} />
-                )}
+                ) : null}
 
                 <Pressable onPress={() => { if (!disabled) void onTaskToggle(goalId, task.id); }} style={{ flexDirection: "row", alignItems: "center", gap: 10, flex: 1 }}>
                   <View style={{ width: 20, height: 20, borderRadius: 6, borderWidth: 1.5, borderColor: completed ? appPalette.brand.primary : appPalette.semantic.textSubtle, backgroundColor: completed ? appPalette.brand.primary : appPalette.surface.background, alignItems: "center", justifyContent: "center" }}>
-                    {completed && <Text style={{ color: appPalette.semantic.textInverse, fontSize: 12, fontWeight: "500", fontFamily: "Montserrat", lineHeight: 18 }}>?</Text>}
+                    {completed && <Text style={{ color: appPalette.semantic.textInverse, fontSize: 12, fontWeight: "700", fontFamily: "Montserrat", lineHeight: 18 }}>✓</Text>}
                   </View>
 
                   <View style={{ flex: 1, gap: 2 }}>

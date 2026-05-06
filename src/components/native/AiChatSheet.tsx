@@ -3,11 +3,23 @@ import { useTranslation } from "react-i18next";
 import { KeyboardAvoidingView, Modal, Platform, ScrollView, Text, TextInput, View } from "react-native";
 
 import { ActionChip } from "@/components/native/ActionChip";
+import { Calendar, Clock, Crown, Gift, Award, Star, Target, Trophy, Zap } from "@/components/native/Icons";
+import { categoryConfig } from "@/components/native/GoalCardParts";
 import { SurfaceCard } from "@/components/native/SurfaceCard";
 import { formatReminderDayLabel } from "@/shared/display/reminders";
+import type { RewardIconType } from "@/shared/domain";
 import { useAppStore } from "@/stores/useAppStore";
 import { appPalette } from "@/theme/palette";
 import type { AIChatResponse, ChatMessage, Draft, Goal, Task } from "@/types";
+
+const rewardIconMap: Record<RewardIconType, React.ComponentType<{ size?: string | number; color?: string }>> = {
+  trophy: Trophy,
+  star: Star,
+  gift: Gift,
+  crown: Crown,
+  award: Award,
+  zap: Zap,
+};
 
 export function AiChatSheet({ open, onOpenChange, onDraftAdded }: { open: boolean; onOpenChange: (open: boolean) => void; onDraftAdded: (goal: Goal) => void }) {
   const { t } = useTranslation();
@@ -112,7 +124,7 @@ export function AiChatSheet({ open, onOpenChange, onDraftAdded }: { open: boolea
               <TextInput
                 value={prompt}
                 onChangeText={setPrompt}
-                placeholder={t("ai.goal_prompt_placeholder")}
+                placeholder={t("ai.placeholder")}
                 multiline
                 textAlignVertical="top"
                 style={{ minHeight: 96, borderWidth: 1, borderColor: appPalette.semantic.borderStrong, borderRadius: 16, paddingHorizontal: 14, paddingVertical: 12, backgroundColor: appPalette.surface.background, color: appPalette.semantic.textStrong, fontFamily: "Montserrat", fontSize: 12, lineHeight: 18 }}
@@ -127,7 +139,7 @@ export function AiChatSheet({ open, onOpenChange, onDraftAdded }: { open: boolea
             <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8 }}>
               <ActionChip onPress={() => onOpenChange(false)}>{t("common.close")}</ActionChip>
               <ActionChip onPress={() => void handleGenerate()} tone="primary">
-                {loading ? t("ai.thinking") : t("ai.ask_ai")}
+                {loading ? t("ai.asking") : t("ai.ask")}
               </ActionChip>
             </View>
           </View>
@@ -160,6 +172,9 @@ function GoalDraftCard({ draft, isDraftAdded, messageId, onAdd }: { draft: Draft
   const { t } = useTranslation();
   const { categories, addDraft } = useAppStore();
   const categoryLabel = categories.find((item) => item.value === draft.goal.category)?.label ?? draft.goal.category;
+  const categoryPalette = categoryConfig[draft.goal.category] ?? categoryConfig.custom;
+  const CategoryIcon = categoryPalette.icon;
+  const RewardDraftIcon = rewardIconMap[(draft.reward?.icon as RewardIconType | undefined) ?? "trophy"] ?? Trophy;
   const periodLabels: Record<string, string> = {
     DAILY: t("goal_period.daily"),
     WEEKLY: t("goal_period.weekly"),
@@ -177,15 +192,29 @@ function GoalDraftCard({ draft, isDraftAdded, messageId, onAdd }: { draft: Draft
   };
 
   return (
-    <SurfaceCard gap={10}>
+    <SurfaceCard gap={12}>
       <View style={{ gap: 6 }}>
-        <Text style={{ fontSize: 16, fontWeight: "700", color: appPalette.semantic.textStrong, fontFamily: "Montserrat" }}>{draft.goal.title}</Text>
-        <Text style={{ color: appPalette.semantic.text, fontFamily: "Montserrat", fontSize: 12, lineHeight: 18 }}>{categoryLabel}</Text>
+        <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
+          <Target size={18} color={appPalette.brand.primary} />
+          <Text style={{ flex: 1, fontSize: 16, fontWeight: "700", color: appPalette.semantic.textStrong, fontFamily: "Montserrat", lineHeight: 24 }}>{draft.goal.title}</Text>
+        </View>
+        <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8 }}>
+          <View style={{ alignSelf: "flex-start", maxWidth: "100%", paddingHorizontal: 8, paddingVertical: 4, borderRadius: 999, borderWidth: 1, backgroundColor: categoryPalette.backgroundColor, borderColor: categoryPalette.borderColor, flexDirection: "row", alignItems: "center", gap: 6 }}>
+            <CategoryIcon size={12} color={categoryPalette.textColor} />
+            <Text style={{ color: categoryPalette.textColor, fontWeight: "600", fontSize: 12, fontFamily: "Montserrat", lineHeight: 18, flexShrink: 1 }}>{categoryLabel}</Text>
+          </View>
+          {draft.goal.goalPeriod !== "NONE" && (
+            <MetaBadge icon={<Clock size={12} color={appPalette.semantic.infoText} />}>
+              {periodLabels[draft.goal.goalPeriod] ?? draft.goal.goalPeriod}
+            </MetaBadge>
+          )}
+          {!!draft.goal.dueDate && (
+            <MetaBadge icon={<Calendar size={12} color={appPalette.semantic.infoText} />}>
+              {draft.goal.dueDate}
+            </MetaBadge>
+          )}
+        </View>
         {!!draft.goal.description && <Text style={{ color: appPalette.semantic.text, fontFamily: "Montserrat", fontSize: 12, lineHeight: 18 }}>{draft.goal.description}</Text>}
-      </View>
-      <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8 }}>
-        {draft.goal.goalPeriod !== "NONE" && <Pill>{periodLabels[draft.goal.goalPeriod] ?? draft.goal.goalPeriod}</Pill>}
-        {!!draft.goal.dueDate && <Pill>{draft.goal.dueDate}</Pill>}
       </View>
       {draft.tasks?.length > 0 && (
         <View style={{ gap: 6 }}>
@@ -198,11 +227,14 @@ function GoalDraftCard({ draft, isDraftAdded, messageId, onAdd }: { draft: Draft
           <Text style={{ fontWeight: "600", color: appPalette.semantic.textStrong, fontFamily: "Montserrat", fontSize: 12, lineHeight: 18 }}>{t("ai.reminders")}</Text>
           {draft.reminders.map((reminder, index) => (
             <View key={`${reminder.title}-${index}`} style={{ backgroundColor: appPalette.ui.inputBackground, borderRadius: 12, padding: 10, gap: 6 }}>
-              <Text style={{ color: appPalette.semantic.textStrong, fontWeight: "600", fontFamily: "Montserrat", fontSize: 12, lineHeight: 18 }}>{reminder.title}</Text>
+              <View style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
+                <Clock size={14} color={appPalette.brand.primary} />
+                <Text style={{ color: appPalette.semantic.textStrong, fontWeight: "600", fontFamily: "Montserrat", fontSize: 12, lineHeight: 18 }}>{reminder.title}</Text>
+              </View>
               <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8 }}>
-                <Pill>{reminder.time}</Pill>
-                {reminder.daysOfWeek.map((day) => <Pill key={day}>{formatReminderDayLabel(day, t)}</Pill>)}
-                {reminder.daysOfMonth.map((day) => <Pill key={day}>{String(day)}</Pill>)}
+                <MetaBadge icon={<Clock size={12} color={appPalette.semantic.infoText} />}>{reminder.time}</MetaBadge>
+                {reminder.daysOfWeek.map((day) => <MetaBadge key={day}>{formatReminderDayLabel(day, t)}</MetaBadge>)}
+                {reminder.daysOfMonth.map((day) => <MetaBadge key={day}>{String(day)}</MetaBadge>)}
               </View>
             </View>
           ))}
@@ -212,15 +244,20 @@ function GoalDraftCard({ draft, isDraftAdded, messageId, onAdd }: { draft: Draft
         <View style={{ gap: 6 }}>
           <Text style={{ fontWeight: "600", color: appPalette.semantic.textStrong, fontFamily: "Montserrat", fontSize: 12, lineHeight: 18 }}>{t("ai.reward")}</Text>
           <View style={{ backgroundColor: appPalette.ui.inputBackground, borderRadius: 12, padding: 10, gap: 4 }}>
-            <Text style={{ color: appPalette.semantic.textStrong, fontWeight: "600", fontFamily: "Montserrat", fontSize: 12, lineHeight: 18 }}>{draft.reward.title}</Text>
+            <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
+              <View style={{ width: 28, height: 28, borderRadius: 10, alignItems: "center", justifyContent: "center", backgroundColor: appPalette.semantic.warningSurface }}>
+                <RewardDraftIcon size={16} color={appPalette.semantic.warningText} />
+              </View>
+              <Text style={{ color: appPalette.semantic.textStrong, fontWeight: "600", fontFamily: "Montserrat", fontSize: 12, lineHeight: 18 }}>{draft.reward.title}</Text>
+            </View>
             {!!draft.reward.description && <Text style={{ color: appPalette.semantic.text, fontFamily: "Montserrat", fontSize: 12, lineHeight: 18 }}>{draft.reward.description}</Text>}
-            {draft.reward.xpRequires != null && <Text style={{ color: appPalette.semantic.warningText, fontFamily: "Montserrat", fontSize: 12, lineHeight: 18 }}>{t("ai.xp_required", { xp: draft.reward.xpRequires })}</Text>}
+            {draft.reward.xpRequires != null && <MetaBadge>{t("ai.xp_required", { xp: draft.reward.xpRequires })}</MetaBadge>}
           </View>
         </View>
       )}
       <View style={{ flexDirection: "row", justifyContent: "flex-end" }}>
         <ActionChip onPress={() => void handleAdd()} tone="primary">
-          {isDraftAdded ? t("ai.already_added") : t("ai.add_to_goals")}
+          {isDraftAdded ? t("common.added") : t("common.add")}
         </ActionChip>
       </View>
     </SurfaceCard>
@@ -229,19 +266,22 @@ function GoalDraftCard({ draft, isDraftAdded, messageId, onAdd }: { draft: Draft
 
 function TaskPreview({ task, depth }: { task: Task; depth: number }) {
   return (
-    <View style={{ gap: 6, marginLeft: depth * 12 }}>
-      <View style={{ backgroundColor: appPalette.ui.inputBackground, borderRadius: 12, padding: 10, gap: 4 }}>
-        <Text style={{ color: appPalette.semantic.textStrong, fontFamily: "Montserrat", fontSize: 12, lineHeight: 18 }}>{task.title}</Text>
-        {task.xpReward != null && <Text style={{ color: appPalette.brand.primary, fontWeight: "600", fontFamily: "Montserrat", fontSize: 12, lineHeight: 18 }}>+{task.xpReward} XP</Text>}
+    <View style={{ gap: 6, marginLeft: depth * 12, paddingLeft: depth > 0 ? 10 : 0, borderLeftWidth: depth > 0 ? 1 : 0, borderLeftColor: appPalette.semantic.borderSubtle }}>
+      <View style={{ backgroundColor: appPalette.ui.inputBackground, borderRadius: 12, padding: 10, gap: 6 }}>
+        <View style={{ flexDirection: "row", alignItems: "flex-start", justifyContent: "space-between", gap: 8 }}>
+          <Text style={{ flex: 1, color: appPalette.semantic.textStrong, fontFamily: "Montserrat", fontSize: 12, lineHeight: 18 }}>{task.title}</Text>
+          {task.xpReward != null && <MetaBadge>+{task.xpReward} XP</MetaBadge>}
+        </View>
       </View>
       {task.subtasks?.map((subtask, index) => <TaskPreview key={`${subtask.title}-${index}`} task={subtask} depth={depth + 1} />)}
     </View>
   );
 }
 
-function Pill({ children }: { children: string }) {
+function MetaBadge({ children, icon }: { children: React.ReactNode; icon?: React.ReactNode }) {
   return (
-    <View style={{ backgroundColor: appPalette.semantic.infoSurfaceStrong, borderRadius: 999, paddingHorizontal: 10, paddingVertical: 6 }}>
+    <View style={{ alignSelf: "flex-start", flexDirection: "row", alignItems: "center", gap: 6, backgroundColor: appPalette.semantic.infoSurfaceStrong, borderRadius: 999, paddingHorizontal: 10, paddingVertical: 6 }}>
+      {icon ? <View style={{ width: 12, height: 12, alignItems: "center", justifyContent: "center" }}>{icon}</View> : null}
       <Text style={{ color: appPalette.semantic.infoText, fontWeight: "600", fontSize: 12, fontFamily: "Montserrat", lineHeight: 18 }}>{children}</Text>
     </View>
   );
