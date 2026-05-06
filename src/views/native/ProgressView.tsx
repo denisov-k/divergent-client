@@ -16,8 +16,10 @@ import {
 } from "@/components/native/progress-screen/ProgressSections";
 import { ProgressStatCard } from "@/components/native/progress-screen/ProgressPrimitives";
 import Config from "@/services/Config";
+import { isTaskCompletedThisPeriod } from "@/shared/screens/goals/model";
 import { useProgressScreen } from "@/shared/screens/progress/useProgressScreen";
 import { appPalette } from "@/theme/palette";
+import type { Task } from "@/types";
 
 type SectionBoundaryProps = {
   section: string;
@@ -146,6 +148,18 @@ function NativeProgressScreenContent(props: { goalId?: string | null; onConsumeL
     [activity, streakDays]
   );
   const debugLines = useMemo(() => {
+    const flattenTasks = (tasks: Task[]): Task[] =>
+      tasks.flatMap((task) => [task, ...(task.subtasks?.length ? flattenTasks(task.subtasks) : [])]);
+    const goalTasks = selectedGoal?.tasks ? flattenTasks(selectedGoal.tasks) : [];
+    const completedTasksThisPeriod = selectedGoal
+      ? goalTasks.filter((task) => isTaskCompletedThisPeriod(task, selectedGoal.goalPeriod)).length
+      : 0;
+    const recentTaskTail = goalTasks
+      .filter((task) => task.lastCompletedAt)
+      .sort((a, b) => new Date(b.lastCompletedAt).getTime() - new Date(a.lastCompletedAt).getTime())
+      .slice(0, 3)
+      .map((task) => `${task.title}:${task.lastCompletedAt}`)
+      .join(" | ") || "none";
     const last7Xp = activity?.data.slice(-7).reduce((sum, item) => sum + (item.xp || 0), 0) ?? 0;
     const activityTail = activity?.data.slice(-3).map((item) => `${item.periodStart}:${item.completed}/${item.total}:${item.xp}`).join(" | ") ?? "none";
 
@@ -155,6 +169,8 @@ function NativeProgressScreenContent(props: { goalId?: string | null; onConsumeL
       `selectedGoalTitle: ${selectedGoal?.title ?? "none"}`,
       `selectedGoalType: ${selectedGoal?.goalType ?? "none"}`,
       `selectedGoalPeriod: ${selectedGoal?.goalPeriod ?? "none"}`,
+      `goalTasks: ${goalTasks.length}`,
+      `completedTasksThisPeriod: ${completedTasksThisPeriod}`,
       `xp: ${xp}`,
       `xpError: ${String(xpError)}`,
       `activityError: ${String(activityError)}`,
@@ -165,6 +181,7 @@ function NativeProgressScreenContent(props: { goalId?: string | null; onConsumeL
       `last7Xp: ${last7Xp}`,
       `weeklyXpBars: ${weeklyXpData.map((item) => `${item.name}:${item.value}`).join(", ") || "none"}`,
       `activityTail: ${activityTail}`,
+      `recentTaskTail: ${recentTaskTail}`,
     ];
   }, [activity, activityError, loadingActivity, selectedGoal, weeklyXpData, xp, xpError]);
   const baseDiagnostics = useMemo(
