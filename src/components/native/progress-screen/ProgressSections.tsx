@@ -1,4 +1,5 @@
-import { Modal, Pressable, ScrollView, Text, View } from "react-native";
+import { Modal, ScrollView, Text, View } from "react-native";
+import { HapticPressable as Pressable } from "@/components/native/HapticPressable";
 import { useTranslation } from "react-i18next";
 
 import { ChartSpline, ChevronDown, Flame } from "@/components/native/Icons";

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Pressable, Text, TextInput, View } from "react-native";
+import { Text, TextInput, View } from "react-native";
+import { HapticPressable as Pressable } from "@/components/native/HapticPressable";
 
 import { useNativeNavigation } from "@/app/native/NativeNavigation";
 import { buildChallengesPath, buildRewardsPath } from "@/app/routes";

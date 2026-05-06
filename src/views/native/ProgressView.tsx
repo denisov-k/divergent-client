@@ -1,5 +1,6 @@
 import { Component, type ErrorInfo, type ReactNode, useEffect, useMemo, useState } from "react";
-import { Pressable, ScrollView, Text, View } from "react-native";
+import { ScrollView, Text, View } from "react-native";
+import { HapticPressable as Pressable } from "@/components/native/HapticPressable";
 import { useTranslation } from "react-i18next";
 
 import { Target, Trophy, Zap } from "@/components/native/Icons";

@@ -1,13 +1,13 @@
 import { Suspense, lazy, useCallback, useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Linking, Pressable, SafeAreaView, Text, View } from "react-native";
+import { Linking, SafeAreaView, Text, View } from "react-native";
+import { HapticPressable as Pressable } from "@/components/native/HapticPressable";
 
 import { NativeNavigationProvider } from "@/app/native/NativeNavigation";
 import { parseNativeAppRoute, type NativeAppTab } from "@/app/router.native";
 import { NativeAppHeader } from "@/components/native/NativeAppHeader";
 import { BarChart2, Bell, Gift, Swords, Target } from "@/components/native/Icons";
 import { AppLoader } from "@/components/shared/AppLoader";
-import { triggerSelectionHaptic } from "@/platform/haptics";
 import { useAppStore } from "@/stores/useAppStore";
 import { appPalette } from "@/theme/palette";
 
@@ -245,7 +245,6 @@ export default function NativeAppShell({ mode = "standalone" }: { mode?: "previe
               <Pressable
                 key={tab.key}
                 onPress={() => {
-                  void triggerSelectionHaptic();
                   setActiveTab(tab.key);
                 }}
                 style={{

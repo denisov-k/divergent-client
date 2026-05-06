@@ -1,4 +1,5 @@
-﻿import { Image, Pressable, Text, View } from "react-native";
+﻿import { Image, Text, View } from "react-native";
+import { HapticPressable as Pressable } from "@/components/native/HapticPressable";
 import { useTranslation } from "react-i18next";
 
 import { Settings } from "@/components/native/Icons";

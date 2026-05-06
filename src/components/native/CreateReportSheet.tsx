@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Modal, Pressable, Text, TextInput, View } from "react-native";
+import { Modal, Text, TextInput, View } from "react-native";
+import { HapticPressable as Pressable } from "@/components/native/HapticPressable";
 
 import { ActionChip } from "@/components/native/ActionChip";
 import { pickReportUpload } from "@/platform/reportUpload";

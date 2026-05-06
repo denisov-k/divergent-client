@@ -1,4 +1,5 @@
-import { Pressable, Text, View } from "react-native";
+import { Text, View } from "react-native";
+import { HapticPressable as Pressable } from "@/components/native/HapticPressable";
 
 import { ActionChip } from "@/components/native/ActionChip";
 

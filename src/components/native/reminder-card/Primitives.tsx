@@ -1,5 +1,6 @@
 import { useTranslation } from "react-i18next";
-import { Pressable, Text, View } from "react-native";
+import { Text, View } from "react-native";
+import { HapticPressable as Pressable } from "@/components/native/HapticPressable";
 
 import { formatReminderDayLabel } from "@/shared/display/reminders";
 import { appPalette } from "@/theme/palette";
