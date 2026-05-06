@@ -17,7 +17,6 @@ import {
 import { ProgressStatCard } from "@/components/native/progress-screen/ProgressPrimitives";
 import { useProgressScreen } from "@/shared/screens/progress/useProgressScreen";
 import { appPalette } from "@/theme/palette";
-import type { GoalActivity } from "@/types";
 
 type SectionBoundaryProps = {
   section: string;
@@ -147,18 +146,6 @@ function NativeProgressScreenContent(props: { goalId?: string | null; onConsumeL
     ? "Не удалось загрузить прогресс по этой цели. Попробуй повторить запрос ещё раз."
     : "Couldn't load progress for this goal. Try requesting it again.";
   const retryLabel = i18n.language?.startsWith("ru") ? "Повторить" : "Retry";
-  const taskGoalFallbackActivity = useMemo<GoalActivity | null>(() => {
-    if (!selectedGoal || selectedGoal.goalType !== "TASK") {
-      return null;
-    }
-
-    return activity ?? {
-      currentStreak: 0,
-      longestStreak: 0,
-      period: selectedGoal.goalPeriod,
-      data: [],
-    };
-  }, [activity, selectedGoal]);
   const showTaskGoalError = !!selectedGoal && selectedGoal.goalType === "TASK" && (xpError || activityError);
 
   return (
@@ -172,15 +159,24 @@ function NativeProgressScreenContent(props: { goalId?: string | null; onConsumeL
           {!selectedGoal && <ProgressStatCard title={t("progress.rewards_received")} value={unlockedRewards} description={t("progress.rewards_received_description", { count: rewards.length })} icon={<Trophy size={20} color={appPalette.semantic.textMuted} />} />}
         </View>
 
-        {selectedGoal && selectedGoal.goalType === "TASK" && taskGoalFallbackActivity && (
+        {selectedGoal && selectedGoal.goalType === "TASK" && (loadingActivity || activity) && (
           <ProgressSectionBoundary
             section="NativePeriodCalendar"
             diagnostics={{
               ...baseDiagnostics,
-              renderedActivityPoints: taskGoalFallbackActivity.data.length,
+              renderedActivityPoints: activity?.data.length ?? 0,
             }}
           >
-            <NativePeriodCalendar goal={selectedGoal} activity={taskGoalFallbackActivity} loading={loadingActivity} />
+            <NativePeriodCalendar
+              goal={selectedGoal}
+              activity={activity ?? {
+                currentStreak: 0,
+                longestStreak: 0,
+                period: selectedGoal.goalPeriod,
+                data: [],
+              }}
+              loading={loadingActivity}
+            />
           </ProgressSectionBoundary>
         )}
 
@@ -205,7 +201,7 @@ function NativeProgressScreenContent(props: { goalId?: string | null; onConsumeL
           </ProgressSectionBoundary>
         )}
 
-        {selectedGoal && selectedGoal.goalType === "TASK" && weeklyXpData.length > 0 && (
+        {selectedGoal && selectedGoal.goalType === "TASK" && activity && (
           <ProgressSectionBoundary
             section="ProgressWeeklyXpSection"
             diagnostics={{
