@@ -1,5 +1,6 @@
 ﻿import Config from "@/services/Config";
 import { readDownloadResponse } from "@/platform/download";
+import { streamFetch } from "@/platform/streamFetch";
 import { clearSessionToken, readSessionToken, writeSessionToken } from "@/platform/session";
 import { createReportUploadBody } from "@/platform/upload";
 import type {
@@ -65,7 +66,7 @@ type FetchJSONOptions = RequestInit & {
   timeoutMs?: number;
 };
 
-async function fetchWithAuth(url: string, options: FetchJSONOptions = {}) {
+async function fetchWithAuth(url: string, options: FetchJSONOptions = {}, fetchImpl: typeof fetch = fetch) {
   const { timeoutMs, ...requestOptions } = options;
   const isFormData = options.body instanceof FormData;
   const baseUrl = Config.data.api.http.baseURL;
@@ -76,7 +77,7 @@ async function fetchWithAuth(url: string, options: FetchJSONOptions = {}) {
   const timeoutId = setTimeout(() => controller.abort(), requestTimeoutMs);
 
   try {
-    return await fetch(baseUrl + url, {
+    return await fetchImpl(baseUrl + url, {
       ...requestOptions,
       credentials: publicAuthRoute ? "omit" : "include",
       signal: controller.signal,
@@ -372,7 +373,7 @@ export async function chatAIStream(message: string, handlers: AIChatStreamHandle
       method: "POST",
       body: JSON.stringify({ message }),
       timeoutMs: AI_API_TIMEOUT_MS,
-    });
+    }, streamFetch);
 
     const nextSessionToken = res.headers.get("x-session-token");
     if (nextSessionToken) {
