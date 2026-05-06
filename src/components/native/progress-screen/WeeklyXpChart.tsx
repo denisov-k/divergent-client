@@ -8,6 +8,7 @@ export function WeeklyXpChart({ data }: { data: { name: string; value: number }[
   }
 
   const maxValue = Math.max(...data.map((item) => item.value), 1);
+  const chartHeight = 112;
 
   return (
     <View style={{ gap: 8 }}>
@@ -31,7 +32,7 @@ export function WeeklyXpChart({ data }: { data: { name: string; value: number }[
               style={{
                 width: "100%",
                 maxWidth: 28,
-                height: `${Math.max(6, (item.value / maxValue) * 100)}%`,
+                height: Math.max(6, (item.value / maxValue) * chartHeight),
                 minHeight: 6,
                 borderRadius: 999,
                 backgroundColor: appPalette.brand.primary,

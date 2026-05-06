@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { Component, type ErrorInfo, type ReactNode, useEffect, useMemo, useState } from "react";
 import { Pressable, ScrollView, Text, View } from "react-native";
 import { useTranslation } from "react-i18next";
 
@@ -17,6 +17,43 @@ import { ProgressStatCard } from "@/components/native/progress-screen/ProgressPr
 import { useProgressScreen } from "@/shared/screens/progress/useProgressScreen";
 import { appPalette } from "@/theme/palette";
 import type { GoalActivity } from "@/types";
+
+type SectionBoundaryProps = {
+  section: string;
+  diagnostics: Record<string, unknown>;
+  children: ReactNode;
+};
+
+type SectionBoundaryState = {
+  hasError: boolean;
+};
+
+class ProgressSectionBoundary extends Component<SectionBoundaryProps, SectionBoundaryState> {
+  state: SectionBoundaryState = {
+    hasError: false,
+  };
+
+  static getDerivedStateFromError() {
+    return { hasError: true };
+  }
+
+  componentDidCatch(error: Error, errorInfo: ErrorInfo) {
+    console.error("Native progress section render failed", {
+      section: this.props.section,
+      error,
+      componentStack: errorInfo.componentStack,
+      diagnostics: this.props.diagnostics,
+    });
+  }
+
+  render() {
+    if (!this.state.hasError) {
+      return this.props.children;
+    }
+
+    return null;
+  }
+}
 
 function ProgressGoalErrorCard({
   title,
@@ -85,6 +122,25 @@ function NativeProgressScreenContent(props: { goalId?: string | null; onConsumeL
     () => (!activity || !streakDays ? null : { current: activity.currentStreak, longest: activity.longestStreak, days: streakDays }),
     [activity, streakDays]
   );
+  const baseDiagnostics = useMemo(
+    () => ({
+      goalId,
+      selectedGoalId: selectedGoal?.id ?? null,
+      selectedGoalType: selectedGoal?.goalType ?? null,
+      selectedGoalPeriod: selectedGoal?.goalPeriod ?? null,
+      selectedGoalTaskCount: selectedGoal?.tasks?.length ?? 0,
+      hasActivity: Boolean(activity),
+      activityPoints: activity?.data?.length ?? 0,
+      currentStreak: activity?.currentStreak ?? null,
+      longestStreak: activity?.longestStreak ?? null,
+      streakDaysCount: streakDays?.length ?? 0,
+      weeklyXpBars: weeklyXpData.length,
+      loadingActivity,
+      xpError,
+      activityError,
+    }),
+    [activity, activityError, goalId, loadingActivity, selectedGoal, streakDays, weeklyXpData.length, xpError]
+  );
   const selectedLabel = selectedGoal?.title || t("progress.all_goals");
   const progressLoadErrorDescription = i18n.language?.startsWith("ru")
     ? "Не удалось загрузить прогресс по этой цели. Попробуй повторить запрос ещё раз."
@@ -116,7 +172,15 @@ function NativeProgressScreenContent(props: { goalId?: string | null; onConsumeL
         </View>
 
         {selectedGoal && selectedGoal.goalType === "TASK" && taskGoalFallbackActivity && (
-          <NativePeriodCalendar goal={selectedGoal} activity={taskGoalFallbackActivity} loading={loadingActivity} />
+          <ProgressSectionBoundary
+            section="NativePeriodCalendar"
+            diagnostics={{
+              ...baseDiagnostics,
+              renderedActivityPoints: taskGoalFallbackActivity.data.length,
+            }}
+          >
+            <NativePeriodCalendar goal={selectedGoal} activity={taskGoalFallbackActivity} loading={loadingActivity} />
+          </ProgressSectionBoundary>
         )}
 
         {showTaskGoalError && (
@@ -129,10 +193,29 @@ function NativeProgressScreenContent(props: { goalId?: string | null; onConsumeL
         )}
 
         {selectedGoal && selectedGoal.goalType === "TASK" && streakMeta && (
-          <ProgressStreakSection current={streakMeta.current} longest={streakMeta.longest} days={streakMeta.days} />
+          <ProgressSectionBoundary
+            section="ProgressStreakSection"
+            diagnostics={{
+              ...baseDiagnostics,
+              renderedStreakDays: streakMeta.days.length,
+            }}
+          >
+            <ProgressStreakSection current={streakMeta.current} longest={streakMeta.longest} days={streakMeta.days} />
+          </ProgressSectionBoundary>
         )}
 
-        {selectedGoal && selectedGoal.goalType === "TASK" && weeklyXpData.length > 0 && <ProgressWeeklyXpSection data={weeklyXpData} />}
+        {selectedGoal && selectedGoal.goalType === "TASK" && weeklyXpData.length > 0 && (
+          <ProgressSectionBoundary
+            section="ProgressWeeklyXpSection"
+            diagnostics={{
+              ...baseDiagnostics,
+              renderedWeeklyXpBars: weeklyXpData.length,
+              maxWeeklyXpValue: Math.max(...weeklyXpData.map((item) => item.value), 0),
+            }}
+          >
+            <ProgressWeeklyXpSection data={weeklyXpData} />
+          </ProgressSectionBoundary>
+        )}
 
         {!selectedGoal && <ProgressCategoriesSection categoryData={categoryData} />}
       </ScrollView>

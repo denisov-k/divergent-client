@@ -8,8 +8,18 @@ import type { Goal } from "@/types";
 
 import { WeeklyXpChart } from "./WeeklyXpChart";
 
-function getStreakDayLabel(count: number, language: string, t: (key: string) => string) {
-  const category = new Intl.PluralRules(language.startsWith("ru") ? "ru" : "en").select(count);
+function getStreakDayLabel(count: number, language: string | undefined, t: (key: string) => string) {
+  const normalizedLanguage = language?.startsWith("ru") ? "ru" : "en";
+  const pluralRules = typeof Intl !== "undefined" && typeof Intl.PluralRules === "function"
+    ? new Intl.PluralRules(normalizedLanguage)
+    : null;
+  const category = pluralRules
+    ? pluralRules.select(count)
+    : normalizedLanguage === "ru"
+      ? (count % 10 === 1 && count % 100 !== 11 ? "one" : count % 10 >= 2 && count % 10 <= 4 && (count % 100 < 12 || count % 100 > 14) ? "few" : "many")
+      : count === 1
+        ? "one"
+        : "other";
 
   if (category === "one") {
     return t("progress.streak.day_one");

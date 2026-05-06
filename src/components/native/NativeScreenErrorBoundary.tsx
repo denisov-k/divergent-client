@@ -10,6 +10,8 @@ type Props = {
   message: string;
   resetLabel: string;
   onReset: () => void;
+  diagnostics?: Record<string, unknown>;
+  onError?: (error: Error, errorInfo: ErrorInfo) => void;
 };
 
 type State = {
@@ -29,7 +31,10 @@ export class NativeScreenErrorBoundary extends Component<Props, State> {
     console.error("Native screen render failed", {
       error,
       componentStack: errorInfo.componentStack,
+      diagnostics: this.props.diagnostics,
     });
+
+    this.props.onError?.(error, errorInfo);
   }
 
   private handleReset = () => {
