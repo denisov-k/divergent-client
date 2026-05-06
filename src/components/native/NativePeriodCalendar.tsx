@@ -43,7 +43,7 @@ export function NativePeriodCalendar({ goal, activity, loading }: Props) {
     }, 0);
 
     return () => clearTimeout(timer);
-  }, [goal]);
+  }, [goal, activity.data.length, loading]);
 
   const daysToShow = 365;
   const today = dayjs();

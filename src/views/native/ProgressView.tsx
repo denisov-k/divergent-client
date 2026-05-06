@@ -15,11 +15,8 @@ import {
   ProgressWeeklyXpSection,
 } from "@/components/native/progress-screen/ProgressSections";
 import { ProgressStatCard } from "@/components/native/progress-screen/ProgressPrimitives";
-import Config from "@/services/Config";
-import { isTaskCompletedThisPeriod } from "@/shared/screens/goals/model";
 import { useProgressScreen } from "@/shared/screens/progress/useProgressScreen";
 import { appPalette } from "@/theme/palette";
-import type { Task } from "@/types";
 
 type SectionBoundaryProps = {
   section: string;
@@ -93,28 +90,6 @@ function ProgressGoalErrorCard({
   );
 }
 
-function ProgressDebugCard({
-  lines,
-}: {
-  lines: string[];
-}) {
-  return (
-    <SurfaceCard gap={6} padding={16} radius={12}>
-      <Text style={{ color: appPalette.semantic.textStrong, fontSize: 14, fontWeight: "500", lineHeight: 20, fontFamily: "Montserrat" }}>
-        Progress Debug
-      </Text>
-      {lines.map((line) => (
-        <Text
-          key={line}
-          style={{ color: appPalette.semantic.textMuted, fontSize: 12, fontWeight: "400", lineHeight: 18, fontFamily: "Montserrat" }}
-        >
-          {line}
-        </Text>
-      ))}
-    </SurfaceCard>
-  );
-}
-
 function NativeProgressScreenContent(props: { goalId?: string | null; onConsumeLinkState?: () => void }) {
   const { t, i18n } = useTranslation();
   const [goalId, setGoalId] = useState<string | null>(props.goalId || null);
@@ -147,43 +122,6 @@ function NativeProgressScreenContent(props: { goalId?: string | null; onConsumeL
     () => (!activity || !streakDays ? null : { current: activity.currentStreak, longest: activity.longestStreak, days: streakDays }),
     [activity, streakDays]
   );
-  const debugLines = useMemo(() => {
-    const flattenTasks = (tasks: Task[]): Task[] =>
-      tasks.flatMap((task) => [task, ...(task.subtasks?.length ? flattenTasks(task.subtasks) : [])]);
-    const goalTasks = selectedGoal?.tasks ? flattenTasks(selectedGoal.tasks) : [];
-    const completedTasksThisPeriod = selectedGoal
-      ? goalTasks.filter((task) => isTaskCompletedThisPeriod(task, selectedGoal.goalPeriod)).length
-      : 0;
-    const recentTaskTail = goalTasks
-      .filter((task) => task.lastCompletedAt)
-      .sort((a, b) => new Date(b.lastCompletedAt).getTime() - new Date(a.lastCompletedAt).getTime())
-      .slice(0, 3)
-      .map((task) => `${task.title}:${task.lastCompletedAt}`)
-      .join(" | ") || "none";
-    const last7Xp = activity?.data.slice(-7).reduce((sum, item) => sum + (item.xp || 0), 0) ?? 0;
-    const activityTail = activity?.data.slice(-3).map((item) => `${item.periodStart}:${item.completed}/${item.total}:${item.xp}`).join(" | ") ?? "none";
-
-    return [
-      `baseURL: ${Config.data.api.http.baseURL || "empty"}`,
-      `selectedGoalId: ${selectedGoal?.id ?? "none"}`,
-      `selectedGoalTitle: ${selectedGoal?.title ?? "none"}`,
-      `selectedGoalType: ${selectedGoal?.goalType ?? "none"}`,
-      `selectedGoalPeriod: ${selectedGoal?.goalPeriod ?? "none"}`,
-      `goalTasks: ${goalTasks.length}`,
-      `completedTasksThisPeriod: ${completedTasksThisPeriod}`,
-      `xp: ${xp}`,
-      `xpError: ${String(xpError)}`,
-      `activityError: ${String(activityError)}`,
-      `loadingActivity: ${String(loadingActivity)}`,
-      `activityPoints: ${activity?.data.length ?? 0}`,
-      `currentStreak: ${activity?.currentStreak ?? 0}`,
-      `longestStreak: ${activity?.longestStreak ?? 0}`,
-      `last7Xp: ${last7Xp}`,
-      `weeklyXpBars: ${weeklyXpData.map((item) => `${item.name}:${item.value}`).join(", ") || "none"}`,
-      `activityTail: ${activityTail}`,
-      `recentTaskTail: ${recentTaskTail}`,
-    ];
-  }, [activity, activityError, loadingActivity, selectedGoal, weeklyXpData, xp, xpError]);
   const baseDiagnostics = useMemo(
     () => ({
       goalId,
@@ -220,8 +158,6 @@ function NativeProgressScreenContent(props: { goalId?: string | null; onConsumeL
           {!selectedGoal && <ProgressStatCard title={t("progress.completed_goals")} value={completedGoals} description={t("progress.completed_goals_description", { count: filteredGoals.length })} icon={<Target size={20} color={appPalette.semantic.textMuted} />} />}
           {!selectedGoal && <ProgressStatCard title={t("progress.rewards_received")} value={unlockedRewards} description={t("progress.rewards_received_description", { count: rewards.length })} icon={<Trophy size={20} color={appPalette.semantic.textMuted} />} />}
         </View>
-
-        <ProgressDebugCard lines={debugLines} />
 
         {selectedGoal && selectedGoal.goalType === "TASK" && (loadingActivity || activity) && (
           <ProgressSectionBoundary
