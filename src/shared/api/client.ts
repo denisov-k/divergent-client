@@ -133,16 +133,21 @@ function sleep(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-function isNativeRuntime() {
-  return typeof navigator !== "undefined" && navigator.product === "ReactNative";
+function supportsStreamingAiRequests() {
+  return typeof TextDecoder !== "undefined";
 }
 
-function supportsStreamingAiRequests() {
-  if (isNativeRuntime()) {
+function shouldFallbackToAIJob(error: unknown) {
+  if (!(error instanceof Error)) {
     return false;
   }
 
-  return typeof TextDecoder !== "undefined";
+  return (
+    error.message === "Streaming response body is not available" ||
+    error.message.includes("getReader") ||
+    error.message.includes("TextDecoder") ||
+    error.message.includes("ReadableStream")
+  );
 }
 
 function parseSseEventBlock(block: string) {
@@ -362,111 +367,122 @@ export async function chatAIStream(message: string, handlers: AIChatStreamHandle
     return waitForAIChatJob(job.id);
   }
 
-  const res = await fetchWithAuth(`/api/ai/chat/stream`, {
-    method: "POST",
-    body: JSON.stringify({ message }),
-    timeoutMs: AI_API_TIMEOUT_MS,
-  });
+  try {
+    const res = await fetchWithAuth(`/api/ai/chat/stream`, {
+      method: "POST",
+      body: JSON.stringify({ message }),
+      timeoutMs: AI_API_TIMEOUT_MS,
+    });
 
-  const nextSessionToken = res.headers.get("x-session-token");
-  if (nextSessionToken) {
-    await writeSessionToken(nextSessionToken);
-  }
-
-  const contentType = res.headers.get("content-type") || "";
-
-  if (!res.ok) {
-    if (res.status === 401) {
-      await clearSessionToken();
+    const nextSessionToken = res.headers.get("x-session-token");
+    if (nextSessionToken) {
+      await writeSessionToken(nextSessionToken);
     }
 
-    if (contentType.includes("application/json")) {
-      const data = (await res.json()) as { error?: string };
-      throw new Error(data.error || `API error: ${res.status}`);
-    }
+    const contentType = res.headers.get("content-type") || "";
 
-    const text = await res.text();
-    throw new Error(text || `API error: ${res.status}`);
-  }
-
-  if (!contentType.includes("text/event-stream")) {
-    throw new Error(`Expected event stream but received ${contentType || "unknown content type"}`);
-  }
-
-  if (!res.body) {
-    throw new Error("Streaming response body is not available");
-  }
-
-  const reader = res.body.getReader();
-  const decoder = new TextDecoder();
-  let buffer = "";
-  let finalResult: AIChatResponse | null = null;
-  let streamError: string | null = null;
-
-  while (true) {
-    const { done, value } = await reader.read();
-    buffer += decoder.decode(value || new Uint8Array(), { stream: !done });
-
-    const blocks = buffer.split(/\r?\n\r?\n/);
-    buffer = blocks.pop() ?? "";
-
-    for (const block of blocks) {
-      const parsed = parseSseEventBlock(block);
-      if (!parsed) {
-        continue;
+    if (!res.ok) {
+      if (res.status === 401) {
+        await clearSessionToken();
       }
 
-      if (parsed.event === "status") {
-        const status = parsed.data.status;
-        if (status === "started" || status === "streaming" || status === "completed") {
-          handlers.onStatus?.(status);
+      if (contentType.includes("application/json")) {
+        const data = (await res.json()) as { error?: string };
+        throw new Error(data.error || `API error: ${res.status}`);
+      }
+
+      const text = await res.text();
+      throw new Error(text || `API error: ${res.status}`);
+    }
+
+    if (!contentType.includes("text/event-stream")) {
+      throw new Error(`Expected event stream but received ${contentType || "unknown content type"}`);
+    }
+
+    if (!res.body) {
+      throw new Error("Streaming response body is not available");
+    }
+
+    const reader = res.body.getReader();
+    const decoder = new TextDecoder();
+    let buffer = "";
+    let finalResult: AIChatResponse | null = null;
+    let streamError: string | null = null;
+
+    while (true) {
+      const { done, value } = await reader.read();
+      buffer += decoder.decode(value || new Uint8Array(), { stream: !done });
+
+      const blocks = buffer.split(/\r?\n\r?\n/);
+      buffer = blocks.pop() ?? "";
+
+      for (const block of blocks) {
+        const parsed = parseSseEventBlock(block);
+        if (!parsed) {
+          continue;
         }
-        continue;
-      }
 
-      if (parsed.event === "ready") {
-        handlers.onAccepted?.();
-        continue;
-      }
-
-      if (parsed.event === "message" && typeof parsed.data.content === "string") {
-        handlers.onMessage?.(parsed.data.content);
-        continue;
-      }
-
-      if (parsed.event === "draft_status") {
-        const status = parsed.data.status;
-        if (status === "preparing") {
-          handlers.onDraftStatus?.(status);
+        if (parsed.event === "status") {
+          const status = parsed.data.status;
+          if (status === "started" || status === "streaming" || status === "completed") {
+            handlers.onStatus?.(status);
+          }
+          continue;
         }
-        continue;
+
+        if (parsed.event === "ready") {
+          handlers.onAccepted?.();
+          continue;
+        }
+
+        if (parsed.event === "message" && typeof parsed.data.content === "string") {
+          handlers.onMessage?.(parsed.data.content);
+          continue;
+        }
+
+        if (parsed.event === "draft_status") {
+          const status = parsed.data.status;
+          if (status === "preparing") {
+            handlers.onDraftStatus?.(status);
+          }
+          continue;
+        }
+
+        if (parsed.event === "result") {
+          finalResult = parsed.data as unknown as AIChatResponse;
+          continue;
+        }
+
+        if (parsed.event === "error" && typeof parsed.data.error === "string") {
+          streamError = parsed.data.error;
+          continue;
+        }
       }
 
-      if (parsed.event === "result") {
-        finalResult = parsed.data as unknown as AIChatResponse;
-        continue;
-      }
-
-      if (parsed.event === "error" && typeof parsed.data.error === "string") {
-        streamError = parsed.data.error;
-        continue;
+      if (done) {
+        break;
       }
     }
 
-    if (done) {
-      break;
+    if (streamError) {
+      throw new Error(streamError);
     }
-  }
 
-  if (streamError) {
-    throw new Error(streamError);
-  }
+    if (!finalResult) {
+      throw new Error("AI stream ended without a final result");
+    }
 
-  if (!finalResult) {
-    throw new Error("AI stream ended without a final result");
-  }
+    return finalResult;
+  } catch (error) {
+    if (!shouldFallbackToAIJob(error)) {
+      throw error;
+    }
 
-  return finalResult;
+    const job = await createAIChatJob(message);
+    handlers.onAccepted?.();
+    handlers.onStatus?.("started");
+    return waitForAIChatJob(job.id);
+  }
 }
 
 export async function getChatHistory() {
