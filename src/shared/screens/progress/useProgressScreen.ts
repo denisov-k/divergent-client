@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import dayjs from "dayjs";
 
+import Config from "@/services/Config";
 import { useAppStore } from "@/stores/useAppStore";
 import type { GoalActivity } from "@/types";
 
@@ -83,6 +84,13 @@ export function useProgressScreen(goalId?: string | null) {
         const nextXp = selectedGoal ? await getGoalXp(selectedGoal.id) : fallbackXp;
 
         if (active) {
+          console.info("Progress XP loaded", {
+            goalId: selectedGoal?.id ?? null,
+            goalTitle: selectedGoal?.title ?? null,
+            goalType: selectedGoal?.goalType ?? null,
+            baseURL: Config.data.api.http.baseURL,
+            xp: nextXp,
+          });
           setXpError(false);
           setXp(nextXp);
         }
@@ -124,6 +132,18 @@ export function useProgressScreen(goalId?: string | null) {
 
         const response = await getActivity(selectedGoal.id);
         if (active) {
+          console.info("Progress activity loaded", {
+            goalId: selectedGoal.id,
+            goalTitle: selectedGoal.title,
+            goalType: selectedGoal.goalType,
+            goalPeriod: selectedGoal.goalPeriod,
+            baseURL: Config.data.api.http.baseURL,
+            points: response.data.length,
+            currentStreak: response.currentStreak,
+            longestStreak: response.longestStreak,
+            last7Xp: response.data.slice(-7).reduce((sum, item) => sum + (item.xp || 0), 0),
+            sampleTail: response.data.slice(-3),
+          });
           setActivityError(false);
           setActivity(response);
         }
