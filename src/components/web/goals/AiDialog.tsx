@@ -1,4 +1,4 @@
-﻿import { useState, useRef, useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { Calendar, Clock, Target } from "lucide-react";
 
@@ -8,8 +8,10 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { RewardIcon } from "@/components/shared/RewardIcon";
 import { CategoryBadge } from "@/components/shared/CategoryBadge";
+import { formatElapsed } from "@/shared/ai/formatElapsed";
+import { useAiChatSession } from "@/shared/ai/useAiChatSession";
 import { useAppStore } from "@/stores/useAppStore";
-import type { AIChatResponse, Task, ChatMessage, Draft, Goal, RewardIcon as RewardIconType } from "@/types";
+import type { Task, ChatMessage, Draft, Goal, RewardIcon as RewardIconType } from "@/types";
 import { DAYS_OF_WEEK } from "@/types";
 
 interface Props {
@@ -22,121 +24,39 @@ const daysMap = Object.fromEntries(DAYS_OF_WEEK.map((d) => [d.key, d.label])) as
 
 export default function AiChatDialog({ open, onOpenChange, onDraftAdded }: Props) {
   const { t } = useTranslation();
-  const { chatAIStream, getChatHistory } = useAppStore();
-
-  const [prompt, setPrompt] = useState("");
-  const [history, setHistory] = useState<ChatMessage[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [submitting, setSubmitting] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [streamingMessageId, setStreamingMessageId] = useState<string | null>(null);
-  const [draftPendingMessageId, setDraftPendingMessageId] = useState<string | null>(null);
-
   const scrollRef = useRef<HTMLDivElement>(null);
+  const {
+    prompt,
+    setPrompt,
+    history,
+    loading,
+    submitting,
+    error,
+    streamingMessageId,
+    draftPendingMessageId,
+    elapsedSeconds,
+    allowAutoScrollRef,
+    handleGenerate,
+    handleDraftAdded,
+    resetSession,
+  } = useAiChatSession({ open, onDraftAdded });
 
   useEffect(() => {
+    if (!allowAutoScrollRef.current) {
+      allowAutoScrollRef.current = true;
+      return;
+    }
+
     const el = scrollRef.current?.lastElementChild as HTMLElement | null;
     el?.scrollIntoView({ block: "start", behavior: "smooth" });
-  }, [history]);
-
-  const handleGenerate = async () => {
-    if (!prompt.trim()) return;
-
-    const currentPrompt = prompt.trim();
-    const streamingMessageId = `stream-${Date.now()}`;
-    setStreamingMessageId(streamingMessageId);
-    setDraftPendingMessageId(null);
-    setPrompt("");
-
-    const userMessage: ChatMessage = { role: "user", content: currentPrompt, isDraftAdded: false };
-    const assistantMessage: ChatMessage = {
-      id: streamingMessageId,
-      role: "assistant",
-      content: "",
-      isDraftAdded: false,
-    };
-
-    setHistory((h) => [...h, userMessage, assistantMessage]);
-    setLoading(true);
-    setSubmitting(true);
-    setError(null);
-
-    try {
-      const data: AIChatResponse = await chatAIStream(currentPrompt, {
-        onAccepted: () => {
-          setSubmitting(false);
-        },
-        onMessage: (content) => {
-          setHistory((items) =>
-            items.map((item) =>
-              item.id === streamingMessageId ? { ...item, content } : item
-            )
-          );
-        },
-        onDraftStatus: () => {
-          setDraftPendingMessageId(streamingMessageId);
-        },
-      });
-
-      if (data.message) {
-        setHistory((items) =>
-          items.map((item) =>
-            item.id === streamingMessageId
-              ? {
-                  id: data.id,
-                  role: "assistant",
-                  content: data.message,
-                  goalDraft: data.goalDraft ?? null,
-                  isDraftAdded: data.isDraftAdded,
-                }
-              : item
-          )
-        );
-      }
-    } catch {
-      setHistory((items) => items.filter((item) => item.id !== streamingMessageId));
-      setError(t("ai.goal_response_error"));
-    } finally {
-      setSubmitting(false);
-      setStreamingMessageId((current) => (current === streamingMessageId ? null : current));
-      setDraftPendingMessageId((current) => (current === streamingMessageId ? null : current));
-      setLoading(false);
-    }
-  };
+  }, [history, allowAutoScrollRef]);
 
   const handleClose = (nextOpen: boolean) => {
     if (!nextOpen) {
-      setPrompt("");
-      setHistory([]);
-      setError(null);
-      setSubmitting(false);
-      setStreamingMessageId(null);
-      setDraftPendingMessageId(null);
+      resetSession();
     }
     onOpenChange(nextOpen);
   };
-
-  const handleGoalAdded = (goal: Goal, messageId?: string) => {
-    onDraftAdded(goal);
-
-    if (messageId) {
-      setHistory((prev) => prev.map((m) => (m.id === messageId ? { ...m, isDraftAdded: true } : m)));
-    }
-  };
-
-  useEffect(() => {
-    if (open) {
-      const loadHistory = async () => {
-        try {
-          const storedHistory = await getChatHistory();
-          if (storedHistory) setHistory(storedHistory);
-        } catch (err) {
-          console.error("Failed to load chat history:", err);
-        }
-      };
-      void loadHistory();
-    }
-  }, [open, getChatHistory]);
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
@@ -151,9 +71,10 @@ export default function AiChatDialog({ open, onOpenChange, onDraftAdded }: Props
               key={index}
               message={message}
               messageId={message.id}
-              onDraftAdded={handleGoalAdded}
+              onDraftAdded={handleDraftAdded}
               isDraftPending={message.id === streamingMessageId}
               isPreparingDraft={message.id === draftPendingMessageId}
+              elapsedSeconds={message.id === streamingMessageId ? elapsedSeconds : 0}
             />
           ))}
         </div>
@@ -164,7 +85,7 @@ export default function AiChatDialog({ open, onOpenChange, onDraftAdded }: Props
         </div>
 
         <DialogFooter>
-          <Button onClick={handleGenerate} disabled={loading || !prompt.trim()} size="sm">
+          <Button onClick={() => void handleGenerate()} disabled={loading || !prompt.trim()} size="sm">
             {submitting ? t("ai.asking") : t("ai.ask")}
           </Button>
         </DialogFooter>
@@ -179,20 +100,30 @@ function ChatMessageItem({
   onDraftAdded,
   isDraftPending,
   isPreparingDraft,
+  elapsedSeconds,
 }: {
   message: ChatMessage;
   messageId?: string;
   onDraftAdded: (goal: Goal) => void;
   isDraftPending: boolean;
   isPreparingDraft: boolean;
+  elapsedSeconds: number;
 }) {
   const { t } = useTranslation();
   const messageContent = message.content || (isDraftPending ? t("ai.thinking") : "");
+  const showThinkingState = message.role === "assistant" && isDraftPending && !message.content;
 
   return (
     <div className="space-y-1">
       <div className={`whitespace-pre-wrap rounded p-2 ${message.role === "user" ? "bg-blue-100 text-blue-900" : "bg-gray-100 text-gray-800"}`}>
-        {messageContent}
+        {showThinkingState ? (
+          <div className="flex items-center justify-between gap-3">
+            <span>{messageContent}</span>
+            <span className="shrink-0 text-xs text-gray-500">{formatElapsed(elapsedSeconds)}</span>
+          </div>
+        ) : (
+          messageContent
+        )}
       </div>
 
       {message.role === "assistant" && message.goalDraft && (
@@ -220,8 +151,14 @@ function GoalDraftPreview({
 }) {
   const { t } = useTranslation();
   const { addDraft, categories } = useAppStore();
+  const draftGoal = draft.goal as Draft["goal"] & {
+    goalType?: "TASK" | "PROGRESS";
+    currentValue?: number | null;
+    targetValue?: number | null;
+  };
 
   const categoryLabel = categories.find((c) => c.value === draft.goal.category)?.label ?? draft.goal.category;
+  const isProgressGoal = draftGoal.goalType === "PROGRESS";
 
   const handleAdd = async () => {
     if (!messageId) return;
@@ -246,6 +183,12 @@ function GoalDraftPreview({
       {draft.goal.description && <div>{draft.goal.description}</div>}
 
       <div className="flex items-center gap-2 font-medium">
+        {draftGoal.goalType && (
+          <Badge variant="secondary">
+            {isProgressGoal ? t("goals.dialog.goal_type_progress") : t("goals.dialog.goal_type_tasks")}
+          </Badge>
+        )}
+
         {draft.goal.goalPeriod !== "NONE" && (
           <Badge variant="outline">
             {draft.goal.goalPeriod === "DAILY" && t("goal_period.daily")}
@@ -262,7 +205,15 @@ function GoalDraftPreview({
         )}
       </div>
 
-      {draft.tasks?.length > 0 && (
+      {isProgressGoal && (
+        <div className="flex flex-wrap gap-2">
+          <Badge variant="outline">
+            {t("goals.dialog.target_value")}: {draftGoal.targetValue ?? 0}
+          </Badge>
+        </div>
+      )}
+
+      {!isProgressGoal && draft.tasks?.length > 0 && (
         <div>
           <div className="mb-1 font-medium">{t("ai.tasks")}</div>
           <ul className="ml-4 list-disc space-y-1">
@@ -364,5 +315,3 @@ function TaskItem({ task }: { task: Task }) {
     </li>
   );
 }
-
-
