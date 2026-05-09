@@ -28,6 +28,13 @@ type AIChatStreamHandlers = {
   onDraftStatus?: (status: "preparing") => void;
 };
 
+export type RegisterPushDevicePayload = {
+  platform: string;
+  expoPushToken: string;
+  deviceId?: string;
+  appVersion?: string;
+};
+
 type AIChatJobStatus = "pending" | "running" | "completed" | "failed";
 
 type AIChatJobResponse = {
@@ -207,6 +214,20 @@ export async function loginWithTelegramIdToken(idToken: string) {
   return fetchJSON("/api/auth/telegram/native-login", {
     method: "POST",
     body: JSON.stringify({ idToken }),
+  });
+}
+
+export async function registerPushDevice(payload: RegisterPushDevicePayload) {
+  return fetchJSON("/api/push/register", {
+    method: "POST",
+    body: JSON.stringify(payload),
+  });
+}
+
+export async function unregisterPushDevice(payload: { expoPushToken?: string; deviceId?: string }) {
+  return fetchJSON("/api/push/unregister", {
+    method: "POST",
+    body: JSON.stringify(payload),
   });
 }
 
@@ -618,6 +639,21 @@ export async function updateReminder(reminder: Reminder) {
 
 export async function toggleReminder(id: string) {
   return fetchJSON(`/api/reminders/${id}/toggle`, { method: "PATCH" });
+}
+
+export async function markReminderDone(id: string) {
+  return fetchJSON(`/api/reminders/${id}/done`, { method: "POST" });
+}
+
+export async function snoozeReminder(id: string, minutes = 10) {
+  return fetchJSON(`/api/reminders/${id}/snooze`, {
+    method: "POST",
+    body: JSON.stringify({ minutes }),
+  });
+}
+
+export async function skipReminder(id: string) {
+  return fetchJSON(`/api/reminders/${id}/skip`, { method: "POST" });
 }
 
 export async function fetchFriends(): Promise<FriendSummary[]> {
