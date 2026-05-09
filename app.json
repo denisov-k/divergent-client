@@ -4,11 +4,17 @@
     "slug": "divergent-client",
     "scheme": "divergent",
     "icon": "./public/icon.jpg",
+    "plugins": [
+      "expo-notifications"
+    ],
     "android": {
       "package": "com.spritemedia.divergent"
     },
     "ios": {
       "bundleIdentifier": "com.spritemedia.divergent",
+      "entitlements": {
+        "aps-environment": "production"
+      },
       "infoPlist": {
         "LSApplicationQueriesSchemes": [
           "tg"
