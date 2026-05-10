@@ -24,7 +24,7 @@ export function ReminderBadge({
 }) {
   const palette = {
     neutral: { backgroundColor: appPalette.semantic.neutralSurfaceStrong, color: appPalette.semantic.neutralText, borderColor: appPalette.semantic.borderSubtle },
-    info: { backgroundColor: appPalette.semantic.infoSurface, color: appPalette.semantic.infoText, borderColor: appPalette.categories.work.border },
+    info: { backgroundColor: appPalette.brand.primary, color: appPalette.semantic.textInverse, borderColor: appPalette.brand.primary },
   }[tone];
 
   const content = (

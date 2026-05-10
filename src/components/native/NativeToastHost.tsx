@@ -83,7 +83,7 @@ export function NativeToastHost() {
       pointerEvents="box-none"
       style={{
         position: "absolute",
-        top: 14,
+        bottom: 78,
         left: 12,
         right: 12,
         zIndex: 1000,

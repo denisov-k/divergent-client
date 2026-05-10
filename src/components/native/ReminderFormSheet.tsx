@@ -13,6 +13,7 @@ import {
   ReminderStateSection,
   ReminderTaskSection,
 } from "@/components/native/reminder-form-sheet/Sections";
+import { ReminderTimeSection } from "@/components/native/reminder-form-sheet/ReminderTimeSection";
 import { MONTH_DAYS, type ReminderMode, WEEK_DAYS } from "@/components/native/reminder-form-sheet/constants";
 import type { Goal, Reminder } from "@/types";
 
@@ -158,7 +159,7 @@ export function ReminderFormSheet({
       }
     >
       <FieldInput label={t("common.title")} value={title} onChangeText={setTitle} placeholder={t("reminders.dialog.title_placeholder")} />
-      <FieldInput label={t("common.time")} value={time} onChangeText={setTime} placeholder="09:00" />
+      <ReminderTimeSection value={time} onChange={setTime} />
       <ReminderModeSection mode={mode} onChange={setMode} />
       <ReminderScheduleSection
         mode={mode}

@@ -83,12 +83,12 @@ export function ReminderLinksSection({
   return (
     <View style={{ borderTopWidth: 1, borderTopColor: appPalette.semantic.borderSubtle, paddingTop: 8, flexDirection: "row", flexWrap: "wrap", gap: 8 }}>
       {!!goal && (
-        <ReminderBadge tone="info" icon={<Target size={12} color={appPalette.semantic.infoText} />} onPress={() => goal?.id && navigateToPath(buildGoalsPath({ id: goal.id }))}>
+        <ReminderBadge tone="info" icon={<Target size={12} color={appPalette.semantic.textInverse} />} onPress={() => goal?.id && navigateToPath(buildGoalsPath({ id: goal.id }))}>
           {goal.title}
         </ReminderBadge>
       )}
       {!!goal && !!task && (
-        <ReminderBadge tone="info" icon={<CircleCheck size={12} color={appPalette.semantic.infoText} />} onPress={() => goal?.id && navigateToPath(buildGoalsPath({ id: goal.id }))}>
+        <ReminderBadge tone="info" icon={<CircleCheck size={12} color={appPalette.semantic.textInverse} />} onPress={() => goal?.id && navigateToPath(buildGoalsPath({ id: goal.id }))}>
           {task.title}
         </ReminderBadge>
       )}
