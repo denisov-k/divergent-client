@@ -7,6 +7,7 @@ import { appPalette } from "@/theme/palette";
 
 export default function NativeGoalsScreen(props: {
   goalId?: string | null;
+  reportTaskId?: string | null;
   onConsumeLinkState?: () => void;
 }) {
   const {

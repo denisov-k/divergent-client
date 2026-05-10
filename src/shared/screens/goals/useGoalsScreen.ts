@@ -113,6 +113,17 @@ export function useGoalsScreen(
     setReminderDialogOpen(true);
   };
 
+  const openReportForTask = (taskId: string) => {
+    const matchingGoal = goals.find((goal) => findTaskRecursive(goal.tasks, taskId));
+    if (!matchingGoal) {
+      return false;
+    }
+
+    setReportTaskId(taskId);
+    setCreateReportDialogOpen(true);
+    return true;
+  };
+
   const saveReport = async ({ file, fileName, mimeType, comment }: ReportUploadPayload) => {
     if (!reportTaskId) {
       return false;
@@ -187,6 +198,7 @@ export function useGoalsScreen(
     navigateToProgress,
     createCategory,
     openReminderForGoal,
+    openReportForTask,
     saveReminder,
     saveReport,
     toggleGoalTask,

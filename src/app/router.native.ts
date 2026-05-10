@@ -3,7 +3,7 @@ export type NativeAuthTab = "signin" | "signup" | "reset";
 export type NativeResetMode = "request" | "confirm";
 
 export type NativeAppRoute =
-  | { kind: "app"; tab: "goals"; goalId?: string | null }
+  | { kind: "app"; tab: "goals"; goalId?: string | null; reportTaskId?: string | null }
   | { kind: "app"; tab: "reminders"; reminderId?: string | null; goalId?: string | null }
   | { kind: "app"; tab: "challenges"; focusId?: string | null; paymentId?: string | null }
   | { kind: "app"; tab: "rewards"; rewardId?: string | null }
@@ -158,6 +158,7 @@ function parseAppRoute(parsed: URL): NativeAppRoute | null {
       kind: "app",
       tab,
       goalId: parsed.searchParams.get("id") || parsed.searchParams.get("goalId"),
+      reportTaskId: parsed.searchParams.get("reportTaskId"),
     };
   }
 

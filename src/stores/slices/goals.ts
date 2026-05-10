@@ -12,9 +12,33 @@ type GoalsSlice = Pick<
   | "getGoalXp"
   | "toggleTask"
   | "addReport"
+  | "showNativeToast"
+  | "hideNativeToast"
 >;
 
 export const createGoalsSlice: StoreSlice<GoalsSlice> = (set, get) => ({
+  showNativeToast: ({ title, message, tone = "info", durationMs = 3000 }) => {
+    const id = Date.now();
+    set({
+      nativeToast: {
+        id,
+        title,
+        message,
+        tone,
+      },
+    });
+
+    setTimeout(() => {
+      if (get().nativeToast?.id === id) {
+        set({ nativeToast: null });
+      }
+    }, durationMs);
+  },
+
+  hideNativeToast: () => {
+    set({ nativeToast: null });
+  },
+
   addCategory: (category) => {
     set({ categories: [...get().categories, category] });
   },

@@ -191,6 +191,7 @@
                   "draft_added_title":  "Draft added",
                   "draft_added_description":  "Goal \"{{title}}\" was added to the list.",
                   "completed_alert":  "+{{xp}} XP",
+                  "task_completed_toast":  "Task marked as completed.",
                   "report_required_title":  "Report required",
                   "report_required_description":  "You need to attach a report before completing this task.",
                   "category_created":  "Category \"{{title}}\" created",

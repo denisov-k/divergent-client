@@ -22,6 +22,7 @@ export type PushReminderResponse = {
   reminderId?: string;
   goalId?: string;
   taskId?: string;
+  requiresReport?: boolean;
 };
 
 const REMINDER_ACTIONS_CATEGORY = "REMINDER_ACTIONS";
@@ -59,6 +60,7 @@ function extractReminderResponse(
     reminderId: typeof data.reminderId === "string" ? data.reminderId : undefined,
     goalId: typeof data.goalId === "string" ? data.goalId : undefined,
     taskId: typeof data.taskId === "string" ? data.taskId : undefined,
+    requiresReport: data.requiresReport === true,
   };
 
   switch (response.actionIdentifier) {

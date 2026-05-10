@@ -122,6 +122,10 @@ export const createAuthSlice: StoreSlice<AuthSlice> = (set, get) => ({
     }
   },
 
+  refreshAppData: async () => {
+    await hydrateAppData(set);
+  },
+
   initialize: async () => {
     set({ loading: true });
     try {

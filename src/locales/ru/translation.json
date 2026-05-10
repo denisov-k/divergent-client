@@ -191,6 +191,7 @@
     "draft_added_title": "Черновик добавлен",
     "draft_added_description": "Цель \"{{title}}\" появилась в списке.",
     "completed_alert": "+{{xp}} XP",
+    "task_completed_toast": "Задача отмечена как выполненная.",
     "report_required_title": "Нужен отчёт",
     "report_required_description": "Для этой задачи сначала нужно прикрепить отчёт.",
     "category_created": "Категория \"{{title}}\" создана",

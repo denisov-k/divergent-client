@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { Alert } from "react-native";
 
 import { useAppBootstrap } from "@/app/useAppBootstrap";
+import { NativeToastHost } from "@/components/native/NativeToastHost";
 import { AppLoader } from "@/components/shared/AppLoader";
 import { consumeLastNativeFatalError } from "@/platform/nativeDiagnostics";
 import NativeAppShell from "@/views/native/AppShell";
@@ -47,9 +48,12 @@ export function NativeRuntimeRoot({
     return <NativeLoadingScreen mode={mode} />;
   }
 
-  if (!user) {
-    return <NativeAuthScreen />;
-  }
+  const content = !user ? <NativeAuthScreen /> : <NativeAppShell mode={mode} />;
 
-  return <NativeAppShell mode={mode} />;
+  return (
+    <>
+      {content}
+      <NativeToastHost />
+    </>
+  );
 }

@@ -39,6 +39,12 @@ export interface AppStoreState {
   friends: FriendSummary[];
   categories: CategoryOption[];
   reports: Record<string, Report[]>;
+  nativeToast: {
+    id: number;
+    title: string;
+    message?: string;
+    tone: "success" | "danger" | "info";
+  } | null;
 }
 
 export interface AuthSlice {
@@ -59,6 +65,7 @@ export interface AuthSlice {
   confirmPasswordReset: (token: string, password: string) => Promise<void>;
   logout: () => void;
   refreshUser: () => Promise<void>;
+  refreshAppData: () => Promise<void>;
 }
 
 export interface AppStoreActions {
@@ -96,6 +103,13 @@ export interface AppStoreActions {
   updateReminder: (reminder: Reminder) => Promise<void>;
   toggleReminder: (id: string) => Promise<void>;
   addFriend: (friend: FriendInput) => Promise<void>;
+  showNativeToast: (toast: {
+    title: string;
+    message?: string;
+    tone?: "success" | "danger" | "info";
+    durationMs?: number;
+  }) => void;
+  hideNativeToast: () => void;
 }
 
 export type AppStore = AppStoreState & AuthSlice & AppStoreActions;

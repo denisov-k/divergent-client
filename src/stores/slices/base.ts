@@ -12,4 +12,5 @@ export const createBaseSlice: StoreSlice<AppStoreState> = () => ({
   friends: [],
   categories: [],
   reports: {},
+  nativeToast: null,
 });

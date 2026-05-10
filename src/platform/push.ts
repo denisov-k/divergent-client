@@ -18,6 +18,7 @@ export type PushReminderResponse = {
   reminderId?: string;
   goalId?: string;
   taskId?: string;
+  requiresReport?: boolean;
 };
 
 export function isNativePushRegistrationSupported() {

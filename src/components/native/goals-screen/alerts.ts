@@ -1,12 +1,17 @@
 import { Alert } from "react-native";
 import type { TFunction } from "i18next";
+import { useAppStore } from "@/stores/useAppStore";
 
 export function showGoalTaskToggleResultAlert(
   result: { status: "completed" | "report_required" | "ignored" | "toggled"; xpReward?: number },
   t: TFunction,
 ) {
   if (result.status === "completed") {
-    Alert.alert(t("common.done"), t("goals.completed_alert", { xp: result.xpReward }));
+    useAppStore.getState().showNativeToast({
+      title: t("common.done"),
+      message: t("goals.completed_alert", { xp: result.xpReward }),
+      tone: "success",
+    });
     return;
   }
 

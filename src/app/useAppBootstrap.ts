@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Linking } from "react-native";
 
-import { buildRemindersPath } from "@/app/routes";
+import { buildGoalsPath } from "@/app/routes";
 import i18n from "@/i18n";
 import { buildNativeRouteUrl } from "@/platform/appUrl.native";
 import {
@@ -20,17 +20,24 @@ import {
 import Config from "@/services/Config";
 import { useAppStore } from "@/stores/useAppStore";
 
-function buildReminderUrl(reminderId?: string, goalId?: string) {
+function buildGoalFocusUrl(goalId?: string, reportTaskId?: string) {
   return buildNativeRouteUrl(
-    buildRemindersPath({
-      id: reminderId ?? null,
-      goalId: goalId ?? null,
+    buildGoalsPath({
+      id: goalId ?? null,
+      reportTaskId: reportTaskId ?? null,
     })
   );
 }
 
 export function useAppBootstrap() {
-  const { initialize, initialized, loading, user } = useAppStore();
+  const {
+    initialize,
+    initialized,
+    loading,
+    refreshAppData,
+    showNativeToast,
+    user,
+  } = useAppStore();
   const [configReady, setConfigReady] = useState(Boolean(Config.data.api.http.baseURL));
 
   useEffect(() => {
@@ -99,30 +106,48 @@ export function useAppBootstrap() {
         return;
       }
 
-      const openReminder = async () => {
-        await Linking.openURL(buildReminderUrl(response.reminderId, response.goalId));
+      const openGoalList = async () => {
+        await Linking.openURL(
+          buildGoalFocusUrl(
+            response.goalId,
+            response.action === "open_report" || response.requiresReport
+              ? response.taskId
+              : undefined
+          )
+        );
       };
 
       try {
         if (response.action === "done") {
-          await markReminderDone(response.reminderId);
+          const result = await markReminderDone(response.reminderId);
+          await refreshAppData();
+
+          if (result?.status === "done" || result?.status === "already_done") {
+            showNativeToast({
+              title: i18n.t("common.done"),
+              message: i18n.t("goals.task_completed_toast"),
+              tone: "success",
+            });
+          }
           return;
         }
 
         if (response.action === "snooze") {
           await snoozeReminder(response.reminderId, 10);
+          await refreshAppData();
           return;
         }
 
         if (response.action === "skip") {
           await skipReminder(response.reminderId);
+          await refreshAppData();
           return;
         }
 
-        await openReminder();
+        await openGoalList();
       } catch (error) {
         console.error(error);
-        await openReminder();
+        await openGoalList();
       }
     };
 
@@ -141,7 +166,7 @@ export function useAppBootstrap() {
       active = false;
       subscription.remove();
     };
-  }, []);
+  }, [refreshAppData, showNativeToast]);
 
   return {
     initialized,
