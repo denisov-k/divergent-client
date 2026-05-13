@@ -111,19 +111,19 @@ export function useAiChatSession({ open, onDraftAdded }: UseAiChatSessionArgs) {
           allowAutoScrollRef.current = false;
         }
 
-        setHistory((items) =>
-          items.map((item) =>
-            item.id === nextStreamingMessageId
-              ? {
-                  id: data.id,
-                  role: "assistant",
-                  content: data.message,
-                  goalDraft: data.goalDraft ?? null,
-                  isDraftAdded: data.isDraftAdded,
-                }
-              : item
-          )
-        );
+        setHistory((items) => {
+          const finalizedMessage: ChatMessage = {
+            id: data.id,
+            role: "assistant",
+            content: data.message,
+            goalDraft: data.goalDraft ?? null,
+            isDraftAdded: data.isDraftAdded,
+          };
+
+          return items.map((item) =>
+            item.id === nextStreamingMessageId ? finalizedMessage : item
+          );
+        });
       }
     } catch {
       setHistory((items) => items.filter((item) => item.id !== nextStreamingMessageId));
