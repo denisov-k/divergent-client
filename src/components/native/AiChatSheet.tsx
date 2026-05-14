@@ -73,7 +73,7 @@ export function AiChatSheet({ open, onOpenChange, onDraftAdded }: { open: boolea
         <View style={{ flex: 1, backgroundColor: appPalette.surface.overlay, justifyContent: "flex-end" }}>
           <View style={{ maxHeight: "92%", backgroundColor: appPalette.surface.background, borderTopLeftRadius: 24, borderTopRightRadius: 24, padding: 20, gap: 14 }}>
             <View style={{ gap: 6 }}>
-              <Text style={{ fontSize: 20, fontWeight: "700", color: appPalette.semantic.textStrong, fontFamily: "Montserrat" }}>{t("ai.title")}</Text>
+              <SelectableText style={{ fontSize: 20, fontWeight: "700", color: appPalette.semantic.textStrong, fontFamily: "Montserrat" }}>{t("ai.title")}</SelectableText>
             </View>
             <ScrollView
               ref={scrollRef}
@@ -112,7 +112,7 @@ export function AiChatSheet({ open, onOpenChange, onDraftAdded }: { open: boolea
               />
               {!!error && (
                 <View style={{ backgroundColor: appPalette.semantic.dangerSurface, borderRadius: 12, padding: 12 }}>
-                  <Text style={{ color: appPalette.semantic.dangerText, fontFamily: "Montserrat", fontSize: 12, lineHeight: 18 }}>{error}</Text>
+                  <SelectableText style={{ color: appPalette.semantic.dangerText, fontFamily: "Montserrat", fontSize: 12, lineHeight: 18 }}>{error}</SelectableText>
                 </View>
               )}
             </View>
@@ -146,21 +146,21 @@ function AiChatMessageCard({ message, messageId, onDraftAdded, isDraftPending, i
       <View style={{ backgroundColor: tone.backgroundColor, borderRadius: 14, padding: 12 }}>
         {showThinkingState ? (
           <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
-            <Text style={{ flex: 1, color: tone.textColor, fontFamily: "Montserrat", fontSize: 12, lineHeight: 18 }}>{messageContent}</Text>
-            <Text style={{ color: appPalette.semantic.textMuted, fontFamily: "Montserrat", fontSize: 12, lineHeight: 18 }}>
+            <SelectableText style={{ flex: 1, color: tone.textColor, fontFamily: "Montserrat", fontSize: 12, lineHeight: 18 }}>{messageContent}</SelectableText>
+            <SelectableText style={{ color: appPalette.semantic.textMuted, fontFamily: "Montserrat", fontSize: 12, lineHeight: 18 }}>
               {formatElapsed(elapsedSeconds)}
-            </Text>
+            </SelectableText>
           </View>
         ) : (
-          <Text style={{ color: tone.textColor, fontFamily: "Montserrat", fontSize: 12, lineHeight: 18 }}>{messageContent}</Text>
+          <SelectableText style={{ color: tone.textColor, fontFamily: "Montserrat", fontSize: 12, lineHeight: 18 }}>{messageContent}</SelectableText>
         )}
       </View>
       {message.role === "assistant" && message.goalDraft && <GoalDraftCard draft={message.goalDraft} messageId={message.id ?? messageId} isDraftAdded={message.isDraftAdded} onAdd={onDraftAdded} />}
       {message.role === "assistant" && !message.goalDraft && isPreparingDraft && (
         <View style={{ borderRadius: 14, paddingHorizontal: 12, paddingVertical: 10, borderWidth: 1, borderColor: appPalette.brand.primary, backgroundColor: appPalette.semantic.infoSurface }}>
-          <Text style={{ color: appPalette.semantic.infoTextStrong, fontFamily: "Montserrat", fontSize: 12, lineHeight: 18 }}>
+          <SelectableText style={{ color: appPalette.semantic.infoTextStrong, fontFamily: "Montserrat", fontSize: 12, lineHeight: 18 }}>
             {t("ai.preparing_draft")}
-          </Text>
+          </SelectableText>
         </View>
       )}
     </View>
@@ -201,12 +201,12 @@ function GoalDraftCard({ draft, isDraftAdded, messageId, onAdd }: { draft: Draft
       <View style={{ gap: 6 }}>
         <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
           <Target size={18} color={appPalette.brand.primary} />
-          <Text style={{ flex: 1, fontSize: 16, fontWeight: "700", color: appPalette.semantic.textStrong, fontFamily: "Montserrat", lineHeight: 24 }}>{draft.goal.title}</Text>
+          <SelectableText style={{ flex: 1, fontSize: 16, fontWeight: "700", color: appPalette.semantic.textStrong, fontFamily: "Montserrat", lineHeight: 24 }}>{draft.goal.title}</SelectableText>
         </View>
         <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8 }}>
           <View style={{ alignSelf: "flex-start", maxWidth: "100%", paddingHorizontal: 8, paddingVertical: 4, borderRadius: 999, borderWidth: 1, backgroundColor: categoryPalette.backgroundColor, borderColor: categoryPalette.borderColor, flexDirection: "row", alignItems: "center", gap: 6 }}>
             <CategoryIcon size={12} color={categoryPalette.textColor} />
-            <Text style={{ color: categoryPalette.textColor, fontWeight: "600", fontSize: 12, fontFamily: "Montserrat", lineHeight: 18, flexShrink: 1 }}>{categoryLabel}</Text>
+            <SelectableText style={{ color: categoryPalette.textColor, fontWeight: "600", fontSize: 12, fontFamily: "Montserrat", lineHeight: 18, flexShrink: 1 }}>{categoryLabel}</SelectableText>
           </View>
           {draftGoal.goalType && (
             <MetaBadge>
@@ -224,7 +224,7 @@ function GoalDraftCard({ draft, isDraftAdded, messageId, onAdd }: { draft: Draft
             </MetaBadge>
           )}
         </View>
-        {!!draft.goal.description && <Text style={{ color: appPalette.semantic.text, fontFamily: "Montserrat", fontSize: 12, lineHeight: 18 }}>{draft.goal.description}</Text>}
+        {!!draft.goal.description && <SelectableText style={{ color: appPalette.semantic.text, fontFamily: "Montserrat", fontSize: 12, lineHeight: 18 }}>{draft.goal.description}</SelectableText>}
         {isProgressGoal && (
           <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8 }}>
             <MetaBadge>{t("goals.dialog.target_value")}: {draftGoal.targetValue ?? 0}</MetaBadge>
@@ -233,18 +233,18 @@ function GoalDraftCard({ draft, isDraftAdded, messageId, onAdd }: { draft: Draft
       </View>
       {!isProgressGoal && draft.tasks?.length > 0 && (
         <View style={{ gap: 6 }}>
-          <Text style={{ fontWeight: "600", color: appPalette.semantic.textStrong, fontFamily: "Montserrat", fontSize: 12, lineHeight: 18 }}>{t("ai.tasks")}</Text>
+          <SelectableText style={{ fontWeight: "600", color: appPalette.semantic.textStrong, fontFamily: "Montserrat", fontSize: 12, lineHeight: 18 }}>{t("ai.tasks")}</SelectableText>
           {draft.tasks.map((task, index) => <TaskPreview key={`${task.title}-${index}`} task={task} depth={0} />)}
         </View>
       )}
       {draft.reminders?.length > 0 && (
         <View style={{ gap: 6 }}>
-          <Text style={{ fontWeight: "600", color: appPalette.semantic.textStrong, fontFamily: "Montserrat", fontSize: 12, lineHeight: 18 }}>{t("ai.reminders")}</Text>
+          <SelectableText style={{ fontWeight: "600", color: appPalette.semantic.textStrong, fontFamily: "Montserrat", fontSize: 12, lineHeight: 18 }}>{t("ai.reminders")}</SelectableText>
           {draft.reminders.map((reminder, index) => (
             <View key={`${reminder.title}-${index}`} style={{ backgroundColor: appPalette.ui.inputBackground, borderRadius: 12, padding: 10, gap: 6 }}>
               <View style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
                 <Clock size={14} color={appPalette.brand.primary} />
-                <Text style={{ color: appPalette.semantic.textStrong, fontWeight: "600", fontFamily: "Montserrat", fontSize: 12, lineHeight: 18 }}>{reminder.title}</Text>
+                <SelectableText style={{ color: appPalette.semantic.textStrong, fontWeight: "600", fontFamily: "Montserrat", fontSize: 12, lineHeight: 18 }}>{reminder.title}</SelectableText>
               </View>
               <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8 }}>
                 <MetaBadge icon={<Clock size={12} color={appPalette.semantic.infoText} />}>{reminder.time}</MetaBadge>
@@ -257,15 +257,15 @@ function GoalDraftCard({ draft, isDraftAdded, messageId, onAdd }: { draft: Draft
       )}
       {!!draft.reward?.title && (
         <View style={{ gap: 6 }}>
-          <Text style={{ fontWeight: "600", color: appPalette.semantic.textStrong, fontFamily: "Montserrat", fontSize: 12, lineHeight: 18 }}>{t("ai.reward")}</Text>
+          <SelectableText style={{ fontWeight: "600", color: appPalette.semantic.textStrong, fontFamily: "Montserrat", fontSize: 12, lineHeight: 18 }}>{t("ai.reward")}</SelectableText>
           <View style={{ backgroundColor: appPalette.ui.inputBackground, borderRadius: 12, padding: 10, gap: 4 }}>
             <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
               <View style={{ width: 28, height: 28, borderRadius: 10, alignItems: "center", justifyContent: "center", backgroundColor: appPalette.semantic.warningSurface }}>
                 <RewardDraftIcon size={16} color={appPalette.semantic.warningText} />
               </View>
-              <Text style={{ color: appPalette.semantic.textStrong, fontWeight: "600", fontFamily: "Montserrat", fontSize: 12, lineHeight: 18 }}>{draft.reward.title}</Text>
+              <SelectableText style={{ color: appPalette.semantic.textStrong, fontWeight: "600", fontFamily: "Montserrat", fontSize: 12, lineHeight: 18 }}>{draft.reward.title}</SelectableText>
             </View>
-            {!!draft.reward.description && <Text style={{ color: appPalette.semantic.text, fontFamily: "Montserrat", fontSize: 12, lineHeight: 18 }}>{draft.reward.description}</Text>}
+            {!!draft.reward.description && <SelectableText style={{ color: appPalette.semantic.text, fontFamily: "Montserrat", fontSize: 12, lineHeight: 18 }}>{draft.reward.description}</SelectableText>}
             {draft.reward.xpRequires != null && <MetaBadge>{t("ai.xp_required", { xp: draft.reward.xpRequires })}</MetaBadge>}
           </View>
         </View>
@@ -284,7 +284,7 @@ function TaskPreview({ task, depth }: { task: Task; depth: number }) {
     <View style={{ gap: 6, marginLeft: depth * 12, paddingLeft: depth > 0 ? 10 : 0, borderLeftWidth: depth > 0 ? 1 : 0, borderLeftColor: appPalette.semantic.borderSubtle }}>
       <View style={{ backgroundColor: appPalette.ui.inputBackground, borderRadius: 12, padding: 10, gap: 6 }}>
         <View style={{ flexDirection: "row", alignItems: "flex-start", justifyContent: "space-between", gap: 8 }}>
-          <Text style={{ flex: 1, color: appPalette.semantic.textStrong, fontFamily: "Montserrat", fontSize: 12, lineHeight: 18 }}>{task.title}</Text>
+          <SelectableText style={{ flex: 1, color: appPalette.semantic.textStrong, fontFamily: "Montserrat", fontSize: 12, lineHeight: 18 }}>{task.title}</SelectableText>
           {task.xpReward != null && <MetaBadge>+{task.xpReward} XP</MetaBadge>}
         </View>
       </View>
@@ -297,7 +297,15 @@ function MetaBadge({ children, icon }: { children: React.ReactNode; icon?: React
   return (
     <View style={{ alignSelf: "flex-start", flexDirection: "row", alignItems: "center", gap: 6, backgroundColor: appPalette.semantic.infoSurfaceStrong, borderRadius: 999, paddingHorizontal: 10, paddingVertical: 6 }}>
       {icon ? <View style={{ width: 12, height: 12, alignItems: "center", justifyContent: "center" }}>{icon}</View> : null}
-      <Text style={{ color: appPalette.semantic.infoText, fontWeight: "600", fontSize: 12, fontFamily: "Montserrat", lineHeight: 18 }}>{children}</Text>
+      <SelectableText style={{ color: appPalette.semantic.infoText, fontWeight: "600", fontSize: 12, fontFamily: "Montserrat", lineHeight: 18 }}>{children}</SelectableText>
     </View>
+  );
+}
+
+function SelectableText({ children, style }: { children: React.ReactNode; style?: React.ComponentProps<typeof Text>["style"] }) {
+  return (
+    <Text selectable style={style}>
+      {children}
+    </Text>
   );
 }
