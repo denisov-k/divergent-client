@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef } from "react";
 import { useTranslation } from "react-i18next";
-import { KeyboardAvoidingView, Modal, Platform, ScrollView, Text, TextInput, View } from "react-native";
+import { Keyboard, KeyboardAvoidingView, Modal, Platform, ScrollView, Text, TextInput, View } from "react-native";
 
 import { ActionChip } from "@/components/native/ActionChip";
 import { Calendar, Clock, Crown, Gift, Award, Star, Target, Trophy, Zap } from "@/components/native/Icons";
@@ -58,6 +58,11 @@ export function AiChatSheet({ open, onOpenChange, onDraftAdded }: { open: boolea
     return () => cancelAnimationFrame(frameId);
   }, [history, open, allowAutoScrollRef]);
 
+  const handleSubmit = () => {
+    Keyboard.dismiss();
+    void handleGenerate();
+  };
+
   return (
     <Modal visible={open} transparent animationType="none" onRequestClose={() => onOpenChange(false)}>
       <KeyboardAvoidingView
@@ -113,7 +118,7 @@ export function AiChatSheet({ open, onOpenChange, onDraftAdded }: { open: boolea
             </View>
             <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
               <ActionChip onPress={() => onOpenChange(false)}>{t("common.close")}</ActionChip>
-              <ActionChip onPress={() => void handleGenerate()} tone="primary" disabled={loading || !prompt.trim()}>
+              <ActionChip onPress={handleSubmit} tone="primary" disabled={loading || !prompt.trim()}>
                 {submitting ? t("ai.asking") : t("ai.ask")}
               </ActionChip>
             </View>

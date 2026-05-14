@@ -9,18 +9,16 @@ import { Badge } from "@/components/ui/badge";
 import { RewardIcon } from "@/components/shared/RewardIcon";
 import { CategoryBadge } from "@/components/shared/CategoryBadge";
 import { formatElapsed } from "@/shared/ai/formatElapsed";
+import { formatReminderDayLabel } from "@/shared/display/reminders";
 import { useAiChatSession } from "@/shared/ai/useAiChatSession";
 import { useAppStore } from "@/stores/useAppStore";
 import type { Task, ChatMessage, Draft, Goal, RewardIcon as RewardIconType } from "@/types";
-import { DAYS_OF_WEEK } from "@/types";
 
 interface Props {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onDraftAdded: (goal: Goal) => void;
 }
-
-const daysMap = Object.fromEntries(DAYS_OF_WEEK.map((d) => [d.key, d.label])) as Record<string, string>;
 
 export default function AiChatDialog({ open, onOpenChange, onDraftAdded }: Props) {
   const { t } = useTranslation();
@@ -231,14 +229,14 @@ function GoalDraftPreview({
             {draft.reminders.map((r, i) => (
               <li key={i} className="flex flex-col space-y-1">
                 <div className="flex items-center gap-1">
-                  <Clock size="12" />
+                  <Clock className="size-3 shrink-0" />
                   <span>{r.title}</span>
                 </div>
                 {r.daysOfWeek?.length > 0 && (
                   <div className="flex flex-wrap gap-2">
                     {[...r.daysOfWeek].map((d) => (
                       <Badge key={d} variant="outline" className="px-1.5 py-0">
-                        {daysMap[d] ?? d}
+                        {formatReminderDayLabel(d, t)}
                       </Badge>
                     ))}
                   </div>
