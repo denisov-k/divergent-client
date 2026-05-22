@@ -47,7 +47,6 @@ export function AiChatSheet({ open, onOpenChange, onDraftAdded }: { open: boolea
     }
 
     if (!allowAutoScrollRef.current) {
-      allowAutoScrollRef.current = true;
       return;
     }
 
@@ -81,7 +80,6 @@ export function AiChatSheet({ open, onOpenChange, onDraftAdded }: { open: boolea
               keyboardShouldPersistTaps="handled"
               onContentSizeChange={() => {
                 if (!allowAutoScrollRef.current) {
-                  allowAutoScrollRef.current = true;
                   return;
                 }
 

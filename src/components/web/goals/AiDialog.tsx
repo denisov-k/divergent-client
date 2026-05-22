@@ -41,7 +41,6 @@ export default function AiChatDialog({ open, onOpenChange, onDraftAdded }: Props
 
   useEffect(() => {
     if (!allowAutoScrollRef.current) {
-      allowAutoScrollRef.current = true;
       return;
     }
 

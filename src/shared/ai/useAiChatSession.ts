@@ -26,6 +26,7 @@ export function useAiChatSession({ open, onDraftAdded }: UseAiChatSessionArgs) {
 
   useEffect(() => {
     if (!open) {
+      allowAutoScrollRef.current = true;
       setPrompt("");
       setHistory([]);
       setLoading(false);
@@ -70,6 +71,7 @@ export function useAiChatSession({ open, onDraftAdded }: UseAiChatSessionArgs) {
 
     const currentPrompt = prompt.trim();
     const nextStreamingMessageId = `stream-${Date.now()}`;
+    allowAutoScrollRef.current = true;
     setStreamingMessageId(nextStreamingMessageId);
     setDraftPendingMessageId(null);
     setPrompt("");
@@ -149,6 +151,7 @@ export function useAiChatSession({ open, onDraftAdded }: UseAiChatSessionArgs) {
   };
 
   const resetSession = () => {
+    allowAutoScrollRef.current = true;
     setPrompt("");
     setHistory([]);
     setLoading(false);
