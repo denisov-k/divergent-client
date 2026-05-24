@@ -4,16 +4,23 @@ import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import commonjs from "vite-plugin-commonjs";
 
+const httpsKeyPath = path.resolve(__dirname, "localhost+2-key.pem");
+const httpsCertPath = path.resolve(__dirname, "localhost+2.pem");
+const https =
+  fs.existsSync(httpsKeyPath) && fs.existsSync(httpsCertPath)
+    ? {
+        key: fs.readFileSync(httpsKeyPath),
+        cert: fs.readFileSync(httpsCertPath),
+      }
+    : undefined;
+
 export default defineConfig({
   server: {
     host: true,
     port: 8081,
     strictPort: true,
     cors: true,
-    https: {
-      key: fs.readFileSync(path.resolve(__dirname, "localhost+2-key.pem")),
-      cert: fs.readFileSync(path.resolve(__dirname, "localhost+2.pem")),
-    },
+    https,
   },
   preview: {
     port: 8080,
