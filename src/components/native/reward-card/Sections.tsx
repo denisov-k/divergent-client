@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 
 import { useNativeNavigation } from "@/app/native/NativeNavigation";
 import { buildChallengesPath, buildGoalsPath } from "@/app/routes";
-import { Edit, Swords, Target } from "@/components/native/Icons";
+import { Edit, Swords, Target } from "@/components/native/icons";
 import { NativeRewardIcon } from "@/components/native/NativeRewardIcon";
 import { appPalette } from "@/theme/palette";
 import type { Challenge, Goal, Reward } from "@/types";

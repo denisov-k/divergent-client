@@ -2,7 +2,7 @@
 import { HapticPressable as Pressable } from "@/components/native/HapticPressable";
 import { useTranslation } from "react-i18next";
 
-import { Settings } from "@/components/native/Icons";
+import { Settings } from "@/components/native/icons";
 import { appPalette } from "@/theme/palette";
 import type { User } from "@/types";
 

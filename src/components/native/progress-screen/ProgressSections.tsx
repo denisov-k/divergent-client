@@ -2,7 +2,7 @@ import { Modal, ScrollView, Text, View } from "react-native";
 import { HapticPressable as Pressable } from "@/components/native/HapticPressable";
 import { useTranslation } from "react-i18next";
 
-import { ChartSpline, ChevronDown, Flame } from "@/components/native/Icons";
+import { ChartSpline, ChevronDown, Flame } from "@/components/native/icons";
 import { SurfaceCard } from "@/components/native/SurfaceCard";
 import { appPalette } from "@/theme/palette";
 import type { Goal } from "@/types";

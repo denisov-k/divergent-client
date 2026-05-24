@@ -6,7 +6,7 @@ import dayjs from "dayjs";
 import "dayjs/locale/ru";
 import isoWeek from "dayjs/plugin/isoWeek";
 
-import { Activity } from "@/components/native/Icons";
+import { Activity } from "@/components/native/icons";
 import { SurfaceCard } from "@/components/native/SurfaceCard";
 import { appPalette } from "@/theme/palette";
 import type { Goal, GoalActivity } from "@/types";

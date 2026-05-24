@@ -4,7 +4,7 @@ import { HapticPressable as Pressable } from "@/components/native/HapticPressabl
 import { useTranslation } from "react-i18next";
 
 import { EmptyStateCard } from "@/components/native/EmptyStateCard";
-import { Plus } from "@/components/native/Icons";
+import { Plus } from "@/components/native/icons";
 import { NativeChallengeCardView } from "@/components/native/NativeChallengeCardView";
 import { appPalette } from "@/theme/palette";
 import type { Challenge } from "@/types";

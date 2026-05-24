@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import { Keyboard, KeyboardAvoidingView, Modal, Platform, ScrollView, Text, TextInput, View } from "react-native";
 
 import { ActionChip } from "@/components/native/ActionChip";
-import { Calendar, Clock, Crown, Gift, Award, Star, Target, Trophy, Zap } from "@/components/native/Icons";
+import { Calendar, Clock, Crown, Gift, Award, Star, Target, Trophy, Zap } from "@/components/native/icons";
 import { categoryConfig } from "@/components/native/GoalCardParts";
 import { SurfaceCard } from "@/components/native/SurfaceCard";
 import { formatElapsed } from "@/shared/ai/formatElapsed";

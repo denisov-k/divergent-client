@@ -3,7 +3,7 @@ import { Modal, ScrollView, Text, View } from "react-native";
 import { HapticPressable as Pressable } from "@/components/native/HapticPressable";
 import { useTranslation } from "react-i18next";
 
-import { ChevronDown } from "@/components/native/Icons";
+import { ChevronDown } from "@/components/native/icons";
 import { NativeRewardIcon } from "@/components/native/NativeRewardIcon";
 import { formSectionLabelStyle } from "@/components/native/form-sheet/Layout";
 import { appPalette } from "@/theme/palette";

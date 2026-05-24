@@ -3,7 +3,7 @@ import { ScrollView, Text, View } from "react-native";
 import { HapticPressable as Pressable } from "@/components/native/HapticPressable";
 import { useTranslation } from "react-i18next";
 
-import { Target, Trophy, Zap } from "@/components/native/Icons";
+import { Target, Trophy, Zap } from "@/components/native/icons";
 import { NativePeriodCalendar } from "@/components/native/NativePeriodCalendar";
 import { NativeScreenErrorBoundary } from "@/components/native/NativeScreenErrorBoundary";
 import { SurfaceCard } from "@/components/native/SurfaceCard";

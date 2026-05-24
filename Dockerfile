@@ -1,10 +1,11 @@
-FROM node:latest
+FROM node:22-alpine
 
 WORKDIR /app
 
-COPY package.json .
+COPY package.json package-lock.json ./
+COPY modules ./modules
 
-RUN npm install
+RUN npm ci
 
 RUN npm i -g serve
 

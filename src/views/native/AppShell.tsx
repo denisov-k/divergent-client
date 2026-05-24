@@ -6,7 +6,7 @@ import { HapticPressable as Pressable } from "@/components/native/HapticPressabl
 import { NativeNavigationProvider } from "@/app/native/NativeNavigation";
 import { parseNativeAppRoute, type NativeAppTab } from "@/app/router.native";
 import { NativeAppHeader } from "@/components/native/NativeAppHeader";
-import { BarChart2, Bell, Gift, Swords, Target } from "@/components/native/Icons";
+import { BarChart2, Bell, Gift, Swords, Target } from "@/components/native/icons";
 import { AppLoader } from "@/components/shared/AppLoader";
 import { useAppStore } from "@/stores/useAppStore";
 import { appPalette } from "@/theme/palette";

@@ -5,7 +5,7 @@ import { useTranslation } from "react-i18next";
 
 import { ProgressRing } from "@/components/shared/ProgressRing";
 import { ActionChip } from "@/components/native/ActionChip";
-import { Calendar, ChevronDown, ChevronUp, Users } from "@/components/native/Icons";
+import { Calendar, ChevronDown, ChevronUp, Users } from "@/components/native/icons";
 import { SurfaceCard } from "@/components/native/SurfaceCard";
 import { getChallengeDerivedState, goalCompleted } from "@/shared/display/challenges";
 import { useAppStore } from "@/stores/useAppStore";

@@ -4,7 +4,7 @@ import { HapticPressable as Pressable } from "@/components/native/HapticPressabl
 import { useTranslation } from "react-i18next";
 
 import { ActionChip } from "@/components/native/ActionChip";
-import { ChevronDown } from "@/components/native/Icons";
+import { ChevronDown } from "@/components/native/icons";
 import { SectionTabs } from "@/components/native/SectionTabs";
 import { formHelperStyle, formSectionLabelStyle } from "@/components/native/form-sheet/Layout";
 import { appPalette } from "@/theme/palette";

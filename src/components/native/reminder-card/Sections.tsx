@@ -2,7 +2,7 @@ import { Text, View } from "react-native";
 
 import { useNativeNavigation } from "@/app/native/NativeNavigation";
 import { buildGoalsPath } from "@/app/routes";
-import { Bell, CircleCheck, Clock, Edit, Repeat, Target } from "@/components/native/Icons";
+import { Bell, CircleCheck, Clock, Edit, Repeat, Target } from "@/components/native/icons";
 import { appPalette } from "@/theme/palette";
 import type { Goal, Reminder, Task } from "@/types";
 

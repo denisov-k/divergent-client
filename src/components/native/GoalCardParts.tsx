@@ -22,7 +22,7 @@ import {
   Rocket,
   Swords,
   Target,
-} from "@/components/native/Icons";
+} from "@/components/native/icons";
 import { formatGoalDate } from "@/shared/display/goals";
 import { isTaskCompletedThisPeriod } from "@/shared/screens/goals/model";
 import type { CategoryType } from "@/shared/domain";

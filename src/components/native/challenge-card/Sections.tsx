@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 
 import { useNativeNavigation } from "@/app/native/NativeNavigation";
 import { buildGoalsPath } from "@/app/routes";
-import { Calendar, ChevronDown, ChevronUp, Swords, Users } from "@/components/native/Icons";
+import { Calendar, ChevronDown, ChevronUp, Swords, Users } from "@/components/native/icons";
 import { appPalette } from "@/theme/palette";
 import type { Challenge, Goal, Leader } from "@/types";
 

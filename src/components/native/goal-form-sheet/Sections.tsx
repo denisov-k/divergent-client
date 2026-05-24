@@ -5,7 +5,7 @@ import { useTranslation } from "react-i18next";
 
 import { ActionChip } from "@/components/native/ActionChip";
 import { FieldInput } from "@/components/native/FieldInput";
-import { Calendar, ChevronDown, ChevronUp, Plus, X } from "@/components/native/Icons";
+import { Calendar, ChevronDown, ChevronUp, Plus, X } from "@/components/native/icons";
 import { SectionTabs } from "@/components/native/SectionTabs";
 import { formHelperStyle, formSectionLabelStyle } from "@/components/native/form-sheet/Layout";
 import { appPalette } from "@/theme/palette";
