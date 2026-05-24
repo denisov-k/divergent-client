@@ -14,10 +14,13 @@ const ChallengesView = lazy(() => import("@/views/web/challenges"));
 const FrensView = lazy(() => import("@/views/web/frens"));
 const GoalsView = lazy(() => import("@/views/web/goals"));
 const IndexView = lazy(() => import("@/views/web/index"));
+const MarketingView = lazy(() => import("@/views/web/marketing"));
+const PrivacyView = lazy(() => import("@/views/web/privacy"));
 const ProgressView = lazy(() => import("@/views/web/progress"));
 const RemindersView = lazy(() => import("@/views/web/reminders"));
 const RewardsView = lazy(() => import("@/views/web/rewards"));
 const SettingsView = lazy(() => import("@/views/web/settings"));
+const SupportView = lazy(() => import("@/views/web/support"));
 
 function RouteFallback() {
   return <AppLoader />;
@@ -50,6 +53,9 @@ export function renderAuthRoutes() {
 export function renderProductWebRoutes() {
   return (
     <>
+      <Route path="/app" element={withSuspense(<MarketingView />)} />
+      <Route path="/support" element={withSuspense(<SupportView />)} />
+      <Route path="/privacy" element={withSuspense(<PrivacyView />)} />
       <Route path="/" element={renderProtectedWeb(<IndexView />)} />
       <Route path="/frens" element={renderProtectedWeb(<FrensView />)} />
       <Route path="/goals" element={renderProtectedWeb(<GoalsView />)} />
