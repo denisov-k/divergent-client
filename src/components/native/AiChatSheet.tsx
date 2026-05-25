@@ -204,9 +204,9 @@ function GoalDraftCard({ draft, isDraftAdded, messageId, onAdd }: { draft: Draft
   return (
     <SurfaceCard gap={12}>
       <View style={{ gap: 6 }}>
-        <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
+        <View style={{ flexDirection: "row", alignItems: "center", gap: 8, minWidth: 0 }}>
           <Target size={18} color={appPalette.brand.primary} />
-          <SelectableText style={{ flex: 1, fontSize: 16, fontWeight: "700", color: appPalette.semantic.textStrong, fontFamily: "Montserrat", lineHeight: 24 }}>{draft.goal.title}</SelectableText>
+          <SelectableText style={{ flex: 1, minWidth: 0, fontSize: 16, fontWeight: "700", color: appPalette.semantic.textStrong, fontFamily: "Montserrat", lineHeight: 24 }}>{draft.goal.title}</SelectableText>
         </View>
         <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8 }}>
           <View style={{ alignSelf: "flex-start", maxWidth: "100%", paddingHorizontal: 8, paddingVertical: 4, borderRadius: 999, borderWidth: 1, backgroundColor: categoryPalette.backgroundColor, borderColor: categoryPalette.borderColor, flexDirection: "row", alignItems: "center", gap: 6 }}>
@@ -322,6 +322,11 @@ function SelectableText({ children, style }: { children: React.ReactNode; style?
       textAlignVertical="top"
       style={[
         {
+          margin: 0,
+          minHeight: 0,
+          borderWidth: 0,
+          backgroundColor: "transparent",
+          padding: 0,
           paddingTop: 0,
           paddingBottom: 0,
           paddingVertical: 0,

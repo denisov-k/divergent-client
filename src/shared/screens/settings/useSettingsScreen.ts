@@ -2,7 +2,7 @@
 
 import { useTranslation } from "react-i18next";
 
-import { getSystemLanguage } from "@/i18nConfig";
+import { getSystemLanguage } from "@/shared/i18n/getSystemLanguage";
 import { useAppStore } from "@/stores/useAppStore";
 
 export function useSettingsScreen() {
@@ -21,6 +21,7 @@ export function useSettingsScreen() {
   const [isDeletingAccount, setIsDeletingAccount] = useState(false);
 
   const hasPassword = Boolean(user?.hasPassword);
+  const systemLanguage = getSystemLanguage();
   const credentialsTitle = useMemo(
     () => (hasPassword ? t("settings.credentials_change_title") : t("settings.credentials_add_title")),
     [hasPassword, t]
@@ -80,7 +81,7 @@ export function useSettingsScreen() {
   const changeLanguage = async (language: string | null) => {
     try {
       setIsSavingProfile(true);
-      await i18n.changeLanguage(language ?? getSystemLanguage());
+      await i18n.changeLanguage(language ?? systemLanguage);
       await updateUser({ language });
     } finally {
       setIsSavingProfile(false);
