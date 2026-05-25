@@ -312,7 +312,16 @@ function SelectableText({ children, style }: { children: React.ReactNode; style?
       contextMenuHidden={false}
       showSoftInputOnFocus={false}
       selectionColor={appPalette.brand.primary}
-      style={style}
+      textAlignVertical="top"
+      style={[
+        {
+          paddingTop: 0,
+          paddingBottom: 0,
+          paddingVertical: 0,
+          includeFontPadding: false,
+        },
+        style,
+      ]}
     />
   );
 }
