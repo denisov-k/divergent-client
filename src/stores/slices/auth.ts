@@ -78,6 +78,19 @@ export const createAuthSlice: StoreSlice<AuthSlice> = (set, get) => ({
     }
   },
 
+  deleteAccount: async () => {
+    set({ loading: true });
+    try {
+      await api.deleteAccount();
+    } catch (err) {
+      console.error(err);
+      throw err;
+    } finally {
+      get().logout();
+      set({ initialized: true, loading: false });
+    }
+  },
+
   updateUser: async (patch) => {
     const updated = await api.updateUser(patch);
     set({ user: updated });

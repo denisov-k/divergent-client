@@ -10,7 +10,7 @@ import TimezoneSelector from "./TimezoneSelector";
 
 export default function Settings() {
   const { t } = useTranslation();
-  const { signOut, setCredentials, user } = useAppStore();
+  const { signOut, deleteAccount, setCredentials, user } = useAppStore();
   const [formData, setFormData] = useState({
     email: user?.email || "",
     currentPassword: "",
@@ -20,6 +20,7 @@ export default function Settings() {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isDeletingAccount, setIsDeletingAccount] = useState(false);
 
   const hasPassword = Boolean(user?.hasPassword);
   const credentialsTitle = useMemo(
@@ -67,6 +68,28 @@ export default function Settings() {
       setError(message);
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  const handleDeleteAccount = async () => {
+    const confirmed = window.confirm(
+      "Delete account permanently? This action cannot be undone."
+    );
+
+    if (!confirmed) {
+      return;
+    }
+
+    try {
+      setIsDeletingAccount(true);
+      setError(null);
+      setSuccess(null);
+      await deleteAccount();
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Failed to delete account.";
+      setError(message);
+    } finally {
+      setIsDeletingAccount(false);
     }
   };
 
@@ -131,6 +154,20 @@ export default function Settings() {
       <div className="flex justify-center">
         <Button onClick={signOut} variant="destructive">{t("settings.sign_out")}</Button>
       </div>
+
+      <Card className="border-red-500/20 bg-card/95">
+        <CardHeader>
+          <CardTitle>Delete account</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <p className="text-sm text-muted-foreground">
+            Permanently delete your account and associated data from the app.
+          </p>
+          <Button onClick={handleDeleteAccount} variant="destructive" disabled={isDeletingAccount}>
+            {isDeletingAccount ? "Deleting..." : "Delete account"}
+          </Button>
+        </CardContent>
+      </Card>
     </div>
   );
 }

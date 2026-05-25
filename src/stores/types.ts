@@ -59,6 +59,7 @@ export interface AuthSlice {
     referrerLinkId?: string
   ) => Promise<void>;
   signOut: () => Promise<void>;
+  deleteAccount: () => Promise<void>;
   updateUser: (patch: Partial<User>) => Promise<void>;
   setCredentials: (password: string, email?: string, currentPassword?: string) => Promise<void>;
   passwordReset: (email: string) => Promise<{ resetUrl?: string }>;

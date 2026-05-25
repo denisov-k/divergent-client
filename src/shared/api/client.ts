@@ -264,6 +264,14 @@ export async function updateUser(patch: Partial<User>) {
   });
 }
 
+export async function deleteAccount() {
+  const result = await fetchJSON("/api/user", {
+    method: "DELETE",
+  });
+  await clearSessionToken();
+  return result;
+}
+
 export async function setCredentials(password: string, email?: string, currentPassword?: string) {
   return fetchJSON("/api/user/credentials", {
     method: "POST",

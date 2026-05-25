@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef } from "react";
 import { useTranslation } from "react-i18next";
-import { Keyboard, KeyboardAvoidingView, Modal, Platform, ScrollView, Text, TextInput, View } from "react-native";
+import { Keyboard, KeyboardAvoidingView, Modal, Platform, ScrollView, TextInput, View } from "react-native";
 
 import { ActionChip } from "@/components/native/ActionChip";
 import { Calendar, Clock, Crown, Gift, Award, Star, Target, Trophy, Zap } from "@/components/native/icons";
@@ -300,10 +300,35 @@ function MetaBadge({ children, icon }: { children: React.ReactNode; icon?: React
   );
 }
 
-function SelectableText({ children, style }: { children: React.ReactNode; style?: React.ComponentProps<typeof Text>["style"] }) {
+function SelectableText({ children, style }: { children: React.ReactNode; style?: React.ComponentProps<typeof TextInput>["style"] }) {
+  const textValue = flattenText(children);
+
   return (
-    <Text selectable style={style}>
-      {children}
-    </Text>
+    <TextInput
+      value={textValue}
+      editable={false}
+      multiline
+      scrollEnabled={false}
+      contextMenuHidden={false}
+      showSoftInputOnFocus={false}
+      selectionColor={appPalette.brand.primary}
+      style={style}
+    />
   );
+}
+
+function flattenText(children: React.ReactNode): string {
+  if (children == null || typeof children === "boolean") {
+    return "";
+  }
+
+  if (typeof children === "string" || typeof children === "number") {
+    return String(children);
+  }
+
+  if (Array.isArray(children)) {
+    return children.map((child) => flattenText(child)).join("");
+  }
+
+  return "";
 }

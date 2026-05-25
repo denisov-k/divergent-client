@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 import { ScreenHeader } from "@/components/native/ScreenHeader";
 import {
   CredentialsSection,
+  DeleteAccountSection,
   handleSettingsSubmit,
   LanguageSection,
   ProfileSection,
@@ -22,6 +23,7 @@ export default function NativeSettingsScreen() {
     success,
     isSubmitting,
     isSavingProfile,
+    isDeletingAccount,
     hasPassword,
     credentialsTitle,
     deviceTimeZone,
@@ -31,6 +33,7 @@ export default function NativeSettingsScreen() {
     submitCredentials,
     changeLanguage,
     changeTimeZone,
+    removeAccount,
     signOut,
   } = useSettingsScreen();
 
@@ -70,6 +73,10 @@ export default function NativeSettingsScreen() {
           onSignOut={async () => {
             await signOut();
           }}
+        />
+        <DeleteAccountSection
+          isDeletingAccount={isDeletingAccount}
+          onDeleteAccount={removeAccount}
         />
       </ScrollView>
     </View>

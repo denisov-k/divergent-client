@@ -6,7 +6,7 @@ import { useAppStore } from "@/stores/useAppStore";
 
 export function useSettingsScreen() {
   const { i18n } = useTranslation();
-  const { signOut, setCredentials, updateUser, user } = useAppStore();
+  const { signOut, deleteAccount, setCredentials, updateUser, user } = useAppStore();
   const [formData, setFormData] = useState({
     email: user?.email || "",
     currentPassword: "",
@@ -17,6 +17,7 @@ export function useSettingsScreen() {
   const [success, setSuccess] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSavingProfile, setIsSavingProfile] = useState(false);
+  const [isDeletingAccount, setIsDeletingAccount] = useState(false);
 
   const hasPassword = Boolean(user?.hasPassword);
   const credentialsTitle = useMemo(
@@ -94,6 +95,22 @@ export function useSettingsScreen() {
     }
   };
 
+  const removeAccount = async () => {
+    try {
+      setIsDeletingAccount(true);
+      setError(null);
+      setSuccess(null);
+      await deleteAccount();
+      return true;
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Failed to delete account.";
+      setError(message);
+      return false;
+    } finally {
+      setIsDeletingAccount(false);
+    }
+  };
+
   return {
     user,
     formData,
@@ -101,6 +118,7 @@ export function useSettingsScreen() {
     success,
     isSubmitting,
     isSavingProfile,
+    isDeletingAccount,
     hasPassword,
     credentialsTitle,
     deviceTimeZone,
@@ -110,6 +128,7 @@ export function useSettingsScreen() {
     submitCredentials,
     changeLanguage,
     changeTimeZone,
+    removeAccount,
     signOut,
   };
 }

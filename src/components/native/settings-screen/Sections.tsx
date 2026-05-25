@@ -140,6 +140,42 @@ export function SignOutSection(props: { onSignOut: () => Promise<void> }) {
   );
 }
 
+export function DeleteAccountSection(props: {
+  isDeletingAccount: boolean;
+  onDeleteAccount: () => Promise<boolean>;
+}) {
+  return (
+    <SurfaceCard>
+      <SectionTitle>Delete account</SectionTitle>
+      <Text style={{ color: appPalette.semantic.textMuted, fontFamily: "Montserrat", fontSize: 12, lineHeight: 18, marginBottom: 12 }}>
+        Permanently delete your account and associated data from the app.
+      </Text>
+      <ActionChip
+        onPress={() => {
+          Alert.alert(
+            "Delete account",
+            "Delete your account permanently? This action cannot be undone.",
+            [
+              { text: "Cancel", style: "cancel" },
+              {
+                text: "Delete",
+                style: "destructive",
+                onPress: () => {
+                  void props.onDeleteAccount();
+                },
+              },
+            ]
+          );
+        }}
+        tone="danger"
+        disabled={props.isDeletingAccount}
+      >
+        {props.isDeletingAccount ? "Deleting..." : "Delete account"}
+      </ActionChip>
+    </SurfaceCard>
+  );
+}
+
 export async function handleSettingsSubmit(
   submitCredentials: () => Promise<boolean>,
   hasPassword: boolean,
