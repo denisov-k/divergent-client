@@ -15,6 +15,7 @@ export function useAiChatSession({ open, onDraftAdded }: UseAiChatSessionArgs) {
 
   const [prompt, setPrompt] = useState("");
   const [history, setHistory] = useState<ChatMessage[]>([]);
+  const [historyLoading, setHistoryLoading] = useState(false);
   const [loading, setLoading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -29,6 +30,7 @@ export function useAiChatSession({ open, onDraftAdded }: UseAiChatSessionArgs) {
       allowAutoScrollRef.current = true;
       setPrompt("");
       setHistory([]);
+      setHistoryLoading(false);
       setLoading(false);
       setError(null);
       setSubmitting(false);
@@ -40,11 +42,14 @@ export function useAiChatSession({ open, onDraftAdded }: UseAiChatSessionArgs) {
     }
 
     const loadHistory = async () => {
+      setHistoryLoading(true);
       try {
         const storedHistory = await getChatHistory();
         setHistory(storedHistory ?? []);
       } catch {
         setHistory([]);
+      } finally {
+        setHistoryLoading(false);
       }
     };
 
@@ -154,6 +159,7 @@ export function useAiChatSession({ open, onDraftAdded }: UseAiChatSessionArgs) {
     allowAutoScrollRef.current = true;
     setPrompt("");
     setHistory([]);
+    setHistoryLoading(false);
     setLoading(false);
     setError(null);
     setSubmitting(false);
@@ -167,6 +173,7 @@ export function useAiChatSession({ open, onDraftAdded }: UseAiChatSessionArgs) {
     prompt,
     setPrompt,
     history,
+    historyLoading,
     loading,
     submitting,
     error,

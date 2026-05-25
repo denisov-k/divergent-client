@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef } from "react";
 import { useTranslation } from "react-i18next";
-import { Keyboard, KeyboardAvoidingView, Modal, Platform, ScrollView, TextInput, View } from "react-native";
+import { ActivityIndicator, Keyboard, KeyboardAvoidingView, Modal, Platform, ScrollView, TextInput, View } from "react-native";
 
 import { ActionChip } from "@/components/native/ActionChip";
 import { Calendar, Clock, Crown, Gift, Award, Star, Target, Trophy, Zap } from "@/components/native/icons";
@@ -30,6 +30,7 @@ export function AiChatSheet({ open, onOpenChange, onDraftAdded }: { open: boolea
     prompt,
     setPrompt,
     history,
+    historyLoading,
     loading,
     submitting,
     error,
@@ -86,17 +87,23 @@ export function AiChatSheet({ open, onOpenChange, onDraftAdded }: { open: boolea
                 scrollRef.current?.scrollToEnd({ animated: true });
               }}
             >
-              {history.map((message, index) => (
-                <AiChatMessageCard
-                  key={`${message.id ?? message.role}-${index}`}
-                  message={message}
-                  messageId={message.id}
-                  onDraftAdded={handleDraftAdded}
-                  isDraftPending={message.id === streamingMessageId}
-                  isPreparingDraft={message.id === draftPendingMessageId}
-                  elapsedSeconds={message.id === streamingMessageId ? elapsedSeconds : 0}
-                />
-              ))}
+              {historyLoading ? (
+                <View style={{ minHeight: 160, alignItems: "center", justifyContent: "center" }}>
+                  <ActivityIndicator size="large" color={appPalette.brand.primary} />
+                </View>
+              ) : (
+                history.map((message, index) => (
+                  <AiChatMessageCard
+                    key={`${message.id ?? message.role}-${index}`}
+                    message={message}
+                    messageId={message.id}
+                    onDraftAdded={handleDraftAdded}
+                    isDraftPending={message.id === streamingMessageId}
+                    isPreparingDraft={message.id === draftPendingMessageId}
+                    elapsedSeconds={message.id === streamingMessageId ? elapsedSeconds : 0}
+                  />
+                ))
+              )}
             </ScrollView>
             <View style={{ gap: 8 }}>
               <TextInput

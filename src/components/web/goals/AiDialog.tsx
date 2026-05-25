@@ -2,6 +2,7 @@ import { useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { Calendar, Clock, Target } from "lucide-react";
 
+import { AppLoader } from "@/components/shared/AppLoader";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -27,6 +28,7 @@ export default function AiChatDialog({ open, onOpenChange, onDraftAdded }: Props
     prompt,
     setPrompt,
     history,
+    historyLoading,
     loading,
     submitting,
     error,
@@ -63,17 +65,21 @@ export default function AiChatDialog({ open, onOpenChange, onDraftAdded }: Props
         </DialogHeader>
 
         <div ref={scrollRef} className="flex-1 overflow-y-auto rounded bg-gray-50 p-2 space-y-2">
-          {history.map((message, index) => (
-            <ChatMessageItem
-              key={index}
-              message={message}
-              messageId={message.id}
-              onDraftAdded={handleDraftAdded}
-              isDraftPending={message.id === streamingMessageId}
-              isPreparingDraft={message.id === draftPendingMessageId}
-              elapsedSeconds={message.id === streamingMessageId ? elapsedSeconds : 0}
-            />
-          ))}
+          {historyLoading ? (
+            <AppLoader />
+          ) : (
+            history.map((message, index) => (
+              <ChatMessageItem
+                key={index}
+                message={message}
+                messageId={message.id}
+                onDraftAdded={handleDraftAdded}
+                isDraftPending={message.id === streamingMessageId}
+                isPreparingDraft={message.id === draftPendingMessageId}
+                elapsedSeconds={message.id === streamingMessageId ? elapsedSeconds : 0}
+              />
+            ))
+          )}
         </div>
 
         <div className="mt-2 space-y-2">

@@ -40,19 +40,19 @@ export default function Settings() {
   const handleCredentialsSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!formData.email.trim()) {
-      setError("Email is required.");
+      setError(t("settings.email_required"));
       return;
     }
     if (formData.password.length < 8) {
-      setError("Password must be at least 8 characters.");
+      setError(t("settings.password_min"));
       return;
     }
     if (formData.password !== formData.confirmPassword) {
-      setError("Passwords do not match.");
+      setError(t("settings.passwords_no_match"));
       return;
     }
     if (hasPassword && !formData.currentPassword) {
-      setError("Current password is required.");
+      setError(t("settings.current_password_required"));
       return;
     }
 
@@ -62,9 +62,9 @@ export default function Settings() {
       setSuccess(null);
       await setCredentials(formData.password, formData.email.trim(), formData.currentPassword || undefined);
       setFormData((prev) => ({ ...prev, currentPassword: "", password: "", confirmPassword: "" }));
-      setSuccess(hasPassword ? "Password updated." : "Email and password added to your account.");
+      setSuccess(hasPassword ? t("settings.password_updated") : t("settings.email_and_password_added"));
     } catch (err) {
-      const message = err instanceof Error ? err.message : "Failed to update credentials.";
+      const message = err instanceof Error ? err.message : t("settings.credentials_update_failed");
       setError(message);
     } finally {
       setIsSubmitting(false);
@@ -72,9 +72,7 @@ export default function Settings() {
   };
 
   const handleDeleteAccount = async () => {
-    const confirmed = window.confirm(
-      "Delete account permanently? This action cannot be undone."
-    );
+    const confirmed = window.confirm(t("settings.delete_account_confirm"));
 
     if (!confirmed) {
       return;
@@ -86,7 +84,7 @@ export default function Settings() {
       setSuccess(null);
       await deleteAccount();
     } catch (err) {
-      const message = err instanceof Error ? err.message : "Failed to delete account.";
+      const message = err instanceof Error ? err.message : t("settings.delete_account_failed");
       setError(message);
     } finally {
       setIsDeletingAccount(false);
@@ -107,7 +105,7 @@ export default function Settings() {
             </div>
             <div className="flex flex-col">
               <label className="text-sm text-gray-500">{t("settings.role")}</label>
-              <Input className="mt-1 bg-gray-50" value={user.role || "user"} readOnly />
+              <Input className="mt-1 bg-gray-50" value={user.role || t("settings.role_user")} readOnly />
             </div>
           </div>
           <LanguageSwitcher />
@@ -122,8 +120,8 @@ export default function Settings() {
         <CardContent>
           <form className="space-y-4" onSubmit={handleCredentialsSubmit}>
             <div className="space-y-2">
-              <label htmlFor="email" className="text-sm font-medium text-foreground">Email</label>
-              <Input id="email" name="email" type="email" value={formData.email} onChange={handleChange} placeholder="you@example.com" className="h-11" />
+              <label htmlFor="email" className="text-sm font-medium text-foreground">{t("common.email")}</label>
+              <Input id="email" name="email" type="email" value={formData.email} onChange={handleChange} placeholder={t("auth.email_placeholder")} className="h-11" />
             </div>
 
             {hasPassword && (
@@ -146,7 +144,7 @@ export default function Settings() {
             {error && <p className="rounded-md border border-red-500/20 bg-red-500/10 px-3 py-2 text-sm text-red-300">{error}</p>}
             {success && <p className="rounded-md border border-emerald-500/20 bg-emerald-500/10 px-3 py-2 text-sm text-emerald-700">{success}</p>}
 
-            <Button type="submit" disabled={isSubmitting}>{isSubmitting ? "Saving..." : hasPassword ? "Update password" : "Save credentials"}</Button>
+            <Button type="submit" disabled={isSubmitting}>{isSubmitting ? t("common.saving") : hasPassword ? t("settings.update_password") : t("settings.save_credentials")}</Button>
           </form>
         </CardContent>
       </Card>
@@ -157,14 +155,14 @@ export default function Settings() {
 
       <Card className="border-red-500/20 bg-card/95">
         <CardHeader>
-          <CardTitle>Delete account</CardTitle>
+          <CardTitle>{t("settings.delete_account_title")}</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <p className="text-sm text-muted-foreground">
-            Permanently delete your account and associated data from the app.
+            {t("settings.delete_account_description")}
           </p>
           <Button onClick={handleDeleteAccount} variant="destructive" disabled={isDeletingAccount}>
-            {isDeletingAccount ? "Deleting..." : "Delete account"}
+            {isDeletingAccount ? t("settings.deleting_account") : t("settings.delete_account")}
           </Button>
         </CardContent>
       </Card>

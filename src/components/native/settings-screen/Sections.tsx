@@ -18,16 +18,16 @@ export function ProfileSection(props: {
     <SurfaceCard>
       <SectionTitle>{t("settings.profile")}</SectionTitle>
       <InfoRow label={t("settings.id")} value={props.user.id} />
-      <InfoRow label={t("settings.role")} value={props.user.role || "user"} />
+      <InfoRow label={t("settings.role")} value={props.user.role || t("settings.role_user")} />
       <InfoRow label={t("common.email")} value={props.user.email || t("common.not_specified")} />
     </SurfaceCard>
   );
 }
 
 export function LanguageSection(props: {
-  language: string;
+  language: string | null | undefined;
   isSavingProfile: boolean;
-  onChangeLanguage: (language: "en" | "ru") => void;
+  onChangeLanguage: (language: "en" | "ru" | null) => void;
 }) {
   const { t } = useTranslation();
 
@@ -35,11 +35,14 @@ export function LanguageSection(props: {
     <SurfaceCard>
       <SectionTitle>{t("settings.language")}</SectionTitle>
       <View style={{ flexDirection: "row", gap: 8 }}>
+        <ActionChip onPress={() => props.onChangeLanguage(null)} tone={props.language == null ? "primary" : "secondary"}>
+          {t("settings.language_system")}
+        </ActionChip>
         <ActionChip onPress={() => props.onChangeLanguage("en")} tone={props.language === "en" ? "primary" : "secondary"}>
-          English
+          {t("settings.language_english")}
         </ActionChip>
         <ActionChip onPress={() => props.onChangeLanguage("ru")} tone={props.language === "ru" ? "primary" : "secondary"}>
-          Русский
+          {t("settings.language_russian")}
         </ActionChip>
       </View>
       {props.isSavingProfile && (
@@ -144,21 +147,23 @@ export function DeleteAccountSection(props: {
   isDeletingAccount: boolean;
   onDeleteAccount: () => Promise<boolean>;
 }) {
+  const { t } = useTranslation();
+
   return (
     <SurfaceCard>
-      <SectionTitle>Delete account</SectionTitle>
+      <SectionTitle>{t("settings.delete_account_title")}</SectionTitle>
       <Text style={{ color: appPalette.semantic.textMuted, fontFamily: "Montserrat", fontSize: 12, lineHeight: 18, marginBottom: 12 }}>
-        Permanently delete your account and associated data from the app.
+        {t("settings.delete_account_description")}
       </Text>
       <ActionChip
         onPress={() => {
           Alert.alert(
-            "Delete account",
-            "Delete your account permanently? This action cannot be undone.",
+            t("settings.delete_account_title"),
+            t("settings.delete_account_confirm"),
             [
-              { text: "Cancel", style: "cancel" },
+              { text: t("common.cancel"), style: "cancel" },
               {
-                text: "Delete",
+                text: t("common.delete"),
                 style: "destructive",
                 onPress: () => {
                   void props.onDeleteAccount();
@@ -170,7 +175,7 @@ export function DeleteAccountSection(props: {
         tone="danger"
         disabled={props.isDeletingAccount}
       >
-        {props.isDeletingAccount ? "Deleting..." : "Delete account"}
+        {props.isDeletingAccount ? t("settings.deleting_account") : t("settings.delete_account")}
       </ActionChip>
     </SurfaceCard>
   );

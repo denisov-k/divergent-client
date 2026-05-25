@@ -2,10 +2,11 @@
 
 import { useTranslation } from "react-i18next";
 
+import { getSystemLanguage } from "@/i18nConfig";
 import { useAppStore } from "@/stores/useAppStore";
 
 export function useSettingsScreen() {
-  const { i18n } = useTranslation();
+  const { i18n, t } = useTranslation();
   const { signOut, deleteAccount, setCredentials, updateUser, user } = useAppStore();
   const [formData, setFormData] = useState({
     email: user?.email || "",
@@ -21,8 +22,8 @@ export function useSettingsScreen() {
 
   const hasPassword = Boolean(user?.hasPassword);
   const credentialsTitle = useMemo(
-    () => (hasPassword ? "Change password" : "Add email and password"),
-    [hasPassword]
+    () => (hasPassword ? t("settings.credentials_change_title") : t("settings.credentials_add_title")),
+    [hasPassword, t]
   );
   const deviceTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
@@ -34,22 +35,22 @@ export function useSettingsScreen() {
 
   const submitCredentials = async () => {
     if (!formData.email.trim()) {
-      setError("Email is required.");
+      setError(t("settings.email_required"));
       return false;
     }
 
     if (formData.password.length < 8) {
-      setError("Password must be at least 8 characters.");
+      setError(t("settings.password_min"));
       return false;
     }
 
     if (formData.password !== formData.confirmPassword) {
-      setError("Passwords do not match.");
+      setError(t("settings.passwords_no_match"));
       return false;
     }
 
     if (hasPassword && !formData.currentPassword) {
-      setError("Current password is required.");
+      setError(t("settings.current_password_required"));
       return false;
     }
 
@@ -65,10 +66,10 @@ export function useSettingsScreen() {
         password: "",
         confirmPassword: "",
       }));
-      setSuccess(hasPassword ? "Password updated." : "Email and password added to your account.");
+      setSuccess(hasPassword ? t("settings.password_updated") : t("settings.email_and_password_added"));
       return true;
     } catch (err) {
-      const message = err instanceof Error ? err.message : "Failed to update credentials.";
+      const message = err instanceof Error ? err.message : t("settings.credentials_update_failed");
       setError(message);
       return false;
     } finally {
@@ -76,10 +77,10 @@ export function useSettingsScreen() {
     }
   };
 
-  const changeLanguage = async (language: string) => {
+  const changeLanguage = async (language: string | null) => {
     try {
       setIsSavingProfile(true);
-      await i18n.changeLanguage(language);
+      await i18n.changeLanguage(language ?? getSystemLanguage());
       await updateUser({ language });
     } finally {
       setIsSavingProfile(false);
@@ -103,7 +104,7 @@ export function useSettingsScreen() {
       await deleteAccount();
       return true;
     } catch (err) {
-      const message = err instanceof Error ? err.message : "Failed to delete account.";
+      const message = err instanceof Error ? err.message : t("settings.delete_account_failed");
       setError(message);
       return false;
     } finally {
@@ -122,7 +123,7 @@ export function useSettingsScreen() {
     hasPassword,
     credentialsTitle,
     deviceTimeZone,
-    language: user?.language || i18n.language,
+    language: user?.language,
     timeZone: user?.timeZone || deviceTimeZone,
     setField,
     submitCredentials,

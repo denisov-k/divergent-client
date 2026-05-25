@@ -1,4 +1,4 @@
-import type {
+ï»¿import type {
   CategoryType,
   RewardIconType as SharedRewardIconType,
 } from "@/shared/domain";
@@ -13,13 +13,13 @@ export enum UserRole {
 }
 
 export const DAYS_OF_WEEK = [
-  { key: "mon", label: "Ïí" },
-  { key: "tue", label: "Âò" },
-  { key: "wed", label: "Ñð" },
-  { key: "thu", label: "×ò" },
-  { key: "fri", label: "Ïò" },
-  { key: "sat", label: "Ñá" },
-  { key: "sun", label: "Âñ" },
+  { key: "mon", label: "ÐŸÐ½" },
+  { key: "tue", label: "Ð’Ñ‚" },
+  { key: "wed", label: "Ð¡Ñ€" },
+  { key: "thu", label: "Ð§Ñ‚" },
+  { key: "fri", label: "ÐŸÑ‚" },
+  { key: "sat", label: "Ð¡Ð±" },
+  { key: "sun", label: "Ð’Ñ" },
 ] as const;
 
 export const DAYS_OF_MONTH = Array.from({ length: 31 }, (_, i) => i + 1);
@@ -192,7 +192,7 @@ export interface User {
   xpInCurrentLevel: number;
   requiredXp: number;
   photoUrl: string;
-  language: string;
+  language: string | null;
   timeZone: string;
 }
 

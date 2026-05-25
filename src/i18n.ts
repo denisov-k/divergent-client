@@ -1,18 +1,7 @@
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
 
-// Import your translation files
-import enTranslation from './locales/en/translation.json';
-import ruTranslation from './locales/ru/translation.json';
-
-const resources = {
-  en: {
-    translation: enTranslation,
-  },
-  ru: {
-    translation: ruTranslation,
-  },
-};
+import { defaultLanguage, fallbackLanguage, resources } from './i18nConfig';
 
 i18n
   // pass the i18n instance to react-i18next.
@@ -20,8 +9,8 @@ i18n
   // init i18next
   // for all options read: https://www.i18next.com/overview/configuration-options
   .init({
-    lng: 'ru', // default language
-    fallbackLng: 'en',
+    lng: defaultLanguage,
+    fallbackLng: fallbackLanguage,
     debug: true,
     resources,
     interpolation: {

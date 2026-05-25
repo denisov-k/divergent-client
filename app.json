@@ -5,7 +5,8 @@
     "scheme": "divergent",
     "icon": "./public/icon.jpg",
     "plugins": [
-      "expo-notifications"
+      "expo-notifications",
+      "expo-localization"
     ],
     "android": {
       "package": "com.spritemedia.divergent"
