@@ -9,6 +9,7 @@ import {
   confirmLeaveChallenge,
   showAcceptChallengeResult,
   showChallengePaymentStatusAlert,
+  showPaidChallengeUnavailableAlert,
 } from "./alerts";
 
 export function useChallengesScreenController(props: {
@@ -50,6 +51,12 @@ export function useChallengesScreenController(props: {
   }, [screen.paymentSyncStatus, screen.clearPaymentSyncStatus, t]);
 
   const handleAcceptChallenge = async (id: string) => {
+    const challenge = screen.challenges.find((item) => item.id === id);
+    if (challenge?.price && challenge.price > 0) {
+      showPaidChallengeUnavailableAlert(t);
+      return { status: "ignored" as const };
+    }
+
     const result = await screen.acceptSelectedChallenge(id);
     if (result.status === "ignored") {
       return result;

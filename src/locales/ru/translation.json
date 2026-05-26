@@ -303,6 +303,8 @@
     "accepted_description": "Вы присоединились к челленджу.",
     "payment_required_title": "Нужна оплата",
     "payment_required_description": "Откроем выбор способа оплаты и продолжим через redirect flow.",
+    "mobile_paid_unavailable_title": "Платные челленджи недоступны в приложении",
+    "mobile_paid_unavailable_description": "Сейчас присоединиться к платному челленджу можно только вне мобильного приложения.",
     "payment_sheet_title": "Выбери способ оплаты",
     "payment_sheet_description": "Сейчас в мобильной ветке уже подключён базовый redirect flow через YooKassa.",
     "payment_sheet_submit": "Оплатить картой",

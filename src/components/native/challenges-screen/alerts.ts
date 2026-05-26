@@ -52,3 +52,10 @@ export function showAcceptChallengeResult(status: "accepted" | "payment_required
 
   Alert.alert(t("challenges.payment_required_title"), t("challenges.payment_required_description"));
 }
+
+export function showPaidChallengeUnavailableAlert(t: TFunction) {
+  Alert.alert(
+    t("challenges.mobile_paid_unavailable_title"),
+    t("challenges.mobile_paid_unavailable_description"),
+  );
+}

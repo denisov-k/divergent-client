@@ -235,6 +235,7 @@ export function ChallengeActionsRow({
   isCreator,
   hasStarted,
   hasEnded,
+  isPaid,
   hasLink,
   onOpenLink,
   onOpenParticipants,
@@ -245,6 +246,7 @@ export function ChallengeActionsRow({
   isCreator: boolean;
   hasStarted: boolean;
   hasEnded: boolean;
+  isPaid: boolean;
   hasLink: boolean;
   onOpenLink?: () => void;
   onOpenParticipants?: () => void;
@@ -257,7 +259,7 @@ export function ChallengeActionsRow({
       {!!onOpenDetails && <ChallengePrimaryButton label={t("common.details")} onPress={onOpenDetails} />}
       {!!onOpenLink && hasLink && isParticipant && <ChallengePrimaryButton label={t("common.community")} onPress={onOpenLink} />}
       {!!onOpenParticipants && isCreator && <ChallengePrimaryButton label={t("common.participants")} onPress={onOpenParticipants} />}
-      {!!onAccept && !isParticipant && !hasStarted && !hasEnded && <ChallengePrimaryButton label={t("challenges.accept")} onPress={onAccept} />}
+      {!!onAccept && !isParticipant && !hasStarted && !hasEnded && !isPaid && <ChallengePrimaryButton label={t("challenges.accept")} onPress={onAccept} />}
     </View>
   );
 }

@@ -327,14 +327,12 @@ export function ChallengeFieldsSection(props: {
   description: string;
   rules: string;
   link: string;
-  price: string;
   startsAt: string;
   endsAt: string;
   onChangeTitle: (value: string) => void;
   onChangeDescription: (value: string) => void;
   onChangeRules: (value: string) => void;
   onChangeLink: (value: string) => void;
-  onChangePrice: (value: string) => void;
   onChangeStartsAt: (value: string) => void;
   onChangeEndsAt: (value: string) => void;
 }) {
@@ -362,7 +360,6 @@ export function ChallengeFieldsSection(props: {
         numberOfLines={4}
       />
       <FieldInput label={t("challenges.fields.link")} value={props.link} onChangeText={props.onChangeLink} placeholder={t("challenges.placeholders.link")} keyboardType="url" autoCapitalize="none" />
-      <FieldInput label={t("challenges.fields.price")} value={props.price} onChangeText={props.onChangePrice} placeholder={t("challenges.placeholders.price")} keyboardType="numeric" />
       <DateField label={t("challenges.fields.start_date")} value={props.startsAt} placeholder={t("challenges.placeholders.start_date")} onChange={props.onChangeStartsAt} />
       <DateField label={t("challenges.fields.end_date")} value={props.endsAt} placeholder={t("challenges.placeholders.end_date")} onChange={props.onChangeEndsAt} />
     </>

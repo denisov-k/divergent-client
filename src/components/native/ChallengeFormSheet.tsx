@@ -31,7 +31,6 @@ export function ChallengeFormSheet({
   const [description, setDescription] = useState("");
   const [rules, setRules] = useState("");
   const [link, setLink] = useState("");
-  const [price, setPrice] = useState("");
   const [startsAt, setStartsAt] = useState("");
   const [endsAt, setEndsAt] = useState("");
   const [isPublic, setIsPublic] = useState(true);
@@ -49,7 +48,6 @@ export function ChallengeFormSheet({
       setDescription(challenge.description ?? "");
       setRules(challenge.rules ?? "");
       setLink(challenge.link ?? "");
-      setPrice(challenge.price ? String(challenge.price) : "");
       setStartsAt(challenge.startsAt ?? "");
       setEndsAt(challenge.endsAt ?? "");
       setIsPublic(challenge.isPublic);
@@ -62,7 +60,6 @@ export function ChallengeFormSheet({
     setDescription("");
     setRules("");
     setLink("");
-    setPrice("");
     setStartsAt("");
     setEndsAt("");
     setIsPublic(true);
@@ -92,7 +89,7 @@ export function ChallengeFormSheet({
         isPublic,
         reports: challenge?.reports ?? [],
         requiresReport,
-        price: price ? Number(price) : undefined,
+        price: challenge?.price,
         startsAt: startsAt.trim() || undefined,
         endsAt: endsAt.trim() || undefined,
         goalIds: selectedGoalIds,
@@ -123,14 +120,12 @@ export function ChallengeFormSheet({
         description={description}
         rules={rules}
         link={link}
-        price={price}
         startsAt={startsAt}
         endsAt={endsAt}
         onChangeTitle={setTitle}
         onChangeDescription={setDescription}
         onChangeRules={setRules}
         onChangeLink={setLink}
-        onChangePrice={setPrice}
         onChangeStartsAt={setStartsAt}
         onChangeEndsAt={setEndsAt}
       />

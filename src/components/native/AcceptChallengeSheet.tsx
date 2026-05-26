@@ -306,12 +306,38 @@ export function AcceptChallengeSheet({
                 {safeChallenge?.price ? `${safeChallenge.price} ${t("common.rubles_short")}` : t("challenges.free")}
               </Text>
             </View>
+
+            {!!safeChallenge?.price && safeChallenge.price > 0 && !isParticipant && !hasStarted && !hasEnded && (
+              <SurfaceCard gap={6} padding={12} radius={12}>
+                <Text
+                  style={{
+                    color: appPalette.semantic.textStrong,
+                    fontFamily: "Montserrat",
+                    fontSize: 12,
+                    lineHeight: 18,
+                    fontWeight: "500",
+                  }}
+                >
+                  {t("challenges.mobile_paid_unavailable_title")}
+                </Text>
+                <Text
+                  style={{
+                    color: appPalette.semantic.textMuted,
+                    fontFamily: "Montserrat",
+                    fontSize: 12,
+                    lineHeight: 18,
+                  }}
+                >
+                  {t("challenges.mobile_paid_unavailable_description")}
+                </Text>
+              </SurfaceCard>
+            )}
           </ScrollView>
 
           <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8 }}>
             <ActionChip onPress={() => onOpenChange(false)}>{t("common.close")}</ActionChip>
             {!!safeChallenge && <ActionChip onPress={() => onShare(safeChallenge.id)} tone="secondary">{t("common.share")}</ActionChip>}
-            {!!safeChallenge && !isParticipant && !hasStarted && !hasEnded && (
+            {!!safeChallenge && !safeChallenge.price && !isParticipant && !hasStarted && !hasEnded && (
               <ActionChip onPress={() => void handleAccept()} tone="primary">
                 {t("challenges.accept")}
               </ActionChip>

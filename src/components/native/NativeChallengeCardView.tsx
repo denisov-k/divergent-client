@@ -145,6 +145,7 @@ export function NativeChallengeCardView({
             isCreator={isCreator}
             hasStarted={hasStarted}
             hasEnded={hasEnded}
+            isPaid={Boolean(challenge.price && challenge.price > 0)}
             hasLink={Boolean(challenge.link)}
             onOpenLink={onOpenLink ? () => onOpenLink(challenge.id) : undefined}
             onOpenParticipants={onOpenParticipants ? () => onOpenParticipants(challenge.id) : undefined}

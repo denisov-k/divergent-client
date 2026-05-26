@@ -303,6 +303,8 @@
                        "accepted_description":  "You joined the challenge.",
                        "payment_required_title":  "Payment required",
                        "payment_required_description":  "We will open the payment method picker and continue through the redirect flow.",
+                       "mobile_paid_unavailable_title":  "Paid challenges are unavailable in the app",
+                       "mobile_paid_unavailable_description":  "Joining a paid challenge is currently available only outside the mobile app.",
                        "payment_sheet_title":  "Choose payment method",
                        "payment_sheet_description":  "The basic redirect flow through YooKassa is already connected in the mobile branch.",
                        "payment_sheet_submit":  "Pay by card",
