@@ -1,10 +1,12 @@
-﻿import { Suspense, lazy, useEffect, useState } from "react";
-import { Alert, ScrollView, View } from "react-native";
+import { Suspense, lazy, useEffect, useState } from "react";
+import { Alert, ScrollView, Text, View } from "react-native";
 import { useTranslation } from "react-i18next";
 
-const ReminderFormSheet = lazy(() => import("@/components/native/ReminderFormSheet").then((m) => ({ default: m.ReminderFormSheet })));
+const ReminderFormSheet = lazy(() =>
+  import("@/components/native/ReminderFormSheet").then((m) => ({ default: m.ReminderFormSheet }))
+);
 
-import { EmptyStateCard } from "@/components/native/EmptyStateCard";
+import { HapticPressable as Pressable } from "@/components/native/HapticPressable";
 import { NativeReminderCardView } from "@/components/native/NativeReminderCardView";
 import { ScreenHeader } from "@/components/native/ScreenHeader";
 import { useRemindersScreen } from "@/shared/screens/reminders/useRemindersScreen";
@@ -72,15 +74,57 @@ export default function NativeRemindersScreen(props: {
 
       <ScrollView contentContainerStyle={{ paddingHorizontal: 8, gap: 8 }}>
         {reminders.length === 0 ? (
-          <EmptyStateCard
-            title={t("reminders.empty_native_title")}
-            description={t("reminders.empty_native_description")}
-            actionLabel={t("reminders.create_first")}
-            onAction={() => {
-              setInitialGoalId(undefined);
-              openCreateReminder();
+          <View
+            style={{
+              backgroundColor: appPalette.surface.card,
+              borderRadius: 16,
+              borderWidth: 1,
+              borderColor: appPalette.semantic.borderSubtle,
+              paddingHorizontal: 24,
+              paddingVertical: 48,
+              alignItems: "center",
             }}
-          />
+          >
+            <Text
+              style={{
+                color: appPalette.semantic.textMuted,
+                marginBottom: 16,
+                fontFamily: "Montserrat",
+                fontSize: 12,
+                lineHeight: 18,
+                textAlign: "center",
+              }}
+            >
+              {t("reminders.empty")}
+            </Text>
+            <Pressable
+              onPress={() => {
+                setInitialGoalId(undefined);
+                openCreateReminder();
+              }}
+              style={{
+                minHeight: 36,
+                paddingHorizontal: 16,
+                paddingVertical: 8,
+                borderRadius: 6,
+                backgroundColor: appPalette.brand.primaryStrong,
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <Text
+                style={{
+                  color: appPalette.brand.primaryForeground,
+                  fontFamily: "Montserrat",
+                  fontSize: 12,
+                  fontWeight: "500",
+                  lineHeight: 18,
+                }}
+              >
+                {t("reminders.create_first")}
+              </Text>
+            </Pressable>
+          </View>
         ) : (
           reminders.map((reminder) => {
             const goal = goals.find((item) => item.id === reminder.goalId);

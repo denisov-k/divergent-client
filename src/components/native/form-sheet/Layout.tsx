@@ -1,7 +1,9 @@
 import type { ReactNode } from "react";
-import { KeyboardAvoidingView, Modal, Platform, ScrollView, Text, View } from "react-native";
+import { Animated, KeyboardAvoidingView, Modal, Platform, ScrollView, Text, View } from "react-native";
 
 import { appPalette } from "@/theme/palette";
+
+import { SheetDragHandle, useSheetDragToClose } from "@/components/native/form-sheet/SheetChrome";
 
 export function FormSheetLayout(props: {
   open: boolean;
@@ -11,6 +13,8 @@ export function FormSheetLayout(props: {
   children: ReactNode;
   footer: ReactNode;
 }) {
+  const { headerPanHandlers, sheetStyle } = useSheetDragToClose(props.open, () => props.onOpenChange(false));
+
   return (
     <Modal visible={props.open} transparent animationType="none" onRequestClose={() => props.onOpenChange(false)}>
       <KeyboardAvoidingView
@@ -19,7 +23,7 @@ export function FormSheetLayout(props: {
         keyboardVerticalOffset={Platform.OS === "ios" ? 12 : 0}
       >
         <View style={{ flex: 1, backgroundColor: appPalette.surface.overlay, justifyContent: "flex-end" }}>
-          <View
+          <Animated.View
             style={{
               maxHeight: "90%",
               backgroundColor: appPalette.surface.background,
@@ -27,9 +31,11 @@ export function FormSheetLayout(props: {
               borderTopRightRadius: 24,
               padding: 20,
               gap: 14,
+              ...sheetStyle,
             }}
           >
-            <View style={{ gap: 6 }}>
+            <View {...headerPanHandlers} style={{ gap: 6 }}>
+              <SheetDragHandle />
               <Text style={{ fontSize: 20, fontWeight: "700", color: appPalette.semantic.textStrong, fontFamily: "Montserrat" }}>
                 {props.title}
               </Text>
@@ -43,7 +49,7 @@ export function FormSheetLayout(props: {
             </ScrollView>
 
             {props.footer}
-          </View>
+          </Animated.View>
         </View>
       </KeyboardAvoidingView>
     </Modal>

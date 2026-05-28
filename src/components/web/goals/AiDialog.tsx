@@ -57,6 +57,12 @@ export default function AiChatDialog({ open, onOpenChange, onDraftAdded }: Props
     onOpenChange(nextOpen);
   };
 
+  const quickActions = [
+    { label: t("ai.quick_action_capabilities"), prompt: t("ai.quick_prompt_capabilities") },
+    { label: t("ai.quick_action_goal"), prompt: t("ai.quick_prompt_goal") },
+    { label: t("ai.quick_action_progress"), prompt: t("ai.quick_prompt_progress") },
+  ];
+
   return (
     <Dialog open={open} onOpenChange={handleClose}>
       <DialogContent className="max-w-2xl max-h-[90vh] text-sm flex flex-col">
@@ -67,6 +73,21 @@ export default function AiChatDialog({ open, onOpenChange, onDraftAdded }: Props
         <div ref={scrollRef} className="flex-1 overflow-y-auto rounded bg-gray-50 p-2 space-y-2">
           {historyLoading ? (
             <AppLoader />
+          ) : history.length === 0 ? (
+            <div className="space-y-3 rounded-xl border bg-white p-4">
+              <div className="space-y-1">
+                <div className="text-base font-semibold text-foreground">{t("ai.welcome_title")}</div>
+                <div className="text-sm text-muted-foreground">{t("ai.welcome_description")}</div>
+              </div>
+
+              <div className="flex flex-wrap gap-2">
+                {quickActions.map((action) => (
+                  <Button key={action.label} variant="secondary" size="sm" onClick={() => void handleGenerate(action.prompt)} disabled={loading || submitting}>
+                    {action.label}
+                  </Button>
+                ))}
+              </div>
+            </div>
           ) : (
             history.map((message, index) => (
               <ChatMessageItem

@@ -200,7 +200,7 @@ export function AcceptChallengeDialog({ challenge, isOpen, onOpenChange, onAccep
           </div>
         </div>
 
-        <DialogFooter className="mt-4 flex justify-end gap-2">
+        <DialogFooter className="mt-4">
           <Button variant="outline" onClick={() => onOpenChange(false)}>
             {t("common.close")}
           </Button>

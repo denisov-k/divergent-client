@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from "react";
-import { Alert, ScrollView, View } from "react-native";
+import { Alert, ScrollView, Text, View } from "react-native";
 import { useTranslation } from "react-i18next";
 
-import { EmptyStateCard } from "@/components/native/EmptyStateCard";
+import { HapticPressable as Pressable } from "@/components/native/HapticPressable";
 import { RewardFormSheet } from "@/components/native/RewardFormSheet";
 import { NativeRewardCardView } from "@/components/native/NativeRewardCardView";
 import { ScreenHeader } from "@/components/native/ScreenHeader";
@@ -47,7 +47,54 @@ export default function NativeRewardsScreen(props: { rewardId?: string | null; o
 
       <ScrollView ref={scrollRef} contentContainerStyle={{ paddingHorizontal: 8, gap: 8 }}>
         {rewards.length === 0 ? (
-          <EmptyStateCard title={t("rewards.empty_title")} description={t("rewards.empty_description")} actionLabel={t("common.create_first_reward")} onAction={openCreateReward} />
+          <View
+            style={{
+              backgroundColor: appPalette.surface.card,
+              borderRadius: 16,
+              borderWidth: 1,
+              borderColor: appPalette.semantic.borderSubtle,
+              paddingHorizontal: 24,
+              paddingVertical: 48,
+              alignItems: "center",
+            }}
+          >
+            <Text
+              style={{
+                color: appPalette.semantic.textMuted,
+                marginBottom: 16,
+                fontFamily: "Montserrat",
+                fontSize: 12,
+                lineHeight: 18,
+                textAlign: "center",
+              }}
+            >
+              {t("rewards.empty_title")}
+            </Text>
+            <Pressable
+              onPress={openCreateReward}
+              style={{
+                minHeight: 36,
+                paddingHorizontal: 16,
+                paddingVertical: 8,
+                borderRadius: 6,
+                backgroundColor: appPalette.brand.primaryStrong,
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <Text
+                style={{
+                  color: appPalette.brand.primaryForeground,
+                  fontFamily: "Montserrat",
+                  fontSize: 12,
+                  fontWeight: "500",
+                  lineHeight: 18,
+                }}
+              >
+                {t("common.create_first_reward")}
+              </Text>
+            </Pressable>
+          </View>
         ) : (
           rewards.map((reward) => {
             const goal = goals.find((item) => item.id === reward.goalId);
@@ -66,6 +113,7 @@ export default function NativeRewardsScreen(props: { rewardId?: string | null; o
           })
         )}
       </ScrollView>
+
       <RewardFormSheet open={rewardDialogOpen} reward={editingReward} goals={goals} onOpenChange={closeRewardDialog} onSave={saveReward} onDelete={handleDeleteReward} />
     </View>
   );

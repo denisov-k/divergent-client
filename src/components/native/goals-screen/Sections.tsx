@@ -3,7 +3,6 @@ import { ScrollView, Text, View } from "react-native";
 import { HapticPressable as Pressable } from "@/components/native/HapticPressable";
 import { useTranslation } from "react-i18next";
 
-import { EmptyStateCard } from "@/components/native/EmptyStateCard";
 import { NativeGoalCardView } from "@/components/native/NativeGoalCardView";
 import { Plus, Sparkles } from "@/components/native/icons";
 import { AppLoader } from "@/components/shared/AppLoader";
@@ -155,14 +154,56 @@ export function GoalsScreenContent({
   }
 
   return (
-      <ScrollView ref={scrollRef} contentContainerStyle={{ paddingHorizontal: 8, gap: 8 }}>
+    <ScrollView ref={scrollRef} contentContainerStyle={{ paddingHorizontal: 8, gap: 8 }}>
       {goals.length === 0 ? (
-        <EmptyStateCard
-          title={t("goals.empty_title")}
-          description={t("goals.empty_description")}
-          actionLabel={t("common.create_first_goal")}
-          onAction={onCreate}
-        />
+        <View
+          style={{
+            backgroundColor: appPalette.surface.card,
+            borderRadius: 16,
+            borderWidth: 1,
+            borderColor: appPalette.semantic.borderSubtle,
+            paddingHorizontal: 24,
+            paddingVertical: 48,
+            alignItems: "center",
+          }}
+        >
+          <Text
+            style={{
+              color: appPalette.semantic.textMuted,
+              marginBottom: 16,
+              fontFamily: "Montserrat",
+              fontSize: 12,
+              lineHeight: 18,
+              textAlign: "center",
+            }}
+          >
+            {t("goals.empty_title")}
+          </Text>
+          <Pressable
+            onPress={onCreate}
+            style={{
+              minHeight: 36,
+              paddingHorizontal: 16,
+              paddingVertical: 8,
+              borderRadius: 6,
+              backgroundColor: appPalette.brand.primaryStrong,
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <Text
+              style={{
+                color: appPalette.brand.primaryForeground,
+                fontFamily: "Montserrat",
+                fontSize: 12,
+                fontWeight: "500",
+                lineHeight: 18,
+              }}
+            >
+              {t("common.create_first_goal")}
+            </Text>
+          </Pressable>
+        </View>
       ) : (
         goals.map((goal) => {
           const reward = rewards.find((item) => item.goalId === goal.id) || null;

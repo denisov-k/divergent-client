@@ -1,5 +1,5 @@
 ﻿import { useState } from "react";
-import { Modal, ScrollView, Text, View } from "react-native";
+import { Animated, Modal, ScrollView, Text, View } from "react-native";
 import { HapticPressable as Pressable } from "@/components/native/HapticPressable";
 import { useTranslation } from "react-i18next";
 
@@ -7,6 +7,7 @@ import { ProgressRing } from "@/components/shared/ProgressRing";
 import { ActionChip } from "@/components/native/ActionChip";
 import { Calendar, ChevronDown, ChevronUp, Users } from "@/components/native/icons";
 import { SurfaceCard } from "@/components/native/SurfaceCard";
+import { SheetDragHandle, useSheetDragToClose } from "@/components/native/form-sheet/SheetChrome";
 import { getChallengeDerivedState, goalCompleted } from "@/shared/display/challenges";
 import { useAppStore } from "@/stores/useAppStore";
 import { appPalette } from "@/theme/palette";
@@ -99,6 +100,7 @@ export function AcceptChallengeSheet({
   const safeChallenge = challenge;
   const safeGoals = safeChallenge?.goals ?? [];
   const safeParticipants = safeChallenge?.participants ?? [];
+  const { headerPanHandlers, sheetStyle } = useSheetDragToClose(open, () => onOpenChange(false));
 
   const { challengeStatus, hasEnded, hasStarted, isParticipant, progress } = safeChallenge
     ? getChallengeDerivedState(safeChallenge, user?.id)
@@ -144,7 +146,7 @@ export function AcceptChallengeSheet({
   return (
     <Modal visible={open} transparent animationType="none" onRequestClose={() => onOpenChange(false)}>
       <View style={{ flex: 1, backgroundColor: appPalette.surface.overlay, justifyContent: "flex-end" }}>
-        <View
+        <Animated.View
           style={{
             maxHeight: "88%",
             backgroundColor: appPalette.surface.background,
@@ -152,9 +154,11 @@ export function AcceptChallengeSheet({
             borderTopRightRadius: 24,
             padding: 20,
             gap: 14,
+            ...sheetStyle,
           }}
         >
-          <View style={{ gap: 6 }}>
+          <View {...headerPanHandlers} style={{ gap: 6 }}>
+            <SheetDragHandle />
             <Text
               style={{
                 fontSize: 20,
@@ -343,7 +347,7 @@ export function AcceptChallengeSheet({
               </ActionChip>
             )}
           </View>
-        </View>
+        </Animated.View>
       </View>
     </Modal>
   );

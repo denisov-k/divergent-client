@@ -1,8 +1,9 @@
 import { useEffect, useMemo, useRef } from "react";
 import { useTranslation } from "react-i18next";
-import { ActivityIndicator, Keyboard, KeyboardAvoidingView, Modal, Platform, ScrollView, Text, TextInput, View } from "react-native";
+import { ActivityIndicator, Animated, Keyboard, KeyboardAvoidingView, Modal, Platform, ScrollView, Text, TextInput, View } from "react-native";
 
 import { ActionChip } from "@/components/native/ActionChip";
+import { SheetDragHandle, useSheetDragToClose } from "@/components/native/form-sheet/SheetChrome";
 import { Calendar, Clock, Crown, Gift, Award, Star, Target, Trophy, Zap } from "@/components/native/icons";
 import { categoryConfig } from "@/components/native/GoalCardParts";
 import { SurfaceCard } from "@/components/native/SurfaceCard";
@@ -26,6 +27,7 @@ const rewardIconMap: Record<RewardIconType, React.ComponentType<{ size?: string 
 export function AiChatSheet({ open, onOpenChange, onDraftAdded }: { open: boolean; onOpenChange: (open: boolean) => void; onDraftAdded: (goal: Goal) => void }) {
   const { t } = useTranslation();
   const scrollRef = useRef<ScrollView>(null);
+  const { headerPanHandlers, sheetStyle } = useSheetDragToClose(open, () => onOpenChange(false));
   const {
     prompt,
     setPrompt,
@@ -63,6 +65,12 @@ export function AiChatSheet({ open, onOpenChange, onDraftAdded }: { open: boolea
     void handleGenerate();
   };
 
+  const quickActions = [
+    { label: t("ai.quick_action_capabilities"), prompt: t("ai.quick_prompt_capabilities") },
+    { label: t("ai.quick_action_goal"), prompt: t("ai.quick_prompt_goal") },
+    { label: t("ai.quick_action_progress"), prompt: t("ai.quick_prompt_progress") },
+  ];
+
   return (
     <Modal visible={open} transparent animationType="none" onRequestClose={() => onOpenChange(false)}>
       <KeyboardAvoidingView
@@ -71,8 +79,9 @@ export function AiChatSheet({ open, onOpenChange, onDraftAdded }: { open: boolea
         keyboardVerticalOffset={Platform.OS === "ios" ? 12 : 0}
       >
         <View style={{ flex: 1, backgroundColor: appPalette.surface.overlay, justifyContent: "flex-end" }}>
-          <View style={{ maxHeight: "92%", backgroundColor: appPalette.surface.background, borderTopLeftRadius: 24, borderTopRightRadius: 24, padding: 20, gap: 14 }}>
-            <View style={{ gap: 6 }}>
+          <Animated.View style={{ maxHeight: "92%", backgroundColor: appPalette.surface.background, borderTopLeftRadius: 24, borderTopRightRadius: 24, padding: 20, gap: 14, ...sheetStyle }}>
+            <View {...headerPanHandlers} style={{ gap: 6 }}>
+              <SheetDragHandle />
               <SelectableText style={{ fontSize: 20, fontWeight: "700", color: appPalette.semantic.textStrong, fontFamily: "Montserrat" }}>{t("ai.title")}</SelectableText>
             </View>
             <ScrollView
@@ -90,6 +99,26 @@ export function AiChatSheet({ open, onOpenChange, onDraftAdded }: { open: boolea
               {historyLoading ? (
                 <View style={{ minHeight: 160, alignItems: "center", justifyContent: "center" }}>
                   <ActivityIndicator size="large" color={appPalette.brand.primary} />
+                </View>
+              ) : history.length === 0 ? (
+                <View style={{ gap: 12, paddingVertical: 12 }}>
+                  <SurfaceCard gap={12} padding={16} radius={16}>
+                    <View style={{ gap: 6 }}>
+                      <SelectableText style={{ color: appPalette.semantic.textStrong, fontSize: 16, lineHeight: 24, fontWeight: "700", fontFamily: "Montserrat" }}>
+                        {t("ai.welcome_title")}
+                      </SelectableText>
+                      <SelectableText style={{ color: appPalette.semantic.textMuted, fontSize: 12, lineHeight: 18, fontFamily: "Montserrat" }}>
+                        {t("ai.welcome_description")}
+                      </SelectableText>
+                    </View>
+                    <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8 }}>
+                      {quickActions.map((action) => (
+                        <ActionChip key={action.label} onPress={() => void handleGenerate(action.prompt)} tone="secondary" disabled={loading || submitting}>
+                          {action.label}
+                        </ActionChip>
+                      ))}
+                    </View>
+                  </SurfaceCard>
                 </View>
               ) : (
                 history.map((message, index) => (
@@ -127,7 +156,7 @@ export function AiChatSheet({ open, onOpenChange, onDraftAdded }: { open: boolea
                 {submitting ? t("ai.asking") : t("ai.ask")}
               </ActionChip>
             </View>
-          </View>
+          </Animated.View>
         </View>
       </KeyboardAvoidingView>
     </Modal>
@@ -310,7 +339,7 @@ function MetaBadge({ children, icon }: { children: React.ReactNode; icon?: React
 function SelectableText({ children, style }: { children: React.ReactNode; style?: React.ComponentProps<typeof TextInput>["style"] }) {
     const textValue = flattenText(children);
 
-    if (Platform.OS === "ios") {
+    if (Platform.OS === "ios" || Platform.OS === "web") {
       return (
         <Text selectable style={style}>
           {textValue}

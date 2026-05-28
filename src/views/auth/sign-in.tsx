@@ -3,15 +3,7 @@ import { useTranslation } from "react-i18next";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { z, ZodError } from "zod";
 
-import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
+import { AuthCard, AuthField, AuthHeader, AuthScreenShell, DividerLabel, ErrorBanner, InlineLink, PrimaryButton, SuccessBanner, TelegramButton } from "@/components/web/auth-screen/Primitives";
 import { platformCapabilities } from "@/platform/capabilities";
 import { createTelegramLoginUrl } from "@/platform/telegram";
 import { redirectToUrl } from "@/platform/browser";
@@ -56,19 +48,17 @@ export default function SignIn() {
     if (!telegramError && !resetStatus) return;
 
     if (resetStatus === "success") {
-      setErrors({
-        submit: "Password updated. You can sign in with your new password now.",
-      });
+      setErrors({});
       return;
     }
 
     setErrors({
       submit:
         telegramError === "telegram_oauth_failed"
-          ? `Telegram sign in failed. Please try again.${telegramErrorDetail ? ` (${telegramErrorDetail})` : ""}`
-          : "Telegram sign in is not available right now.",
+          ? `${t("auth.telegram_signin_failed")}${telegramErrorDetail ? ` (${telegramErrorDetail})` : ""}`
+          : t("auth.telegram_signin_unavailable"),
     });
-  }, [telegramError, telegramErrorDetail, resetStatus]);
+  }, [telegramError, telegramErrorDetail, resetStatus, t]);
 
   const handleSubmit = async (data: typeof formData) => {
     try {
@@ -106,24 +96,14 @@ export default function SignIn() {
   const isBusy = isSubmitting || loading;
 
   return (
-    <div className="relative flex min-h-svh items-center justify-center overflow-hidden bg-[radial-gradient(circle_at_top,#eef6ff_0%,#ffffff_42%,#f3f4f6_100%)] px-4 py-10">
-      <div className="pointer-events-none absolute inset-0">
-        <div className="absolute left-[-6rem] top-[-5rem] h-56 w-56 rounded-full bg-sky-100 blur-3xl" />
-        <div className="absolute right-[-5rem] top-20 h-48 w-48 rounded-full bg-blue-100/80 blur-3xl" />
-        <div className="absolute bottom-[-6rem] left-1/2 h-64 w-64 -translate-x-1/2 rounded-full bg-zinc-200/70 blur-3xl" />
-      </div>
+    <AuthScreenShell>
+      <AuthCard>
+        <div className="space-y-6">
+          <AuthHeader
+            title={t("auth.signin_welcome_title")}
+            subtitle={t("auth.signin_welcome_subtitle")}
+          />
 
-      <Card className="relative z-10 w-full max-w-md border-border/80 bg-card/95 shadow-[0_24px_80px_rgba(15,23,42,0.10)] backdrop-blur">
-        <CardHeader className="space-y-2 pb-0 text-center">
-          <div className="space-y-2">
-            <CardTitle className="text-2xl text-foreground">Welcome back</CardTitle>
-            <CardDescription className="text-sm text-muted-foreground">
-              Sign in with email or continue with Telegram.
-            </CardDescription>
-          </div>
-        </CardHeader>
-
-        <CardContent className="pt-6">
           <form
             className="space-y-4"
             onSubmit={(e) => {
@@ -131,89 +111,63 @@ export default function SignIn() {
               handleSubmit(formData);
             }}
           >
-            <div className="space-y-2">
-              <label htmlFor="email" className="text-sm font-medium text-foreground">
-                Email
-              </label>
-              <Input
-                id="email"
-                name="email"
-                type="email"
-                value={formData.email}
-                onChange={handleChange}
-                required
-                placeholder={t("auth.email_placeholder")}
-                aria-invalid={Boolean(errors.email)}
-                className="h-11 border-border bg-input-background text-foreground placeholder:text-muted-foreground"
-              />
-              {errors.email && <p className="text-sm text-red-400">{errors.email}</p>}
-            </div>
+            <AuthField
+              id="email"
+              name="email"
+              type="email"
+              value={formData.email}
+              onChange={handleChange}
+              required
+              label={t("common.email")}
+              placeholder={t("auth.email_placeholder")}
+              aria-invalid={Boolean(errors.email)}
+              error={errors.email}
+              autoComplete="email"
+            />
 
-            <div className="space-y-2">
-              <label htmlFor="password" className="text-sm font-medium text-foreground">
-                Password
-              </label>
-              <Input
-                id="password"
-                name="password"
-                type="password"
-                value={formData.password}
-                onChange={handleChange}
-                required
-                placeholder={t("auth.password_placeholder")}
-                aria-invalid={Boolean(errors.password)}
-                className="h-11 border-border bg-input-background text-foreground placeholder:text-muted-foreground"
-              />
-              {errors.password && <p className="text-sm text-red-400">{errors.password}</p>}
-            </div>
+            <AuthField
+              id="password"
+              name="password"
+              type="password"
+              value={formData.password}
+              onChange={handleChange}
+              required
+              label={t("common.password")}
+              placeholder={t("auth.password_placeholder")}
+              aria-invalid={Boolean(errors.password)}
+              error={errors.password}
+              autoComplete="current-password"
+            />
 
-            {errors.submit && (
-              <p className="rounded-md border border-red-500/20 bg-red-500/10 px-3 py-2 text-sm text-red-300">
-                {errors.submit}
-              </p>
-            )}
+            <ErrorBanner message={errors.submit} />
+            <SuccessBanner message={resetStatus === "success" ? t("auth.password_updated") : undefined} />
 
-            <Button type="submit" disabled={isBusy} size="lg" className="w-full">
-              {isSubmitting ? "Signing in..." : "Sign in"}
-            </Button>
+            <PrimaryButton type="submit" disabled={isBusy}>
+              {isSubmitting ? t("auth.signin_submitting") : t("auth.signin_submit")}
+            </PrimaryButton>
 
             {platformCapabilities.telegramLogin && (
-              <>
-                <div className="flex items-center gap-3 py-1">
-                  <div className="h-px flex-1 bg-border" />
-                  <span className="text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground">
-                    or
-                  </span>
-                  <div className="h-px flex-1 bg-border" />
-                </div>
-
-                <div className="rounded-xl border border-border bg-muted/40 p-4">
-                  <p className="mb-3 text-sm text-foreground">Continue with Telegram</p>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="lg"
-                    className="w-full bg-background"
-                    disabled={isBusy}
-                    onClick={() => redirectToUrl(createTelegramLoginUrl(redirect || "/"))}
-                  >
-                    Sign in with Telegram
-                  </Button>
-                </div>
-              </>
+              <div className="space-y-3">
+                <DividerLabel>{t("auth.or_divider")}</DividerLabel>
+                <TelegramButton
+                  type="button"
+                  disabled={isBusy}
+                  onClick={() => redirectToUrl(createTelegramLoginUrl(redirect || "/"))}
+                >
+                  {t("auth.telegram_signin")}
+                </TelegramButton>
+              </div>
             )}
 
-            <div className="flex items-center justify-between gap-3 pt-2 text-sm">
-              <a href="/signup" className="text-primary underline-offset-4 hover:underline">
-                Create account
-              </a>
-              <a href="/reset" className="text-muted-foreground underline-offset-4 hover:text-foreground hover:underline">
-                Reset password
-              </a>
+            <div className="flex items-center justify-between gap-3 pt-1 text-sm">
+              <InlineLink to="/signup">{t("auth.create_account_link")}</InlineLink>
+              <InlineLink to="/reset" muted>
+                {t("auth.reset_password")}
+              </InlineLink>
             </div>
           </form>
-        </CardContent>
-      </Card>
-    </div>
+        </div>
+      </AuthCard>
+    </AuthScreenShell>
   );
 }

@@ -1,9 +1,10 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Modal, Text, TextInput, View } from "react-native";
+import { Animated, Modal, Text, TextInput, View } from "react-native";
 import { HapticPressable as Pressable } from "@/components/native/HapticPressable";
 
 import { ActionChip } from "@/components/native/ActionChip";
+import { SheetDragHandle, useSheetDragToClose } from "@/components/native/form-sheet/SheetChrome";
 import { pickReportUpload } from "@/platform/reportUpload";
 import { appPalette } from "@/theme/palette";
 import type { ReportUploadPayload } from "@/types";
@@ -14,6 +15,7 @@ export function CreateReportSheet({ open, onOpenChange, onSubmit }: { open: bool
   const [selectedFile, setSelectedFile] = useState<ReportUploadPayload | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const { headerPanHandlers, sheetStyle } = useSheetDragToClose(open, () => onOpenChange(false));
 
   const handlePickFile = async () => {
     try {
@@ -50,9 +52,12 @@ export function CreateReportSheet({ open, onOpenChange, onSubmit }: { open: bool
   return (
     <Modal visible={open} transparent animationType="none" onRequestClose={() => onOpenChange(false)}>
       <View style={{ flex: 1, backgroundColor: appPalette.surface.overlay, justifyContent: "flex-end" }}>
-        <View style={{ backgroundColor: appPalette.surface.background, borderTopLeftRadius: 24, borderTopRightRadius: 24, padding: 20, gap: 14 }}>
-          <Text style={{ fontSize: 20, fontWeight: "700", color: appPalette.semantic.textStrong, fontFamily: "Montserrat" }}>{t("reports.title")}</Text>
-          <Text style={{ color: appPalette.semantic.textMuted, fontFamily: "Montserrat", fontSize: 12, lineHeight: 18 }}>{t("reports.description")}</Text>
+        <Animated.View style={{ backgroundColor: appPalette.surface.background, borderTopLeftRadius: 24, borderTopRightRadius: 24, padding: 20, gap: 14, ...sheetStyle }}>
+          <View {...headerPanHandlers} style={{ gap: 6 }}>
+            <SheetDragHandle />
+            <Text style={{ fontSize: 20, fontWeight: "700", color: appPalette.semantic.textStrong, fontFamily: "Montserrat" }}>{t("reports.title")}</Text>
+            <Text style={{ color: appPalette.semantic.textMuted, fontFamily: "Montserrat", fontSize: 12, lineHeight: 18 }}>{t("reports.description")}</Text>
+          </View>
           <Pressable onPress={() => void handlePickFile()} style={{ borderWidth: 1, borderStyle: "dashed", borderColor: appPalette.semantic.borderStrong, borderRadius: 16, padding: 18, backgroundColor: appPalette.ui.inputBackground }}>
             <Text style={{ color: appPalette.semantic.textStrong, fontWeight: "600", fontFamily: "Montserrat", fontSize: 12, lineHeight: 18 }}>{selectedFile ? selectedFile.fileName : t("common.choose_file")}</Text>
             <Text style={{ color: appPalette.semantic.textMuted, marginTop: 4, fontFamily: "Montserrat", fontSize: 12, lineHeight: 18 }}>{selectedFile ? selectedFile.mimeType || t("common.file_selected") : t("common.supported_images_pdf")}</Text>
@@ -63,7 +68,7 @@ export function CreateReportSheet({ open, onOpenChange, onSubmit }: { open: bool
           </View>
           {!!error && <View style={{ backgroundColor: appPalette.semantic.dangerSurface, borderRadius: 12, padding: 12 }}><Text style={{ color: appPalette.semantic.dangerText, fontFamily: "Montserrat", fontSize: 12, lineHeight: 18 }}>{error}</Text></View>}
           <View style={{ flexDirection: "row", gap: 8, flexWrap: "wrap" }}><ActionChip onPress={() => onOpenChange(false)}>{t("common.cancel")}</ActionChip><ActionChip onPress={() => void handleSubmit()} tone="primary">{loading ? t("common.sending") : t("common.confirm_completion")}</ActionChip></View>
-        </View>
+        </Animated.View>
       </View>
     </Modal>
   );

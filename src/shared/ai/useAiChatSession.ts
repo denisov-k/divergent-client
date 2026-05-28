@@ -71,15 +71,17 @@ export function useAiChatSession({ open, onDraftAdded }: UseAiChatSessionArgs) {
     return () => clearInterval(intervalId);
   }, [generationStartedAt, loading]);
 
-  const handleGenerate = async () => {
-    if (!prompt.trim()) return;
+  const handleGenerate = async (promptOverride?: string) => {
+    const currentPrompt = (promptOverride ?? prompt).trim();
+    if (!currentPrompt) return;
 
-    const currentPrompt = prompt.trim();
     const nextStreamingMessageId = `stream-${Date.now()}`;
     allowAutoScrollRef.current = true;
     setStreamingMessageId(nextStreamingMessageId);
     setDraftPendingMessageId(null);
-    setPrompt("");
+    if (!promptOverride) {
+      setPrompt("");
+    }
     setHistory((items) => [
       ...items,
       { role: "user", content: currentPrompt, isDraftAdded: false },

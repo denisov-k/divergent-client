@@ -104,7 +104,7 @@ export function ChallengeCard({
           <div className="flex min-w-0 flex-1 flex-col gap-2">
             <div className="flex items-center gap-2">
               <Swords className="size-5 text-primary" />
-              <CardTitle>{challenge.title}</CardTitle>
+              <CardTitle className="break-words">{challenge.title}</CardTitle>
             </div>
             <div className="flex flex-wrap gap-2">
               {(isCreator && <Badge variant="outline">{t("common.created_by")}</Badge>) ||
@@ -123,7 +123,7 @@ export function ChallengeCard({
                 </Badge>
               )}
             </div>
-            {challenge.description && <CardDescription>{challenge.description}</CardDescription>}
+            {challenge.description && <CardDescription className="break-words">{challenge.description}</CardDescription>}
           </div>
 
           <div className="flex items-center gap-2">
@@ -192,7 +192,7 @@ export function ChallengeCard({
               </Button>
             </CollapsibleTrigger>
 
-            <CollapsibleContent className="my-2 whitespace-pre-line text-sm text-muted-foreground">
+            <CollapsibleContent className="my-2 whitespace-pre-line break-words text-sm text-muted-foreground">
               {challenge.rules}
             </CollapsibleContent>
           </Collapsible>
@@ -231,7 +231,7 @@ export function ChallengeCard({
           <span>{challenge.price ? `${challenge.price} ${t("common.rubles_short")}` : t("challenges.free")}</span>
         </div>
 
-        <div className="flex justify-center gap-2">
+        <div className="flex flex-wrap justify-center gap-2">
           {onSelect && (
             <div className="flex justify-center py-2">
               <Button onClick={() => onSelect(challenge)}>{t("common.details")}</Button>
