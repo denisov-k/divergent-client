@@ -12,6 +12,7 @@ import { useTranslation } from "react-i18next";
 import { DateTime } from "luxon";
 
 import { formatGoalDate, getGoalPeriodTranslationKey } from "@/shared/display/goals";
+import { sumCompletedTaskXp } from "@/shared/screens/goals/model";
 import { Challenge, GoalPeriod, GoalType, Reward, Task } from "@/types";
 import { useNavigate } from "react-router-dom";
 import { useAppStore } from "@/stores/useAppStore.ts";
@@ -26,6 +27,7 @@ interface GoalCardProps {
   challenge?: Challenge;
   currentValue?: number;
   targetValue?: number;
+  taskXpTarget?: number;
   lastCompletedAt?: string;
   tasks?: Task[];
   dueDate?: string;
@@ -40,7 +42,7 @@ interface GoalCardProps {
   autoExpand?: boolean;
 }
 
-export function GoalCard({ id, title, description, category, tasks, challenge, goalType, goalPeriod, currentValue, targetValue, dueDate, lastCompletedAt, reward, editMode = false, onEdit, onTaskToggle, onAddReminder, onAddProgress, onGoToProgress, autoExpand }: GoalCardProps) {
+export function GoalCard({ id, title, description, category, tasks, challenge, goalType, goalPeriod, currentValue, targetValue, taskXpTarget, dueDate, lastCompletedAt, reward, editMode = false, onEdit, onTaskToggle, onAddReminder, onAddProgress, onGoToProgress, autoExpand }: GoalCardProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [expandedTasks, setExpandedTasks] = useState<Record<string, boolean>>({});
   const [newSubTaskTitles, setNewSubTaskTitles] = useState<Record<string, string>>({});
@@ -52,6 +54,7 @@ export function GoalCard({ id, title, description, category, tasks, challenge, g
   const { t } = useTranslation();
   const categoryLabel = categories.find((c) => c.value === category)!.label;
   const safeTasks = tasks ?? [];
+  const completedTaskXp = sumCompletedTaskXp(safeTasks, goalPeriod);
 
   function countTasks(taskList?: Task[]): number {
     if (!taskList || taskList.length === 0) return 0;
@@ -75,9 +78,20 @@ export function GoalCard({ id, title, description, category, tasks, challenge, g
   }
 
   const isNumeric = goalType === "PROGRESS";
+  const isXpBasedTaskGoal = goalType === "TASK" && taskXpTarget != null;
   const totalTasks = countTasks(safeTasks);
   const completedTasks = countCompleted(safeTasks, goalPeriod);
-  const progress = isNumeric ? (targetValue && targetValue > 0 ? Math.min(((currentValue ?? 0) / targetValue) * 100, 100) : 0) : totalTasks > 0 ? (completedTasks / totalTasks) * 100 : 0;
+  const progress = isNumeric
+    ? targetValue && targetValue > 0
+      ? Math.min(((currentValue ?? 0) / targetValue) * 100, 100)
+      : 0
+    : isXpBasedTaskGoal
+      ? taskXpTarget && taskXpTarget > 0
+        ? Math.min((completedTaskXp / taskXpTarget) * 100, 100)
+        : 100
+      : totalTasks > 0
+        ? (completedTasks / totalTasks) * 100
+        : 0;
 
   const now = new Date();
   let due = null;
@@ -175,7 +189,13 @@ export function GoalCard({ id, title, description, category, tasks, challenge, g
         <div>
           <div className="flex items-center justify-between mb-2">
             <span className="text-muted-foreground">{t("goals.progress")}</span>
-            {goalType === "TASK" ? <span className="text-muted-foreground">{completedTasks} / {totalTasks} {t("goals.tasks_count")}</span> : <span className="text-muted-foreground">{currentValue ?? 0} / {targetValue ?? 0}</span>}
+            {isXpBasedTaskGoal ? (
+              <span className="text-muted-foreground">{completedTaskXp} / {taskXpTarget} XP</span>
+            ) : goalType === "TASK" ? (
+              <span className="text-muted-foreground">{completedTasks} / {totalTasks} {t("goals.tasks_count")}</span>
+            ) : (
+              <span className="text-muted-foreground">{currentValue ?? 0} / {targetValue ?? 0}</span>
+            )}
           </div>
           <Progress value={progress} className="h-2" />
         </div>

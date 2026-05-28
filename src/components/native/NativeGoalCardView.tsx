@@ -12,7 +12,7 @@ import {
   GoalTaskSection,
 } from "@/components/native/GoalCardParts";
 import { SurfaceCard } from "@/components/native/SurfaceCard";
-import { isTaskCompletedThisPeriod } from "@/shared/screens/goals/model";
+import { isTaskCompletedThisPeriod, sumCompletedTaskXp } from "@/shared/screens/goals/model";
 import { appPalette } from "@/theme/palette";
 import type { Goal, GoalPeriod, Reward, Task } from "@/types";
 
@@ -58,10 +58,16 @@ export function NativeGoalCardView({ goal, categoryLabel, reward, userTimeZone, 
   const totalTasks = countTasks(safeTasks);
   const completedTasks = countCompleted(safeTasks, goal.goalPeriod);
   const isNumeric = goal.goalType === "PROGRESS";
+  const completedTaskXp = sumCompletedTaskXp(safeTasks, goal.goalPeriod);
+  const isXpBasedTaskGoal = goal.goalType === "TASK" && goal.taskXpTarget != null;
   const progress = isNumeric
     ? goal.targetValue && goal.targetValue > 0
       ? Math.min(((goal.currentValue ?? 0) / goal.targetValue) * 100, 100)
       : 0
+    : isXpBasedTaskGoal
+      ? goal.taskXpTarget && goal.taskXpTarget > 0
+        ? Math.min((completedTaskXp / goal.taskXpTarget) * 100, 100)
+        : 100
     : totalTasks > 0
       ? (completedTasks / totalTasks) * 100
       : 0;

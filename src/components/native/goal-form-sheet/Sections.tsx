@@ -568,6 +568,37 @@ export function ProgressFieldsSection(props: {
   );
 }
 
+export function TaskXpTargetSection(props: {
+  taskXpTarget: string;
+  totalTaskXp: number;
+  onChangeTaskXpTarget: (value: string) => void;
+}) {
+  const { t } = useTranslation();
+
+  return (
+    <View style={{ gap: 8 }}>
+      <Text style={formSectionLabelStyle}>{t("goals.dialog.task_xp_target_label")}</Text>
+      <View style={{ flexDirection: "row", gap: 8 }}>
+        <View style={{ flex: 1 }}>
+          <FieldInput
+            value={props.taskXpTarget}
+            onChangeText={props.onChangeTaskXpTarget}
+            placeholder="0"
+            keyboardType="numeric"
+          />
+        </View>
+        <View style={{ flex: 1 }}>
+          <FieldInput
+            label={t("goals.dialog.task_xp_total_label")}
+            value={String(props.totalTaskXp)}
+            editable={false}
+          />
+        </View>
+      </View>
+    </View>
+  );
+}
+
 export function TasksSection(props: {
   tasks: Task[];
   newTaskTitle: string;

@@ -44,3 +44,25 @@ export function isTaskCompletedThisPeriod(task: Task, goalPeriod: GoalPeriod) {
 
   return true;
 }
+
+export function sumTaskXp(tasks?: Task[]): number {
+  if (!tasks || tasks.length === 0) {
+    return 0;
+  }
+
+  return tasks.reduce((sum, task) => sum + (task.xpReward ?? 0) + sumTaskXp(task.subtasks), 0);
+}
+
+export function sumCompletedTaskXp(tasks: Task[] | undefined, goalPeriod: GoalPeriod): number {
+  if (!tasks || tasks.length === 0) {
+    return 0;
+  }
+
+  return tasks.reduce(
+    (sum, task) =>
+      sum +
+      (isTaskCompletedThisPeriod(task, goalPeriod) ? task.xpReward ?? 0 : 0) +
+      sumCompletedTaskXp(task.subtasks, goalPeriod),
+    0,
+  );
+}

@@ -240,7 +240,9 @@
                                  "task_placeholder":  "Task name",
                                  "empty_tasks":  "Add tasks for your goal",
                                  "current_progress":  "Current progress",
-                                 "target_value":  "Target value"
+                                 "target_value":  "Target value",
+                                 "task_xp_target_label":  "XP to finish",
+                                 "task_xp_total_label":  "Total task XP"
                              },
                   "subtask_placeholder":  "Subtask"
               },

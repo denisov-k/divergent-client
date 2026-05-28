@@ -240,7 +240,9 @@
       "task_placeholder": "Название задачи",
       "empty_tasks": "Добавьте задачи для вашей цели",
       "current_progress": "Текущий прогресс",
-      "target_value": "Целевое значение"
+      "target_value": "Целевое значение",
+      "task_xp_target_label": "XP для завершения",
+      "task_xp_total_label": "Сумма XP по задачам"
     },
     "subtask_placeholder": "Подзадача"
   },

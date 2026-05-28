@@ -47,6 +47,7 @@ export interface Goal {
   xpReward?: number;
   currentValue?: number;
   targetValue?: number;
+  taskXpTarget?: number;
   goalType: GoalType;
   goalPeriod: GoalPeriod;
   challengeId?: string;

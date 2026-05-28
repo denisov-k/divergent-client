@@ -20,6 +20,7 @@ import { Plus } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 
 import type { CategoryType } from "@/shared/domain";
+import { sumTaskXp } from "@/shared/screens/goals/model";
 import type { GoalFormData, Goal, CategoryOption, Task, Reward, GoalPeriod, GoalType } from "@/types";
 
 interface GoalDialogProps {
@@ -61,6 +62,7 @@ export function GoalDialog({
   const [goalPeriod, setGoalPeriod] = useState<GoalPeriod>(goal?.goalPeriod || "NONE");
   const [numericTarget, setNumericTarget] = useState(goal?.targetValue?.toString() || "");
   const [numericCurrent, setNumericCurrent] = useState(goal?.currentValue?.toString() || "");
+  const [taskXpTarget, setTaskXpTarget] = useState(goal?.taskXpTarget?.toString() || "");
 
   useEffect(() => {
     if (goal) {
@@ -72,6 +74,7 @@ export function GoalDialog({
       setGoalPeriod(goal.goalPeriod || "NONE");
       setNumericTarget(goal.targetValue !== undefined && goal.targetValue !== null ? goal.targetValue.toString() : "");
       setNumericCurrent(goal.currentValue !== undefined && goal.currentValue !== null ? goal.currentValue.toString() : "");
+      setTaskXpTarget(goal.taskXpTarget !== undefined && goal.taskXpTarget !== null ? goal.taskXpTarget.toString() : "");
       setTasks(goal.tasks || []);
       setRewardId(rewards.find((r) => r.goalId === goal.id)?.id || "none");
     } else {
@@ -90,6 +93,7 @@ export function GoalDialog({
     setGoalPeriod("NONE");
     setNumericTarget("");
     setNumericCurrent("");
+    setTaskXpTarget("");
     setNewTaskTitle("");
     setNewTaskXp("");
     setIsCreatingCategory(false);
@@ -212,7 +216,18 @@ export function GoalDialog({
     setExpandedTasks({ ...expandedTasks, [id]: !expandedTasks[id] });
   };
 
+  const totalTaskXp = sumTaskXp(tasks);
+  const parsedTaskXpTarget = taskXpTarget.trim() === "" ? undefined : Number(taskXpTarget);
+  const isTaskXpTargetValid =
+    goalType !== "TASK" ||
+    parsedTaskXpTarget === undefined ||
+    (Number.isFinite(parsedTaskXpTarget) && parsedTaskXpTarget >= 0 && parsedTaskXpTarget <= totalTaskXp);
+
   const handleSave = () => {
+    if (!isTaskXpTargetValid) {
+      return;
+    }
+
     const goalData: GoalFormData = {
       id: goal?.id || Date.now().toString(),
       title,
@@ -221,8 +236,9 @@ export function GoalDialog({
       goalType,
       goalPeriod,
       tasks: goalType === "TASK" ? tasks : [],
-      targetValue: goalType === "PROGRESS" && numericTarget ? parseInt(numericTarget, 10) : undefined,
-      currentValue: goalType === "PROGRESS" && numericCurrent ? parseInt(numericCurrent, 10) : undefined,
+      taskXpTarget: goalType === "TASK" && parsedTaskXpTarget !== undefined ? parsedTaskXpTarget : undefined,
+      targetValue: goalType === "PROGRESS" && numericTarget.trim() !== "" ? parseInt(numericTarget, 10) : undefined,
+      currentValue: goalType === "PROGRESS" && numericCurrent.trim() !== "" ? parseInt(numericCurrent, 10) : undefined,
       dueDate: dueDate
         ? dueDate.getFullYear() + "-" + String(dueDate.getMonth() + 1).padStart(2, "0") + "-" + String(dueDate.getDate()).padStart(2, "0")
         : undefined,
@@ -373,73 +389,92 @@ export function GoalDialog({
             </Select>
           </div>
 
-          <Separator />
+      <Separator />
 
-          {goalType === "PROGRESS" && (
+      {goalType === "TASK" && (
+        <div className="space-y-4">
+          <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-2">
-              <Label>{t("goals.dialog.current_progress")}</Label>
-              <Input type="number" min={0} value={numericCurrent} onChange={(e) => setNumericCurrent(e.target.value)} />
-
-              <Label>{t("goals.dialog.target_value")}</Label>
-              <Input type="number" min={1} value={numericTarget} onChange={(e) => setNumericTarget(e.target.value)} />
+              <Label htmlFor="taskXpTarget">{t("goals.dialog.task_xp_target_label")}</Label>
+              <Input
+                id="taskXpTarget"
+                type="number"
+                min={0}
+                max={totalTaskXp}
+                value={taskXpTarget}
+                onChange={(e) => setTaskXpTarget(e.target.value)}
+              />
             </div>
-          )}
-
-          {goalType === "TASK" && (
-            <div className="space-y-3">
-              <Label>{t("goals.dialog.tasks_label")}</Label>
-
-              {tasks.map((task) => (
-                <TaskItem
-                  key={task.id}
-                  id={task.id}
-                  title={task.title}
-                  lastCompletedAt={task.lastCompletedAt}
-                  editMode
-                  xpReward={task.xpReward}
-                  dueDate={task.dueDate}
-                  subtasks={task.subtasks}
-                  expanded={expandedTasks[task.id]}
-                  onToggle={handleToggleTask}
-                  onRemove={handleRemoveTask}
-                  onToggleExpand={toggleExpand}
-                  newSubTaskTitles={newSubTaskTitles}
-                  newSubTaskXps={newSubTaskXps}
-                  setNewSubTaskTitles={setNewSubTaskTitles}
-                  setNewSubTaskXps={setNewSubTaskXps}
-                  handleAddSubTask={handleAddSubTask}
-                  goalPeriod={goalPeriod ?? "NONE"}
-                />
-              ))}
-
-              <div className="mt-2 flex gap-2">
-                <Input
-                  placeholder={t("goals.dialog.task_placeholder")}
-                  value={newTaskTitle}
-                  onChange={(e) => setNewTaskTitle(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") {
-                      e.preventDefault();
-                      handleAddTask();
-                    }
-                  }}
-                />
-                <Input
-                  type="number"
-                  min={0}
-                  className="w-24"
-                  placeholder={t("common.xp")}
-                  value={newTaskXp}
-                  onChange={(e) => setNewTaskXp(e.target.value)}
-                />
-                <Button type="button" onClick={() => handleAddTask()} size="icon">
-                  <Plus className="size-4" />
-                </Button>
-              </div>
-
-              {tasks.length === 0 && <p className="py-4 text-center text-muted-foreground">{t("goals.dialog.empty_tasks")}</p>}
+            <div className="space-y-2">
+              <Label htmlFor="taskXpTotal">{t("goals.dialog.task_xp_total_label")}</Label>
+              <Input id="taskXpTotal" value={String(totalTaskXp)} readOnly />
             </div>
-          )}
+          </div>
+
+          <div className="space-y-3">
+            <Label>{t("goals.dialog.tasks_label")}</Label>
+
+            {tasks.map((task) => (
+              <TaskItem
+                key={task.id}
+                id={task.id}
+                title={task.title}
+                lastCompletedAt={task.lastCompletedAt}
+                editMode
+                xpReward={task.xpReward}
+                dueDate={task.dueDate}
+                subtasks={task.subtasks}
+                expanded={expandedTasks[task.id]}
+                onToggle={handleToggleTask}
+                onRemove={handleRemoveTask}
+                onToggleExpand={toggleExpand}
+                newSubTaskTitles={newSubTaskTitles}
+                newSubTaskXps={newSubTaskXps}
+                setNewSubTaskTitles={setNewSubTaskTitles}
+                setNewSubTaskXps={setNewSubTaskXps}
+                handleAddSubTask={handleAddSubTask}
+                goalPeriod={goalPeriod ?? "NONE"}
+              />
+            ))}
+
+            <div className="mt-2 flex gap-2">
+              <Input
+                placeholder={t("goals.dialog.task_placeholder")}
+                value={newTaskTitle}
+                onChange={(e) => setNewTaskTitle(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    e.preventDefault();
+                    handleAddTask();
+                  }
+                }}
+              />
+              <Input
+                type="number"
+                min={0}
+                className="w-24"
+                placeholder={t("common.xp")}
+                value={newTaskXp}
+                onChange={(e) => setNewTaskXp(e.target.value)}
+              />
+              <Button type="button" onClick={() => handleAddTask()} size="icon">
+                <Plus className="size-4" />
+              </Button>
+            </div>
+
+            {tasks.length === 0 && <p className="py-4 text-center text-muted-foreground">{t("goals.dialog.empty_tasks")}</p>}
+          </div>
+        </div>
+      )}
+
+      {goalType === "PROGRESS" && (
+        <div className="space-y-2">
+          <Label>{t("goals.dialog.current_progress")}</Label>
+          <Input type="number" min={0} value={numericCurrent} onChange={(e) => setNumericCurrent(e.target.value)} />
+          <Label>{t("goals.dialog.target_value")}</Label>
+          <Input type="number" min={1} value={numericTarget} onChange={(e) => setNumericTarget(e.target.value)} />
+        </div>
+      )}
         </div>
 
         <DialogFooter>
@@ -451,7 +486,7 @@ export function GoalDialog({
           <Button variant="outline" onClick={handleClose}>
             {t("common.cancel")}
           </Button>
-          <Button onClick={handleSave} disabled={!title}>
+          <Button onClick={handleSave} disabled={!title || !isTaskXpTargetValid}>
             {goal ? t("common.save") : t("common.create")}
           </Button>
         </DialogFooter>

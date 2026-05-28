@@ -12,9 +12,11 @@ import {
   GoalTypeSection,
   ProgressFieldsSection,
   RewardSection,
+  TaskXpTargetSection,
   TasksSection,
 } from "@/components/native/goal-form-sheet/Sections";
 import { createTask } from "@/components/native/goal-form-sheet/helpers";
+import { sumTaskXp } from "@/shared/screens/goals/model";
 import type { CategoryOption, Goal, GoalFormData, GoalPeriod, GoalType, Reward, Task } from "@/types";
 
 function addSubtaskRecursive(currentTasks: Task[], parentId: string, subtask: Task): Task[] {
@@ -72,6 +74,7 @@ export function GoalFormSheet({
   const [dueDate, setDueDate] = useState("");
   const [currentValue, setCurrentValue] = useState("");
   const [targetValue, setTargetValue] = useState("");
+  const [taskXpTarget, setTaskXpTarget] = useState("");
   const [selectedRewardId, setSelectedRewardId] = useState<string | null>(null);
   const [tasks, setTasks] = useState<Task[]>([]);
   const [newTaskTitle, setNewTaskTitle] = useState("");
@@ -103,6 +106,7 @@ export function GoalFormSheet({
       setDueDate(goal.dueDate ?? "");
       setCurrentValue(goal.currentValue?.toString() ?? "");
       setTargetValue(goal.targetValue?.toString() ?? "");
+      setTaskXpTarget(goal.taskXpTarget?.toString() ?? "");
       setTasks(goal.tasks ?? []);
       setSelectedRewardId(rewards.find((reward) => reward.goalId === goal.id)?.id ?? null);
       setExpandedTasks({});
@@ -121,6 +125,7 @@ export function GoalFormSheet({
     setDueDate("");
     setCurrentValue("");
     setTargetValue("");
+    setTaskXpTarget("");
     setTasks([]);
     setNewTaskTitle("");
     setNewTaskXp("");
@@ -173,6 +178,13 @@ export function GoalFormSheet({
     setExpandedTasks((current) => ({ ...current, [taskId]: !current[taskId] }));
   };
 
+  const totalTaskXp = sumTaskXp(tasks);
+  const parsedTaskXpTarget = taskXpTarget.trim() === "" ? undefined : Number(taskXpTarget);
+  const isTaskXpTargetValid =
+    goalType !== "TASK" ||
+    parsedTaskXpTarget === undefined ||
+    (Number.isFinite(parsedTaskXpTarget) && parsedTaskXpTarget >= 0 && parsedTaskXpTarget <= totalTaskXp);
+
   const handleSave = async () => {
     if (!title.trim()) {
       Alert.alert(t("goals.dialog.title_label"), t("goals.dialog.title_placeholder"));
@@ -181,6 +193,11 @@ export function GoalFormSheet({
 
     if (goalType === "TASK" && tasks.length === 0) {
       Alert.alert(t("goals.dialog.tasks_label"), t("goals.dialog.empty_tasks"));
+      return;
+    }
+
+    if (!isTaskXpTargetValid) {
+      Alert.alert(t("goals.dialog.task_xp_target_label"), t("goals.dialog.task_xp_total_label"));
       return;
     }
 
@@ -195,8 +212,9 @@ export function GoalFormSheet({
         dueDate: dueDate.trim() || undefined,
         lastCompletedAt: goal?.lastCompletedAt,
         xpReward: goal?.xpReward,
-        currentValue: goalType === "PROGRESS" && currentValue ? Number(currentValue) : undefined,
-        targetValue: goalType === "PROGRESS" && targetValue ? Number(targetValue) : undefined,
+        taskXpTarget: goalType === "TASK" && parsedTaskXpTarget !== undefined ? parsedTaskXpTarget : undefined,
+        currentValue: goalType === "PROGRESS" && currentValue.trim() !== "" ? Number(currentValue) : undefined,
+        targetValue: goalType === "PROGRESS" && targetValue.trim() !== "" ? Number(targetValue) : undefined,
         goalType,
         goalPeriod,
         rewardId: activeRewardId,
@@ -244,7 +262,7 @@ export function GoalFormSheet({
             </ActionChip>
           )}
           <ActionChip onPress={() => onOpenChange(false)}>{t("common.cancel")}</ActionChip>
-          <ActionChip onPress={() => void handleSave()} tone="primary">
+          <ActionChip onPress={() => void handleSave()} tone="primary" disabled={isSubmitting || !title.trim() || !isTaskXpTargetValid}>
             {isSubmitting ? t("common.saving") : goal ? t("common.save") : t("common.create")}
           </ActionChip>
         </View>
@@ -268,22 +286,25 @@ export function GoalFormSheet({
       {goalType === "PROGRESS" ? (
         <ProgressFieldsSection currentValue={currentValue} targetValue={targetValue} onChangeCurrentValue={setCurrentValue} onChangeTargetValue={setTargetValue} />
       ) : (
-        <TasksSection
-          tasks={tasks}
-          newTaskTitle={newTaskTitle}
-          newTaskXp={newTaskXp}
-          onChangeNewTaskTitle={setNewTaskTitle}
-          onChangeNewTaskXp={setNewTaskXp}
-          onAddTask={addTask}
-          onRemoveTask={removeTask}
-          expandedTasks={expandedTasks}
-          onToggleExpand={toggleExpand}
-          newSubTaskTitles={newSubTaskTitles}
-          newSubTaskXps={newSubTaskXps}
-          onChangeNewSubTaskTitle={(taskId, value) => setNewSubTaskTitles((current) => ({ ...current, [taskId]: value }))}
-          onChangeNewSubTaskXp={(taskId, value) => setNewSubTaskXps((current) => ({ ...current, [taskId]: value }))}
-          onAddSubTask={addSubTask}
-        />
+        <>
+          <TaskXpTargetSection taskXpTarget={taskXpTarget} totalTaskXp={totalTaskXp} onChangeTaskXpTarget={setTaskXpTarget} />
+          <TasksSection
+            tasks={tasks}
+            newTaskTitle={newTaskTitle}
+            newTaskXp={newTaskXp}
+            onChangeNewTaskTitle={setNewTaskTitle}
+            onChangeNewTaskXp={setNewTaskXp}
+            onAddTask={addTask}
+            onRemoveTask={removeTask}
+            expandedTasks={expandedTasks}
+            onToggleExpand={toggleExpand}
+            newSubTaskTitles={newSubTaskTitles}
+            newSubTaskXps={newSubTaskXps}
+            onChangeNewSubTaskTitle={(taskId, value) => setNewSubTaskTitles((current) => ({ ...current, [taskId]: value }))}
+            onChangeNewSubTaskXp={(taskId, value) => setNewSubTaskXps((current) => ({ ...current, [taskId]: value }))}
+            onAddSubTask={addSubTask}
+          />
+        </>
       )}
     </FormSheetLayout>
   );

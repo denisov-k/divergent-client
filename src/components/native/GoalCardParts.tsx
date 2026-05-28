@@ -24,7 +24,7 @@ import {
   Target,
 } from "@/components/native/icons";
 import { formatGoalDate } from "@/shared/display/goals";
-import { isTaskCompletedThisPeriod } from "@/shared/screens/goals/model";
+import { isTaskCompletedThisPeriod, sumCompletedTaskXp } from "@/shared/screens/goals/model";
 import type { CategoryType } from "@/shared/domain";
 import { appPalette } from "@/theme/palette";
 import type { Goal, GoalPeriod, Reward, Task } from "@/types";
@@ -157,12 +157,16 @@ export function GoalCardActions({ goal, onEdit, onAddReminder, onGoToProgress }:
 
 export function GoalProgressSection({ goal, progress, completedTasks, totalTasks }: { goal: Goal; progress: number; completedTasks: number; totalTasks: number }) {
   const { t } = useTranslation();
+  const completedTaskXp = sumCompletedTaskXp(goal.tasks, goal.goalPeriod);
+  const isXpBasedTaskGoal = goal.goalType === "TASK" && goal.taskXpTarget != null;
 
   return (
     <View style={{ gap: 8 }}>
       <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
         <Text style={{ color: appPalette.semantic.textMuted, fontSize: 12, fontWeight: "400", lineHeight: 18, fontFamily: "Montserrat" }}>{t("goals.progress")}</Text>
-        {goal.goalType === "TASK" ? (
+        {isXpBasedTaskGoal ? (
+          <Text style={{ color: appPalette.semantic.textMuted, fontSize: 12, fontWeight: "400", lineHeight: 18, fontFamily: "Montserrat" }}>{completedTaskXp} / {goal.taskXpTarget} XP</Text>
+        ) : goal.goalType === "TASK" ? (
           <Text style={{ color: appPalette.semantic.textMuted, fontSize: 12, fontWeight: "400", lineHeight: 18, fontFamily: "Montserrat" }}>{completedTasks} / {totalTasks} {t("goals.tasks_count")}</Text>
         ) : (
           <Text style={{ color: appPalette.semantic.textMuted, fontSize: 12, fontWeight: "400", lineHeight: 18, fontFamily: "Montserrat" }}>{goal.currentValue ?? 0} / {goal.targetValue ?? 0}</Text>
