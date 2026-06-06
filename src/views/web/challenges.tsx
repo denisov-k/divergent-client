@@ -62,21 +62,23 @@ export default function ChallengesScreen() {
   };
 
   return (
-    <div className="flex flex-1 flex-col px-2">
+    <div className="flex min-h-0 flex-1 flex-col px-2">
       <ChallengesScreenHeader onCreate={openCreateChallenge} />
 
-      <ChallengesScreenContent
-        challenges={challenges}
-        focusId={focusId}
-        onCreate={openCreateChallenge}
-        onEdit={openEditChallenge}
-        onShare={shareChallenge}
-        onSelect={selectChallenge}
-        onLeave={prepareLeaveChallenge}
-        onOpenLink={openChallengeLink}
-        onOpenParticipants={openParticipants}
-        onAccept={acceptSelectedChallenge}
-      />
+      <div className="min-h-0 flex-1 overflow-y-auto pb-2">
+        <ChallengesScreenContent
+          challenges={challenges}
+          focusId={focusId}
+          onCreate={openCreateChallenge}
+          onEdit={openEditChallenge}
+          onShare={shareChallenge}
+          onSelect={selectChallenge}
+          onLeave={prepareLeaveChallenge}
+          onOpenLink={openChallengeLink}
+          onOpenParticipants={openParticipants}
+          onAccept={acceptSelectedChallenge}
+        />
+      </div>
 
       <ChallengesScreenDialogs
         goals={goals}

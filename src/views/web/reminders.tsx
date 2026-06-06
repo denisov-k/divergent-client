@@ -39,7 +39,7 @@ export default function RemindersScreen() {
   };
 
   return (
-    <div className="flex flex-1 flex-col px-2">
+    <div className="flex min-h-0 flex-1 flex-col px-2">
       <div className="flex items-center justify-between py-2">
         <h2>{t("reminders.title")}</h2>
         <Button onClick={openCreateReminder}>
@@ -48,28 +48,30 @@ export default function RemindersScreen() {
         </Button>
       </div>
 
-      {reminders.length === 0 ? (
-        <Card>
-          <CardContent className="flex flex-col items-center justify-center py-12">
-            <p className="mb-4 text-muted-foreground">{t("reminders.empty")}</p>
-            <Button onClick={openCreateReminder}>
-              <Plus className="mr-2 size-4" />
-              {t("reminders.create_first")}
-            </Button>
-          </CardContent>
-        </Card>
-      ) : (
-        <div className="columns-1 gap-2 sm:columns-2 lg:columns-3 xl:columns-4">
-          {reminders.map((reminder) => (
-            <ReminderCard
-              key={reminder.id}
-              {...reminder}
-              onToggle={() => void toggleReminderState(reminder.id)}
-              onEdit={openEditReminder}
-            />
-          ))}
-        </div>
-      )}
+      <div className="min-h-0 flex-1 overflow-y-auto pb-2">
+        {reminders.length === 0 ? (
+          <Card>
+            <CardContent className="flex flex-col items-center justify-center py-12">
+              <p className="mb-4 text-muted-foreground">{t("reminders.empty")}</p>
+              <Button onClick={openCreateReminder}>
+                <Plus className="mr-2 size-4" />
+                {t("reminders.create_first")}
+              </Button>
+            </CardContent>
+          </Card>
+        ) : (
+          <div className="columns-1 gap-2 sm:columns-2 lg:columns-3 xl:columns-4">
+            {reminders.map((reminder) => (
+              <ReminderCard
+                key={reminder.id}
+                {...reminder}
+                onToggle={() => void toggleReminderState(reminder.id)}
+                onEdit={openEditReminder}
+              />
+            ))}
+          </div>
+        )}
+      </div>
 
       <Suspense fallback={<DialogFallback />}>
         {reminderDialogOpen && (
