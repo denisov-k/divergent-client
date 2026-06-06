@@ -56,6 +56,7 @@ export function GoalFormSheet({
   onOpenChange,
   onSave,
   onDelete,
+  onAddCategory,
 }: {
   open: boolean;
   goal?: Goal;
@@ -64,6 +65,7 @@ export function GoalFormSheet({
   onOpenChange: (open: boolean) => void;
   onSave: (data: GoalFormData) => Promise<unknown>;
   onDelete: (id: string) => Promise<boolean>;
+  onAddCategory: (category: CategoryOption) => void;
 }) {
   const { t } = useTranslation();
   const [title, setTitle] = useState("");
@@ -133,7 +135,7 @@ export function GoalFormSheet({
     setExpandedTasks({});
     setNewSubTaskTitles({});
     setNewSubTaskXps({});
-  }, [open, goal, categories, rewards]);
+  }, [open, goal, rewards]);
 
   const addTask = () => {
     const nextTitle = newTaskTitle.trim();
@@ -281,7 +283,7 @@ export function GoalFormSheet({
       <GoalTypeSection goalType={goalType} onChange={setGoalType} />
       <GoalPeriodSection goalPeriod={goalPeriod} onChange={setGoalPeriod} />
       <DueDateSection dueDate={dueDate} onChange={setDueDate} />
-      <CategorySection categories={categories} category={category} onChange={setCategory} />
+      <CategorySection categories={categories} category={category} onChange={setCategory} onAddCategory={onAddCategory} />
       <RewardSection rewards={rewards} activeRewardId={activeRewardId} onChange={setSelectedRewardId} />
       {goalType === "PROGRESS" ? (
         <ProgressFieldsSection currentValue={currentValue} targetValue={targetValue} onChangeCurrentValue={setCurrentValue} onChangeTargetValue={setTargetValue} />

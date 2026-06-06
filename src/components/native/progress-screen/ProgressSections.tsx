@@ -4,34 +4,11 @@ import { useTranslation } from "react-i18next";
 
 import { ChartSpline, ChevronDown, Flame } from "@/components/native/icons";
 import { SurfaceCard } from "@/components/native/SurfaceCard";
+import { getStreakUnitTranslationKey } from "@/shared/display/streak";
 import { appPalette } from "@/theme/palette";
-import type { Goal } from "@/types";
+import type { Goal, GoalPeriod } from "@/types";
 
 import { WeeklyXpChart } from "./WeeklyXpChart";
-
-function getStreakDayLabel(count: number, language: string | undefined, t: (key: string) => string) {
-  const normalizedLanguage = language?.startsWith("ru") ? "ru" : "en";
-  const pluralRules = typeof Intl !== "undefined" && typeof Intl.PluralRules === "function"
-    ? new Intl.PluralRules(normalizedLanguage)
-    : null;
-  const category = pluralRules
-    ? pluralRules.select(count)
-    : normalizedLanguage === "ru"
-      ? (count % 10 === 1 && count % 100 !== 11 ? "one" : count % 10 >= 2 && count % 10 <= 4 && (count % 100 < 12 || count % 100 > 14) ? "few" : "many")
-      : count === 1
-        ? "one"
-        : "other";
-
-  if (category === "one") {
-    return t("progress.streak.day_one");
-  }
-
-  if (category === "few") {
-    return t("progress.streak.day_few");
-  }
-
-  return t("progress.streak.day_many");
-}
 
 export function ProgressHeader({
   title,
@@ -74,15 +51,19 @@ export function ProgressHeader({
 export function ProgressStreakSection({
   current,
   longest,
-  days,
+  goalPeriod,
+  streakItems,
+  windowLabel,
 }: {
   current: number;
   longest: number;
-  days: boolean[];
+  goalPeriod: GoalPeriod;
+  streakItems: { active: boolean; label: string }[];
+  windowLabel: string;
 }) {
   const { t, i18n } = useTranslation();
-  const currentDayLabel = getStreakDayLabel(current, i18n.language, t);
-  const longestDayLabel = getStreakDayLabel(longest, i18n.language, t);
+  const currentUnitLabel = t(getStreakUnitTranslationKey(goalPeriod, current, i18n.language));
+  const longestUnitLabel = t(getStreakUnitTranslationKey(goalPeriod, longest, i18n.language));
 
   return (
     <SurfaceCard gap={16} padding={16} radius={12}>
@@ -95,7 +76,7 @@ export function ProgressStreakSection({
         <View style={{ flex: 1 }}>
           <View style={{ flexDirection: "row", alignItems: "baseline", gap: 8 }}>
             <Text style={{ color: appPalette.semantic.textStrong, fontSize: 30, fontWeight: "500", lineHeight: 36, fontFamily: "Montserrat" }}>{current}</Text>
-            <Text style={{ color: appPalette.semantic.textMuted, fontSize: 12, fontWeight: "400", lineHeight: 18, fontFamily: "Montserrat" }}>{currentDayLabel}</Text>
+            <Text style={{ color: appPalette.semantic.textMuted, fontSize: 12, fontWeight: "400", lineHeight: 18, fontFamily: "Montserrat" }}>{currentUnitLabel}</Text>
           </View>
           <Text style={{ color: appPalette.semantic.textMuted, fontSize: 12, fontWeight: "400", lineHeight: 18, fontFamily: "Montserrat" }}>{t("progress.streak.current")}</Text>
         </View>
@@ -103,20 +84,21 @@ export function ProgressStreakSection({
         <View style={{ flex: 1, alignItems: "flex-end" }}>
           <View style={{ flexDirection: "row", alignItems: "baseline", gap: 8 }}>
             <Text style={{ color: appPalette.semantic.textMuted, fontSize: 24, fontWeight: "500", lineHeight: 30, fontFamily: "Montserrat" }}>{longest}</Text>
-            <Text style={{ color: appPalette.semantic.textMuted, fontSize: 12, fontWeight: "400", lineHeight: 18, fontFamily: "Montserrat" }}>{longestDayLabel}</Text>
+            <Text style={{ color: appPalette.semantic.textMuted, fontSize: 12, fontWeight: "400", lineHeight: 18, fontFamily: "Montserrat" }}>{longestUnitLabel}</Text>
           </View>
           <Text style={{ color: appPalette.semantic.textMuted, fontSize: 12, fontWeight: "400", lineHeight: 18, fontFamily: "Montserrat" }}>{t("progress.streak.record")}</Text>
         </View>
       </View>
 
       <View style={{ gap: 8 }}>
-        <Text style={{ color: appPalette.semantic.textMuted, fontSize: 12, fontWeight: "400", lineHeight: 18, fontFamily: "Montserrat" }}>{t("progress.last_7_days")}</Text>
+        <Text style={{ color: appPalette.semantic.textMuted, fontSize: 12, fontWeight: "400", lineHeight: 18, fontFamily: "Montserrat" }}>{windowLabel}</Text>
         <View style={{ flexDirection: "row", gap: 8 }}>
-          {days.map((day, index) => (
+          {streakItems.map((item, index) => (
             <View key={index} style={{ flex: 1, alignItems: "center", gap: 6 }}>
-              <View style={{ width: 32, height: 32, borderRadius: 16, alignItems: "center", justifyContent: "center", backgroundColor: day ? appPalette.semantic.warningStrong : appPalette.semantic.borderSubtle }}>
-                {day ? <Flame size={16} color={appPalette.brand.primaryForeground} /> : null}
+              <View style={{ width: 32, height: 32, borderRadius: 16, alignItems: "center", justifyContent: "center", backgroundColor: item.active ? appPalette.semantic.warningStrong : appPalette.semantic.borderSubtle }}>
+                {item.active ? <Flame size={16} color={appPalette.brand.primaryForeground} /> : null}
               </View>
+              <Text style={{ color: appPalette.semantic.textMuted, fontSize: 10, fontWeight: "400", lineHeight: 14, fontFamily: "Montserrat" }}>{item.label}</Text>
             </View>
           ))}
         </View>

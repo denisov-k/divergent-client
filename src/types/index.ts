@@ -41,6 +41,7 @@ export interface Goal {
   title: string;
   description?: string;
   category: CategoryType;
+  createdAt?: string;
   tasks: Task[];
   dueDate?: string;
   lastCompletedAt?: string;

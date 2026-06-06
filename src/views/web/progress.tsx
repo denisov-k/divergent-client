@@ -7,6 +7,7 @@ import { ProgressChart } from "@/components/web/progress/ProgressChart";
 import { StatCard } from "@/components/web/progress/StatCard";
 import { StreakCard } from "@/components/web/progress/StreakCard";
 import { buildProgressPath } from "@/app/routes";
+import { getStreakWindowTranslationKey } from "@/shared/display/streak";
 import { useProgressScreen } from "@/shared/screens/progress/useProgressScreen";
 
 export default function ProgressScreen() {
@@ -26,8 +27,9 @@ export default function ProgressScreen() {
     completedGoals,
     categoryData,
     weeklyXpData,
-    streakDays,
+    activityView,
   } = useProgressScreen(goalId);
+  const streakWindowLabel = t(getStreakWindowTranslationKey(selectedGoal?.goalPeriod));
 
   const handleGoalChange = (value: string) => {
     if (!value) {
@@ -59,7 +61,7 @@ export default function ProgressScreen() {
 
       <div className="flex flex-col gap-2 overflow-y-auto">
         {selectedGoal && selectedGoal.goalType === "TASK" && activity && (
-          <PeriodCalendar goal={selectedGoal} activity={activity} loading={loadingActivity} />
+          <PeriodCalendar goal={selectedGoal} dateStatusMap={activityView.dateStatusMap} loading={loadingActivity} />
         )}
 
         <div className="columns-1 gap-2 sm:columns-2 lg:columns-3 xl:columns-4">
@@ -90,11 +92,13 @@ export default function ProgressScreen() {
             />
           )}
 
-          {selectedGoal && selectedGoal.goalType === "TASK" && activity && streakDays && (
+          {selectedGoal && selectedGoal.goalType === "TASK" && activity && (
             <StreakCard
-              currentStreak={activity.currentStreak}
-              longestStreak={activity.longestStreak}
-              streakDays={streakDays}
+              currentStreak={activityView.currentStreak}
+              longestStreak={activityView.longestStreak}
+              streakItems={activityView.streakItems}
+              windowLabel={streakWindowLabel}
+              goalPeriod={selectedGoal.goalPeriod}
             />
           )}
 

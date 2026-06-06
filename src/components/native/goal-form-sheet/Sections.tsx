@@ -497,18 +497,64 @@ export function CategorySection(props: {
   categories: CategoryOption[];
   category: string;
   onChange: (value: string) => void;
+  onAddCategory: (category: CategoryOption) => void;
 }) {
   const { t } = useTranslation();
   const [open, setOpen] = useState(false);
+  const [isCreatingCategory, setIsCreatingCategory] = useState(false);
+  const [newCategoryName, setNewCategoryName] = useState("");
+  const [createdCategoryLabel, setCreatedCategoryLabel] = useState<string | null>(null);
   const activeLabel = useMemo(
-    () => props.categories.find((item) => item.value === props.category)?.label ?? t("goals.dialog.category_placeholder"),
-    [props.categories, props.category, t],
+    () =>
+      props.categories.find((item) => item.value === props.category)?.label ??
+      createdCategoryLabel ??
+      t("goals.dialog.category_placeholder"),
+    [props.categories, props.category, createdCategoryLabel, t],
   );
+
+  const handleAddCategory = () => {
+    const nextName = newCategoryName.trim();
+    if (!nextName) {
+      return;
+    }
+
+    const value = nextName.toLowerCase().replace(/\s+/g, "-");
+    props.onAddCategory({ value, label: nextName });
+    props.onChange(value);
+    setCreatedCategoryLabel(nextName);
+    setNewCategoryName("");
+    setIsCreatingCategory(false);
+  };
 
   return (
     <View style={{ gap: 8 }}>
-      <Text style={formSectionLabelStyle}>{t("goals.dialog.category_label")}</Text>
-      <PickerTrigger value={activeLabel} onPress={() => setOpen(true)} />
+      <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
+        <Text style={formSectionLabelStyle}>{t("goals.dialog.category_label")}</Text>
+        {!isCreatingCategory ? (
+          <ActionChip onPress={() => setIsCreatingCategory(true)}>{t("goals.dialog.create_category")}</ActionChip>
+        ) : (
+          <ActionChip onPress={() => setIsCreatingCategory(false)}>{t("goals.dialog.cancel_category")}</ActionChip>
+        )}
+      </View>
+
+      {isCreatingCategory ? (
+        <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
+          <View style={{ flex: 1 }}>
+            <FieldInput
+              value={newCategoryName}
+              onChangeText={setNewCategoryName}
+              placeholder={t("goals.dialog.category_placeholder")}
+              autoCapitalize="sentences"
+            />
+          </View>
+          <ActionChip onPress={handleAddCategory} disabled={!newCategoryName.trim()}>
+            OK
+          </ActionChip>
+        </View>
+      ) : (
+        <PickerTrigger value={activeLabel} onPress={() => setOpen(true)} />
+      )}
+
       <OptionPickerModal
         open={open}
         title={t("goals.dialog.category_label")}
@@ -577,10 +623,10 @@ export function TaskXpTargetSection(props: {
 
   return (
     <View style={{ gap: 8 }}>
-      <Text style={formSectionLabelStyle}>{t("goals.dialog.task_xp_target_label")}</Text>
-      <View style={{ flexDirection: "row", gap: 8 }}>
+      <View style={{ flexDirection: "row", gap: 8, alignItems: "flex-start" }}>
         <View style={{ flex: 1 }}>
           <FieldInput
+            label={t("goals.dialog.task_xp_target_label")}
             value={props.taskXpTarget}
             onChangeText={props.onChangeTaskXpTarget}
             placeholder="0"

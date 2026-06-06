@@ -15,6 +15,12 @@ export function UserAvatar({ name, level, avatarUrl, size = "md" }: UserAvatarPr
     lg: "size-24",
   };
 
+  const badgeSizeClasses = {
+    sm: "size-6 -bottom-1 -right-1",
+    md: "size-6 -bottom-1 -right-1",
+    lg: "size-6 -bottom-1 -right-1",
+  };
+
   const initials = name
     .split(" ")
     .map((n) => n[0])
@@ -28,9 +34,9 @@ export function UserAvatar({ name, level, avatarUrl, size = "md" }: UserAvatarPr
         <AvatarImage src={avatarUrl} alt={name} />
         <AvatarFallback>{initials}</AvatarFallback>
       </Avatar>
-      <Badge 
-        variant="default" 
-        className="absolute -bottom-1 -right-1 size-6 flex items-center justify-center p-0 rounded-full"
+      <Badge
+        variant="default"
+        className={`absolute flex items-center justify-center rounded-full p-0 ${badgeSizeClasses[size]}`}
       >
         {level}
       </Badge>

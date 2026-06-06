@@ -5,9 +5,10 @@ import dayjs from "dayjs";
 import Config from "@/services/Config";
 import { useAppStore } from "@/stores/useAppStore";
 import type { GoalActivity } from "@/types";
+import { buildProgressActivityView } from "./model";
 
 export function useProgressScreen(goalId?: string | null) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { user, goals, rewards, categories, getActivity, getGoalXp } = useAppStore();
 
   const [xp, setXp] = useState<number>(0);
@@ -19,6 +20,10 @@ export function useProgressScreen(goalId?: string | null) {
 
   const selectedGoal = useMemo(() => goals.find((goal) => goal.id === goalId), [goals, goalId]);
   const filteredGoals = useMemo(() => (selectedGoal ? [selectedGoal] : goals), [selectedGoal, goals]);
+  const activityView = useMemo(
+    () => buildProgressActivityView(activity, selectedGoal?.goalPeriod, i18n.language),
+    [activity, i18n.language, selectedGoal?.goalPeriod],
+  );
 
   const completedGoals = filteredGoals.filter((goal) => goal.tasks?.length && goal.tasks.every((task) => !!task.lastCompletedAt)).length;
 
@@ -66,8 +71,6 @@ export function useProgressScreen(goalId?: string | null) {
 
     return result.map(({ name, value }) => ({ name, value }));
   }, [activity, t]);
-
-  const streakDays = activity?.data.slice(-7).map((item) => item.status === "full");
 
   const retryGoalMetrics = useCallback(() => {
     setXpError(false);
@@ -186,7 +189,7 @@ export function useProgressScreen(goalId?: string | null) {
     completedGoals,
     categoryData,
     weeklyXpData,
-    streakDays,
+    activityView,
     retryGoalMetrics,
   };
 }

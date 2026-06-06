@@ -8,17 +8,18 @@ import isoWeek from "dayjs/plugin/isoWeek";
 import { Activity } from "lucide-react";
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Goal, GoalActivity } from "@/types";
+import { Goal } from "@/types";
+import { getActivityCellStatus } from "@/shared/screens/progress/model";
 
 dayjs.extend(isoWeek);
 
 type Props = {
   goal: Goal;
-  activity: GoalActivity;
+  dateStatusMap: Map<string, "empty" | "partial" | "full">;
   loading?: boolean;
 };
 
-export function PeriodCalendar({ goal, activity, loading }: Props) {
+export function PeriodCalendar({ goal, dateStatusMap, loading }: Props) {
   const { t, i18n } = useTranslation();
   const dayjsLocale = i18n.language?.startsWith("ru") ? "ru" : "en";
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -43,7 +44,6 @@ export function PeriodCalendar({ goal, activity, loading }: Props) {
 
   const daysToShow = 365;
   const today = dayjs();
-  const dateMap = new Map(activity.data.map((d) => [dayjs(d.periodStart).format("YYYY-MM-DD"), d.status]));
   const firstDate = today.subtract(daysToShow - 1, "day").startOf("isoWeek");
   const lastDate = today;
 
@@ -127,10 +127,11 @@ export function PeriodCalendar({ goal, activity, loading }: Props) {
                             </td>
                           );
                         }
-                        const status = dateMap.get(date.format("YYYY-MM-DD")) || "empty";
+                        const status = getActivityCellStatus(date, goal, dateStatusMap);
                         let bgColor = "bg-gray-200";
                         if (status === "partial") bgColor = "bg-yellow-300";
                         if (status === "full") bgColor = "bg-green-300";
+                        if (status === "missed") bgColor = "bg-red-300";
                         return (
                           <td key={colIdx} className="align-middle">
                             <span className={`inline-block h-4 w-4 cursor-pointer rounded-sm align-middle ${bgColor}`} title={date.format("DD.MM.YYYY")}></span>

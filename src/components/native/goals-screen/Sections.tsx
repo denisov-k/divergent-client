@@ -1,18 +1,27 @@
 import { useEffect, useRef, useState } from "react";
 import { ScrollView, Text, View } from "react-native";
-import { HapticPressable as Pressable } from "@/components/native/HapticPressable";
 import { useTranslation } from "react-i18next";
 
+import { HapticPressable as Pressable } from "@/components/native/HapticPressable";
 import { NativeGoalCardView } from "@/components/native/NativeGoalCardView";
 import { Plus, Sparkles } from "@/components/native/icons";
+import { SectionTabs } from "@/components/native/SectionTabs";
 import { AppLoader } from "@/components/shared/AppLoader";
 import { appPalette } from "@/theme/palette";
 import type { CategoryOption, Goal, Reward } from "@/types";
 
 export function GoalsScreenHeader({
+  categories,
+  showCategories,
+  selectedCategory,
+  onCategoryChange,
   onCreate,
   onOpenAi,
 }: {
+  categories: CategoryOption[];
+  showCategories: boolean;
+  selectedCategory: string;
+  onCategoryChange: (category: string) => void;
   onCreate: () => void;
   onOpenAi: () => void;
 }) {
@@ -23,78 +32,95 @@ export function GoalsScreenHeader({
       style={{
         paddingHorizontal: 8,
         paddingVertical: 8,
-        flexDirection: "row",
-        alignItems: "center",
-        justifyContent: "space-between",
-        gap: 8,
+        gap: 10,
         backgroundColor: appPalette.surface.background,
       }}
     >
-      <Text
+      <View
         style={{
-          fontSize: 19,
-          fontWeight: "500",
-          color: appPalette.semantic.textStrong,
-          fontFamily: "Montserrat",
-          lineHeight: 29,
+          flexDirection: "row",
+          alignItems: "center",
+          justifyContent: "space-between",
+          gap: 8,
         }}
       >
-        {t("goals.title")}
-      </Text>
-      <View style={{ flexDirection: "row", gap: 8 }}>
-        <Pressable
-          onPress={onCreate}
+        <Text
           style={{
-            flexDirection: "row",
-            alignItems: "center",
-            gap: 8,
-            backgroundColor: appPalette.semantic.infoSurface,
-            borderWidth: 1,
-            borderColor: appPalette.semantic.infoBorder,
-            borderRadius: 10,
-            paddingHorizontal: 12,
-            paddingVertical: 10,
+            fontSize: 19,
+            fontWeight: "500",
+            color: appPalette.semantic.textStrong,
+            fontFamily: "Montserrat",
+            lineHeight: 29,
           }}
         >
-          <Plus size={16} color={appPalette.semantic.infoText} />
-          <Text
+          {t("goals.title")}
+        </Text>
+        <View style={{ flexDirection: "row", gap: 8 }}>
+          <Pressable
+            onPress={onCreate}
             style={{
-              color: appPalette.semantic.infoText,
-              fontSize: 12,
-              fontWeight: "500",
-              lineHeight: 18,
-              fontFamily: "Montserrat",
+              flexDirection: "row",
+              alignItems: "center",
+              gap: 8,
+              backgroundColor: appPalette.semantic.infoSurface,
+              borderWidth: 1,
+              borderColor: appPalette.semantic.infoBorder,
+              borderRadius: 10,
+              paddingHorizontal: 12,
+              paddingVertical: 10,
             }}
           >
-            {t("goals.create_goal")}
-          </Text>
-        </Pressable>
-        <Pressable
-          onPress={onOpenAi}
-          style={{
-            flexDirection: "row",
-            alignItems: "center",
-            gap: 8,
-            backgroundColor: appPalette.brand.ai,
-            borderRadius: 10,
-            paddingHorizontal: 12,
-            paddingVertical: 10,
-          }}
-        >
-          <Sparkles size={16} color={appPalette.brand.primaryForeground} />
-          <Text
+            <Plus size={16} color={appPalette.semantic.infoText} />
+            <Text
+              style={{
+                color: appPalette.semantic.infoText,
+                fontSize: 12,
+                fontWeight: "500",
+                lineHeight: 18,
+                fontFamily: "Montserrat",
+              }}
+            >
+              {t("goals.create_goal")}
+            </Text>
+          </Pressable>
+          <Pressable
+            onPress={onOpenAi}
             style={{
-              color: appPalette.brand.primaryForeground,
-              fontSize: 12,
-              fontWeight: "500",
-              lineHeight: 18,
-              fontFamily: "Montserrat",
+              flexDirection: "row",
+              alignItems: "center",
+              gap: 8,
+              backgroundColor: appPalette.brand.ai,
+              borderRadius: 10,
+              paddingHorizontal: 12,
+              paddingVertical: 10,
             }}
           >
-            {t("goals.open_ai")}
-          </Text>
-        </Pressable>
+            <Sparkles size={16} color={appPalette.brand.primaryForeground} />
+            <Text
+              style={{
+                color: appPalette.brand.primaryForeground,
+                fontSize: 12,
+                fontWeight: "500",
+                lineHeight: 18,
+                fontFamily: "Montserrat",
+              }}
+            >
+              {t("goals.open_ai")}
+            </Text>
+          </Pressable>
+        </View>
       </View>
+
+      {showCategories && (
+        <SectionTabs
+          tabs={[
+            { key: "all", label: t("goals.all_categories") },
+            ...categories.map((category) => ({ key: category.value, label: category.label })),
+          ]}
+          activeTab={selectedCategory}
+          onChange={onCategoryChange}
+        />
+      )}
     </View>
   );
 }
@@ -104,6 +130,8 @@ export function GoalsScreenContent({
   goals,
   rewards,
   categories,
+  hasGoals,
+  selectedCategoryLabel,
   userTimeZone,
   focusedGoalId,
   onCreate,
@@ -117,6 +145,8 @@ export function GoalsScreenContent({
   goals: Goal[];
   rewards: Reward[];
   categories: CategoryOption[];
+  hasGoals: boolean;
+  selectedCategoryLabel: string;
   userTimeZone: string;
   focusedGoalId?: string | null;
   onCreate: () => void;
@@ -177,7 +207,7 @@ export function GoalsScreenContent({
               textAlign: "center",
             }}
           >
-            {t("goals.empty_title")}
+            {hasGoals ? t("goals.empty_filtered_title", { category: selectedCategoryLabel }) : t("goals.empty_title")}
           </Text>
           <Pressable
             onPress={onCreate}

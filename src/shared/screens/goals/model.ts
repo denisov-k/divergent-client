@@ -18,31 +18,51 @@ export function findTaskRecursive(tasks: Task[], taskId: string): Task | null {
 }
 
 export function isTaskCompletedThisPeriod(task: Task, goalPeriod: GoalPeriod) {
+  return isTaskCompletedThisPeriodAt(task, goalPeriod, new Date());
+}
+
+function getCurrentPeriodStart(goalPeriod: GoalPeriod, now: Date) {
+  const start = new Date(now);
+
+  if (goalPeriod === "DAILY") {
+    start.setHours(0, 0, 0, 0);
+    return start;
+  }
+
+  if (goalPeriod === "WEEKLY") {
+    const day = start.getDay();
+    const diff = (day + 6) % 7;
+    start.setDate(start.getDate() - diff);
+    start.setHours(0, 0, 0, 0);
+    return start;
+  }
+
+  if (goalPeriod === "MONTHLY") {
+    start.setDate(1);
+    start.setHours(0, 0, 0, 0);
+    return start;
+  }
+
+  return start;
+}
+
+export function isTaskCompletedThisPeriodAt(task: Task, goalPeriod: GoalPeriod, now: Date) {
   if (!task.lastCompletedAt) {
     return false;
   }
 
   const last = new Date(task.lastCompletedAt);
-  const now = new Date();
+  const periodStart = getCurrentPeriodStart(goalPeriod, now);
+
+  if (goalPeriod === "NONE") {
+    return true;
+  }
 
   if (goalPeriod === "DAILY") {
-    return last.toDateString() === now.toDateString();
+    return last >= periodStart;
   }
 
-  if (goalPeriod === "WEEKLY") {
-    const week = (d: Date) => {
-      const onejan = new Date(d.getFullYear(), 0, 1);
-      return Math.ceil((((d.getTime() - onejan.getTime()) / 86400000) + onejan.getDay() + 1) / 7);
-    };
-
-    return last.getFullYear() === now.getFullYear() && week(last) === week(now);
-  }
-
-  if (goalPeriod === "MONTHLY") {
-    return last.getFullYear() === now.getFullYear() && last.getMonth() === now.getMonth();
-  }
-
-  return true;
+  return last >= periodStart;
 }
 
 export function sumTaskXp(tasks?: Task[]): number {
@@ -53,7 +73,7 @@ export function sumTaskXp(tasks?: Task[]): number {
   return tasks.reduce((sum, task) => sum + (task.xpReward ?? 0) + sumTaskXp(task.subtasks), 0);
 }
 
-export function sumCompletedTaskXp(tasks: Task[] | undefined, goalPeriod: GoalPeriod): number {
+export function sumCompletedTaskXp(tasks: Task[] | undefined, goalPeriod: GoalPeriod, now = new Date()): number {
   if (!tasks || tasks.length === 0) {
     return 0;
   }
@@ -61,8 +81,8 @@ export function sumCompletedTaskXp(tasks: Task[] | undefined, goalPeriod: GoalPe
   return tasks.reduce(
     (sum, task) =>
       sum +
-      (isTaskCompletedThisPeriod(task, goalPeriod) ? task.xpReward ?? 0 : 0) +
-      sumCompletedTaskXp(task.subtasks, goalPeriod),
+      (isTaskCompletedThisPeriodAt(task, goalPeriod, now) ? task.xpReward ?? 0 : 0) +
+      sumCompletedTaskXp(task.subtasks, goalPeriod, now),
     0,
   );
 }

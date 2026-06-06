@@ -16,6 +16,7 @@ import {
 } from "@/components/native/progress-screen/ProgressSections";
 import { ProgressStatCard } from "@/components/native/progress-screen/ProgressPrimitives";
 import { useProgressScreen } from "@/shared/screens/progress/useProgressScreen";
+import { getStreakWindowTranslationKey } from "@/shared/display/streak";
 import { appPalette } from "@/theme/palette";
 
 type SectionBoundaryProps = {
@@ -107,7 +108,7 @@ function NativeProgressScreenContent(props: { goalId?: string | null; onConsumeL
     completedGoals,
     categoryData,
     weeklyXpData,
-    streakDays,
+    activityView,
     retryGoalMetrics,
   } = useProgressScreen(goalId);
 
@@ -119,9 +120,17 @@ function NativeProgressScreenContent(props: { goalId?: string | null; onConsumeL
 
   const unlockedRewards = rewards.filter((reward) => reward.isUnlocked).length;
   const streakMeta = useMemo(
-    () => (!activity || !streakDays ? null : { current: activity.currentStreak, longest: activity.longestStreak, days: streakDays }),
-    [activity, streakDays]
+    () =>
+      !activity
+        ? null
+        : {
+            current: activityView.currentStreak,
+            longest: activityView.longestStreak,
+            items: activityView.streakItems,
+          },
+    [activity, activityView]
   );
+  const streakWindowLabel = t(getStreakWindowTranslationKey(selectedGoal?.goalPeriod));
   const baseDiagnostics = useMemo(
     () => ({
       goalId,
@@ -131,15 +140,15 @@ function NativeProgressScreenContent(props: { goalId?: string | null; onConsumeL
       selectedGoalTaskCount: selectedGoal?.tasks?.length ?? 0,
       hasActivity: Boolean(activity),
       activityPoints: activity?.data?.length ?? 0,
-      currentStreak: activity?.currentStreak ?? null,
-      longestStreak: activity?.longestStreak ?? null,
-      streakDaysCount: streakDays?.length ?? 0,
+      currentStreak: activityView.currentStreak,
+      longestStreak: activityView.longestStreak,
+      streakDaysCount: activityView.streakItems.length,
       weeklyXpBars: weeklyXpData.length,
       loadingActivity,
       xpError,
       activityError,
     }),
-    [activity, activityError, goalId, loadingActivity, selectedGoal, streakDays, weeklyXpData.length, xpError]
+    [activity, activityError, activityView.streakItems.length, goalId, loadingActivity, selectedGoal, weeklyXpData.length, xpError]
   );
   const selectedLabel = selectedGoal?.title || t("progress.all_goals");
   const progressLoadErrorDescription = i18n.language?.startsWith("ru")
@@ -169,12 +178,7 @@ function NativeProgressScreenContent(props: { goalId?: string | null; onConsumeL
           >
             <NativePeriodCalendar
               goal={selectedGoal}
-              activity={activity ?? {
-                currentStreak: 0,
-                longestStreak: 0,
-                period: selectedGoal.goalPeriod,
-                data: [],
-              }}
+              dateStatusMap={activityView.dateStatusMap}
               loading={loadingActivity}
             />
           </ProgressSectionBoundary>
@@ -191,13 +195,13 @@ function NativeProgressScreenContent(props: { goalId?: string | null; onConsumeL
 
         {selectedGoal && selectedGoal.goalType === "TASK" && streakMeta && (
           <ProgressSectionBoundary
-            section="ProgressStreakSection"
-            diagnostics={{
-              ...baseDiagnostics,
-              renderedStreakDays: streakMeta.days.length,
-            }}
-          >
-            <ProgressStreakSection current={streakMeta.current} longest={streakMeta.longest} days={streakMeta.days} />
+              section="ProgressStreakSection"
+              diagnostics={{
+                ...baseDiagnostics,
+                renderedStreakDays: streakMeta.items.length,
+              }}
+            >
+            <ProgressStreakSection current={streakMeta.current} longest={streakMeta.longest} goalPeriod={selectedGoal.goalPeriod} streakItems={streakMeta.items} windowLabel={streakWindowLabel} />
           </ProgressSectionBoundary>
         )}
 

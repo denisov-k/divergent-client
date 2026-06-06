@@ -9,10 +9,9 @@ import { TaskItem } from "@/components/shared/TaskItem";
 import { useEffect, useRef, useState } from "react";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { useTranslation } from "react-i18next";
-import { DateTime } from "luxon";
 
 import { formatGoalDate, getGoalPeriodTranslationKey } from "@/shared/display/goals";
-import { sumCompletedTaskXp } from "@/shared/screens/goals/model";
+import { isTaskCompletedThisPeriod, sumCompletedTaskXp } from "@/shared/screens/goals/model";
 import { Challenge, GoalPeriod, GoalType, Reward, Task } from "@/types";
 import { useNavigate } from "react-router-dom";
 import { useAppStore } from "@/stores/useAppStore.ts";
@@ -61,20 +60,9 @@ export function GoalCard({ id, title, description, category, tasks, challenge, g
     return taskList.reduce((sum, task) => sum + 1 + countTasks(task.subtasks), 0);
   }
 
-  function isTaskCompletedInPeriod(task: Task, period?: GoalPeriod) {
-    if (!task.lastCompletedAt || !period) return false;
-    if (period === "NONE") return !!task.lastCompletedAt;
-    const date = DateTime.fromJSDate(new Date(task.lastCompletedAt));
-    const now = DateTime.now();
-    if (period === "DAILY") return date.hasSame(now, "day");
-    if (period === "WEEKLY") return date.hasSame(now, "week");
-    if (period === "MONTHLY") return date.hasSame(now, "month");
-    return false;
-  }
-
   function countCompleted(taskList?: Task[], period?: GoalPeriod): number {
     if (!taskList || taskList.length === 0) return 0;
-    return taskList.reduce((sum, task) => sum + (isTaskCompletedInPeriod(task, period) ? 1 : 0) + countCompleted(task.subtasks, period), 0);
+    return taskList.reduce((sum, task) => sum + (period && isTaskCompletedThisPeriod(task, period) ? 1 : 0) + countCompleted(task.subtasks, period), 0);
   }
 
   const isNumeric = goalType === "PROGRESS";

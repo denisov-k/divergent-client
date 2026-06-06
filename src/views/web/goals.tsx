@@ -1,4 +1,5 @@
-﻿import { useTranslation } from "react-i18next";
+import { useEffect, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { toast } from "sonner";
 
@@ -16,6 +17,7 @@ export default function GoalsScreen() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const focusId = searchParams.get("id");
+  const [selectedCategory, setSelectedCategory] = useState<string>("all");
 
   const {
     loading,
@@ -47,6 +49,30 @@ export default function GoalsScreen() {
     onNavigateToProgress: (goalId) => navigate(buildProgressPath({ goalId })),
     onReminderCreated: () => navigate(buildRemindersPath()),
   });
+
+  const filteredGoals = useMemo(() => {
+    if (selectedCategory === "all") {
+      return goals;
+    }
+
+    return goals.filter((goal) => goal.category === selectedCategory);
+  }, [goals, selectedCategory]);
+
+  const categoriesWithGoals = useMemo(
+    () => categories.filter((category) => goals.some((goal) => goal.category === category.value)),
+    [categories, goals],
+  );
+
+  useEffect(() => {
+    if (selectedCategory !== "all" && !categoriesWithGoals.some((category) => category.value === selectedCategory)) {
+      setSelectedCategory("all");
+    }
+  }, [categoriesWithGoals, selectedCategory]);
+
+  const selectedCategoryLabel =
+    selectedCategory === "all"
+      ? t("goals.all_categories")
+      : categories.find((category) => category.value === selectedCategory)?.label ?? selectedCategory;
 
   const handleSaveGoal = async (...args: Parameters<typeof saveGoal>) => {
     const result = await saveGoal(...args);
@@ -84,21 +110,32 @@ export default function GoalsScreen() {
   };
 
   return (
-    <div className="flex flex-1 flex-col px-2">
-      <GoalsScreenHeader onCreate={openCreateGoal} onOpenAi={() => setAiOpen(true)} />
-
-      <GoalsScreenContent
-        loading={loading}
-        goals={goals}
-        rewards={rewards}
-        focusId={focusId}
+    <div className="flex flex-1 min-h-0 flex-col px-2">
+      <GoalsScreenHeader
+        categories={categoriesWithGoals}
+        showCategories={goals.length > 0}
+        selectedCategory={selectedCategory}
+        onCategoryChange={setSelectedCategory}
         onCreate={openCreateGoal}
-        onEdit={openEditGoal}
-        onTaskToggle={handleTaskToggle}
-        onAddReminder={openReminderForGoal}
-        onAddProgress={addProgress}
-        onGoToProgress={navigateToProgress}
+        onOpenAi={() => setAiOpen(true)}
       />
+
+      <div className="min-h-0 flex-1 overflow-y-auto pb-2">
+        <GoalsScreenContent
+          loading={loading}
+          goals={filteredGoals}
+          rewards={rewards}
+          focusId={focusId}
+          hasGoals={goals.length > 0}
+          selectedCategoryLabel={selectedCategoryLabel}
+          onCreate={openCreateGoal}
+          onEdit={openEditGoal}
+          onTaskToggle={handleTaskToggle}
+          onAddReminder={openReminderForGoal}
+          onAddProgress={addProgress}
+          onGoToProgress={navigateToProgress}
+        />
+      </div>
 
       <GoalsScreenDialogs
         goalDialogOpen={goalDialogOpen}
@@ -124,7 +161,3 @@ export default function GoalsScreen() {
     </div>
   );
 }
-
-
-
-

@@ -1,41 +1,23 @@
-﻿import dayjs from "dayjs";
-import isoWeek from "dayjs/plugin/isoWeek";
-import "dayjs/locale/ru";
 import { Flame } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-
-function getStreakDayLabel(count: number, language: string, t: (key: string) => string) {
-  const category = new Intl.PluralRules(language.startsWith("ru") ? "ru" : "en").select(count);
-
-  if (category === "one") {
-    return t("progress.streak.day_one");
-  }
-
-  if (category === "few") {
-    return t("progress.streak.day_few");
-  }
-
-  return t("progress.streak.day_many");
-}
-
-dayjs.extend(isoWeek);
-dayjs.locale("ru");
+import { getStreakUnitTranslationKey } from "@/shared/display/streak";
+import type { GoalPeriod } from "@/types";
 
 interface StreakCardProps {
   currentStreak: number;
   longestStreak: number;
-  streakDays: boolean[];
+  streakItems: { active: boolean; label: string }[];
+  windowLabel: string;
+  goalPeriod: GoalPeriod;
 }
 
-const today = dayjs();
-
-export function StreakCard({ currentStreak, longestStreak, streakDays }: StreakCardProps) {
+export function StreakCard({ currentStreak, longestStreak, streakItems, windowLabel, goalPeriod }: StreakCardProps) {
   const { t, i18n } = useTranslation();
-  const currentDayLabel = getStreakDayLabel(currentStreak, i18n.language, t);
-  const longestDayLabel = getStreakDayLabel(longestStreak, i18n.language, t);
+  const currentUnitLabel = t(getStreakUnitTranslationKey(goalPeriod, currentStreak, i18n.language));
+  const longestUnitLabel = t(getStreakUnitTranslationKey(goalPeriod, longestStreak, i18n.language));
 
   return (
     <Card className="mb-2 break-inside-avoid border-orange-200 bg-gradient-to-br from-orange-50/50 to-transparent">
@@ -48,34 +30,30 @@ export function StreakCard({ currentStreak, longestStreak, streakDays }: StreakC
           <div>
             <div className="flex items-baseline gap-2">
               <span className="text-3xl">{currentStreak}</span>
-              <span className="text-muted-foreground">{currentDayLabel}</span>
+              <span className="text-muted-foreground">{currentUnitLabel}</span>
             </div>
             <p className="mt-1 text-sm text-muted-foreground">{t("progress.streak.current")}</p>
           </div>
           <div className="text-right">
             <div className="flex items-baseline gap-2">
               <span className="text-xl text-muted-foreground">{longestStreak}</span>
-              <span className="text-sm text-muted-foreground">{longestDayLabel}</span>
+              <span className="text-sm text-muted-foreground">{longestUnitLabel}</span>
             </div>
             <p className="mt-1 text-sm text-muted-foreground">{t("progress.streak.record")}</p>
           </div>
         </div>
 
         <div className="space-y-2">
-          <p className="text-sm text-muted-foreground">{t("progress.last_7_days")}</p>
+          <p className="text-sm text-muted-foreground">{windowLabel}</p>
           <div className="grid grid-cols-7 gap-2">
-            {streakDays.map((active, index) => {
-              const date = today.subtract(6 - index, "day");
-              const label = date.format("dd");
-              return (
-                <div key={index} className="flex flex-col items-center gap-1">
-                  <div className={`flex size-8 items-center justify-center rounded-full transition-colors ${active ? "bg-orange-500 text-white" : "bg-muted text-muted-foreground"}`}>
-                    {active && <Flame className="size-4" />}
-                  </div>
-                  <span className="text-xs text-muted-foreground">{label}</span>
+            {streakItems.map((item, index) => (
+              <div key={index} className="flex flex-col items-center gap-1">
+                <div className={`flex size-8 items-center justify-center rounded-full transition-colors ${item.active ? "bg-orange-500 text-white" : "bg-muted text-muted-foreground"}`}>
+                  {item.active && <Flame className="size-4" />}
                 </div>
-              );
-            })}
+                <span className="text-xs text-muted-foreground">{item.label}</span>
+              </div>
+            ))}
           </div>
         </div>
 

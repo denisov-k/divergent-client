@@ -23,6 +23,7 @@ export function GoalsScreenDialogs({
   editingGoal,
   categories,
   rewards,
+  onAddCategory,
   onCreateReportDialogOpenChange,
   onGoalDialogOpenChange,
   onAiOpenChange,
@@ -37,6 +38,7 @@ export function GoalsScreenDialogs({
   editingGoal?: Goal | null;
   categories: CategoryOption[];
   rewards: Reward[];
+  onAddCategory: (category: CategoryOption) => void;
   onCreateReportDialogOpenChange: (open: boolean) => void;
   onGoalDialogOpenChange: (open: boolean) => void;
   onAiOpenChange: (open: boolean) => void;
@@ -63,6 +65,7 @@ export function GoalsScreenDialogs({
           onOpenChange={onGoalDialogOpenChange}
           onSave={onSaveGoal}
           onDelete={onDeleteGoal}
+          onAddCategory={onAddCategory}
         />
       )}
       {aiOpen && (

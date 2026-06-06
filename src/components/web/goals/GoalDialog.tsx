@@ -55,6 +55,7 @@ export function GoalDialog({
   const [rewardId, setRewardId] = useState(rewards.find((r) => r.goalId === goal?.id)?.id || "none");
   const [isCreatingCategory, setIsCreatingCategory] = useState(false);
   const [newCategoryName, setNewCategoryName] = useState("");
+  const [createdCategoryLabel, setCreatedCategoryLabel] = useState<string | null>(null);
   const [expandedTasks, setExpandedTasks] = useState<Record<string, boolean>>({});
   const [newSubTaskTitles, setNewSubTaskTitles] = useState<Record<string, string>>({});
   const [newSubTaskXps, setNewSubTaskXps] = useState<Record<string, string>>({});
@@ -109,6 +110,7 @@ export function GoalDialog({
     const newCategory = { value, label: newCategoryName };
     onAddCategoryProp(newCategory);
     setCategory(value);
+    setCreatedCategoryLabel(newCategoryName);
     setNewCategoryName("");
     setIsCreatingCategory(false);
   };
@@ -346,7 +348,9 @@ export function GoalDialog({
             ) : (
               <Select value={category} onValueChange={(value) => setCategory(value)}>
                 <SelectTrigger id="category">
-                  <SelectValue />
+                  <SelectValue>
+                    {categories.find((option) => option.value === category)?.label ?? createdCategoryLabel ?? undefined}
+                  </SelectValue>
                 </SelectTrigger>
                 <SelectContent>
                   {categories.map((option) => (

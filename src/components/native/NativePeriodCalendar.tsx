@@ -8,18 +8,19 @@ import isoWeek from "dayjs/plugin/isoWeek";
 
 import { Activity } from "@/components/native/icons";
 import { SurfaceCard } from "@/components/native/SurfaceCard";
+import { getActivityCellStatus } from "@/shared/screens/progress/model";
 import { appPalette } from "@/theme/palette";
-import type { Goal, GoalActivity } from "@/types";
+import type { Goal } from "@/types";
 
 dayjs.extend(isoWeek);
 
 type Props = {
   goal: Goal;
-  activity: GoalActivity;
+  dateStatusMap: Map<string, "empty" | "partial" | "full">;
   loading?: boolean;
 };
 
-export function NativePeriodCalendar({ goal, activity, loading }: Props) {
+export function NativePeriodCalendar({ goal, dateStatusMap, loading }: Props) {
   const { t, i18n } = useTranslation();
   const dayjsLocale = i18n.language?.startsWith("ru") ? "ru" : "en";
   const dayLabels = [
@@ -43,11 +44,10 @@ export function NativePeriodCalendar({ goal, activity, loading }: Props) {
     }, 0);
 
     return () => clearTimeout(timer);
-  }, [goal, activity.data.length, loading]);
+  }, [goal, dateStatusMap.size, loading]);
 
   const daysToShow = 365;
   const today = dayjs();
-  const dateMap = new Map(activity.data.map((d) => [dayjs(d.periodStart).format("YYYY-MM-DD"), d.status]));
   const firstDate = today.subtract(daysToShow - 1, "day").startOf("isoWeek");
   const lastDate = today;
   const dates: dayjs.Dayjs[] = [];
@@ -148,8 +148,15 @@ export function NativePeriodCalendar({ goal, activity, loading }: Props) {
                     return <View key={`${day}-${colIdx}`} style={{ width: 16, height: 16 }} />;
                   }
 
-                  const status = dateMap.get(date.format("YYYY-MM-DD")) || "empty";
-                  const backgroundColor = status === "full" ? appPalette.semantic.successSurfaceStrong : status === "partial" ? appPalette.semantic.warningSurfaceStrong : appPalette.semantic.neutralBorder;
+                  const status = getActivityCellStatus(date, goal, dateStatusMap);
+                  const backgroundColor =
+                    status === "full"
+                      ? appPalette.semantic.successSurfaceStrong
+                      : status === "partial"
+                        ? appPalette.semantic.warningSurfaceStrong
+                        : status === "missed"
+                          ? appPalette.semantic.dangerStrong
+                          : appPalette.semantic.neutralBorder;
 
                   return (
                     <View key={`${day}-${colIdx}`} style={{ width: 16, height: 16, alignItems: "center", justifyContent: "center" }}>
