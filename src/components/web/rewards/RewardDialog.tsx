@@ -112,7 +112,6 @@ export function RewardDialog({ open, onOpenChange, onSave, onDelete, reward, goa
             <Label htmlFor="reward-description">{t("rewards.dialog.description_label")}</Label>
             <Textarea
               id="reward-description"
-              placeholder={t("rewards.dialog.description_placeholder")}
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               rows={3}

@@ -5,6 +5,7 @@ import { useTranslation } from "react-i18next";
 import { GoalsScreenDialogs } from "@/components/native/goals-screen/Dialogs";
 import { GoalsScreenContent, GoalsScreenHeader } from "@/components/native/goals-screen/Sections";
 import { useGoalsScreenController } from "@/components/native/goals-screen/useGoalsScreenController";
+import { useOnboardingChecklist } from "@/shared/screens/onboarding/useOnboardingChecklist";
 import { appPalette } from "@/theme/palette";
 
 export default function NativeGoalsScreen(props: {
@@ -39,7 +40,7 @@ export default function NativeGoalsScreen(props: {
     handleTaskToggle,
     handleDraftAdded,
   } = useGoalsScreenController(props);
-
+  const onboarding = useOnboardingChecklist(goals);
   const categoriesWithGoals = useMemo(
     () => categories.filter((category) => goals.some((goal) => goal.category === category.value)),
     [categories, goals],
@@ -81,6 +82,7 @@ export default function NativeGoalsScreen(props: {
         rewards={rewards}
         categories={categoriesWithGoals}
         hasGoals={goals.length > 0}
+        onboarding={onboarding}
         selectedCategoryLabel={selectedCategoryLabel}
         userTimeZone={userTimeZone}
         focusedGoalId={props.goalId}

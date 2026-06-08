@@ -11,6 +11,7 @@ import type {
   FriendInput,
   FriendSummary,
   Goal,
+  OnboardingStepKey,
   Reminder,
   ReportUploadPayload,
   Reward,
@@ -261,6 +262,13 @@ export async function updateUser(patch: Partial<User>) {
   return fetchJSON("/api/user", {
     method: "PATCH",
     body: JSON.stringify(patch),
+  });
+}
+
+export async function completeOnboardingStep(step: OnboardingStepKey) {
+  return fetchJSON("/api/user/onboarding", {
+    method: "PATCH",
+    body: JSON.stringify({ step }),
   });
 }
 

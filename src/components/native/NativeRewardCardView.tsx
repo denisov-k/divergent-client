@@ -20,7 +20,7 @@ export function NativeRewardCardView({
   focused?: boolean;
   onEdit?: (id: string) => void;
 }) {
-  const canEdit = onEdit && !goal?.challengeId;
+  const canEdit = onEdit && !goal?.challengeId && reward.sourceKey !== "onboarding_completion";
   const [highlight, setHighlight] = useState(focused);
 
   useEffect(() => {

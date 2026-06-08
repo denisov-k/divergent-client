@@ -3,11 +3,13 @@ import { ScrollView, Text, View } from "react-native";
 import { useTranslation } from "react-i18next";
 
 import { HapticPressable as Pressable } from "@/components/native/HapticPressable";
+import { OnboardingCard } from "@/components/native/goals-screen/OnboardingCard";
 import { NativeGoalCardView } from "@/components/native/NativeGoalCardView";
 import { Plus, Sparkles } from "@/components/native/icons";
 import { SectionTabs } from "@/components/native/SectionTabs";
 import { AppLoader } from "@/components/shared/AppLoader";
 import { appPalette } from "@/theme/palette";
+import type { OnboardingChecklistState } from "@/shared/screens/onboarding/model";
 import type { CategoryOption, Goal, Reward } from "@/types";
 
 export function GoalsScreenHeader({
@@ -131,6 +133,7 @@ export function GoalsScreenContent({
   rewards,
   categories,
   hasGoals,
+  onboarding,
   selectedCategoryLabel,
   userTimeZone,
   focusedGoalId,
@@ -146,6 +149,7 @@ export function GoalsScreenContent({
   rewards: Reward[];
   categories: CategoryOption[];
   hasGoals: boolean;
+  onboarding: OnboardingChecklistState & { historyLoading: boolean; ready: boolean };
   selectedCategoryLabel: string;
   userTimeZone: string;
   focusedGoalId?: string | null;
@@ -174,6 +178,10 @@ export function GoalsScreenContent({
   }, [focusedGoalId, itemOffsets]);
 
   const showInitialLoading = loading && goals.length === 0;
+  const showOnboarding = onboarding.ready && !onboarding.isComplete;
+  const showFilteredEmpty = goals.length === 0 && hasGoals;
+  const showTrueEmpty = goals.length === 0 && !hasGoals;
+  const onboardingReward = rewards.find((item) => item.sourceKey === "onboarding_completion") ?? null;
 
   if (showInitialLoading) {
     return (
@@ -185,7 +193,7 @@ export function GoalsScreenContent({
 
   return (
     <ScrollView ref={scrollRef} contentContainerStyle={{ paddingHorizontal: 8, gap: 8 }}>
-      {goals.length === 0 ? (
+      {showFilteredEmpty ? (
         <View
           style={{
             backgroundColor: appPalette.surface.card,
@@ -207,7 +215,7 @@ export function GoalsScreenContent({
               textAlign: "center",
             }}
           >
-            {hasGoals ? t("goals.empty_filtered_title", { category: selectedCategoryLabel }) : t("goals.empty_title")}
+            {t("goals.empty_filtered_title", { category: selectedCategoryLabel })}
           </Text>
           <Pressable
             onPress={onCreate}
@@ -234,7 +242,7 @@ export function GoalsScreenContent({
             </Text>
           </Pressable>
         </View>
-      ) : (
+      ) : showTrueEmpty ? null : (
         goals.map((goal) => {
           const reward = rewards.find((item) => item.goalId === goal.id) || null;
           const categoryLabel =
@@ -265,6 +273,8 @@ export function GoalsScreenContent({
           );
         })
       )}
+
+      {showOnboarding && <OnboardingCard state={onboarding} reward={onboardingReward} />}
     </ScrollView>
   );
 }

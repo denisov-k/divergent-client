@@ -4,11 +4,13 @@ import type { Reminder } from "@/types";
 
 type AiSlice = Pick<AppStoreActions, "chatAI" | "chatAIStream" | "getChatHistory" | "addDraft">;
 
-export const createAiSlice: StoreSlice<AiSlice> = (set) => ({
+export const createAiSlice: StoreSlice<AiSlice> = (set, get) => ({
   chatAI: async (message) => {
     set({ loading: true });
     try {
-      return await api.chatAI(message);
+      const response = await api.chatAI(message);
+      await get().completeOnboardingStep("used_ai");
+      return response;
     } catch (err) {
       console.error(err);
       throw err;
@@ -20,7 +22,9 @@ export const createAiSlice: StoreSlice<AiSlice> = (set) => ({
   chatAIStream: async (message, handlers) => {
     set({ loading: true });
     try {
-      return await api.chatAIStream(message, handlers);
+      const response = await api.chatAIStream(message, handlers);
+      await get().completeOnboardingStep("used_ai");
+      return response;
     } catch (err) {
       console.error(err);
       throw err;
@@ -52,6 +56,8 @@ export const createAiSlice: StoreSlice<AiSlice> = (set) => ({
           ? state.goals.map((item) => (item.id === goal.id ? goal : item))
           : [...state.goals, goal],
       }));
+
+      await get().completeOnboardingStep("created_first_goal");
 
       if (reward) {
         set((state) => ({

@@ -9,6 +9,7 @@ import {
   GoalsScreenContent,
   GoalsScreenHeader,
 } from "@/components/web/goals-screen/Sections";
+import { useOnboardingChecklist } from "@/shared/screens/onboarding/useOnboardingChecklist";
 import { useGoalsScreen } from "@/shared/screens/goals/useGoalsScreen";
 import type { Goal } from "@/types";
 
@@ -49,7 +50,7 @@ export default function GoalsScreen() {
     onNavigateToProgress: (goalId) => navigate(buildProgressPath({ goalId })),
     onReminderCreated: () => navigate(buildRemindersPath()),
   });
-
+  const onboarding = useOnboardingChecklist(goals);
   const filteredGoals = useMemo(() => {
     if (selectedCategory === "all") {
       return goals;
@@ -127,6 +128,7 @@ export default function GoalsScreen() {
           rewards={rewards}
           focusId={focusId}
           hasGoals={goals.length > 0}
+          onboarding={onboarding}
           selectedCategoryLabel={selectedCategoryLabel}
           onCreate={openCreateGoal}
           onEdit={openEditGoal}

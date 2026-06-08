@@ -12,6 +12,7 @@ import type {
   GoalActivity,
   Leader,
   PaymentMethod,
+  OnboardingStepKey,
   Reminder,
   Report,
   ReportUploadPayload,
@@ -82,6 +83,7 @@ export interface AppStoreActions {
   deleteGoal: (goal: Goal) => Promise<void>;
   updateGoal: (goal: Goal) => Promise<void>;
   updateGoalProgress: (goalId: string, delta: number) => Promise<void>;
+  completeOnboardingStep: (step: OnboardingStepKey) => Promise<void>;
   getActivity: (goalId: string) => Promise<GoalActivity>;
   getGoalXp: (goalId: string) => Promise<number>;
   toggleTask: (taskId: string) => Promise<void>;

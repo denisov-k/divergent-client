@@ -34,6 +34,8 @@ interface GoalDialogProps {
   onAddCategory: (category: CategoryOption) => void;
 }
 
+const ONBOARDING_REWARD_SOURCE_KEY = "onboarding_completion";
+
 export function GoalDialog({
   open,
   onOpenChange,
@@ -251,6 +253,8 @@ export function GoalDialog({
     handleClose();
   };
 
+  const selectableRewards = rewards.filter((reward) => reward.sourceKey !== ONBOARDING_REWARD_SOURCE_KEY);
+
   const handleClose = () => {
     if (!goal) {
       resetForm();
@@ -384,7 +388,7 @@ export function GoalDialog({
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="none">{t("common.no_reward")}</SelectItem>
-                {rewards.map((reward) => (
+                {selectableRewards.map((reward) => (
                   <SelectItem key={reward.id} value={reward.id}>
                     {reward.title}
                   </SelectItem>

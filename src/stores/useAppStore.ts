@@ -6,6 +6,7 @@ import { createBaseSlice } from "@/stores/slices/base";
 import { createChallengesSlice } from "@/stores/slices/challenges";
 import { createFriendsSlice } from "@/stores/slices/friends";
 import { createGoalsSlice } from "@/stores/slices/goals";
+import { createOnboardingSlice } from "@/stores/slices/onboarding";
 import { createRemindersSlice } from "@/stores/slices/reminders";
 import { createRewardsSlice } from "@/stores/slices/rewards";
 import type { AppStore } from "@/stores/types";
@@ -16,6 +17,7 @@ export const useAppStore = create<AppStore>((set, get) => ({
   ...createChallengesSlice(set, get, undefined as never),
   ...createFriendsSlice(set, get, undefined as never),
   ...createGoalsSlice(set, get, undefined as never),
+  ...createOnboardingSlice(set, get, undefined as never),
   ...createRewardsSlice(set, get, undefined as never),
   ...createRemindersSlice(set, get, undefined as never),
   ...createAiSlice(set, get, undefined as never),

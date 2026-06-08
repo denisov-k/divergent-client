@@ -129,6 +129,12 @@ export interface ChallengeParticipant {
 
 export type GoalType = "TASK" | "PROGRESS";
 export type GoalPeriod = "NONE" | "DAILY" | "WEEKLY" | "MONTHLY";
+export type OnboardingStepKey =
+  | "created_first_goal"
+  | "added_first_task"
+  | "used_ai"
+  | "completed_first_task";
+export type OnboardingState = Partial<Record<OnboardingStepKey, string | null>>;
 
 export interface GoalFormData extends Goal {
   rewardId?: string | null;
@@ -181,6 +187,7 @@ export interface Reward {
   goalId?: string;
   goal?: Goal;
   xpRequires?: number;
+  sourceKey?: string;
 }
 
 export interface User {
@@ -196,6 +203,7 @@ export interface User {
   photoUrl: string;
   language: string | null;
   timeZone: string;
+  onboardingState?: OnboardingState | null;
 }
 
 export type PaymentMethod = "YOUKASSA";

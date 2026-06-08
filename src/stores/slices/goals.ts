@@ -16,6 +16,21 @@ type GoalsSlice = Pick<
   | "hideNativeToast"
 >;
 
+type TaskCompletionLike = {
+  lastCompletedAt?: string | null;
+  subtasks?: TaskCompletionLike[] | undefined;
+};
+
+function hasAnyCompletedTask(tasks: TaskCompletionLike[]): boolean {
+  return tasks.some((task) => {
+    if (task.lastCompletedAt) {
+      return true;
+    }
+
+    return hasAnyCompletedTask(task.subtasks ?? []);
+  });
+}
+
 export const createGoalsSlice: StoreSlice<GoalsSlice> = (set, get) => ({
   showNativeToast: ({ title, message, tone = "info", durationMs = 3000 }) => {
     const id = Date.now();
@@ -48,6 +63,7 @@ export const createGoalsSlice: StoreSlice<GoalsSlice> = (set, get) => ({
     try {
       const newGoal = await api.createGoal(goal);
       set({ goals: [...get().goals, newGoal] });
+      await get().completeOnboardingStep("created_first_goal");
     } catch (err) {
       console.error(err);
     } finally {
@@ -147,6 +163,10 @@ export const createGoalsSlice: StoreSlice<GoalsSlice> = (set, get) => ({
         },
       });
 
+      if (hasAnyCompletedTask(goal.tasks)) {
+        await get().completeOnboardingStep("completed_first_task");
+      }
+
       if (goal.challenges.length) {
         const challenges = await api.fetchChallenges();
         set({ challenges });
@@ -178,6 +198,10 @@ export const createGoalsSlice: StoreSlice<GoalsSlice> = (set, get) => ({
           requiredXp: user.requiredXp,
         },
       });
+
+      if (hasAnyCompletedTask(goal.tasks)) {
+        await get().completeOnboardingStep("completed_first_task");
+      }
     } catch (err) {
       console.error(err);
     } finally {

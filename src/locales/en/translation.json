@@ -81,11 +81,31 @@
                      "sat":  "Sa",
                      "sun":  "Su"
                  },
-    "goal_period":  {
+  "goal_period":  {
                         "daily":  "Daily",
                         "weekly":  "Weekly",
                         "monthly":  "Monthly"
                     },
+  "onboarding":  {
+                    "title":  "Getting started",
+                    "subtitle":  "A few quick steps will help you get oriented and see your first progress.",
+                    "progress":  "{{completed}} of {{total}} completed",
+                    "actions":  {
+                                     "create_goal":  "Create goal",
+                                     "open_goal":  "Open goal",
+                                     "open_ai":  "Open AI"
+                                 },
+                    "steps":  {
+                                   "create_goal_title":  "Create your first goal",
+                                   "create_goal_description":  "Add a goal to track tasks, progress, and streaks.",
+                                   "add_task_title":  "Add your first task",
+                                   "add_task_description":  "Break the goal into one clear next step.",
+                                   "use_ai_title":  "Message the AI assistant",
+                                   "use_ai_description":  "AI can help assemble a goal and first tasks for you.",
+                                   "complete_task_title":  "Mark your first task as done",
+                                   "complete_task_description":  "The first completion kicks off XP and makes progress visible."
+                               }
+                },
     "settings":  {
                      "title":  "Settings",
                      "subtitle":  "Profile, language, timezone, and sign-in.",

@@ -11,6 +11,8 @@ import { formHelperStyle, formSectionLabelStyle } from "@/components/native/form
 import { appPalette } from "@/theme/palette";
 import type { CategoryOption, GoalPeriod, GoalType, Reward, Task } from "@/types";
 
+const ONBOARDING_REWARD_SOURCE_KEY = "onboarding_completion";
+
 function formatDisplayDate(value?: string | null) {
   if (!value) {
     return null;
@@ -574,13 +576,14 @@ export function RewardSection(props: {
 }) {
   const { t } = useTranslation();
   const [open, setOpen] = useState(false);
+  const selectableRewards = props.rewards.filter((reward) => reward.sourceKey !== ONBOARDING_REWARD_SOURCE_KEY);
   const activeLabel = useMemo(() => {
     if (!props.activeRewardId) {
       return t("common.no_reward");
     }
 
-    return props.rewards.find((reward) => reward.id === props.activeRewardId)?.title ?? t("common.no_reward");
-  }, [props.activeRewardId, props.rewards, t]);
+    return selectableRewards.find((reward) => reward.id === props.activeRewardId)?.title ?? t("common.no_reward");
+  }, [props.activeRewardId, selectableRewards, t]);
 
   return (
     <View style={{ gap: 8 }}>
@@ -589,7 +592,10 @@ export function RewardSection(props: {
       <OptionPickerModal
         open={open}
         title={t("goals.dialog.reward_label")}
-        options={[{ key: "__none__", label: t("common.no_reward") }, ...props.rewards.map((reward) => ({ key: reward.id, label: reward.title }))]}
+        options={[
+          { key: "__none__", label: t("common.no_reward") },
+          ...selectableRewards.map((reward) => ({ key: reward.id, label: reward.title })),
+        ]}
         selectedKey={props.activeRewardId ?? "__none__"}
         onClose={() => setOpen(false)}
         onSelect={(value) => props.onChange(value === "__none__" ? null : value)}

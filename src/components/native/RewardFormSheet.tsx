@@ -99,7 +99,6 @@ export function RewardFormSheet({
         label={t("rewards.dialog.description_label")}
         value={description}
         onChangeText={setDescription}
-        placeholder={t("rewards.dialog.description_placeholder")}
         multiline
         numberOfLines={4}
       />

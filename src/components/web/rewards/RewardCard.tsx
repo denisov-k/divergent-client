@@ -16,6 +16,7 @@ interface RewardCardProps {
   description: string;
   xpRequires?: number;
   isUnlocked: boolean;
+  sourceKey?: string;
   icon?: RewardIconType;
   goal?: Goal;
   goalTitle?: string;
@@ -29,6 +30,7 @@ export function RewardCard({
   title,
   description,
   xpRequires,
+  sourceKey,
   icon = "trophy",
   goal,
   goalTitle,
@@ -45,7 +47,7 @@ export function RewardCard({
   const { challenges } = useAppStore();
   const challenge = challenges.find((item) => item.id === goal?.challengeId);
 
-  const canEdit = onEdit && !isFromChallenge;
+  const canEdit = onEdit && !isFromChallenge && sourceKey !== "onboarding_completion";
 
   useEffect(() => {
     if (!cardRef.current || !focused) return;

@@ -16,26 +16,31 @@ const iconMap = {
 export function NativeRewardIcon({
   icon = "trophy",
   unlocked = false,
+  size = 48,
+  iconSize = 24,
 }: {
   icon?: RewardIcon;
   unlocked?: boolean;
+  size?: number;
+  iconSize?: number;
 }) {
   const Icon = iconMap[icon] || Trophy;
   const color = unlocked ? appPalette.semantic.successText : appPalette.semantic.textMuted;
   const backgroundColor = unlocked ? appPalette.semantic.successSurface : appPalette.semantic.neutralSurface;
+  const radius = Math.max(8, Math.round(size * 0.25));
 
   return (
     <View
       style={{
-        width: 48,
-        height: 48,
-        borderRadius: 12,
+        width: size,
+        height: size,
+        borderRadius: radius,
         alignItems: "center",
         justifyContent: "center",
         backgroundColor,
       }}
     >
-      <Icon size={24} color={color} />
+      <Icon size={iconSize} color={color} />
     </View>
   );
 }

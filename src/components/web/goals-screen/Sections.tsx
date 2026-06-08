@@ -5,6 +5,8 @@ import { AppLoader } from "@/components/shared/AppLoader";
 import { GoalCard } from "@/components/web/goals/GoalCard";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { OnboardingCard } from "@/components/web/goals-screen/OnboardingCard";
+import type { OnboardingChecklistState } from "@/shared/screens/onboarding/model";
 import type { CategoryOption, Goal, Reward } from "@/types";
 
 export function GoalsScreenHeader({
@@ -78,6 +80,7 @@ export function GoalsScreenContent({
   rewards,
   focusId,
   hasGoals,
+  onboarding,
   selectedCategoryLabel,
   onCreate,
   onEdit,
@@ -91,6 +94,7 @@ export function GoalsScreenContent({
   rewards: Reward[];
   focusId?: string | null;
   hasGoals: boolean;
+  onboarding: OnboardingChecklistState & { historyLoading: boolean; ready: boolean };
   selectedCategoryLabel: string;
   onCreate: () => void;
   onEdit: (id: string) => void;
@@ -101,46 +105,52 @@ export function GoalsScreenContent({
 }) {
   const { t } = useTranslation();
   const showInitialLoading = loading && goals.length === 0;
+  const showOnboarding = onboarding.ready && !onboarding.isComplete;
+  const showFilteredEmpty = goals.length === 0 && hasGoals;
+  const showTrueEmpty = goals.length === 0 && !hasGoals;
+  const onboardingReward = rewards.find((item) => item.sourceKey === "onboarding_completion") ?? null;
 
   if (showInitialLoading) {
     return <AppLoader fullScreen />;
   }
 
-  if (goals.length === 0) {
-    return (
-      <Card>
-        <CardContent className="flex flex-col items-center justify-center py-12">
-          <p className="mb-4 text-center text-muted-foreground">
-            {hasGoals ? t("goals.empty_filtered_title", { category: selectedCategoryLabel }) : t("goals.empty_title")}
-          </p>
-          <Button onClick={onCreate}>
-            <Plus size={16} className="mr-2" />
-            {t("common.create_first_goal")}
-          </Button>
-        </CardContent>
-      </Card>
-    );
-  }
-
   return (
-    <div className="columns-1 gap-2 sm:columns-2 lg:columns-3 xl:columns-4">
-      {goals.map((goal) => {
-        const reward = rewards.find((item) => item.goalId === goal.id) || null;
+    <div className="space-y-2">
+      {showFilteredEmpty ? (
+        <Card>
+          <CardContent className="flex flex-col items-center justify-center py-12">
+            <p className="mb-4 text-center text-muted-foreground">
+              {t("goals.empty_filtered_title", { category: selectedCategoryLabel })}
+            </p>
+            <Button onClick={onCreate}>
+              <Plus size={16} className="mr-2" />
+              {t("common.create_first_goal")}
+            </Button>
+          </CardContent>
+        </Card>
+      ) : showTrueEmpty ? null : (
+        <div className="columns-1 gap-2 sm:columns-2 lg:columns-3 xl:columns-4">
+          {goals.map((goal) => {
+            const reward = rewards.find((item) => item.goalId === goal.id) || null;
 
-        return (
-          <GoalCard
-            {...goal}
-            key={goal.id}
-            reward={reward}
-            onEdit={onEdit}
-            onTaskToggle={onTaskToggle}
-            onAddReminder={onAddReminder}
-            onAddProgress={onAddProgress}
-            onGoToProgress={onGoToProgress}
-            autoExpand={goal.id === focusId}
-          />
-        );
-      })}
+            return (
+              <GoalCard
+                {...goal}
+                key={goal.id}
+                reward={reward}
+                onEdit={onEdit}
+                onTaskToggle={onTaskToggle}
+                onAddReminder={onAddReminder}
+                onAddProgress={onAddProgress}
+                onGoToProgress={onGoToProgress}
+                autoExpand={goal.id === focusId}
+              />
+            );
+          })}
+        </div>
+      )}
+
+      {showOnboarding && <OnboardingCard state={onboarding} reward={onboardingReward} />}
     </div>
   );
 }
