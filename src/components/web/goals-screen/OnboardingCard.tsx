@@ -50,7 +50,7 @@ export function OnboardingCard({
   }
 
   return (
-    <Card className="border-emerald-200 bg-emerald-50/50">
+    <Card className="bg-background">
       <CardContent className="flex flex-col gap-4 py-4">
         <div className="flex items-start justify-between gap-3">
           <div className="space-y-1">
@@ -101,18 +101,21 @@ export function OnboardingCard({
           <button
             type="button"
             onClick={() => navigate({ pathname: "/rewards", search: `?id=${reward.id}` })}
-            className="flex w-full items-center gap-3 rounded-xl border border-emerald-200 bg-emerald-50/70 px-3 py-2 text-left transition hover:border-emerald-300 hover:bg-emerald-50"
+            className="flex w-full items-center gap-3 rounded-xl border border-border bg-background px-3 py-2 text-left transition hover:bg-muted/50"
           >
             <RewardIcon
               icon={reward.icon}
               size={4}
-              className="rounded-md bg-background/80"
-              colorClass={reward.isUnlocked ? "text-emerald-600" : "text-emerald-700"}
+              className="rounded-md bg-muted/60"
+              colorClass={reward.isUnlocked ? "text-foreground" : "text-muted-foreground"}
             />
             <div className="min-w-0 flex-1">
-              <div className="flex items-center gap-2">
-                <span className="truncate text-sm font-semibold text-foreground">{reward.title}</span>
-              </div>
+            <div className="flex items-center gap-2">
+              <span className="truncate text-sm font-semibold text-foreground">{reward.title}</span>
+              <Badge variant={reward.isUnlocked ? "default" : "secondary"} className={reward.isUnlocked ? "bg-green-500" : ""}>
+                {reward.isUnlocked ? t("rewards.unlocked") : t("rewards.locked")}
+              </Badge>
+            </div>
               <p className="line-clamp-2 text-xs text-muted-foreground">{reward.description}</p>
             </div>
             <ChevronRight className="size-4 shrink-0 text-emerald-600" />

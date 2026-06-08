@@ -398,6 +398,8 @@
                     "created":  "Reward created",
                     "updated":  "Reward updated",
                     "unlocked":  "Unlocked",
+                    "locked":  "Locked",
+                    "go_to_onboarding":  "Go to onboarding",
                     "go_to_goal":  "Go to goal",
                     "go_to_challenge":  "Go to challenge"
                 },

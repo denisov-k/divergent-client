@@ -3,6 +3,8 @@ import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { Edit, Swords, Target } from "lucide-react";
 
+import { buildGoalsPath } from "@/app/routes";
+
 import { RewardIcon } from "@/components/shared/RewardIcon";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -73,16 +75,25 @@ export function RewardCard({
           <div className="flex min-w-0 flex-1 flex-col gap-2">
             <div className="flex items-center gap-2">
               <CardTitle>{title}</CardTitle>
-              {isUnlocked && (
-                <Badge variant="default" className="bg-green-500">
-                  {t("rewards.unlocked")}
-                </Badge>
-              )}
+              <Badge variant={isUnlocked ? "default" : "secondary"} className={isUnlocked ? "bg-green-500" : ""}>
+                {isUnlocked ? t("rewards.unlocked") : t("rewards.locked")}
+              </Badge>
             </div>
 
             <CardDescription>{description}</CardDescription>
 
             <div className="flex flex-wrap gap-2">
+              {sourceKey === "onboarding_completion" && (
+                <Badge
+                  className={`bg-primary text-white ${isUnlocked ? "" : "cursor-pointer hover:bg-primary/80"}`}
+                  onClick={isUnlocked ? undefined : () => navigate(buildGoalsPath({ onboarding: true }))}
+                  title={t("rewards.go_to_onboarding")}
+                >
+                  <Target />
+                  {t("rewards.go_to_onboarding")}
+                </Badge>
+              )}
+
               {goal && goalTitle && (
                 <Badge
                   className="cursor-pointer bg-primary text-white hover:bg-primary/80"

@@ -11,6 +11,7 @@ import { appPalette } from "@/theme/palette";
 export default function NativeGoalsScreen(props: {
   goalId?: string | null;
   reportTaskId?: string | null;
+  onboarding?: string | null;
   onConsumeLinkState?: () => void;
 }) {
   const { t } = useTranslation();
@@ -86,6 +87,7 @@ export default function NativeGoalsScreen(props: {
         selectedCategoryLabel={selectedCategoryLabel}
         userTimeZone={userTimeZone}
         focusedGoalId={props.goalId}
+        focusOnboarding={props.onboarding === "1"}
         onCreate={openCreateGoal}
         onEdit={openEditGoal}
         onTaskToggle={handleTaskToggle}

@@ -32,6 +32,7 @@ function syncPreviewUrl(state: ReturnType<typeof parseNativeAppRoute>) {
   params.delete("id");
   params.delete("goalId");
   params.delete("reportTaskId");
+  params.delete("onboarding");
   params.delete("reminderId");
   params.delete("rewardId");
   params.delete("paymentId");
@@ -42,6 +43,10 @@ function syncPreviewUrl(state: ReturnType<typeof parseNativeAppRoute>) {
 
   if (state.tab === "goals" && state.reportTaskId) {
     params.set("reportTaskId", state.reportTaskId);
+  }
+
+  if (state.tab === "goals" && state.onboarding) {
+    params.set("onboarding", state.onboarding);
   }
 
   if (state.tab === "reminders") {
@@ -81,6 +86,7 @@ export default function NativeAppShell({ mode = "standalone" }: { mode?: "previe
   const [goalLinkState, setGoalLinkState] = useState<{
     goalId?: string | null;
     reportTaskId?: string | null;
+    onboarding?: string | null;
   }>({});
   const [reminderLinkState, setReminderLinkState] = useState<{
     reminderId?: string | null;
@@ -125,10 +131,11 @@ export default function NativeAppShell({ mode = "standalone" }: { mode?: "previe
       syncPreviewUrl(state);
     }
 
-    if (state.tab === "goals") {
+  if (state.tab === "goals") {
       setGoalLinkState({
         goalId: state.goalId ?? null,
         reportTaskId: state.reportTaskId ?? null,
+        onboarding: state.onboarding ?? null,
       });
       return;
     }
@@ -198,6 +205,7 @@ export default function NativeAppShell({ mode = "standalone" }: { mode?: "previe
               <NativeGoalsScreen
                 goalId={goalLinkState.goalId}
                 reportTaskId={goalLinkState.reportTaskId}
+                onboarding={goalLinkState.onboarding}
                 onConsumeLinkState={() => {
                   setGoalLinkState({});
                 }}

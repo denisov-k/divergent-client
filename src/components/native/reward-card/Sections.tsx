@@ -26,7 +26,9 @@ export function RewardCardHeader({
           <Text style={{ fontSize: 12, fontWeight: "500", color: appPalette.semantic.textStrong, fontFamily: "Montserrat", lineHeight: 12, flexShrink: 1 }}>
             {reward.title}
           </Text>
-          {reward.isUnlocked && <RewardBadge tone="success">{t("rewards.unlocked")}</RewardBadge>}
+          <RewardBadge tone={reward.isUnlocked ? "success" : "neutral"}>
+            {reward.isUnlocked ? t("rewards.unlocked") : t("rewards.locked")}
+          </RewardBadge>
         </View>
 
         <Text style={{ color: appPalette.semantic.textMuted, fontSize: 12, fontWeight: "400", lineHeight: 18, fontFamily: "Montserrat" }}>
@@ -58,6 +60,16 @@ export function RewardCardLinks({
           onPress={() => navigateToPath(buildGoalsPath({ id: goal.id }))}
         >
           {goal.title}
+        </RewardBadge>
+      )}
+
+      {reward.sourceKey === "onboarding_completion" && (
+        <RewardBadge
+          tone="info"
+          icon={<Target size={12} color={appPalette.semantic.textInverse} />}
+          onPress={reward.isUnlocked ? undefined : () => navigateToPath(buildGoalsPath({ onboarding: true }))}
+        >
+          {t("rewards.go_to_onboarding")}
         </RewardBadge>
       )}
 

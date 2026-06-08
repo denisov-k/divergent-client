@@ -137,6 +137,7 @@ export function GoalsScreenContent({
   selectedCategoryLabel,
   userTimeZone,
   focusedGoalId,
+  focusOnboarding,
   onCreate,
   onEdit,
   onTaskToggle,
@@ -153,6 +154,7 @@ export function GoalsScreenContent({
   selectedCategoryLabel: string;
   userTimeZone: string;
   focusedGoalId?: string | null;
+  focusOnboarding?: boolean;
   onCreate: () => void;
   onEdit: (id: string) => void;
   onTaskToggle: (goalId: string, taskId: string) => Promise<void>;
@@ -163,6 +165,7 @@ export function GoalsScreenContent({
   const { t } = useTranslation();
   const scrollRef = useRef<ScrollView | null>(null);
   const [itemOffsets, setItemOffsets] = useState<Record<string, number>>({});
+  const [onboardingOffset, setOnboardingOffset] = useState<number | null>(null);
 
   useEffect(() => {
     if (!focusedGoalId) {
@@ -182,6 +185,14 @@ export function GoalsScreenContent({
   const showFilteredEmpty = goals.length === 0 && hasGoals;
   const showTrueEmpty = goals.length === 0 && !hasGoals;
   const onboardingReward = rewards.find((item) => item.sourceKey === "onboarding_completion") ?? null;
+
+  useEffect(() => {
+    if (!focusOnboarding || !showOnboarding || typeof onboardingOffset !== "number") {
+      return;
+    }
+
+    scrollRef.current?.scrollTo({ y: Math.max(onboardingOffset - 12, 0), animated: true });
+  }, [focusOnboarding, onboardingOffset, showOnboarding]);
 
   if (showInitialLoading) {
     return (
@@ -274,7 +285,16 @@ export function GoalsScreenContent({
         })
       )}
 
-      {showOnboarding && <OnboardingCard state={onboarding} reward={onboardingReward} />}
+      {showOnboarding && (
+        <View
+          onLayout={(event) => {
+            const { y } = event.nativeEvent.layout;
+            setOnboardingOffset((current) => (current === y ? current : y));
+          }}
+        >
+          <OnboardingCard state={onboarding} reward={onboardingReward} />
+        </View>
+      )}
     </ScrollView>
   );
 }

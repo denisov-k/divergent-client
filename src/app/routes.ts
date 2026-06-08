@@ -1,6 +1,7 @@
 export type GoalsRouteParams = {
   id?: string | null;
   reportTaskId?: string | null;
+  onboarding?: boolean | null;
 };
 
 export type RemindersRouteParams = {
@@ -38,6 +39,7 @@ export function buildGoalsPath(params: GoalsRouteParams = {}) {
   return buildPath("/goals", {
     id: params.id,
     reportTaskId: params.reportTaskId,
+    onboarding: params.onboarding ? "1" : null,
   });
 }
 

@@ -203,25 +203,48 @@ export function OnboardingCard({
             borderRadius: 12,
             borderWidth: 1,
             borderColor: appPalette.semantic.borderSubtle,
-            backgroundColor: appPalette.semantic.successSurface,
+            backgroundColor: appPalette.surface.background,
             paddingHorizontal: 12,
             paddingVertical: 10,
           }}
         >
           <NativeRewardIcon icon={reward.icon} unlocked={reward.isUnlocked} size={32} iconSize={16} />
           <View style={{ flex: 1, minWidth: 0, gap: 2 }}>
-            <Text
-              style={{
-                color: appPalette.semantic.textStrong,
-                fontSize: 13,
-                lineHeight: 19,
-                fontWeight: "600",
-                fontFamily: "Montserrat",
-              }}
-              numberOfLines={1}
-            >
-              {reward.title}
-            </Text>
+            <View style={{ flexDirection: "row", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+              <Text
+                style={{
+                  color: appPalette.semantic.textStrong,
+                  fontSize: 13,
+                  lineHeight: 19,
+                  fontWeight: "600",
+                  fontFamily: "Montserrat",
+                  flexShrink: 1,
+                }}
+                numberOfLines={1}
+              >
+                {reward.title}
+              </Text>
+              <View
+                style={{
+                  borderRadius: 999,
+                  backgroundColor: reward.isUnlocked ? appPalette.semantic.successStrong : appPalette.semantic.neutralSurface,
+                  paddingHorizontal: 8,
+                  paddingVertical: 3,
+                }}
+              >
+                <Text
+                  style={{
+                    color: reward.isUnlocked ? appPalette.semantic.textInverse : appPalette.semantic.neutralText,
+                    fontSize: 11,
+                    lineHeight: 16,
+                    fontWeight: "600",
+                    fontFamily: "Montserrat",
+                  }}
+                >
+                  {reward.isUnlocked ? t("rewards.unlocked") : t("rewards.locked")}
+                </Text>
+              </View>
+            </View>
             <Text
               style={{
                 color: appPalette.semantic.textMuted,

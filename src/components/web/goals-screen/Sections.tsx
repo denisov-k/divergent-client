@@ -1,3 +1,4 @@
+import { useEffect, useRef } from "react";
 import { Plus, Sparkles } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
@@ -79,6 +80,7 @@ export function GoalsScreenContent({
   goals,
   rewards,
   focusId,
+  focusOnboarding,
   hasGoals,
   onboarding,
   selectedCategoryLabel,
@@ -93,6 +95,7 @@ export function GoalsScreenContent({
   goals: Goal[];
   rewards: Reward[];
   focusId?: string | null;
+  focusOnboarding?: boolean;
   hasGoals: boolean;
   onboarding: OnboardingChecklistState & { historyLoading: boolean; ready: boolean };
   selectedCategoryLabel: string;
@@ -104,11 +107,20 @@ export function GoalsScreenContent({
   onGoToProgress: (id: string) => void;
 }) {
   const { t } = useTranslation();
+  const onboardingRef = useRef<HTMLDivElement | null>(null);
   const showInitialLoading = loading && goals.length === 0;
   const showOnboarding = onboarding.ready && !onboarding.isComplete;
   const showFilteredEmpty = goals.length === 0 && hasGoals;
   const showTrueEmpty = goals.length === 0 && !hasGoals;
   const onboardingReward = rewards.find((item) => item.sourceKey === "onboarding_completion") ?? null;
+
+  useEffect(() => {
+    if (!focusOnboarding || !showOnboarding) {
+      return;
+    }
+
+    onboardingRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
+  }, [focusOnboarding, showOnboarding]);
 
   if (showInitialLoading) {
     return <AppLoader fullScreen />;
@@ -150,7 +162,11 @@ export function GoalsScreenContent({
         </div>
       )}
 
-      {showOnboarding && <OnboardingCard state={onboarding} reward={onboardingReward} />}
+      {showOnboarding && (
+        <div ref={onboardingRef}>
+          <OnboardingCard state={onboarding} reward={onboardingReward} />
+        </div>
+      )}
     </div>
   );
 }

@@ -18,6 +18,7 @@ export default function GoalsScreen() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const focusId = searchParams.get("id");
+  const focusOnboarding = searchParams.get("onboarding") === "1";
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
 
   const {
@@ -127,6 +128,7 @@ export default function GoalsScreen() {
           goals={filteredGoals}
           rewards={rewards}
           focusId={focusId}
+          focusOnboarding={focusOnboarding}
           hasGoals={goals.length > 0}
           onboarding={onboarding}
           selectedCategoryLabel={selectedCategoryLabel}
