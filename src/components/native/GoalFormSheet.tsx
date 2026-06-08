@@ -289,7 +289,6 @@ export function GoalFormSheet({
         <ProgressFieldsSection currentValue={currentValue} targetValue={targetValue} onChangeCurrentValue={setCurrentValue} onChangeTargetValue={setTargetValue} />
       ) : (
         <>
-          <TaskXpTargetSection taskXpTarget={taskXpTarget} totalTaskXp={totalTaskXp} onChangeTaskXpTarget={setTaskXpTarget} />
           <TasksSection
             tasks={tasks}
             newTaskTitle={newTaskTitle}
@@ -306,6 +305,7 @@ export function GoalFormSheet({
             onChangeNewSubTaskXp={(taskId, value) => setNewSubTaskXps((current) => ({ ...current, [taskId]: value }))}
             onAddSubTask={addSubTask}
           />
+          <TaskXpTargetSection taskXpTarget={taskXpTarget} totalTaskXp={totalTaskXp} onChangeTaskXpTarget={setTaskXpTarget} />
         </>
       )}
     </FormSheetLayout>

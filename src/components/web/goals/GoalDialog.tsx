@@ -401,24 +401,6 @@ export function GoalDialog({
 
       {goalType === "TASK" && (
         <div className="space-y-4">
-          <div className="grid gap-4 sm:grid-cols-2">
-            <div className="space-y-2">
-              <Label htmlFor="taskXpTarget">{t("goals.dialog.task_xp_target_label")}</Label>
-              <Input
-                id="taskXpTarget"
-                type="number"
-                min={0}
-                max={totalTaskXp}
-                value={taskXpTarget}
-                onChange={(e) => setTaskXpTarget(e.target.value)}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="taskXpTotal">{t("goals.dialog.task_xp_total_label")}</Label>
-              <Input id="taskXpTotal" value={String(totalTaskXp)} readOnly />
-            </div>
-          </div>
-
           <div className="space-y-3">
             <Label>{t("goals.dialog.tasks_label")}</Label>
 
@@ -471,6 +453,24 @@ export function GoalDialog({
             </div>
 
             {tasks.length === 0 && <p className="py-4 text-center text-muted-foreground">{t("goals.dialog.empty_tasks")}</p>}
+          </div>
+
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div className="space-y-2">
+              <Label htmlFor="taskXpTarget">{t("goals.dialog.task_xp_target_label")}</Label>
+              <Input
+                id="taskXpTarget"
+                type="number"
+                min={0}
+                max={totalTaskXp}
+                value={taskXpTarget}
+                onChange={(e) => setTaskXpTarget(e.target.value)}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="taskXpTotal">{t("goals.dialog.task_xp_total_label")}</Label>
+              <Input id="taskXpTotal" value={String(totalTaskXp)} readOnly />
+            </div>
           </div>
         </div>
       )}
