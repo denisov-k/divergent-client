@@ -50,7 +50,7 @@ export function OnboardingCard({
   }
 
   return (
-    <Card className="bg-background">
+    <Card className="mx-auto w-full max-w-2xl bg-background">
       <CardContent className="flex flex-col gap-4 py-4">
         <div className="flex items-start justify-between gap-3">
           <div className="space-y-1">
@@ -81,12 +81,12 @@ export function OnboardingCard({
                     <div className="size-4 rounded-full border-2 border-muted-foreground/30" />
                   )}
                 </div>
-                <div className="min-w-0">
-                  <div className="flex items-start justify-between gap-3">
+                <div className="min-w-0 flex-1 w-full">
+                  <div className="flex w-full items-start gap-3">
                     <div className="min-w-0 flex-1">
                       <div className="font-medium">{t(meta.titleKey)}</div>
                     </div>
-                    <Badge variant="secondary" className="shrink-0 whitespace-nowrap bg-emerald-100 text-emerald-700">
+                    <Badge variant="secondary" className="ml-auto shrink-0 whitespace-nowrap bg-emerald-100 text-emerald-700">
                       +{STEP_XP} {t("common.xp")}
                     </Badge>
                   </div>

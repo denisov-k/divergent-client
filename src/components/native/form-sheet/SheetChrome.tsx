@@ -7,6 +7,10 @@ export function useSheetDragToClose(open: boolean, onClose: () => void) {
   const translateY = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
+    if (!open) {
+      return;
+    }
+
     translateY.stopAnimation();
     translateY.setValue(0);
   }, [open, translateY]);
